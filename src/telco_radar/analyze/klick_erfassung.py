@@ -8,13 +8,17 @@ Datum stammen aus der Datei. HTTP 202, 4xx oder eine Challenge heißen Sperre, a
 andere Störung. Ein gelesener, veralteter oder datumloser Lauf hat keinen Grund.
 
 Trägt der Eintrag einer Datei von heute ``nicht_im_angebot`` (``klickrohsatz``: alle
-Übersichten ganz gelesen, das Gerät in keiner), bekommt jedes dieser Geräte den Satz
+Übersichten ganz gelesen, das Gerät in keiner), bekommt jedes dieser Geräte, dessen
+Klasse die Übersichten abdecken (``uebersicht_klassen``), den Satz
 „Bei Telekom nicht im Angebot (Übersicht vom 09.10.2026 ganz gelesen)“ unter dem
 Schlüssel ``Anbieter|device_id`` (``TRENNER``); ``fuer_modell`` gibt ihn dem Modell
 mit dieser Geräte-ID statt eines Anbietergrundes. Ebenso bekommt jedes Gerät, das ein
 Lauf von heute gelesen hat (``speicher_gelesen``), gestört oder nicht, den Satz „Bei
-Telekom nur mit 256 GB gelesen (10.10.2026)“: ein Modell mit anderem Speicher fehlt
-dort, weil die Übersicht je Gerät einen Speicher zeigt, nicht weil die Seite sperrt.
+Telekom noch nicht erfasst (gelesen: 256 GB, 10.10.2026)“: ein Modell mit anderem
+Speicher fehlt dort, weil die Übersicht je Gerät einen Speicher zeigt, nicht weil die
+Seite sperrt. Der Satz benennt die Messlücke, nicht den Stand des Sortiments („nur mit
+256 GB gelesen“ las sich wie eine Lücke: o2 iPhone Air 512 GB ist in Space Schwarz
+bestellbar, Stichprobe 10.11.2026).
 
 Diese drei Sätze sind Lückenbelege und gelten nur mit Datum, höchstens
 ``BELEG_MAX_TAGE`` alt (``beleg_gilt``), und nur ohne Widerspruch des Radars
@@ -22,7 +26,7 @@ Diese drei Sätze sind Lückenbelege und gelten nur mit Datum, höchstens
 braucht zusätzlich eine Seite, die eine gesperrte Option von einer Option in anderer
 Farbe unterscheidet (``sperre_eindeutig``): Telekom las das Pixel 11 in Frost, dort ist
 512 GB gesperrt, in Obsidian bestellbar (Stichprobe 10.11.2026). Was daran fehlt, ist
-eine Messlücke („nur … gelesen“, „Noch nicht erfasst“), keine Portfolio-Lücke.
+eine Messlücke („Noch nicht erfasst“), keine Portfolio-Lücke.
 """
 
 from __future__ import annotations
@@ -31,6 +35,7 @@ import re
 from datetime import date
 from typing import NamedTuple
 
+from ..geraete_klasse import geraeteklasse
 from ..klick_vertrag import (
     CHALLENGE_STATUS,
     FEHLER_AB_STATUS,
@@ -47,7 +52,7 @@ _HTTP = re.compile(r"HTTP (\d{3})")
 SATZ_NICHT_IM_ANGEBOT = (
     "Bei {anbieter} nicht im Angebot (Übersicht vom {datum} ganz gelesen)"
 )
-SATZ_SPEICHER = "Bei {anbieter} nur mit {speicher} gelesen ({datum})"
+SATZ_SPEICHER = "Bei {anbieter} noch nicht erfasst (gelesen: {speicher}, {datum})"
 SATZ_SPEICHER_ANGEBOT = "Bei {anbieter} nur mit {speicher} im Angebot ({datum})"
 TRENNER = "|"
 BELEG_MAX_TAGE = FRISCHEGRENZE_TAGE
@@ -145,10 +150,14 @@ def je_anbieter_vereint(dateien: list[dict]) -> list[dict]:
 
 
 def nicht_im_angebot(eintrag: dict) -> dict[str, str]:
-    """Je Gerät außerhalb ganz gelesener Übersichten von heute sein Satz."""
+    """Je Gerät außerhalb ganz gelesener Übersichten von heute sein Satz, aber nur für
+    die Klassen, die diese Übersichten abdecken (``uebersicht_klassen`` des Eintrags,
+    ``geraete_klasse``): die Smartphone-Übersicht belegt nichts über AirPods."""
     geraete = eintrag.get("nicht_im_angebot")
     if eintrag.get("alter_tage") != 0 or not isinstance(geraete, list):
         return {}
+    abgedeckt = set(eintrag.get("uebersicht_klassen") or [])
+    geraete = [g for g in geraete if geraeteklasse(g) in abgedeckt]
     anbieter = str(eintrag.get("anbieter"))
     datum = date.fromisoformat(str(eintrag.get("datum"))).strftime("%d.%m.%Y")
     satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter=anbieter, datum=datum)

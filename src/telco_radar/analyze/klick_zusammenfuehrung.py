@@ -47,7 +47,11 @@ from pathlib import Path
 from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE, ORDNER, lies_ergebnisse
 from ..collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
 from ..collect.geraete.klickrohsatz import QUELLE, ZUSTAND_NEU, tarifschluessel
-from ..collect.geraete.klickziele import geplante_anbieter, karten_mit_farbmarke
+from ..collect.geraete.klickziele import (
+    geplante_anbieter,
+    karten_mit_farbmarke,
+    uebersicht_klassen,
+)
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
@@ -173,9 +177,16 @@ def zusammenfuehren(
         return Zusammenfuehrung(list(adapter))
     ergebnisse, unlesbar = lies_ergebnisse(ordner)
     geplant = geplante_anbieter(root)
-    farbe = karten_mit_farbmarke(root)
     return fuehre_zusammen(
-        adapter, ergebnisse, katalog, heute, geraet, unlesbar, geplant, farbe
+        adapter,
+        ergebnisse,
+        katalog,
+        heute,
+        geraet,
+        unlesbar,
+        geplant,
+        karten_mit_farbmarke(root),
+        uebersicht_klassen(root),
     )
 
 
@@ -188,14 +199,18 @@ def fuehre_zusammen(
     unlesbar: Iterable[str] = (),
     geplant: list[str] | None = None,
     farbmarke: frozenset[str] = frozenset(),
+    klassen: Mapping[str, frozenset[str]] | None = None,
 ) -> Zusammenfuehrung:
     """Klick-Sätze ersetzen Adaptersätze mit gleichem Schlüssel (siehe Modulkopf).
-    ``farbmarke``: Karten, die „nur in anderer Farbe“ erkennen (``_datei``)."""
+    ``farbmarke``: Karten, die „nur in anderer Farbe“ erkennen; ``klassen``: je Anbieter
+    die Klassen seiner Übersichten (``klickziele.uebersicht_klassen``, ``_datei``)."""
     eintraege: list[dict] = []
     saetze: list[dict] = []
     ohne_tarif: list[dict] = []
     for daten in ergebnisse:
-        eintrag, aus_datei, geraetepreise = _datei(daten, katalog, heute, farbmarke)
+        eintrag, aus_datei, geraetepreise = _datei(
+            daten, katalog, heute, farbmarke, klassen
+        )
         eintraege.append(eintrag)
         saetze.extend(aus_datei)
         ohne_tarif.extend(geraetepreise)
@@ -274,11 +289,17 @@ def alter_tage(datum: object, heute: str) -> int | None:
 
 
 def _datei(
-    daten: dict, katalog: Katalog, heute: str, farbmarke: frozenset[str] = frozenset()
+    daten: dict,
+    katalog: Katalog,
+    heute: str,
+    farbmarke: frozenset[str] = frozenset(),
+    klassen: Mapping[str, frozenset[str]] | None = None,
 ) -> tuple[dict, list[dict], list[dict]]:
     """Kopf einer Ergebnisdatei für die Bilanz und, wenn verwendet, ihre Rohsätze und
     Gerätepreise ohne Tarif. ``sperre_eindeutig``: die Karte der Datei unterscheidet
-    einen gesperrten Speicher von einem nur in anderer Farbe vorhandenen."""
+    einen gesperrten Speicher von einem nur in anderer Farbe vorhandenen.
+    ``uebersicht_klassen``: die Geräteklassen, die die Übersichten des Anbieters
+    abdecken; nur dafür gilt „nicht im Angebot“ (``klick_erfassung``)."""
     status = daten.get("laufstatus")
     datum = daten.get("datum")
     alter = alter_tage(datum, heute)
@@ -292,6 +313,7 @@ def _datei(
         "verwendet": False,
         "warum_nicht": None,
         "sperre_eindeutig": Path(str(daten.get("karte"))).stem in farbmarke,
+        "uebersicht_klassen": sorted((klassen or {}).get(str(daten.get("name")), ())),
     }
     if alter is None:
         eintrag["warum_nicht"] = GRUND_DATUM.format(datum=datum)

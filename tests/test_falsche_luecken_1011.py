@@ -108,7 +108,9 @@ def _erfassung(katalog, **mehr) -> dict[str, str]:
 def test_telekom_pixel_11_512_ist_keine_portfolio_luecke(katalog):
     """(1) Rot gegen origin/main: dort steht „nur mit 256 GB im Angebot“."""
     satz = fuer_modell(_erfassung(katalog), {"karten": [], "device_id": PIXEL})
-    assert satz == {"Telekom": "Bei Telekom nur mit 256 GB gelesen (09.11.2026)"}
+    assert satz == {
+        "Telekom": "Bei Telekom noch nicht erfasst (gelesen: 256 GB, 09.11.2026)"
+    }
     assert "im Angebot" not in satz["Telekom"]
 
 
@@ -278,7 +280,7 @@ def test_alter_satz_wird_zur_messluecke_in_der_zeile():
         zeilen = fehlen_im_paar(modell, satz, "m", 24, {}, 24)
         return {z["anbieter"]: z["kurz"] for z in zeilen}["congstar"]
 
-    assert zeile("2026-11-09") == "Nur mit 256 GB gelesen"
+    assert zeile("2026-11-09") == f"{NOCH_NICHT_ERFASST} (gelesen: 256 GB)"
     assert zeile("2026-11-12") == NOCH_NICHT_ERFASST
 
 

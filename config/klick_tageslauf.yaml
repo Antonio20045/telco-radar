@@ -59,6 +59,12 @@
 # MagentaMobil-Tarife, M zuerst (Pitch 4, Schnitt 3). 1&1: Tarifdetail-Seiten mit
 # dem Anschlusspreis je Tarif, eigene Lesart (`klickuebersicht.LESARTEN`).
 #
+# `uebersicht_klassen` (Telekom, 1&1): welche Geräteklassen (telefon, tablet, uhr, audio;
+# `geraete_klasse`) die Übersichten des Anbieters abdecken. „Bei … nicht im Angebot
+# (Übersicht ganz gelesen)“ gilt nur für eine abgedeckte Klasse; die Smartphone-Übersicht
+# belegt nichts über Zubehör, Tablets oder Uhren (AirPods 5 bei Telekom, 144 EUR im
+# Zubehörshop, Stichprobe 10.11.2026). Alles andere ist „Noch nicht erfasst“.
+#
 # Vodafone: die Produktseite wählt den Tarif nicht; die Karte klickt „Zur
 # Tarifauswahl“ und dort jeden Tarif (`weiter.klicken: tarif`, seit 242d23c3).
 # Lücke `tarif_unbekannt` bleibt nur, wenn die Tarifauswahl keinen Tarif liefert.
@@ -1670,6 +1676,7 @@ anbieter:
 
   - schluessel: 1und1
     name: 1&1
+    uebersicht_klassen: [telefon]
     # Tarifdetail-Seiten je Tarif mit Smartphone (Einstiege `kind: klick` in
     # config/geraete_quellen.yaml, wörtlich die data-iframe-Adressen der
     # Tarifübersichten vom 29.09.2026, ohne Unlimited XS „Ohne Handy“). Gelesen
@@ -1812,6 +1819,7 @@ anbieter:
   # nicht hintereinander stehen.
   - schluessel: telekom
     name: Telekom
+    uebersicht_klassen: [telefon]
     seitenabstand_sekunden: 60
     uebersichten:
       - https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791

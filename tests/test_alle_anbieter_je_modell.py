@@ -73,7 +73,7 @@ def test_nur_mit_anderem_speicher_gelesen_steht_kurz_an_der_zeile():
         )
     }
     (zeile,) = fehlzeilen([_luecke("Telekom")], {}, 24, erfassung)
-    assert zeile["kurz"] == "Nur mit 256 GB gelesen"
+    assert zeile["kurz"] == f"{NOCH_NICHT_ERFASST} (gelesen: 256 GB)"
     assert zeile["satz"] == erfassung["Telekom"]
 
 
