@@ -71,7 +71,6 @@ from ..tco_model import zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_band, geraete_tco_karten
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
-from .geraete_tarifwelt_lage import ohne_lieferndes
 from .geraete_zeitraum_wort import grund_anderer_zeitraum, zeitraum_der_karte
 
 NETZ_WETTBEWERBER = tuple(
@@ -86,6 +85,7 @@ STATUS_VERGLEICHBAR = "vergleichbar"
 STATUS_BAND_MISMATCH = "band_mismatch"
 STATUS_KEIN_BUENDEL = "kein_buendel"
 STATUS_NICHT_VERGLEICHBAR = "nicht_vergleichbar"
+
 
 SICHTBAR_MAX = 15
 HAENDLER_SICHTBAR_MAX = 6
@@ -924,9 +924,7 @@ def nicht_erhebbar(quellenlage: dict) -> list[dict]:
     config/geraete_quellen.yaml) - keine zweite Einschätzung."""
     out = []
     for z in (quellenlage or {}).get("zeilen", []):
-        if (z.get("typ") or "") != "handel":
-            continue
-        if z.get("zustand") == "liefert":
+        if (z.get("typ") or "") != "handel" or z.get("zustand") == "liefert":
             continue
         out.append(
             {
@@ -966,6 +964,8 @@ def radar(
         tco.get("modelle", []), band_je_tarif, _band_rang(tco.get("baender_katalog"))
     )
     haendler = haendler_zeilen(vergleich_ohne_vertrag)
+    from .geraete_tarifwelt_lage import ohne_lieferndes
+
     fehlt = ohne_lieferndes(nicht_erhebbar(quellenlage), quellenlage, tco)
     hat_vergleichbare = any(
         z["prozent"] is not None for g in gruppen for z in g["zeilen"]
