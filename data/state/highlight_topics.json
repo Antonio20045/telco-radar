@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-10",
+ "updated": "2026-11-11",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -1025,6 +1025,64 @@
     }
    ],
    "ended": "2026-11-08"
+  },
+  {
+   "slug": "disney-startet-guenstigeres-werbe-abo-in-europa",
+   "title": "Disney+ startet günstigeres Werbe-Abo in Europa",
+   "description": "Der Streamingdienst Disney+ führt in mehreren Ländern eine günstigere Abo-Variante mit Werbung ein, um preissensible Kundinnen und Kunden zu gewinnen.",
+   "keywords": [
+    "Disney+",
+    "Werbe-Abo",
+    "Standard mit Werbung",
+    "Streaming",
+    "Österreich",
+    "Polen"
+   ],
+   "first_seen": "2026-11-11",
+   "last_active": "2026-11-11",
+   "runs_ohne_zuwachs": 0,
+   "status": "aktiv",
+   "items": [
+    {
+     "url": "https://www.broadbandtvnews.com/2026/11/11/disney-launches-ad-supported-subscription-tier-in-austria/",
+     "title": "Disney+ launches ad-supported subscription tier in Austria",
+     "headline": "Disney+ startet werbefinanziertes Standard-Abo in Österreich für sechs Euro",
+     "summary": "Disney+ hat in Österreich das neue werbefinanzierte Abo 'Standard mit Werbung' für 6,99 Euro pro Monat eingeführt. Zum Start vom 11. bis 24. November 2026 gilt ein Sonderpreis von 4,99 Euro für die ersten drei Monate.",
+     "operator": "Disney+",
+     "source": "Broadband TV News",
+     "date": "2026-11-11",
+     "week": "2026-11-11",
+     "relevance": 4,
+     "image": "5292b6651a918be9-1280.jpg",
+     "image_w": 900,
+     "image_h": 506
+    },
+    {
+     "url": "https://www.telepolis.pl/rozrywka/telewizja-i-vod/tyle-zaplacimy-w-polsce-za-disney-plus-z-reklamami",
+     "title": "Tyle zapłacimy w Polsce za Disney+ z reklamami",
+     "headline": "Disney+ startet werbefinanziertes Abo für 24,99 zł",
+     "summary": "Disney führt im November 2026 eine neue, günstigere Abo-Stufe mit Werbung ein, die in Polen 24,99 zł pro Monat kosten wird.",
+     "operator": "Disney",
+     "source": "Telepolis (Polen)",
+     "date": "2026-11-03",
+     "week": "2026-11-03",
+     "relevance": 4,
+     "image": "6ad915f5543c486c-1280.jpg",
+     "image_w": 1280,
+     "image_h": 768
+    },
+    {
+     "url": "https://www.adslzone.net/noticias/streaming-tv/promocion-disneystreaming-tv/promocion-disney-plus-24-noviembre/",
+     "title": "Corre a pillar Disney+: rebaja sus tres planes y la oferta desaparece en pocos días",
+     "headline": "Disney+ startet zeitlich begrenzten Rabatt auf alle Streaming-Pläne",
+     "summary": "Disney+ bietet seine Abos Standard mit Werbung für 4,99 Euro, Standard ohne Werbung für 7,99 Euro und Premium für 10,99 Euro pro Monat für die Dauer von zwei Monaten an, wobei die Aktion am 24. November endet.",
+     "operator": "Disney+",
+     "source": "",
+     "date": "",
+     "week": "2026-11-11",
+     "relevance": 4
+    }
+   ]
   }
  ]
 }

@@ -1,6 +1,156 @@
 {
- "stand": "2026-11-10",
+ "stand": "2026-11-11",
  "videos": [
+  {
+   "id": "zjQ_O2srSRM",
+   "titel": "KI-Update kompakt: Nvidia-Affäre, Coding-Agenten, Gemini 4 Carbon, Muse Ember",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1152,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "zjQ_O2srSRM.jpg"
+  },
+  {
+   "id": "uND6iY2qp_c",
+   "titel": "AlphaGenome 2: Teaching AI to read the entire human genome",
+   "kanal": "Google DeepMind",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 2387,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "uND6iY2qp_c.jpg"
+  },
+  {
+   "id": "shpOEg__ICo",
+   "titel": "Google AI Studio Voice Generator – Text to Speech Tutorial",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 345,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "shpOEg__ICo.jpg"
+  },
+  {
+   "id": "pvl3z_GyU2Y",
+   "titel": "He Built an AI System That Runs His Entire Business",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1664,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "pvl3z_GyU2Y.jpg"
+  },
+  {
+   "id": "pIW_8VyvCuQ",
+   "titel": "Build What’s Next on the ChatGPT Platform with Plugins | DevDay 2026",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1665,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "pIW_8VyvCuQ.jpg"
+  },
+  {
+   "id": "jDxKzlGLCas",
+   "titel": "Building with GPT-Live and Image Generation | DevDay 2026",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1358,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "jDxKzlGLCas.jpg"
+  },
+  {
+   "id": "b7l_Dhe1h8M",
+   "titel": "Harness-as-a-Service: Building with the Agents API | DevDay 2026",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1185,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "b7l_Dhe1h8M.jpg"
+  },
+  {
+   "id": "Xtb3Pua0e8s",
+   "titel": "The New Ring Camera Flies Around Your House",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 109,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Xtb3Pua0e8s.jpg"
+  },
+  {
+   "id": "U1IVZy9FhVQ",
+   "titel": "What Will You Build With Coding Agents That Don’t Quit? | DevDay 2026",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1629,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "U1IVZy9FhVQ.jpg"
+  },
+  {
+   "id": "QRm7VNMnurA",
+   "titel": "Sites and the Next Generation of Web Apps | DevDay 2026",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1248,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "QRm7VNMnurA.jpg"
+  },
+  {
+   "id": "NuL5VFS8Prs",
+   "titel": "The $6B Binance heist, Meta’s AI bug tests and looming quantum deadlines",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1947,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "NuL5VFS8Prs.jpg"
+  },
+  {
+   "id": "Mt54ez7xsiI",
+   "titel": "Fable 5.2 Is Quite Insane!",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 112,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Mt54ez7xsiI.jpg"
+  },
+  {
+   "id": "LoQ9B3EWl_U",
+   "titel": "Lokale KI: So siehts aus",
+   "kanal": "c't 3003",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 37,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "LoQ9B3EWl_U.jpg"
+  },
+  {
+   "id": "6e9Spy9JgGs",
+   "titel": "KI-Update kompakt: Nvidia-Affäre, Coding-Agenten, Gemini 4 Carbon, Muse Ember",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 1112,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "6e9Spy9JgGs.jpg"
+  },
+  {
+   "id": "5M6mKitVrDQ",
+   "titel": "Noch viermal singen",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 60,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "5M6mKitVrDQ.jpg"
+  },
   {
    "id": "vug73goPJaM",
    "titel": "Is Software Over?",
@@ -30,6 +180,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "sSyzj08Cy2U.jpg"
+  },
+  {
+   "id": "isqwXApzV5E",
+   "titel": "When you give a humanoid roller skates",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 91,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "isqwXApzV5E.jpg"
   },
   {
    "id": "ZTxzWJeGFAA",
@@ -63,7 +223,7 @@
   },
   {
    "id": "N-Fj9h6Detw",
-   "titel": "3 Excel Dashboards You Won't Believe Are Possible",
+   "titel": "3 Modern Excel Dashboards Your Boss Has Never Seen",
    "kanal": "Leila Gharani",
    "datum": "2026-11-10",
    "dauer_sekunden": 731,
@@ -112,6 +272,16 @@
    "bild": "9Hwanevuhd8.jpg"
   },
   {
+   "id": "583ThJIqQ7k",
+   "titel": "Fable 5.2: The Self-Improvement Loop Keeps Loopin’ … (plus Gemini Carbon)",
+   "kanal": "AI Explained",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 1901,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "583ThJIqQ7k.jpg"
+  },
+  {
    "id": "4uvq8Cz3A7Y",
    "titel": "What Is Model Distillation? How Smaller AI Models Learn",
    "kanal": "IBM Technology",
@@ -130,263 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "1vUnEBsooCo.jpg"
-  },
-  {
-   "id": "frXyEsq-qao",
-   "titel": "You’ve Tried ChatGPT. But Have You Tried Grok?",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 45,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "frXyEsq-qao.jpg"
-  },
-  {
-   "id": "eqyIoewhFzQ",
-   "titel": "KI-Update kompakt: Rechenzentren, Propaganda, Siri AI, Minecraft",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 1143,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "eqyIoewhFzQ.jpg"
-  },
-  {
-   "id": "RcvjZlq12kU",
-   "titel": "Unser gesamtes Firmenwissen! (Stand 2026)",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 42,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "RcvjZlq12kU.jpg"
-  },
-  {
-   "id": "GpZ5T51jE4U",
-   "titel": "Spec-Driven Development vs. Waterfall: What's Different for AI Coding?",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 458,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "GpZ5T51jE4U.jpg"
-  },
-  {
-   "id": "F6QzzhQ8F5M",
-   "titel": "Wie viele Issues kriege ich für $2700 gefixt?",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 1320,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "F6QzzhQ8F5M.jpg"
-  },
-  {
-   "id": "5x8eHMBj0Rk",
-   "titel": "KI-Update kompakt: Rechenzentren, Propaganda, Siri AI, Minecraft - KI-Update – ein heise-Podcast",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 1075,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "5x8eHMBj0Rk.jpg"
-  },
-  {
-   "id": "4vCbQMUVV-I",
-   "titel": "New Microsoft Copilot Harness | More power, token efficiency & control for agents in Foundry",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 879,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "4vCbQMUVV-I.jpg"
-  },
-  {
-   "id": "45-qbcAeUbM",
-   "titel": "More skills = worse agents (do this instead)",
-   "kanal": "David Ondrej",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 2545,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "45-qbcAeUbM.jpg"
-  },
-  {
-   "id": "2TM8W66NI_8",
-   "titel": "Anthropic's Fable 5.2 is the World’s Best AI Model",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-09",
-   "dauer_sekunden": 1247,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "2TM8W66NI_8.jpg"
-  },
-  {
-   "id": "v0q266zAQ9M",
-   "titel": "Es ist passiert: Die KI-Blase platzt in Amerika! DAS musst du jetzt wissen | KI-NEWS",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-08",
-   "dauer_sekunden": 1618,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "v0q266zAQ9M.jpg"
-  },
-  {
-   "id": "jKjir4-HmQI",
-   "titel": "This controls games characters AND robots",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-08",
-   "dauer_sekunden": 74,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "jKjir4-HmQI.jpg"
-  },
-  {
-   "id": "H_GJapsoLyU",
-   "titel": "Why AI Models Run Faster on Some Chips: The KV Cache Effect",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-08",
-   "dauer_sekunden": 601,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "H_GJapsoLyU.jpg"
-  },
-  {
-   "id": "w3z3Fa7ACt8",
-   "titel": "That is Some Crazy Fabric",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-07",
-   "dauer_sekunden": 71,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "w3z3Fa7ACt8.jpg"
-  },
-  {
-   "id": "us6SRuWuqWc",
-   "titel": "The Ultimate Linux Tutorial for AI Agents (watch before 2027)",
-   "kanal": "David Ondrej",
-   "datum": "2026-11-07",
-   "dauer_sekunden": 1528,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "us6SRuWuqWc.jpg"
-  },
-  {
-   "id": "Vpl7e3yZtnk",
-   "titel": "Das hat mich einen ganzen Tag gekostet...",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-11-07",
-   "dauer_sekunden": 723,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "Vpl7e3yZtnk.jpg"
-  },
-  {
-   "id": "GJ6PMUm5oTA",
-   "titel": "OpenAI's Astra Just Opened The Black Box Of AI",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-11-07",
-   "dauer_sekunden": 349,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "GJ6PMUm5oTA.jpg"
-  },
-  {
-   "id": "A5SfzBD6M3o",
-   "titel": "Claude Code Just Called My Phone",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-07",
-   "dauer_sekunden": 67,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "A5SfzBD6M3o.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-10",
-   "abgerufen": "2026-11-10"
+   "versucht": "2026-11-11",
+   "abgerufen": "2026-11-11"
   }
  },
  "error": null
