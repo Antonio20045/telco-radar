@@ -294,20 +294,14 @@
     <button type="button" data-zeitfenster="{{ wert }}" aria-pressed="{{ 'true' if wert == '30t' else 'false' }}">{{ titel }}</button>
     {% endfor %}
   </div>
-  {# data-modell/-band stehen nur im Server-First-Paint (wie data-modell
-     der Fragment-Lager, geraete_zeitreihe_fragment.html.j2) - setzeGraph()
-     montiert beim Clientwechsel nur die KINDER des Fragment-Blocks, kein
-     Wrapper; ein Test ohne Browser (reines BeautifulSoup) braucht trotzdem
-     eine Stelle, die das Startmodell nennt, seit Auflage 1 (PR Nr. 100,
-     12.11.2026) den Antwort-Satz dafuer nicht mehr hat. #}
-  <div class="gr-zr-gruppe" id="gr-zr-gruppe" data-modell="{{ zr.start_block.modell }}" data-band="{{ zr.start_block.band }}">{{ paarblock(zr.start_block) }}</div>
+  <div class="gr-zr-gruppe" id="gr-zr-gruppe">{{ paarblock(zr.start_block) }}</div>
   {# P1/A2 (17.09.2026): EIN Klick-Panel unter dem Graph. app.js setzt hier
-     bei Klick auf einen Kurvenpunkt (unsichtbare Fläche .gr-zr-hit) das
-     fertige <template> genau dieser Messung ein (content.cloneNode - reine
-     Montage, keine Client-Rechnung). Der Container steht BEWUSST außerhalb
-     des Montagepunkts #gr-zr-gruppe: setzeGraph() leert die Gruppe bei
-     jedem Modellwechsel, das Panel schließt app.js dort selbst, statt mit
-     dem Block verschwinden zu müssen. #}
+     bei Klick auf einen Kurvenpunkt (unsichtbare Fläche .gr-zr-hit) oder die
+     PREISZAHL im Antwort-Satz das fertige <template> genau dieser Messung
+     ein (content.cloneNode - reine Montage, keine Client-Rechnung). Der
+     Container steht BEWUSST außerhalb des Montagepunkts #gr-zr-gruppe:
+     setzeGraph() leert die Gruppe bei jedem Modellwechsel, das Panel schließt
+     app.js dort selbst, statt mit dem Block verschwinden zu müssen. #}
   <div class="gr-zr-panel" id="gr-zr-panel" hidden></div>
   {% elif m %}
   {# Paare ohne Serie: der ehrliche Leer-Satz an derselben Stelle. Hat das

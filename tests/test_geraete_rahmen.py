@@ -77,20 +77,22 @@ def test_der_waechter_prueft_wirklich_etwas(tmp_path):
     assert gefunden["Referenzrechnung, kein Angebot"] >= 1, gefunden
 
 
-def test_wie_gerechnet_und_so_gerechnet_sind_beide_weg(tmp_path):
-    """E2 (§3.1, Antonio 16.09.): 'Wie gerechnet?' ist ENDE. Pruefung
-    PR #100, Auflage 1 (12.11.2026) nimmt auch den EINEN Rechenschafts-
-    Aufklapper 'So gerechnet' unter dem (ebenfalls entfernten) Antwort-
-    Satz - was bleibt, ist der Rechenweg je Bündel-Zeile (b) und der
-    Fuss-Aufklapper (c): genau zwei Aufklapper-Typen, kein dritter im
-    Lesefluss."""
+def test_wie_gerechnet_ist_weg_so_gerechnet_steht_genau_einmal(tmp_path):
+    """E2 (§3.1, Antonio 16.09.): 'Wie gerechnet?' ist ENDE - was bleibt,
+    ist der EINE Rechenschafts-Aufklapper 'So gerechnet' unter dem
+    Antwort-Satz des Startzustands. Dazu der Rechenweg je Bündel-Zeile
+    (b) und der Fuss-Aufklapper (c): genau drei Aufklapper-Typen, kein
+    vierter im Lesefluss."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     assert "Wie gerechnet?" not in tafel.get_text(" ")
-    assert tafel.select("details.gr-zr-rechnung") == [], (
-        'der "So gerechnet"-Aufklapper steht noch'
+    rechnung = tafel.select("details.gr-zr-rechnung")
+    assert len(rechnung) == 1, (
+        f"{len(rechnung)} Rechenschafts-Aufklapper statt genau einem"
     )
-    assert tafel.select_one(".gr-zr-antwort") is None, "der Antwort-Satz steht noch"
+    assert rechnung[0].select_one("summary").get_text(strip=True) == "So gerechnet"
+    assert "Alles über 24 Monate" in rechnung[0].get_text(" ")
+    assert "TCO-24" not in rechnung[0].get_text(" ")
     assert tafel.select_one("#gr-tco-wie") is None
 
 

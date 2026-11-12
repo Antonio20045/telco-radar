@@ -91,26 +91,13 @@ def _brauchbar(karte: dict) -> bool:
     )
 
 
-@pytest.fixture(scope="module")
-def bloecke(tmp_path_factory) -> list[tuple[tuple, str]]:
-    """Pruefung PR #100, Auflage 1 (12.11.2026): der Antwort-Satz steht nicht
-    mehr im gerenderten Fragment - er ist mit der "So gerechnet"-Zeile von
-    der Seite genommen. Die Notbremse braucht ihn hier nur als DATEN, nicht
-    als Markup, und liest ihn deshalb wie `karten`/`fehlen` direkt aus
-    `geraete_view.aufbereiten()` - derselbe Wert, den der Server bis dahin
-    nur zusaetzlich gerendert hat."""
-    zustand = tmp_path_factory.mktemp("notbremse-zr-bloecke") / "state"
-    shutil.copytree(ZUSTAND, zustand)
-    wurzel = lese_wurzel()
-    geraete = geraete_view.aufbereiten(
-        zustand, lade_quellen(wurzel), lade_katalog(wurzel), heute=HEUTE
-    )
+def _bloecke(fragment: BeautifulSoup) -> list[tuple[tuple, str]]:
     return [
         (
-            (p["modell"], p["band"], p["laufzeit"]),
-            BeautifulSoup(p["antwort_html"], "html.parser").decode(),
+            (b["data-modell"], b["data-band"], int(b["data-laufzeit"])),
+            b.select_one(".gr-zr-antwort").decode(),
         )
-        for p in geraete["zeitreihe"]["paare"]
+        for b in fragment.select(".gr-zr-lager")
     ]
 
 
@@ -123,9 +110,10 @@ def _sieger(antwort: str, karten: list) -> list[dict]:
     return [k for k in karten if k.get("gesamt") == _euro(betrag.group(1))]
 
 
-def test_sieger_der_zeitreihe_zaehlt(bloecke, karten):
+def test_sieger_der_zeitreihe_zaehlt(gerendert, karten):
+    _, fragment = gerendert
     gesperrt = []
-    for paar, antwort in bloecke:
+    for paar, antwort in _bloecke(fragment):
         traeger = _sieger(antwort, karten.get(paar, []))
         if traeger and all(not k.get("zaehlt", True) for k in traeger):
             k = traeger[0]
@@ -136,23 +124,25 @@ def test_sieger_der_zeitreihe_zaehlt(bloecke, karten):
     )
 
 
-def test_gemessene_sieger_bleiben(bloecke, karten):
+def test_gemessene_sieger_bleiben(gerendert, karten):
     """Gegenprobe: ein gemessener Sieger war schon vorher der günstigste, der
     zählt, und bleibt stehen."""
+    _, fragment = gerendert
     gemessen = {
         k["anbieter"]
-        for paar, antwort in bloecke
+        for paar, antwort in _bloecke(fragment)
         for k in _sieger(antwort, karten.get(paar, []))
         if k.get("zaehlt", True)
     }
     assert {"Vodafone", "o2", "congstar"} <= gemessen, gemessen
 
 
-def test_band_nur_mit_schaetzungen_bleibt_und_nennt_den_grund(bloecke, karten):
+def test_band_nur_mit_schaetzungen_bleibt_und_nennt_den_grund(gerendert, karten):
     """Eine Datenqualitätsheuristik schaltet nie die Navigation: das Band bleibt
     wählbar, der Satz nennt den Grund statt eines Preises."""
+    _, fragment = gerendert
     nur_gesperrt = []
-    for paar, antwort in bloecke:
+    for paar, antwort in _bloecke(fragment):
         brauchbar = [k for k in karten.get(paar, []) if _brauchbar(k)]
         if brauchbar and not any(k.get("zaehlt", True) for k in brauchbar):
             nur_gesperrt.append((paar, antwort))

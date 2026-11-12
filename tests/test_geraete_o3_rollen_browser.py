@@ -272,10 +272,10 @@ def test_der_modellwechsel_zeigt_die_eigenen_zeilen(ctx, seite, mid, erwartet):
     seite.wait_for_timeout(300)
     assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     assert _fehlzeilen(seite) == _lager_fehlzeilen(site, mid), mid
-    feld = seite.eval_on_selector("#gr-zr-suche", "e => e.value")
-    assert mid.split("-256")[0].replace("-", " ") in " ".join(feld.lower().split()), (
-        feld
-    )
+    antwort = seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
+    assert mid.split("-256")[0].replace("-", " ") in " ".join(
+        antwort.lower().split()
+    ), antwort
 
 
 def test_zurueck_zur_vorgabe_zeigt_die_vorgabezeilen(ctx, seite):
@@ -308,8 +308,8 @@ def test_der_deep_link_oeffnet_das_angegebene_modell(ctx):
         )
         s.wait_for_timeout(300)
         assert "modell=google-pixel-11-256" in s.url
-        feld = s.eval_on_selector("#gr-zr-suche", "e => e.value")
-        assert "Pixel 11" in feld, feld
+        antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
+        assert "Pixel 11" in antwort, antwort
         assert _fehlzeilen(s) == _lager_fehlzeilen(site, "google-pixel-11-256")
         assert (
             _lager_anbieter(site, "google-pixel-11-256")
@@ -793,10 +793,7 @@ def test_die_erste_balkenzeile_bleibt_ueber_der_telefon_falz(ctx):
     """11c am eigenen Maß: Untertitel + vierter Reiter kosten Höhe über
     der ersten Balkenzeile — die Leitantwort (A1) geht vor. Der Entwurfs-
     Schwester-Link ist auf dem Telefon bewusst weg (derselbe Link steht
-    als Quasi-Reiter daneben); gemessen wird, nicht behauptet. Pruefung
-    PR #100, Auflage 1 (12.11.2026): der Antwort-Satz, den dieser Test bis
-    dahin maß, ist von der Seite genommen; gemessen wird seither der
-    Graphkopf."""
+    als Quasi-Reiter daneben); gemessen wird, nicht behauptet."""
     _site, wurzel, browser = ctx
     s = browser.new_page(viewport={"width": 390, "height": 844})
     try:
@@ -807,12 +804,12 @@ def test_die_erste_balkenzeile_bleibt_ueber_der_telefon_falz(ctx):
         )
         s.wait_for_timeout(400)
         box = s.evaluate("""() => {
-          const e = document.querySelector('#tafel-tco .gr-zr-graph');
+          const e = document.querySelector('#tafel-tco .gr-zr-antwort');
           if (!e) return null;
-          return Math.round(e.getBoundingClientRect().top);
+          return Math.round(e.getBoundingClientRect().bottom);
         }""")
         assert box is not None and box <= 844, (
-            f"der Graphkopf endet bei {box} px (Falz 844)"
+            f"der Antwort-Satz endet bei {box} px (Falz 844)"
         )
     finally:
         s.close()

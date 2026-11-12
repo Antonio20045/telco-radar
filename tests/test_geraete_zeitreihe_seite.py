@@ -3,13 +3,11 @@ am gerenderten geraete.html geprueft - dieselbe Fixture wie die
 Aufbereitungs-Tests (`test_geraete_zeitreihe_ansicht`).
 
 Die Do-Not-Liste des Auftrags als Messung:
-  §4.2  EINE Wahl-Leiste (Suchfeld + Band) -> der Graph; keine
-        Unterueberschriften/Abschnitte/Erklaertext dazwischen (Pruefung
-        PR #100, Auflage 1, 12.11.2026: der Antwort-Satz und sein
-        "So gerechnet"-Aufklapper sind raus, die Zahl bleibt).
-  §3.1  GENAU ZWEI Rest-Aufklapper: Rechenweg je Anbieterzeile,
-        Fuss-Aufklapper "Massstab & Datenlage". Glossar und
-        "Wie gerechnet?" sind ENDE.
+  §4.2  EINE Wahl-Leiste (Suchfeld + Band) -> EIN Antwort-Satz -> der
+        Graph; keine Unterueberschriften/Abschnitte dazwischen.
+  §3.1  GENAU DREI Rest-Aufklapper: Rechenschaftssatz (eine Zeile unter
+        dem Antwort-Satz), Rechenweg je Anbieterzeile, Fuss-Aufklapper
+        "Massstab & Datenlage". Glossar und "Wie gerechnet?" sind ENDE.
   §3.4  Der Zeitreihen-Graph ersetzt ALLE frueheren Graph-Formen der
         Hauptansicht (Balkenliste, G1, Antwort-Leitzeilen).
 """
@@ -91,14 +89,12 @@ def test_die_balkenliste_und_die_alten_graphformen_sind_weg(tafel):
         assert tafel.select(tot) == [], f"Rest der alten Form: {tot}"
 
 
-def test_der_antwort_satz_und_sein_aufklapper_sind_fuer_auflage_1_weg(tafel):
-    """Pruefung PR #100, Auflage 1 (12.11.2026): Antonio wollte den
-    Ergebnissatz ("Beim ... am günstigsten: ...") und den "So gerechnet"-
-    Link raus. Die Leitzahl (groesste Zahl des Viewports) und der Graph
-    bleiben stehen."""
-    assert tafel.select_one(".gr-zr-antwort") is None
-    assert tafel.select_one(".gr-zr-rechnung") is None
-    assert "TCO-24" not in tafel.get_text(" ", strip=True)
+def test_die_antwort_leitzeile_ist_durch_den_antwort_satz_ersetzt(tafel):
+    antwort = tafel.select_one(".gr-zr-antwort")
+    assert antwort is not None
+    text = antwort.get_text(" ", strip=True)
+    assert "Kosten über 24 Monate" in text
+    assert "TCO-24" not in text
 
 
 def test_der_glossar_und_wie_gerechnet_sind_weg(suppe, tafel):
@@ -108,13 +104,12 @@ def test_der_glossar_und_wie_gerechnet_sind_weg(suppe, tafel):
     assert "Wie gerechnet?" not in text
 
 
-def test_zwischen_wahl_leiste_und_graph_steht_kein_erklaertext(tafel):
-    """Seit Auflage 1 (PR #100, 12.11.2026) bleibt hier hoechstens die
-    Leitzahl (.gr-zr-leit) stehen, kein Antwort-Satz mehr."""
+def test_zwischen_wahl_leiste_und_graph_steht_nur_der_antwort_satz(tafel):
     wahl = tafel.select_one(".gr-zr-wahl")
+    antwort = tafel.select_one(".gr-zr-antwort")
     graph = tafel.select_one(".gr-zr-graph")
-    assert all(e is not None for e in (wahl, graph))
-    positionen = [e.sourceline for e in (wahl, graph) if e is not None]
+    assert all(e is not None for e in (wahl, antwort, graph))
+    positionen = [e.sourceline for e in (wahl, antwort, graph) if e is not None]
     assert positionen == sorted(positionen)
     zwischen = [
         e
@@ -138,10 +133,9 @@ def test_die_wahl_leiste_traegt_suchfeld_und_band_aber_keine_kacheln(tafel):
     assert tafel.select_one("#gr-zr-kacheln") is None
 
 
-def test_kein_aufklapper_ueber_dem_graphen(tafel):
-    """§3.1: zwischen Wahl-Leiste und Graph steht KEIN Aufklapper mehr -
-    der Rechenschafts-Aufklapper ("So gerechnet") ist mit Auflage 1
-    (PR #100, 12.11.2026) weg; der Balken-Graph trug bis E2 einen
+def test_kein_weiterer_aufklapper_ueber_dem_graphen(tafel):
+    """§3.1: zwischen Wahl-Leiste und Graph steht Hoechstens der EINE
+    Rechenschafts-Aufklapper - der Balken-Graph trug bis E2 einen
     'Wie gerechnet?'-Block genau dort."""
     graph = tafel.select_one(".gr-zr-graph")
     for details in tafel.select("details"):
@@ -150,7 +144,9 @@ def test_kein_aufklapper_ueber_dem_graphen(tafel):
         vor_graph = details.sourceline < graph.sourceline if graph else False
         inhalt = " ".join(details.get_text(" ", strip=True).split())[:60]
         if vor_graph and "gr-bnd" not in (details.get("class") or []):
-            raise AssertionError(f"unerwarteter Aufklapper ueber dem Graphen: {inhalt}")
+            assert "gr-zr-rechnung" in (details.get("class") or []), (
+                f"unerwarteter Aufklapper ueber dem Graphen: {inhalt}"
+            )
 
 
 def test_der_fuss_aufklapper_tarife_ohne_geraet_ist_weg(tafel):

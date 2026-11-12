@@ -90,11 +90,14 @@ def test_der_startzustand_ist_derselbe_im_knoten_und_im_serverblock(seite):
     assert vorgabe and vorgabe in knoten["erlaubt"], (
         "die Start-Vorgabe ist kein wählbares Modell"
     )
-    gruppe = seite.select_one("#gr-zr-gruppe")
-    assert gruppe is not None, "der Server-Startblock fehlt"
-    assert gruppe.get("data-modell") == vorgabe, (
-        f"Server-Block nennt nicht das Startgeraet {vorgabe!r}: "
-        f"{gruppe.get('data-modell')!r}"
+    titel = knoten["titel"][vorgabe]
+    antwort = seite.select_one("#tafel-tco .gr-zr-antwort")
+    assert antwort is not None, "der Server-Startblock fehlt"
+    modell_stueck = (
+        " ".join(titel.split()[1:-2]) if titel.split()[-1] == "GB" else titel
+    )
+    assert modell_stueck in antwort.get_text(" ", strip=True), (
+        f"Server-Block nennt nicht das Startgeraet {titel!r}"
     )
 
 

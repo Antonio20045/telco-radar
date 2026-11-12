@@ -257,16 +257,19 @@ def test_beide_auswahlen_stehen_sichtbar_nebeneinander(_seite):
 def test_bandwechsel_schaltet_den_richtigen_graphen_sichtbar(_seite):
     """E2: statt Band-Panels umzublenden oder Balkenzeilen im Browser zu
     bauen, setzt app.js den fertigen Graph-Zustand des gewählten Bands
-    (seit Auflage 1, PR #100, 12.11.2026 ohne Antwort-Satz: Messtag-Zeile,
-    SVG) aus dem Fragment ein - derselbe Nutzereffekt, eine Quelle, keine
-    Zahl im Client."""
-    gedrueckt = _seite.eval_on_selector(
-        "#gr-zr-baender button[aria-pressed='true']", "e => e.getAttribute('data-band')"
+    (Antwort-Satz, Messtag-Zeile, SVG) aus dem Fragment ein - derselbe
+    Nutzereffekt, eine Quelle, keine Zahl im Client."""
+    antwort = _seite.eval_on_selector(
+        "#tafel-tco .gr-zr-antwort", "(e) => e.textContent"
     )
-    assert gedrueckt == "xs", gedrueckt
+    assert "XS" in antwort, antwort
 
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(400)
+    antwort = _seite.eval_on_selector(
+        "#tafel-tco .gr-zr-antwort", "(e) => e.textContent"
+    )
+    assert "M" in antwort, antwort
     knopf = _seite.eval_on_selector(
         "#gr-zr-baender button[data-band='m']", "e => e.getAttribute('aria-pressed')"
     )

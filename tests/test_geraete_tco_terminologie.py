@@ -91,15 +91,18 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
     Zeilen prüft das Fragment, ihren Modellnamen trägt sein Startmodell."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    assert tafel.select_one(".gr-zr-antwort") is None, "der Antwort-Satz steht noch"
-    graph = tafel.select_one(".gr-zr-graph")
-    assert "Kosten über 24 Monate" in (graph.get("aria-label") or "")
+    antwort = tafel.select_one(".gr-zr-antwort")
+    assert antwort is not None, "der Antwort-Satz fehlt"
+    assert "Kosten über 24 Monate" in " ".join(
+        antwort.get_text(" ", strip=True).split()
+    )
     kopie = BeautifulSoup(str(tafel), "html.parser")
     for d in kopie.select("details.gr-zr-rechnung"):
         d.decompose()
     tafel_text = kopie.get_text(" ")
     assert (
-        "TCO-24" not in tafel_text
+        "Kosten über 24 Monate" in tafel_text
+        and "TCO-24" not in tafel_text
         and "TCO-36" not in tafel_text
         and "Gesamtkosten" not in tafel_text
     )
