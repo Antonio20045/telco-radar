@@ -65,17 +65,20 @@ schleichendes Sinken prüfen vorher und bleiben gesperrt."""
 STABIL_ABSTAND_EUR = 0.005
 """Regel 11: zwei Gerätepreise gelten als gleich gelesen, wenn sie auf den Cent
 übereinstimmen."""
-STABIL_MAX_RUECKGANG = 0.35
+STABIL_MAX_RUECKGANG = 0.25
 """Regel 11: so weit darf der Gerätepreis höchstens unter dem Höchstwert liegen, damit
 ``STABIL_TAGE`` gleiche Abruftage den Referenzvergleich aufheben. Darüber bleibt die
 Quarantäne, auch wenn der Preis seit Tagen gleich gelesen wird: ein Lesefehler auf einer
 falschen Seitenvariante steht oft mehrere Tage (Telekom Motorola Edge 70 512 GB,
-30.10.-02.11.2026, -39,7 % und -49,2 %). Die Höhe stammt aus dem Replay der Prüfung von
-PR 95 über alle 524 Freigaben: Bei 35 % bleiben alle 6 falschen Zeilen gesperrt (die
-nächste liegt bei -39,7 %) und 315 der 420 echten Vodafone-Senkungen vom 12.11. werden
-frei; bei 40 % kämen 4 der falschen durch, bei 25 % blieben 225 der 420 echten gesperrt.
-Echte Senkungen reichen bis -45 % (Pixel 10a, am Original belegt), eine saubere Trennung
-gibt es also nicht; die Grenze ist der gewählte Punkt zwischen Abdeckung und Fehler."""
+30.10.-02.11.2026, -39,7 % und -49,2 %). Die Höhe stammt aus der Prüfung von PR 95
+(Abschnitte 4 und 5): bei 35 % kam der falsch gelesene Motorola-Preis zwar noch nicht
+durch, aber eine Obergrenze ohne Sicherheitsabstand zum belegten Fehler (-39,7 %) ist
+fail-closed nicht robust genug. 25 % lässt alle 6 falschen Zeilen gesperrt (Abstand zur
+nächsten falschen Zeile 14,7 Punkte) und gibt 195 der 420 echten Vodafone-Senkungen vom
+12.11. frei; die übrigen 225 reichen von 25,7 % bis 44,7 % (Pixel 10a, am Original
+belegt) und bleiben wie auf main gesperrt, bis der Höchstwert aus dem Fenster wächst.
+Eine saubere Trennung zwischen echter Senkung und Lesefehler gibt es nicht; die Grenze
+ist der gewählte Punkt zwischen Abdeckung und Fehler."""
 
 
 def _nicht(satz: str) -> Befund:
