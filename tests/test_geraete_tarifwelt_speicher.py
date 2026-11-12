@@ -20,12 +20,13 @@ def _hole_mit_speicher(api_gb: int):
         status, text = hole(url, **kw)
         if "/tariff?" in url:
             return status, text
-        if "?" not in url:
-            daten = json.loads(text)
-            for v in daten["hardware"]["variants"] + daten["hardware"]["variantFilter"]:
-                v["storage"] = api_gb
-            return status, json.dumps(daten)
-        return status, text.replace("256 GB", f"{api_gb} GB")
+        daten = json.loads(text.replace("256 GB", f"{api_gb} GB"))
+        hardware = daten.get("hardware") or {}
+        for v in (hardware.get("variants") or []) + (
+            hardware.get("variantFilter") or []
+        ):
+            v["storage"] = api_gb
+        return status, json.dumps(daten)
 
     return umgestellt, aufrufe
 
