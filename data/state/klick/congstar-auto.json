@@ -1,7 +1,7 @@
 {
  "anbieter": "congstar-auto",
- "datum": "2026-11-11",
- "dauer_sekunden": 46.4,
+ "datum": "2026-11-12",
+ "dauer_sekunden": 47.9,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -28,8 +28,8 @@
      "www.congstar.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 7.2,
-    "takte_ms": 2800,
+    "sekunden": 6.5,
+    "takte_ms": 2450,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -62,7 +62,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3615eb39b33f7f7e7f3ef4ee5203fec3b79bec2b8533bd60c352c8dc0e572932",
+      "beleg_id": "bb7c0cb1577fc56cab623e5514b3ffb85981779d8d5820fd30dd955738e95bea",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -78,12 +78,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 64,00 € (Gerät und Tarif zusammen) · Monatsrate 49,00 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 64,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 49,00 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=501",
-      "zeitpunkt": "2026-11-11T05:57:40Z"
+      "zeitpunkt": "2026-11-12T07:21:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -99,7 +99,7 @@
       "tarif": "Allnet Flat XS"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 49.0,
       "ratenzahl": 36,
@@ -123,7 +123,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "11e8144a436097a77671cb63b1d2236353efe54c9711e2db2f0e7ae9ecb45567",
+      "beleg_id": "08ea6e675830bfef64d76a505cee68a9db22520246603895818abad9fb1c2a71",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -139,12 +139,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 88,50 € (Gerät und Tarif zusammen) · Monatsrate 73,50 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 88,50 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 73,50 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-11-11T05:57:41Z"
+      "zeitpunkt": "2026-11-12T07:21:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -160,7 +160,7 @@
       "tarif": "Allnet Flat XS"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 73.5,
       "ratenzahl": 24,
@@ -184,7 +184,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "af62e24a86c39e018e83e8325d841e6ba4ece5e788d75e6b77518dc7862ad585",
+      "beleg_id": "ad0267fa8be729970fda3290b30fb193a421d156928e0f7b5000f5352ba62c38",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -200,12 +200,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 67,00 € (Gerät und Tarif zusammen) · Monatsrate 47,00 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 67,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 47,00 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-11-11T05:57:43Z"
+      "zeitpunkt": "2026-11-12T07:21:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -221,7 +221,7 @@
       "tarif": "Allnet Flat S"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 47.0,
       "ratenzahl": 36,
@@ -245,7 +245,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1bd2f07253650b4893d52e446db2e4fe32ebd26bb2dde925a43f4fe827094156",
+      "beleg_id": "68ebad9768846219e91d7565701f530b754f977d78da647e5cd938a9c336bc07",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -261,12 +261,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 90,50 € (Gerät und Tarif zusammen) · Monatsrate 70,50 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 90,50 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 70,50 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-11-11T05:57:44Z"
+      "zeitpunkt": "2026-11-12T07:21:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -282,7 +282,7 @@
       "tarif": "Allnet Flat S"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 70.5,
       "ratenzahl": 24,
@@ -306,7 +306,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5eaa7413221b4d2c91589bde2f41ce222c4427840c574b2d30a780e934282439",
+      "beleg_id": "3119fc3f3f089b5b00214ded3b38654c91552cfb20847586650cff97a0c53ebc",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -322,12 +322,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 69,00 € (Gerät und Tarif zusammen) · Monatsrate 44,00 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 69,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 44,00 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-11-11T05:57:46Z"
+      "zeitpunkt": "2026-11-12T07:21:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -343,7 +343,7 @@
       "tarif": "Allnet Flat M"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 44.0,
       "ratenzahl": 36,
@@ -355,7 +355,7 @@
         25.0
        ]
       ],
-      "volumen_gb": 125.0
+      "volumen_gb": 250.0
      }
     },
     {
@@ -367,7 +367,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4f5a3434b44ba6b714237f0b68af85ddc583a0b9a41be0fd2682f10c325ac595",
+      "beleg_id": "47f2fdd89a6b7928e4676227ebda65e784a604de3d4ec7079f4c5ce93915c5ae",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -383,12 +383,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 91,00 € (Gerät und Tarif zusammen) · Monatsrate 66,00 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 91,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 66,00 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-11-11T05:57:47Z"
+      "zeitpunkt": "2026-11-12T07:21:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -404,7 +404,7 @@
       "tarif": "Allnet Flat M"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 66.0,
       "ratenzahl": 24,
@@ -416,7 +416,7 @@
         25.0
        ]
       ],
-      "volumen_gb": 125.0
+      "volumen_gb": 250.0
      }
     },
     {
@@ -428,7 +428,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4e8e53513aff14fd2b7ae3efca5fcd475197f1085ded0bff7bd77255a5115316",
+      "beleg_id": "46f18f15cb9e8843eefe1af9d98c495aac9fec02df41a137ab20b4bc41dfb6d5",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -444,12 +444,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 73,00 € (Gerät und Tarif zusammen) · Monatsrate 43,00 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 73,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 43,00 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-11-11T05:57:49Z"
+      "zeitpunkt": "2026-11-12T07:21:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -465,7 +465,7 @@
       "tarif": "Allnet Flat L"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 43.0,
       "ratenzahl": 36,
@@ -477,7 +477,7 @@
         30.0
        ]
       ],
-      "volumen_gb": 200.0
+      "volumen_gb": 300.0
      }
     },
     {
@@ -489,7 +489,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "41f5ceb195f61fab45fd625dc17a1d73bc074034a6f4388a98ff578cd7ac2d9c",
+      "beleg_id": "56a7877d3bd2ed03b4f1f07c7312e96fe096f2786c4b4bed87407b77b25300d9",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -505,12 +505,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 134,00 € · monatlich 94,50 € (Gerät und Tarif zusammen) · Monatsrate 64,50 €"
+        "text": "Im Bild: einmalig 119,00 € · monatlich 94,50 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 64,50 €"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-11-11T05:57:50Z"
+      "zeitpunkt": "2026-11-12T07:21:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -526,7 +526,7 @@
       "tarif": "Allnet Flat L"
      },
      "werte": {
-      "anschluss": 15.0,
+      "anschluss": 0.0,
       "anzahlung": 119.0,
       "rate": 64.5,
       "ratenzahl": 24,
@@ -538,20 +538,23 @@
         30.0
        ]
       ],
-      "volumen_gb": 200.0
+      "volumen_gb": 300.0
      }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 76,
-    "beendet": 62,
+    "anfragen": 80,
+    "beendet": 77,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "images.congstar.de": 10,
+     "www.congstar.de": 4
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 4.0,
-    "takte_ms": 2800,
+    "sekunden": 3.9,
+    "takte_ms": 2450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -574,5 +577,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10263
+ "zeitbudget_sekunden": 10260
 }
