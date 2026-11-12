@@ -4,7 +4,8 @@ Frage reduziert - "Was kostet dieses Gerät?".
 Sechs Abnahmekriterien, sechs Testgruppen:
   1. Ein Graph: G0 ist die einzige `<svg>`-Grafik im sichtbaren Bereich je
      Modellblock (G1-Balken nicht mehr gerendert).
-  2. Antwortzeile steht zwischen Auswahl und Graph.
+  2. Kein Erklärtext zwischen Auswahl und Graph (die Antwortzeile ist mit
+     Auflage 1, Pruefung PR #100, 12.11.2026 raus).
   3. Titel "Gerätepreise im Vergleich"; die Frage-Ueberschrift 0x.
   4. Ampel-Kacheln und Analysten-Tabellen nur innerhalb von `<details>`.
   5. Einzel-Punkt-Anbieter mit "Serie startet"-Beschriftung (Modultest in
@@ -49,41 +50,36 @@ def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
         assert svg.select("circle.gr-zr-punkt"), "SVG ohne Messpunkte"
 
 
-def test_antwortzeile_steht_zwischen_auswahl_und_graph(tmp_path):
-    """E2: dieselbe Invariante am neuen Aufbau - Wahl-Leiste, dann der
-    Antwort-Satz, dann der Graph (§4.2: nichts dazwischen)."""
+def test_zwischen_auswahl_und_graph_steht_kein_antwort_satz(tmp_path):
+    """E2 verlangte Wahl-Leiste, dann Antwort-Satz, dann Graph (§4.2: nichts
+    dazwischen). Pruefung PR #100, Auflage 1 (12.11.2026): Antonio wollte den
+    Antwort-Satz raus - die Reihenfolge Wahl-Leiste -> Graph bleibt, nur
+    ohne Satz dazwischen."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     auswahl = tafel.select_one("#gr-zr-wahl")
     assert auswahl is not None, "die Wahl-Leiste fehlt"
-    antwort = tafel.select_one(".gr-zr-antwort")
+    assert tafel.select_one(".gr-zr-antwort") is None, "der Antwort-Satz steht noch"
+    assert tafel.select_one(".gr-zr-rechnung") is None, (
+        'der "So gerechnet"-Aufklapper steht noch'
+    )
     graph = tafel.select_one(".gr-zr-graph")
-    assert antwort is not None, "der Antwort-Satz fehlt"
     assert graph is not None, "der Zeitreihen-Graph fehlt"
     text = str(tafel)
-    assert (
-        text.index('id="gr-zr-wahl"')
-        < text.index('class="gr-zr-antwort"')
-        < text.index('class="gr-zr-graph"')
-    )
+    assert text.index('id="gr-zr-wahl"') < text.index('class="gr-zr-graph"')
 
 
-def test_der_antwort_satz_nennt_anbieter_und_die_leitzahl(tmp_path):
-    """E2 ersetzt die zwei Leitzahlen der alten Antwortzeile durch den
-    EINEN Antwort-Satz des Prototyps: Geraet, Band, bester Anbieter,
-    Leitzahl - deren Name im Satz selbst steht (§4.9). Seit A1 heisst die
-    Leitzahl "Kosten über 24 Monate" und braucht keine Auflösung mehr:
-    das Kuerzel TCO-24 darf im Satz nicht auftauchen.
+def test_die_legende_nennt_weiterhin_anbieter_und_preis(tmp_path):
+    """Seit Auflage 1 (PR #100, 12.11.2026) sagt kein Satz mehr, wer am
+    günstigsten ist - die Preise selbst (Legende, Graph) bleiben stehen.
     Der Geraetepreis ohne Vertrag steht weiterhin auf jeder Bündel-Zeile."""
     s = _baue(tmp_path)
-    satz = s.select_one("#tafel-tco .gr-zr-antwort")
-    assert satz is not None, "der Antwort-Satz fehlt"
-    text = " ".join(satz.get_text(" ", strip=True).split())
-    assert "Kosten über 24 Monate" in text, text
-    assert "TCO-24" not in text, text
+    legende = s.select_one("#tafel-tco .gr-zr-legende")
+    assert legende is not None, "die Legende fehlt"
+    text = " ".join(legende.get_text(" ", strip=True).split())
     assert "€" in text
     assert any(a in text for a in ("o2", "Vodafone", "1&1", "congstar")), (
-        f"kein Anbieter im Antwort-Satz: {text}"
+        f"kein Anbieter in der Legende: {text}"
     )
 
 

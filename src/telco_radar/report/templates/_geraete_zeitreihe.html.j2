@@ -30,18 +30,10 @@
   {% if p.leitzahl_html %}
   <div class="gr-leit gr-zr-leit">{{ p.leitzahl_html | safe }}</div>
   {% endif %}
-  <p class="gr-zr-antwort{% if p.leitzahl_html %} gr-zr-antwort--nach-leit{% endif %}" id="gr-zr-antwort">{{ p.antwort_html | safe }}</p>
-  {# (a) Der Rechenschaftssatz - EINE Zeile unter dem Antwort-Satz, als
-     Aufklapper (§3.1). Er nennt die Formel der Leitzahl und den Beleg des
-     günstigsten Angebots mit Link und Abrufdatum - Antonios
-     Transparenz-Befund vom Morgen („man kann hier nirgendwo auf den Link
-     drücken") am wichtigsten Ort der Tafel. #}
-  {% if p.rechnung_html %}
-  <details class="gr-auf gr-zr-rechnung">
-    <summary>So gerechnet</summary>
-    <p class="gr-basis--duenn">{{ p.rechnung_html | safe }}</p>
-  </details>
-  {% endif %}
+  {# Auflage 1 (Prüfung PR Nr. 100, 12.11.2026): der Antwort-Satz ("Beim ... am
+     günstigsten: ...") und der "So gerechnet"-Aufklapper sind Erklärtext -
+     Antonios Regel dafür ist raus. Die Zahl (gr-leit-zahl) und der Graph
+     bleiben, der Beleg steht weiter je Punkt im Rechenweg-Panel. #}
   {# Der Zeitraum kommt aus den DATEN (p.graph_beschriftung, gebaut mit
      derselben Wortregel wie die Kurvenetiketten). Eine feste Zahl hier
      behauptet fuer jedes Bild denselben Zeitraum - auch fuer die, in denen

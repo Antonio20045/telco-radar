@@ -216,13 +216,14 @@ def test_am_telefon_rollt_die_geoeffnete_seite_nicht_quer(telefon):
 
 
 def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
-    """Die Fußzeile ist an die Falz GEKOPPELT: Antwort-Satz und Graphkopf
-    bleiben über 844 px - gemessen im ZUGEKLAPPTEN Ausgangszustand (P2/
-    D4b: die Fußzeile ist jetzt noch kürzer als zu P4/D4, ein einzelner
-    "Export ▾"-Knopf statt einer offenen Sechserreihe. Die LEITZAHL des
-    Vergleichs-Reiters (.gr-zr-leit, DIE ANTWORT IST DIE GROESSTE ZAHL)
-    bleibt die groesste Zahl der Tafel, der Kopf bekommt keinen neuen
-    Inhalt."""
+    """Die Fußzeile ist an die Falz GEKOPPELT: der Graphkopf bleibt über
+    844 px - gemessen im ZUGEKLAPPTEN Ausgangszustand (P2/D4b: die
+    Fußzeile ist jetzt noch kürzer als zu P4/D4, ein einzelner
+    "Export ▾"-Knopf statt einer offenen Sechserreihe. Pruefung PR #100,
+    Auflage 1 (12.11.2026): der Antwort-Satz, den dieser Test bis dahin
+    mitmaß, ist von der Seite genommen; die LEITZAHL (.gr-zr-leit, DIE
+    ANTWORT IST DIE GROESSTE ZAHL) bleibt die groesste Zahl der Tafel,
+    der Kopf bekommt keinen neuen Inhalt."""
     telefon.evaluate(
         "() => window.scrollTo(0, document.getElementById('tco')"
         ".getBoundingClientRect().top + window.scrollY)"
@@ -230,9 +231,7 @@ def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
     telefon.wait_for_timeout(120)
     r = _reihe(telefon)
     assert r is not None, "keine Export-Reihe in der Fußzeile der Seite"
-    assert r["antwort"] is not None and r["antwort"] <= 844, (
-        f"Antwort-Satz endet bei {r['antwort']} px"
-    )
+    assert r["antwort"] is None, "der Antwort-Satz steht noch (Auflage 1)"
     assert r["kopf"] is not None and r["kopf"] <= 844, (
         f"Graphkopf endet bei {r['kopf']} px"
     )

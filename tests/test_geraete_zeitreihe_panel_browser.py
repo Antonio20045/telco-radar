@@ -3,11 +3,16 @@ Rechenweg EINER Messung - im echten Chromium.
 
 Abnahme des P1-Auftrags 2 als Messung (design.md Regel 6): Klick auf den
 KURVENPUNKT (unsichtbare Trefferflaeche .gr-zr-hit, r=12, ueber dem
-gezeichneten Kreis) UND auf die PREISZAHL im Antwort-Satz oeffnet EIN
-Panel unter dem Graph mit den Werten GENAU dieser Messung - als gesetzte
-Rechung („24 × 19,00 € = 456,00 €", das ×-Muster). Das Panel montiert das
-serverseitige <template> (A1) per content.cloneNode; im JS wird keine
-Zahl zusammengesetzt (0 Operator-Regel).
+gezeichneten Kreis) oeffnet EIN Panel unter dem Graph mit den Werten
+GENAU dieser Messung - als gesetzte Rechung („24 × 19,00 € = 456,00 €",
+das ×-Muster). Das Panel montiert das serverseitige <template> (A1) per
+content.cloneNode; im JS wird keine Zahl zusammengesetzt (0 Operator-Regel).
+
+Pruefung PR #100, Auflage 1 (12.11.2026): der zweite Montageort - die
+PREISZAHL im Antwort-Satz - ist mit dem Antwort-Satz selbst von der Seite
+verschwunden (app.js laesst die zugehoerigen Funktionen unveraendert
+stehen, sie finden nur kein `#gr-zr-antwort` mehr und tun nichts). Die
+Tests hier oeffnen das Panel seither ausschliesslich ueber den Kurvenpunkt.
 
 Die Pruefung „GENAU dieser Messung" vergleicht den Panel-Inhalt mit dem
 <template> derselben (data-anb, data-m)-Kombination im selben Block -
@@ -208,40 +213,28 @@ def test_der_aktive_punkt_ist_in_beiden_svg_markiert(schreibtisch):
     ], aktiv
 
 
-def test_klick_auf_die_preiszahl_oeffnet_den_rechenweg_des_anbieters(schreibtisch):
-    seite, _fehler = schreibtisch
-    satz = seite.inner_text("#gr-zr-antwort")
-    assert "1&1 am günstigsten:" in satz, satz
-    seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
-    seite.wait_for_timeout(300)
-
-    assert _panel_offen(seite)
-    assert "1&1" in _kopf(seite)
-    erwartet = {"anb": "1&1", "m": "2026-09-12"}
-    assert seite.evaluate(_PANEL_EQ_TEMPLATE, erwartet) is True
-    assert "12. September 2026" in _kopf(seite)
-
-
 def test_derselbe_klick_schliesst_ein_anderer_wechselt(schreibtisch):
     seite, _fehler = schreibtisch
-    seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
+    ziel = _freier_punkt(seite, "o2")
+    assert ziel, "kein ueberlappungsfreier o2-Punkt"
+    seite.mouse.click(ziel["x"], ziel["y"])
     seite.wait_for_timeout(250)
     assert _panel_offen(seite)
-    seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
+    seite.mouse.click(ziel["x"], ziel["y"])
     seite.wait_for_timeout(200)
     assert not _panel_offen(seite)
 
-    seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
+    seite.mouse.click(ziel["x"], ziel["y"])
     seite.wait_for_timeout(250)
     vorher = _kopf(seite)
-    ziel = _freier_punkt(seite, "Vodafone")
-    assert ziel, "kein ueberlappungsfreier Vodafone-Punkt"
-    seite.mouse.click(ziel["x"], ziel["y"])
+    anderes = _freier_punkt(seite, "Vodafone")
+    assert anderes, "kein ueberlappungsfreier Vodafone-Punkt"
+    seite.mouse.click(anderes["x"], anderes["y"])
     seite.wait_for_timeout(300)
     assert _panel_offen(seite)
     assert _kopf(seite) != vorher
-    assert ziel["anb"] in _kopf(seite)
-    assert seite.evaluate(_PANEL_EQ_TEMPLATE, ziel) is True
+    assert anderes["anb"] in _kopf(seite)
+    assert seite.evaluate(_PANEL_EQ_TEMPLATE, anderes) is True
 
 
 def test_der_schliessen_knopf_und_die_tastatur_oeffnen_und_schliessen(schreibtisch):
@@ -265,7 +258,9 @@ def test_der_schliessen_knopf_und_die_tastatur_oeffnen_und_schliessen(schreibtis
 
 def test_der_modellwechsel_schliesst_das_panel(schreibtisch):
     seite, _fehler = schreibtisch
-    seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
+    ziel = _freier_punkt(seite, None)
+    assert ziel
+    seite.mouse.click(ziel["x"], ziel["y"])
     seite.wait_for_timeout(250)
     assert _panel_offen(seite)
     seite.locator("#gr-zr-baender button[data-band='m']").click()
@@ -294,8 +289,10 @@ def test_keine_konsolenfehler_bei_den_klicks(schreibtisch):
     assert ziel
     seite.mouse.click(ziel["x"], ziel["y"])
     seite.wait_for_timeout(250)
-    seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
-    seite.wait_for_timeout(250)
+    anderes = _freier_punkt(seite, None)
+    if anderes and (anderes["anb"], anderes["m"]) != (ziel["anb"], ziel["m"]):
+        seite.mouse.click(anderes["x"], anderes["y"])
+        seite.wait_for_timeout(250)
     seite.locator("#gr-zr-panel .gr-zr-zu").click()
     seite.wait_for_timeout(150)
     assert not fehler, fehler
@@ -331,7 +328,9 @@ def test_im_geoeffneten_panel_gibt_es_keine_schrift_unter_zwoelf_pixel(schreibti
     deshalb sahen die statischen Messungen die 11-px-Klassen nie. Hier
     wird das Panel WIRKLICH geoeffnet und im Dokument gemessen."""
     seite, _fehler = schreibtisch
-    seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
+    ziel = _freier_punkt(seite, None)
+    assert ziel
+    seite.mouse.click(ziel["x"], ziel["y"])
     seite.wait_for_timeout(300)
     zu_klein = seite.evaluate("""() => Array.from(
       document.querySelectorAll('#gr-zr-panel *')).filter(el =>

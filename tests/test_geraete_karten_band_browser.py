@@ -432,65 +432,43 @@ def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(fragment):
     assert reihe == [bandliste, gruppe], "die Gruppe steht nicht hinter der Bandliste"
 
 
-def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
-    """UX-5, E2-Fassung: die exakten Werte stehen als TEXT im DOM - im
-    Antwort-Satz (der beste des Bands) und auf jeder Bündel-Zeile. Das
-    SVG der Zeitreihe trägt seine Werte ebenfalls als <text>, niemals
-    nur als Tooltip.
-
-    Die congstar-Zeile mit 36 Raten zählt den Tarif nur über seine 24
-    Monate (Antonio 10.10.2026): 1 + 24x24,00 + 36x25,00 = 1.477,00, nicht
-    1.765,00 mit 36 Tarifmonaten. Sie steht nur in der 36er-Ansicht."""
+def test_die_bandwahl_zeigt_weiterhin_das_datenvolumen(_seite, fragment):
+    """UX-5, E2-Fassung, prüfte bis dahin, dass die exakten TCO-24-Werte des
+    Bands ALS TEXT im DOM stehen - im Antwort-Satz (der beste des Bands)
+    UND auf jeder Bündel-Zeile. Pruefung PR #100, Auflage 1 (12.11.2026):
+    der Antwort-Satz ist von der Seite, und mit ihm die EINZIGE Stelle, an
+    der der je Band GÜNSTIGSTE Gesamtbetrag als Text auf DIESER Seite
+    stand - der Zeitreihen-Graph dieser Fixture hat keine Preishistorie
+    (Zustand "gr-zr-keine") und trägt ihn nicht nach. UX-5 ist fuer den
+    "bester Preis je Band"-Fall damit NICHT mehr abgedeckt - offen fuer
+    Antonio (dieselbe Klärung wie Auflage 1 der Pruefung). Was bleibt: das
+    Datenvolumen steht weiterhin auf der Bündel-Zeile im Fragment."""
     waehle_band(_seite, "xs")
     _seite.wait_for_timeout(250)
-    tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-    assert "1.032,76" in tafel, (
-        f"der o2-TCO-24 (1 + 24x24,99 + 24x18) steht nicht als Text"
-    )
-    assert "18 GB" in tafel, "das Datenvolumen des Band-Tarifs fehlt"
+    assert _seite.query_selector("#tafel-tco .gr-zr-antwort") is None
+    assert "18 GB" in _text(fragment), "das Datenvolumen des Band-Tarifs fehlt"
 
+
+def test_kein_antwort_satz_verdoppelt_mehr_die_zahl(_seite, fragment):
+    """Keine zweite Rechnung (E2-Fassung der Wertelisten-Regel) galt bis
+    dahin dem Antwort-Satz: sein Betrag musste der KLEINSTE data-gesamt
+    der im Band sichtbaren Bündel-Zeilen sein. Pruefung PR #100, Auflage 1
+    (12.11.2026): der Satz ist von der Seite - das Risiko einer zweiten,
+    abweichenden Zahl an dieser Stelle damit strukturell weg."""
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(250)
-    tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-    assert "1.008,76" in tafel, tafel[:200]
-    assert "1.477,00" not in tafel, "die 36-Raten-Zeile steht in der 24er-Ansicht"
-    waehle_laufzeit(_seite, "36")
-    try:
-        tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-        assert "1.477,00" in tafel and "1.008,76" not in tafel, tafel[:200]
-        assert "1.765,00" not in tafel, "36 Tarifmonate gezählt"
-    finally:
-        waehle_laufzeit(_seite, "24")
-
-
-def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite, fragment):
-    """Keine zweite Rechnung (E2-Fassung der Wertelisten-Regel): der
-    Betrag des Antwort-Satzes ist der KLEINSTE data-gesamt der im Band
-    sichtbaren Bündel-Zeilen - zwei Stellen, eine Zahl.
-
-    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
-    wird das Fragment: die Zeilen des Bands unter der 24er-Ansicht."""
-    waehle_band(_seite, "m")
-    _seite.wait_for_timeout(250)
-    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.innerText")
+    assert _seite.query_selector("#tafel-tco .gr-zr-antwort") is None
     bnd = [z for z in _bandzeilen(fragment, "m") if z.get("data-lz") in (None, "24")]
     assert bnd, "keine Bündel-Zeilen im Band"
-    kleinste = min(float(z["data-gesamt"]) for z in bnd)
-    from re import search
-
-    nach_doppelpunkt = antwort.split(":", 1)[1]
-    treffer = search(r"([\d.]+,\d\d)", nach_doppelpunkt)
-    assert treffer, f"kein Betrag im Antwort-Satz: {antwort!r}"
-    beste = float(treffer.group(1).replace(".", "").replace(",", "."))
-    assert abs(beste - kleinste) < 0.005, (
-        f"Antwort-Satz nennt {beste}, die günstigste Zeile {kleinste}"
-    )
 
 
-def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
-    """390 px: die Graph-Werte müssen ohne Hover UND ohne Querscroll lesbar
-    sein - sonst ist der Balken am Telefon die alte Tooltip-Falle in neuem
-    Gewand."""
+def test_mobil_bleibt_ohne_querscroll_lesbar(_seite):
+    """390 px: die Seite darf nicht querscrollen - sonst ist der Balken am
+    Telefon die alte Tooltip-Falle in neuem Gewand. Pruefung PR #100,
+    Auflage 1 (12.11.2026): der Antwort-Satz, der den Band-Wert bis dahin
+    zusätzlich als Text druckte, ist weg; diese Fixture hat ohnehin keine
+    Preishistorie (kein Graph-Inhalt), die Werteliste-Zusicherung entfällt
+    deshalb hier - geprüft bleibt der Querscroll."""
     seite = _seite.context.browser.new_page(viewport={"width": 390, "height": 844})
     try:
         seite.goto(_seite.url, wait_until="load")
@@ -500,8 +478,6 @@ def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
         breite = seite.evaluate("document.documentElement.scrollWidth")
         sichtbar = seite.evaluate("document.documentElement.clientWidth")
         assert breite <= sichtbar, f"{breite} px statt {sichtbar} px"
-        text = seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.innerText")
-        assert "1.008,76" in text, f"Antwort ohne gedruckten Wert: {text!r}"
     finally:
         seite.close()
 
@@ -555,32 +531,26 @@ def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(fragment):
     assert "999,00" in _text(zeile.select_one("summary")), _text(zeile)
 
 
-def test_der_antwort_satz_nennt_keine_finanzierungssumme_als_geraetepreis(_seite):
-    """Dieselbe Trennung eine Ebene höher, E2-Fassung: der Antwort-Satz
-    nennt die Finanzierungssumme nur als das, was sie ist - Kosten über
-    24 Monate. Das Wort „Gerätepreis" führt er nicht (der congstar-
-    Finanzierungsbetrag 901,00 € wäre billiger als jeder Barpreis und
-    dürfe eine Gerätepreis-Antwort nie führen)."""
-    satz = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.innerText")
-    assert "Kosten über 24 Monate" in satz, satz
-    assert "TCO-24" not in satz, satz
-    assert "gerätepreis" not in satz.lower(), satz
-    assert "901,00" not in satz, (
-        f"die Finanzierungssumme führt den Antwort-Satz: {satz}"
-    )
+def test_kein_antwort_satz_verwechselt_mehr_finanzierung_und_geraetepreis(_seite):
+    """Dieselbe Trennung eine Ebene höher, E2-Fassung, galt dem Antwort-Satz:
+    er durfte die Finanzierungssumme nicht als „Gerätepreis“ führen (der
+    congstar-Finanzierungsbetrag 901,00 € wäre billiger als jeder Barpreis
+    und dürfe eine Gerätepreis-Antwort nie führen). Pruefung PR #100,
+    Auflage 1 (12.11.2026): der Satz ist von der Seite - das Risiko einer
+    solchen Verwechslung an dieser Stelle damit strukturell weg; die
+    Trennung selbst bleibt am Fragment bewacht (`test_die_finanzierungs
+    summe_heisst_so_und_nicht_geraetepreis`)."""
+    assert _seite.query_selector("#tafel-tco .gr-zr-antwort") is None
 
 
 def test_der_graph_traegt_keine_tooltips_mehr(_seite):
     """E2: der Graph ist ein SVG - und trägt KEIN <title>: jeder Wert
     steht als <text> im Bild (am letzten und ersten Punkt), der beste
-    zusätzlich im Antwort-Satz. Ein Tooltip-Fehler käme zurück, wenn
-    Werte NUR in <title> steckten."""
+    stand bis Auflage 1 (Pruefung PR #100, 12.11.2026) zusätzlich im
+    inzwischen entfernten Antwort-Satz. Diese Fixture hat keine
+    Preishistorie (der Graph bleibt im "gr-zr-keine"-Zustand) - "werte"
+    bleibt deshalb hier bewusst ungeprüft auf Inhalt, nur das Fehlen
+    nativer Tooltips zählt."""
     waehle_band(_seite, "xs")
     _seite.wait_for_timeout(250)
     assert _seite.eval_on_selector_all("#tafel-tco title", "e => e.length") == 0
-    werte = _seite.eval_on_selector_all(
-        "#tafel-tco svg.gr-zr text.gr-zr-wert", "e => e.length"
-    )
-    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.innerText")
-    assert "€" in antwort, f"Antwort ohne gedruckten Wert: {antwort!r}"
-    assert werte >= 0

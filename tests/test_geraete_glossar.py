@@ -223,10 +223,12 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
 def test_das_glossar_ist_endgueltig_weg(tmp_path):
     """Antonio (16.09.2026, §3.1 AUFTRAG_GERAETE_EINE_SEITE_V2): „Ich will
     den Abschnitt Begriffe erklärt: weg." - das Glossar ist ENDE, ebenso
-    der 'Wie gerechnet?'-Block; genau DREI Rest-Aufklapper bleiben
-    (Rechenschaftssatz, Rechenweg je Anbieterzeile, Fuss 'Massstab &
-    Datenlage'). Die vier Begriffe leben dort, wo sie gelesen werden:
-    TCO-24 loest der Antwort-Satz selbst auf (§4.9), das Band nennt die
+    der 'Wie gerechnet?'-Block; seit Auflage 1 (Pruefung PR #100,
+    12.11.2026) bleiben genau ZWEI Rest-Aufklapper (Rechenweg je
+    Anbieterzeile, Fuss 'Massstab & Datenlage') - der Rechenschaftssatz
+    ("So gerechnet") ist mit dem Antwort-Satz selbst von der Seite. Die
+    vier Begriffe leben dort, wo sie gelesen werden: TCO-24 loest seither
+    das aria-label des Graph-Abschnitts auf (§4.9), das Band nennt die
     Wahl-Leiste mit ihrer GB-Spanne."""
     s = _baue(tmp_path)
     assert s.select_one("section#gr-glossar") is None, "das Glossar ist zurueckgekehrt"
@@ -235,15 +237,20 @@ def test_das_glossar_ist_endgueltig_weg(tmp_path):
     assert "Wie gerechnet?" not in text
 
 
-def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(tmp_path):
-    """Was das Glossar trug, steht jetzt am ORT seiner Zahl: die Leitzahl
-    mit ihrem Namen im Antwort-Satz (seit A1 "Kosten über 24 Monate" -
-    der Name ist seine eigene Aufloesung), das Tarifband mit GB-Spanne an
-    der Wahl - keine zweite Definition derselben Worte auf der Seite."""
+def test_der_graphkopf_und_die_wahl_leiste_erklaeren_die_begriffe(tmp_path):
+    """Was das Glossar trug, steht jetzt am ORT seiner Zahl - seit A1 "Kosten
+    über 24 Monate" statt TCO-24, der Name ist seine eigene Aufloesung -,
+    das Tarifband mit GB-Spanne an der Wahl - keine zweite Definition
+    derselben Worte auf der Seite. Pruefung PR #100, Auflage 1
+    (12.11.2026): der Antwort-Satz, der diese Aufloesung bis dahin trug,
+    ist von der Seite genommen; sie steht seither im aria-label des
+    Graph-Abschnitts (dem Namen der Leitzahl, zugaenglich fuer Screenreader
+    auch ohne sichtbaren Satz)."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    antwort = tafel.select_one(".gr-zr-antwort").get_text(" ", strip=True)
-    assert "Kosten über 24 Monate" in antwort
+    assert tafel.select_one(".gr-zr-antwort") is None
+    graph = tafel.select_one(".gr-zr-graph")
+    assert "Kosten über 24 Monate" in (graph.get("aria-label") or "")
     knoepfe = {
         k.get_text(" ", strip=True): k for k in tafel.select("#gr-zr-baender button")
     }

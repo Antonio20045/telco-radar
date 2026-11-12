@@ -105,7 +105,10 @@ def telefon(_browser_seite):
         yield paar
 
 
-def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
+def test_am_telefon_steht_der_graphkopf_ueber_der_falz(telefon):
+    """Pruefung PR #100, Auflage 1 (12.11.2026): der Antwort-Satz, den
+    dieser Test bis dahin maß, ist von der Seite genommen; die Zusicherung
+    gilt seither dem Graphkopf allein."""
     s, _ = telefon
     s.evaluate(
         "() => window.scrollTo(0, document.getElementById('tco')"
@@ -117,13 +120,11 @@ def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
       // Seit dem Wegfall der Messtag-Zeile (28.09.2026, Achse traegt die
       // Tage) ist der Graphkopf die Oberkante des Graph-Abschnitts.
       const m = document.querySelector('#tafel-tco .gr-zr-graph');
-      return {antwort: a ? Math.round(a.getBoundingClientRect().bottom) : null,
-              kopf: m ? Math.round(m.getBoundingClientRect().top) : null,
+      return {antwort: a, kopf: m ? Math.round(m.getBoundingClientRect().top) : null,
               quer: Math.max(document.documentElement.scrollWidth,
                              document.body.scrollWidth)};
     }""")
-    assert box["antwort"] is not None, "der Antwort-Satz fehlt"
-    assert box["antwort"] <= 844, f"Antwort-Satz endet bei {box['antwort']} px"
+    assert box["antwort"] is None, "der Antwort-Satz steht noch (Auflage 1)"
     assert box["kopf"] is not None and box["kopf"] <= 844, (
         f"der Graphkopf endet bei {box['kopf']} px"
     )
@@ -229,14 +230,12 @@ def test_die_vorschau_kommt_ab_zwei_zeichen_und_bleibt_klein(schreibtisch):
 
 def test_der_vorschau_treffer_ist_vor_vollstaendiger_eingabe_klickbar(schreibtisch):
     s, _ = schreibtisch
-    vorher = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
     s.fill("#gr-zr-suche", "iph")
     s.wait_for_timeout(150)
     s.click("#gr-zr-vorschau button")
     s.wait_for_timeout(400)
-    nachher = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
-    assert vorher != nachher or "iPhone 17 Pro" in nachher
-    assert "iPhone 17 Pro" in nachher
+    feld = s.eval_on_selector("#gr-zr-suche", "e => e.value")
+    assert "iPhone 17 Pro" in feld
 
 
 def test_auftippen_und_schreiben_ersetzt_die_vorbelegung(schreibtisch):
@@ -292,8 +291,10 @@ def test_nach_der_auswahl_ist_die_vorschau_zu(telefon):
     assert hoehe == 0, f"die Vorschau steht offen ({hoehe} px) nach Auswahl"
     s.tap("#gr-zr-baender button[data-band='m']", timeout=4000)
     s.wait_for_timeout(500)
-    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
-    assert "M" in antwort
+    gedrueckt = s.eval_on_selector(
+        "#gr-zr-baender button[aria-pressed='true']", "e => e.getAttribute('data-band')"
+    )
+    assert gedrueckt == "m"
 
 
 def test_ausstapschliesst_die_vorschau(telefon):
@@ -303,7 +304,7 @@ def test_ausstapschliesst_die_vorschau(telefon):
     s.fill("#gr-zr-suche", "iph")
     s.wait_for_timeout(200)
     assert s.query_selector_all("#gr-zr-vorschau button")
-    s.tap(".gr-zr-antwort")
+    s.tap(".gr-zr-graph")
     s.wait_for_timeout(250)
     hoehe = s.eval_on_selector(
         "#gr-zr-vorschau", "e => Math.round(e.getBoundingClientRect().height)"
@@ -323,8 +324,10 @@ def test_der_bandwechsel_liefert_den_graphen_des_bandes(schreibtisch):
         "#tafel-tco svg.gr-zr circle.gr-zr-punkt",
         "es => es.map(e => e.getAttribute('cx'))",
     )
-    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
-    assert "M" in antwort
+    gedrueckt = s.eval_on_selector(
+        "#gr-zr-baender button[aria-pressed='true']", "e => e.getAttribute('data-band')"
+    )
+    assert gedrueckt == "m"
     assert len(nach) < len(vor) or vor != nach
 
 
@@ -337,8 +340,13 @@ def test_der_deep_link_setzt_modell_und_band(_browser_seite):
             wait_until="load",
         )
         s.wait_for_timeout(450)
-        antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
-        assert "Galaxy S26" in antwort and "XS" in antwort
+        feld = s.eval_on_selector("#gr-zr-suche", "e => e.value")
+        assert "Galaxy S26" in feld
+        gedrueckt = s.eval_on_selector(
+            "#gr-zr-baender button[aria-pressed='true']",
+            "e => e.getAttribute('data-band')",
+        )
+        assert gedrueckt == "xs"
         url = s.url
         assert "modell=samsung-galaxy-s26-256" in url
     finally:
@@ -353,8 +361,8 @@ def test_der_modellwechsel_holt_den_graphen_aus_dem_fragment(schreibtisch):
     s.wait_for_timeout(200)
     s.click("#gr-zr-vorschau button")
     s.wait_for_timeout(450)
-    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
-    assert "Galaxy S26" in antwort
+    feld = s.eval_on_selector("#gr-zr-suche", "e => e.value")
+    assert "Galaxy S26" in feld
     assert s.query_selector("#tafel-tco svg.gr-zr circle.gr-zr-punkt")
 
 

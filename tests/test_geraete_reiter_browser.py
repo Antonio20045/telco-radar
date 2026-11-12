@@ -876,10 +876,11 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
     Seit O2 (11.09.2026) leben die Datums an ZWEI Orten, und der Test
     haelt beide fest: die ALARMTABELLE (Listungs-Datum, in der Fixture der
     11.08.) traegt es weiterhin SICHTBAR (seit E3 Schritt 3 in der ersten
-    Sektion des Radar-Reiters); die Buendel-Zeilen tragen ihres (4.09.) im
-    Rechenweg-Aufklapper - der Test oeffnet die Klappen dafuer und nimmt
-    sie danach zurueck, denn die Fixture hat Modulgueltigkeit und ein
-    anderer Test misst `details[open] == 0`.
+    Sektion des Radar-Reiters); das Abrufdatum der Zeitreihen-Messung
+    (4.09.) stand bis Auflage 1 (Pruefung PR #100, 12.11.2026) ZUSAETZLICH
+    im seither entfernten "So gerechnet"-Aufklapper - es steht unveraendert
+    im Rechenweg-<template> jeder Messung (inertes Markup, kein Klick
+    noetig zum Auslesen, nur zum Anzeigen im Panel).
     """
     _radar_frisch(_seite)
     radar_text = _seite.eval_on_selector("#tafel-radar", "e => e.innerText")
@@ -888,17 +889,14 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
     )
 
     _frisch(_seite)
-    _seite.evaluate(
-        "() => document.querySelectorAll("
-        "'#tafel-tco details').forEach(d => d.open = true)"
+    rechenweg_text = " ".join(
+        _seite.eval_on_selector_all(
+            "#tafel-tco .gr-zr-rechnungen template",
+            "es => es.map(e => e.content.textContent)",
+        )
     )
-    text = _seite.eval_on_selector("body", "e => e.innerText")
-    _seite.evaluate(
-        "() => document.querySelectorAll("
-        "'#tafel-tco details').forEach(d => d.open = false)"
-    )
-    assert "4. September 2026" in text, (
-        "das Abrufdatum der Bündel fehlt auf der Geräteseite"
+    assert "04.09.2026" in rechenweg_text, (
+        "das Abrufdatum der Messung fehlt im Rechenweg der Geräteseite"
     )
 
 
@@ -2922,8 +2920,10 @@ def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
     )
     fremd = next(m for m in auswahl if m != vorgabe)
     waehle_modell(_seite, fremd)
-    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
-    assert antwort.strip(), "der Antwort-Satz des gewaehlten Modells fehlt"
+    feld = _seite.eval_on_selector("#gr-zr-suche", "e => e.value")
+    assert feld.strip(), "das Suchfeld nennt kein gewaehltes Modell"
+    graph = _seite.query_selector("#tafel-tco .gr-zr-graph")
+    assert graph is not None, "der Graph-Abschnitt des gewaehlten Modells fehlt"
     erwartete = _seite.evaluate(
         """(id) => Object.keys(JSON.parse(
              document.getElementById('gr-zeitreihe-daten').textContent)
