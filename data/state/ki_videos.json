@@ -1,6 +1,76 @@
 {
- "stand": "2026-11-11",
+ "stand": "2026-11-12",
  "videos": [
+  {
+   "id": "vu3YlUMkvyg",
+   "titel": "What Codex Unlocks for Holiday Extras",
+   "kanal": "OpenAI",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 147,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "vu3YlUMkvyg.jpg"
+  },
+  {
+   "id": "hvnPWgfmvyI",
+   "titel": "Why AI Agents Need RAG + Observability",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 544,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "hvnPWgfmvyI.jpg"
+  },
+  {
+   "id": "gPNiuyYirfw",
+   "titel": "DeepMind’s AI Just Did The Impossible",
+   "kanal": "Two Minute Papers",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 326,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "gPNiuyYirfw.jpg"
+  },
+  {
+   "id": "Xinj__6uZwc",
+   "titel": "Vibe-Coding überall | c't 4004 #47",
+   "kanal": "c't 3003",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 4348,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "Xinj__6uZwc.jpg"
+  },
+  {
+   "id": "SxiYOCPW8_c",
+   "titel": "DAS ist die Zukunft der Roboter! Asimovs Gesetze, RSI & Superintelligenz (Ex-DeepMind-Forscher)",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 4251,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "SxiYOCPW8_c.jpg"
+  },
+  {
+   "id": "IehCboBcYsA",
+   "titel": "How to automate your photo library",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 71,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "IehCboBcYsA.jpg"
+  },
+  {
+   "id": "33-u5Iht67Q",
+   "titel": "Microsoft Foundry Toolbox Tool Search",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 40,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "33-u5Iht67Q.jpg"
+  },
   {
    "id": "zjQ_O2srSRM",
    "titel": "KI-Update kompakt: Nvidia-Affäre, Coding-Agenten, Gemini 4 Carbon, Muse Ember",
@@ -10,6 +80,16 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "zjQ_O2srSRM.jpg"
+  },
+  {
+   "id": "vdBDMj2UhDg",
+   "titel": "How to enable PR security reviews with Codex Security",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 391,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "vdBDMj2UhDg.jpg"
   },
   {
    "id": "uND6iY2qp_c",
@@ -33,7 +113,7 @@
   },
   {
    "id": "pvl3z_GyU2Y",
-   "titel": "He Built an AI System That Runs His Entire Business",
+   "titel": "How To Build An AI Operating System For Your Life",
    "kanal": "Matt Wolfe",
    "datum": "2026-11-11",
    "dauer_sekunden": 1664,
@@ -60,6 +140,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "jDxKzlGLCas.jpg"
+  },
+  {
+   "id": "hUhr0JiVZZs",
+   "titel": "How to run your first Codex Security scan",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 408,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "hUhr0JiVZZs.jpg"
   },
   {
    "id": "b7l_Dhe1h8M",
@@ -112,6 +202,16 @@
    "bild": "NuL5VFS8Prs.jpg"
   },
   {
+   "id": "NS220dAaRMo",
+   "titel": "How to request and enable Daybreak Blue",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 348,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "NS220dAaRMo.jpg"
+  },
+  {
    "id": "Mt54ez7xsiI",
    "titel": "Fable 5.2 Is Quite Insane!",
    "kanal": "Matt Wolfe",
@@ -130,6 +230,16 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "LoQ9B3EWl_U.jpg"
+  },
+  {
+   "id": "CrrpfvbNyMw",
+   "titel": "ChatGPT Images: Three Ways to Get Started",
+   "kanal": "OpenAI",
+   "datum": "2026-11-11",
+   "dauer_sekunden": 171,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "CrrpfvbNyMw.jpg"
   },
   {
    "id": "6e9Spy9JgGs",
@@ -190,203 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "isqwXApzV5E.jpg"
-  },
-  {
-   "id": "ZTxzWJeGFAA",
-   "titel": "How CodeRabbit uses OpenAI to review AI-generated code",
-   "kanal": "OpenAI",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 77,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "ZTxzWJeGFAA.jpg"
-  },
-  {
-   "id": "Z9k5oI3Paoc",
-   "titel": "Introducing Businesses in ChatGPT in beta",
-   "kanal": "OpenAI",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 49,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Z9k5oI3Paoc.jpg"
-  },
-  {
-   "id": "NkkAwdm2k7s",
-   "titel": "How to Use Claude Code for FREE with Ollama",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 420,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "NkkAwdm2k7s.jpg"
-  },
-  {
-   "id": "N-Fj9h6Detw",
-   "titel": "3 Modern Excel Dashboards Your Boss Has Never Seen",
-   "kanal": "Leila Gharani",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 731,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "N-Fj9h6Detw.jpg"
-  },
-  {
-   "id": "GcFRheDNh5U",
-   "titel": "This Airtaxi is Ready For Primetime!",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 84,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "GcFRheDNh5U.jpg"
-  },
-  {
-   "id": "FNTz0CdqL6g",
-   "titel": "Kuken Industries searches 70 years of drawings in minutes",
-   "kanal": "OpenAI",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 180,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "FNTz0CdqL6g.jpg"
-  },
-  {
-   "id": "BajLtMHISQU",
-   "titel": "„Verbot für Superintelligenz“ USA stoppen Rechenzentren, Claude RSI, Starfall & Merz' KI-Steuer",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 7384,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "BajLtMHISQU.jpg"
-  },
-  {
-   "id": "9Hwanevuhd8",
-   "titel": "Top 6 AI Productivity Tips for Work!",
-   "kanal": "Jeff Su",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 1090,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "9Hwanevuhd8.jpg"
-  },
-  {
-   "id": "583ThJIqQ7k",
-   "titel": "Fable 5.2: The Self-Improvement Loop Keeps Loopin’ … (plus Gemini Carbon)",
-   "kanal": "AI Explained",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 1901,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "583ThJIqQ7k.jpg"
-  },
-  {
-   "id": "4uvq8Cz3A7Y",
-   "titel": "What Is Model Distillation? How Smaller AI Models Learn",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 813,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "4uvq8Cz3A7Y.jpg"
-  },
-  {
-   "id": "1vUnEBsooCo",
-   "titel": "Prompt Agent vs. Agent Harness",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 44,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "1vUnEBsooCo.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-11",
-   "abgerufen": "2026-11-11"
+   "versucht": "2026-11-12",
+   "abgerufen": "2026-11-12"
   }
  },
  "error": null
