@@ -22,7 +22,9 @@ als Base64 im Stempel. HTTP geht über ``collect.http.sende``.
 from __future__ import annotations
 
 import base64
+import functools
 import logging
+import os
 import shutil
 import subprocess
 import tempfile
@@ -239,14 +241,31 @@ def _post(
     return antwort.content, None
 
 
+@functools.lru_cache(maxsize=1)
+def _openssl_konfig() -> str:
+    """Leere, gültige ``openssl.cnf`` für den Unterprozess; einmal je Prozess angelegt.
+
+    Manche Maschinen setzen ``OPENSSL_CONF`` auf eine Systemdatei, die weitere,
+    maschinenspezifische Dateien einbindet (etwa Crypto-Policies); fehlen diese, bricht
+    openssl mit ``No such file or directory`` ab, bevor die eigentliche Anfrage läuft.
+    Die Kommandos hier (``ts``, ``pkcs7``) brauchen keine Einstellung aus der
+    Konfigurationsdatei, also ersetzt eine leere, immer gültige Datei die Systemdatei.
+    """
+    griff, pfad = tempfile.mkstemp(suffix=".cnf", prefix="belegstempel-")
+    os.close(griff)
+    return pfad
+
+
 def _openssl(openssl: str, *argumente: str) -> str | None:
     """Lässt openssl laufen; ``None`` heißt Erfolg, sonst ein lesbarer Grund."""
+    umgebung = dict(os.environ, OPENSSL_CONF=_openssl_konfig())
     try:
         lauf = subprocess.run(
             [openssl, *argumente],
             capture_output=True,
             timeout=OPENSSL_FRIST_S,
             check=False,
+            env=umgebung,
         )
     except subprocess.TimeoutExpired as fehler:
         grund = f"openssl antwortet nicht in {OPENSSL_FRIST_S:g} s"
