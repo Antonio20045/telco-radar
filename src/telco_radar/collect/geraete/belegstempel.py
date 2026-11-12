@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import base64
 import logging
+import os
 import shutil
 import subprocess
 import tempfile
@@ -240,13 +241,22 @@ def _post(
 
 
 def _openssl(openssl: str, *argumente: str) -> str | None:
-    """Lässt openssl laufen; ``None`` heißt Erfolg, sonst ein lesbarer Grund."""
+    """Lässt openssl laufen; ``None`` heißt Erfolg, sonst ein lesbarer Grund.
+
+    ``OPENSSL_CONF`` zeigt auf ``/dev/null``: manche Systeme binden in ihre
+    openssl.cnf ein optionales, selten installiertes Paket ein (z. B. Ubuntus
+    ``crypto-config``); fehlt dessen Verzeichnis, scheitert openssl am
+    Einlesen der Konfiguration, bevor es den eigentlichen Befehl ausführt.
+    Für ``ts``/``x509``/``pkcs7`` brauchen wir keine Systemrichtlinie.
+    """
+    env = {**os.environ, "OPENSSL_CONF": os.devnull}
     try:
         lauf = subprocess.run(
             [openssl, *argumente],
             capture_output=True,
             timeout=OPENSSL_FRIST_S,
             check=False,
+            env=env,
         )
     except subprocess.TimeoutExpired as fehler:
         grund = f"openssl antwortet nicht in {OPENSSL_FRIST_S:g} s"
