@@ -210,17 +210,6 @@ def test_paar_nennt_seine_zeilen_mit_bild(lager, seite):
     assert o2.select_one(".gr-beleg-keins").has_attr("hidden")
 
 
-def test_lager_traegt_die_paarzeile_fuer_den_modellwechsel(lager):
-    """app.js übernimmt `.gr-beleg-paare` aus dem Lager (wie die Fehlliste).
-
-    Stand hier bis zum 12.12.2026 in `test_beleg_je_preis`; dort hat kein Anbieter
-    ein Zeilenbild, und seit diesem Tag steht die Liste dann gar nicht - geprüft
-    wird sie darum an der Aufnahme mit Bild (o2)."""
-    paare = lager.select(f'.gr-bnd-lager[data-modell="{MODELL}"] .gr-beleg-paare')
-    assert len(paare) == 1
-    assert paare[0].select(".gr-beleg-zeile img[data-src]"), "Gegenprobe: mit Bild"
-
-
 def test_fragment_traegt_keine_zeilenbilder_an_der_buendelliste(lager):
     """Die Bündelliste ist von der Seite genommen: dort steht kein Zeilenbild."""
     assert (

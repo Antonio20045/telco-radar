@@ -32,13 +32,14 @@
    Aufklappen (`data-src`); laedt ein Bild nicht (Datei geloescht), steht an seiner
    Stelle "Bild nicht mehr verfuegbar" und `.gr-folge-zahl` zaehlt neu. Die Zuordnung rechnet Python
    (`report/geraete_zeilenbelege.py`). #}
-{#- Antonio, 12.12.2026: liegt fuer dieses Modell zu KEINEM Anbieter ein
-    Screenshot vor, steht hier gar nichts. Bis dahin standen unter dem Graphen
-    acht Zeilen „Fuer diese Kombination liegt noch kein Screenshot vor." - acht
-    Saetze, die zusammen nichts sagen. Sobald ein Anbieter ein Bild hat, steht
-    die Liste wie bisher, samt dem Satz fuer die Anbieter ohne Bild: dann
-    erklaert er eine Luecke neben etwas Vorhandenem. -#}
-{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined and paare | selectattr('zeilenbilder') | list %}
+{#- Antonio, 12.11.2026 (Nachbesserung): die Liste steht JE ANBIETER, auch wenn
+    zu KEINEM Anbieter ein Bild vorliegt. Ein Zwischenstand hatte sie in dem
+    Fall ganz weggelassen ("acht Saetze, die nichts sagen") - damit war aber
+    nicht mehr zu sehen, dass ein Bild FEHLT: "kein Preis" und "kein Bild"
+    waeren eins geworden, und ein Paar-Bild ohne Preiszeile haette unbemerkt
+    als Beleg durchgehen koennen. Der Vermerk bleibt sichtbar auf der Seite,
+    schlicht und ohne Erklaertext (Ziel 1d, 08.11.2026). -#}
+{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}
 <ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Kombination">
 {#- Antonio, 12.12.2026: die Zwischenüberschrift „Screenshots zur gewählten
     Kombination …" ist gefallen; was die Liste zeigt, sagt jede Zeile selbst
