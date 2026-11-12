@@ -12,6 +12,12 @@ EINTEILUNG je Paar (Wettbewerber W, Vodafone) und aktuellem Gerät
   nur Vodafone dasselbe mit vertauschten Rollen
   nicht gemessen  genau eine Seite führt einen frischen Preis, für die andere
                gibt es keinen gültigen Beleg (nie belegt oder abgelaufen)
+
+Seit dem 12.12.2026 zeigt die Seite je Paar nur noch diese vier Zahlen in
+EINER Tabellenzeile (Antonio: „nicht 17 Modelle ohne Aussage"); die belegten
+Geräte stehen als Namen in ihrer Zelle (`namen_w`, `namen_v`). Die früheren
+Satzformen (Kopfzeile, Kontextsatz, Satz über fehlende Anbieter) sind mit den
+Blöcken gefallen und stehen in der Git-Historie.
   (nichts)     keine Seite führt einen frischen Preis: nicht vergleichbar
 
 „Führt einen Preis": mindestens eine neue, frische, nicht geschätzte Karte mit
@@ -19,8 +25,7 @@ Gesamtpreis, egal in welcher Laufzeit und welchem Tarifband. Eine veraltete
 Karte widerlegt einen jüngeren Beleg nicht.
 Ein Beleg zählt nur mit einer Sortiments-Aussage im `grund` (`BELEG_AUSSAGEN`):
 „derzeit nicht verfügbar“ heißt nur „gerade nicht lieferbar“, nicht „nicht im
-Portfolio“, und bleibt eine Messlücke. Ohne belegten Unterschied eines Paars
-steht dessen Messlücken-Liste offen (`offen_zeigen`). Die Geräte sind die aktuellen
+Portfolio“, und bleibt eine Messlücke. Die Geräte sind die aktuellen
 Modelle der Herstellergrafik (`geraete_hersteller.aktuelle_geraete`). Alles
 kommt aus dem Seiten-Build (Bündel der Seite, `config/geraete_abdeckung.yaml`);
 es gibt keinen Abruf. Ein Ausfall steht als `fehler`, nie als leere Liste.
@@ -46,11 +51,10 @@ PREIS, ALT = "preis", "alt"
 FEHLT_SATZ = (
     "{wer} führt es (Preis gemessen). Für {fehlt} liegt kein {beleg} vor{grund}."
 )
-REGEL = (
-    "Als Lücke zählt nur, was am Original belegt ist (Screenshot, geprüft und "
-    "befristet); fehlt ein Preis ohne gültigen Beleg, ist das eine Messlücke und "
-    "zählt nicht als Portfolio-Lücke."
-)
+REGEL = "eine Portfolio-Lücke zählt nur mit Beleg"
+"""Die Pflichtangabe, die von der Regel übrig bleibt: EINE knappe Halbzeile im
+Fuß der Seite (Antonio, 12.12.2026), nicht mehr der Erklärabsatz über der
+Tafel. Was ein Beleg ist, steht auf `geraete-quellen.html#methodik`."""
 
 
 def staende(tco_modelle: list[dict]) -> dict[str, dict[str, str]]:
@@ -155,30 +159,23 @@ def _paar(w: str, geraete: list, staende_je: dict, belege: dict, heute: str) -> 
         "n_v": len(nur_v),
         "n_offen": len(offen),
         "beide": beide,
-        "kopf": kopfzeile(w, len(nur_w), len(nur_v)),
-        "kontext": kontext(len(nur_w) + len(nur_v), len(offen)),
-        "offen_zeigen": not (nur_w or nur_v),
+        "namen_w": _namen(nur_w),
+        "namen_v": _namen(nur_v),
     }
 
 
-def _geraete(n: int) -> str:
-    return "1 Gerät" if n == 1 else f"{n} Geräte"
-
-
-def kopfzeile(w: str, n_w: int, n_v: int) -> str:
-    """Kopfzahlen je Paar: X nur beim Wettbewerber, Y nur bei Vodafone. Jede
-    dieser Zahlen steht in der Vorlage mit `kontext` direkt darunter."""
-    return f"{_geraete(n_w)} nur bei {legendenname(w)}, {n_v} nur bei Vodafone"
-
-
-def kontext(n_belegt: int, n_offen: int) -> str:
-    """Der Satz neben den Kopfzahlen: was die Null wirklich bedeutet."""
-    offen = (
-        "1 aktuelles Gerät ist noch nicht gemessen und wird"
-        if n_offen == 1
-        else f"{n_offen} aktuelle Geräte sind noch nicht gemessen und werden"
-    )
-    return f"Bisher belegt: {_geraete(n_belegt)}; {offen} nicht gezählt."
+def _namen(zeilen: list[dict]) -> list[dict]:
+    """Die belegten Geräte eines Feldes mit ihrem Beleglink - sie sind die
+    Aussage der Zahl daneben, und jede Aussage verlinkt auf ihre Quelle
+    (CLAUDE.md). Leer, wenn es keine gibt: dort steht dann nur die 0."""
+    return [
+        {
+            "name": f"{z['hersteller']} {z['name']}",
+            "beleg": z["beleg"]["url"],
+            "original": z["beleg"]["original"],
+        }
+        for z in sorted(zeilen, key=lambda z: (z["hersteller"], z["name"]))
+    ]
 
 
 def fehlt_satz(fuehrt: str, fehlt: str, grund: str) -> str:
@@ -190,23 +187,6 @@ def fehlt_satz(fuehrt: str, fehlt: str, grund: str) -> str:
         fehlt=legendenname(fehlt),
         beleg="Beleg" if ohne else "gültiger Beleg",
         grund="" if ohne else f": {grund}",
-    )
-
-
-def fehlende_anbieter(paare: list[dict]) -> str:
-    """Satz über Anbieter ohne Paar (1&1, Händler): kein frischer, gezählter
-    Preis bei aktuellen Modellen. Leer, wenn keiner fehlt."""
-    da = {p["name"] for p in paare}
-    namen = [a for a in geraete_hersteller.WETTBEWERBER if a not in da]
-    if all(a in ANBIETER_FOLGE for a in da):
-        namen.append("Händler")
-    if not namen:
-        return ""
-    wer = namen[0] if len(namen) == 1 else f"{', '.join(namen[:-1])} und {namen[-1]}"
-    return (
-        f"{wer} {'fehlt' if len(namen) == 1 else 'fehlen'} noch: bei den aktuellen "
-        "Modellen liegt dort kein frischer, gezählter Preis vor, daher wird dort "
-        "nicht verglichen."
     )
 
 
@@ -226,7 +206,6 @@ def berechne(tco_modelle: list[dict], katalog, belege: dict, heute: str) -> dict
         "paare": paare,
         "standard": STANDARD if STANDARD in namen else (namen[0] if namen else ""),
         "regel": REGEL,
-        "fehlende": fehlende_anbieter(paare),
         "geraete": len(geraete),
         "belege": len(belege),
     }

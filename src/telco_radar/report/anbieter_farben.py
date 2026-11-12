@@ -243,6 +243,50 @@ ANBIETER_FARBE: dict[str, Anbieterstil] = {
 }
 
 
+HERSTELLER_STILE: tuple[Anbieterstil, ...] = (
+    _stil("hersteller-1", ANTHRAZIT, "voll", "kreis"),
+    _stil("hersteller-2", BLAU, "voll", "quadrat"),
+    _stil("hersteller-3", GRUEN, "voll", "dreieck"),
+    _stil("hersteller-4", ORANGE, "voll", "raute"),
+    _stil("hersteller-5", VIOLETT, "gestrichelt", "sechseck"),
+    _stil("hersteller-6", TUERKIS, "gestrichelt", "ring"),
+    _stil("hersteller-7", ROSTBRAUN, "gestrichelt", "dreieck--runter"),
+    _stil("hersteller-8", TAUBENBLAU, "gepunktet", "kreuz"),
+)
+"""Die Linienstile der Hersteller-Grafik, NACH PLATZ vergeben.
+
+Ein Hersteller ist keine Marke dieses Portals: fuer Apple oder Xiaomi gibt es
+hier keine hinterlegte Hausfarbe, und eine Hash-Palette waere Raten (siehe
+oben, Punkt 1). Der Platz ist dagegen bestimmt - `geraete_hersteller.
+reihenfolge` sortiert die grossen drei voran, dann nach Modellzahl -, also
+haengt die Farbe am Platz und ist reproduzierbar. Farbe, Strichart und
+Markerform wechseln gemeinsam, damit die Reihen auch ohne Farbwahrnehmung
+und in Schwarzweiss auseinanderzuhalten sind."""
+
+HERSTELLER_GESAMT = _stil("hersteller-alle", VODAFONE_ROT, "voll", "kreis", eigen=True)
+"""„Alle Hersteller" - die Leitlinie des Bildes: Vodafone-Rot als Akzent und
+die groessere Strichstaerke (`BREITE_EIGEN`), weil sie die Gesamtaussage
+traegt."""
+
+
+def hersteller_stil(platz: int | None) -> Anbieterstil:
+    """Der Stil der `platz`-ten Hersteller-Linie; `None` ist „Alle Hersteller".
+
+    Mehr Hersteller als Stile: die weiteren bekommen die benannte Luecke
+    (`LUECKE`), nie eine geratene Farbe - und der Fall steht im Protokoll."""
+    if platz is None:
+        return HERSTELLER_GESAMT
+    if 0 <= platz < len(HERSTELLER_STILE):
+        return HERSTELLER_STILE[platz]
+    log.warning(
+        "Hersteller-Linie %d ohne hinterlegten Stil - gezeichnet als benannte "
+        "Luecke (%s)",
+        platz,
+        LUECKE_FARBE,
+    )
+    return LUECKE
+
+
 def _schluessel(anbieter) -> str:
     return (anbieter or "").strip().lower()
 

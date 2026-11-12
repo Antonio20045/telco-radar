@@ -5473,13 +5473,16 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   addEventListener('resize', bild);
   bild();
 })();
-
-/* PREISPOSITION JE HERSTELLER (Antonio, 05.11.2026). Der Server zeichnet die
-   Ansicht „aktuell“; hier schaltet der Zeitraum (7 Tage, 30 Tage, eigener
-   Zeitraum) um. Gerechnet wird aus dem JSON im Dokument (#hm-daten), dieselbe
-   Rechnung wie geraete_hersteller.py (mittel_ueber_tage, zellen): je Modell das
-   Mittel der Messtage, je Hersteller das Mittel der Modelle, die einen Wert
-   haben. Fehlt ein Wert, bleibt die Zelle leer (nie 0). Rundung Math.round. */
+/* PREISPOSITION JE HERSTELLER - LINIENDIAGRAMM (Antonio, 12.12.2026).
+   Der Server zeichnet den Vorgabe-Zeitraum (30 Tage) als fertiges SVG; hier
+   wird bei 7 Tage / eigener Zeitraum NEU gezeichnet - nach derselben Regel
+   wie geraete_hersteller_grafik.py (tageswert: je Wettbewerber das Mittel
+   ueber die Modelle, dann das Mittel ueber die Wettbewerber; ohne Wert kein
+   Punkt, nie 0). D.tage sind bereits die VERGLEICHSTAGE: Tage, an denen jeder
+   gezeigte Wettbewerber mindestens D.klein Modelle hat - der Browser lockert
+   diese Regel nicht. Farben, Masse und Achsentitel kommen aus dem JSON, nicht
+   aus einer zweiten Tabelle hier. Ein Browsertest haelt beide Rechnungen
+   zusammen. */
 (function () {
   var sec = document.getElementById('hersteller');
   var roh = document.getElementById('hm-daten');
@@ -5487,116 +5490,263 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   if (!sec || !roh || !zeit) return;
   var D;
   try { D = JSON.parse(roh.textContent); } catch (e) { return; }
+  var NS = 'http://www.w3.org/2000/svg';
   var MINUS = '−', NB = ' ';
   var eigen = document.getElementById('hm-eigen');
   var von = document.getElementById('hm-von'), bis = document.getElementById('hm-bis');
-  var einheit = document.getElementById('hm-einheit');
-  var basis = einheit ? einheit.getAttribute('data-basis') : '';
+  var leer = document.getElementById('hm-ohne-tag');
+  var legende = document.getElementById('hm-legende');
+  var felder = {
+    breit: document.getElementById('hm-bild-breit'),
+    schmal: document.getElementById('hm-bild-schmal')
+  };
   zeit.hidden = false;
 
-  function tag(iso) { return iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.'; }
-  function datum(iso) { return tag(iso) + iso.slice(0, 4); }
+  function tagMonat(iso) { return (+iso.slice(8, 10)) + '.' + (+iso.slice(5, 7)) + '.'; }
+  function tagNr(iso) {
+    return Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / 864e5;
+  }
   function plusTage(iso, n) {
-    var t = Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) + n * 864e5;
-    return new Date(t).toISOString().slice(0, 10);
+    return new Date((tagNr(iso) + n) * 864e5).toISOString().slice(0, 10);
   }
   function prozent(m) {
     var r = Math.round(m);
     return (r > 0 ? '+' : r < 0 ? MINUS : '') + Math.abs(r) + NB + '%';
   }
-  function richtung(m) {
-    if (Math.abs(Math.round(m)) <= D.gleichauf) return 'gleichauf';
-    return m > 0 ? 'teurer' : 'günstiger';
+  function el(name, attr) {
+    var n = document.createElementNS(NS, name);
+    Object.keys(attr || {}).forEach(function (k) { n.setAttribute(k, attr[k]); });
+    return n;
   }
-  function modelle(n) {
-    var w = n === 1 ? n + ' Modell' : n + ' Modelle';
-    return n < D.klein ? 'nur ' + w : w;
+  /* tageswert() aus geraete_hersteller_grafik.py - Wort fuer Wort dieselbe
+     Regel: je Wettbewerber das Mittel ueber die Modelle, dann das Mittel
+     ueber die Wettbewerber mit Wert. Ohne jeden Wert: null, nie 0. */
+  function tageswert(k, hersteller) {
+    var zeilen = D.pct[k], jeSpalte = [], n = 0;
+    D.belegt.forEach(function (j) {
+      var s = 0, m = 0;
+      for (var i = 0; i < D.h.length; i++) {
+        if (hersteller !== null && D.h[i] !== hersteller) continue;
+        var x = zeilen[i][j];
+        if (x !== null && x !== undefined) { s += x; m++; }
+      }
+      if (m) { jeSpalte.push(s / m); n += m; }
+    });
+    if (!jeSpalte.length) return null;
+    var su = 0;
+    jeSpalte.forEach(function (v) { su += v; });
+    return { wert: su / jeSpalte.length, n: n };
   }
-  /* werte[modell][wettbewerber] fuer den gewaehlten Zeitraum */
-  function werteAktuell() { return { zeilen: D.aktuell, tage: 0 }; }
-  function werteVonBis(v, b) {
-    var idx = [];
-    D.tage.forEach(function (t, i) { if (t >= v && t <= b) idx.push(i); });
-    var zeilen = D.h.map(function (_, i) {
-      return D.w.map(function (_w, j) {
-        var s = 0, n = 0;
-        idx.forEach(function (k) {
-          var x = D.pct[k][i][j];
-          if (x !== null && x !== undefined) { s += x; n++; }
+  function reihen(idx) {
+    var aus = [];
+    D.stile.forEach(function (st) {
+      var h = st.gesamt ? null : st.hersteller, punkte = [];
+      idx.forEach(function (k) {
+        var e = tageswert(k, h);
+        if (e) punkte.push({ tag: D.tage[k], wert: Math.round(e.wert * 100) / 100, n: e.n });
+      });
+      if (punkte.length) aus.push({ st: st, punkte: punkte });
+    });
+    return aus;
+  }
+  /* form_pfad() aus geraete_zeitreihe_geometrie.py - dieselben Formen, damit
+     die Reihen auch ohne Farbwahrnehmung unterscheidbar bleiben. */
+  function marke(form, x, y, r) {
+    var s, p, i, w, pts;
+    if (form === 'quadrat') {
+      s = r * 0.86;
+      return el('rect', { x: x - s, y: y - s, width: 2 * s, height: 2 * s });
+    }
+    if (form === 'raute') {
+      s = r * 1.15;
+      p = x + ',' + (y - s) + ' ' + (x + s) + ',' + y + ' ' + x + ',' + (y + s) + ' ' + (x - s) + ',' + y;
+      return el('polygon', { points: p });
+    }
+    if (form === 'dreieck' || form === 'dreieck--runter') {
+      s = r * 1.2;
+      p = form === 'dreieck'
+        ? x + ',' + (y - s) + ' ' + (x + s) + ',' + (y + s * 0.85) + ' ' + (x - s) + ',' + (y + s * 0.85)
+        : x + ',' + (y + s) + ' ' + (x + s) + ',' + (y - s * 0.85) + ' ' + (x - s) + ',' + (y - s * 0.85);
+      return el('polygon', { points: p });
+    }
+    if (form === 'sechseck') {
+      pts = [];
+      for (i = 0; i < 6; i++) {
+        w = (60 * i - 30) * Math.PI / 180;
+        pts.push((x + r * 1.1 * Math.cos(w)).toFixed(1) + ',' + (y + r * 1.1 * Math.sin(w)).toFixed(1));
+      }
+      return el('polygon', { points: pts.join(' ') });
+    }
+    if (form === 'ring') return el('circle', { cx: x, cy: y, r: r * 1.4 });
+    if (form === 'kreuz') {
+      s = r * 1.15;
+      return el('path', {
+        d: 'M' + (x - s) + ' ' + y + 'L' + (x + s) + ' ' + y +
+           ' M' + x + ' ' + (y - s) + 'L' + x + ' ' + (y + s)
+      });
+    }
+    return el('circle', { cx: x, cy: y, r: r });
+  }
+  /* _y_schritt() aus geraete_zeitreihe_geometrie.py */
+  function yschritt(y0, y1) {
+    var spanne = y1 - y0;
+    if (spanne <= 0) return Math.max(Math.abs(y1), 1);
+    var basis = spanne / 4, pot = Math.pow(10, Math.floor(Math.log(basis) / Math.LN10));
+    var kand = [], viel = [1, 2, 2.5, 5, 10], d;
+    for (d = -3; d <= 3; d++) {
+      viel.forEach(function (m) {
+        var v = m * pot * Math.pow(10, d);
+        if (v > 0) kand.push(v);
+      });
+    }
+    kand.sort(function (a, b) { return a - b; });
+    var best = null, rang = null;
+    kand.forEach(function (s) {
+      var wert = Math.ceil(y0 / s) * s, n = 0;
+      while (wert <= y1 + 0.01 && n < 60) { n++; wert += s; }
+      if (n < 2) return;
+      var r = [(n >= 4 && n <= 5) ? 0 : 1, Math.abs(n - 4.5)];
+      if (!rang || r[0] < rang[0] || (r[0] === rang[0] && r[1] < rang[1])) { rang = r; best = s; }
+    });
+    return best || 1;
+  }
+  function zeichne(rs, tage, breit) {
+    var g = D.geo, masse = breit ? g.breit : g.schmal;
+    var w = masse[0], h = masse[1];
+    var links = g.links, rechts = breit ? g.rechts_breit : g.rechts_schmal;
+    var oben = g.oben, unten = g.unten;
+    var pw = w - links - rechts, ph = h - oben - unten;
+    var t0 = tagNr(tage[0]), t1 = tagNr(tage[tage.length - 1]);
+    function xv(iso) {
+      return t1 === t0 ? links + pw / 2 : links + (tagNr(iso) - t0) / (t1 - t0) * pw;
+    }
+    var werte = [0];
+    rs.forEach(function (r) { r.punkte.forEach(function (p) { werte.push(p.wert); }); });
+    var ymin = Math.min.apply(null, werte), ymax = Math.max.apply(null, werte);
+    var luft = (ymax - ymin) * g.luft || 1;
+    var y0 = ymin - luft, y1 = ymax + luft;
+    function yv(v) { return oben + (1 - (v - y0) / (y1 - y0)) * ph; }
+    var svg = el('svg', {
+      'class': 'gr-hl gr-hl--' + (breit ? 'breit' : 'schmal'),
+      viewBox: '0 0 ' + w + ' ' + h, role: 'img',
+      'aria-label': 'Abstand der Vodafone-Gesamtkosten zum Wettbewerb in Prozent je Messtag und Hersteller: ' +
+        rs.map(function (r) { return r.st.name; }).join(', ')
+    });
+    var t = el('text', { 'class': 'gr-hl-titel', x: links - 8, y: 16 });
+    t.textContent = breit ? D.titel : D.titel_kurz;
+    svg.appendChild(t);
+    var schritt = yschritt(y0, y1), wert = Math.ceil(y0 / schritt) * schritt;
+    while (wert <= y1 + 0.01) {
+      var y = yv(wert), istNull = Math.abs(wert) < 0.001;
+      svg.appendChild(el('line', {
+        'class': 'gr-hl-raster' + (istNull ? ' gr-hl-null' : ''),
+        x1: links, y1: y.toFixed(1), x2: w - rechts, y2: y.toFixed(1)
+      }));
+      var a = el('text', {
+        'class': 'gr-hl-achse', x: links - 8, y: (y + 4).toFixed(1), 'text-anchor': 'end'
+      });
+      a.textContent = prozent(wert);
+      svg.appendChild(a);
+      wert += schritt;
+    }
+    /* _x_marken(): gierig von links, Mindestabstand; der letzte Tag ersetzt
+       noetigenfalls den zuletzt gewaehlten. */
+    var mind = breit ? 34 : 62, behalten = [tage[0]], letzteX = xv(tage[0]), i;
+    for (i = 1; i < tage.length - 1; i++) {
+      if (xv(tage[i]) - letzteX >= mind) { behalten.push(tage[i]); letzteX = xv(tage[i]); }
+    }
+    if (tage.length > 1) {
+      if (xv(tage[tage.length - 1]) - letzteX < mind && behalten.length > 1) {
+        behalten[behalten.length - 1] = tage[tage.length - 1];
+      } else {
+        behalten.push(tage[tage.length - 1]);
+      }
+    }
+    behalten.forEach(function (tag) {
+      var xt = el('text', {
+        'class': 'gr-hl-xtick', x: xv(tag).toFixed(1), y: h - unten + 22,
+        'text-anchor': 'middle'
+      });
+      xt.textContent = tagMonat(tag);
+      svg.appendChild(xt);
+    });
+    rs.forEach(function (r) {
+      var pkte = r.punkte.map(function (p) { return [xv(p.tag), yv(p.wert), p.wert]; });
+      var stil = 'stroke:' + r.st.farbe + ';stroke-width:' + r.st.breite +
+        ';stroke-dasharray:' + r.st.muster;
+      if (pkte.length > 1) {
+        var d = pkte.map(function (p, k) {
+          return (k ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+        }).join(' ');
+        svg.appendChild(el('path', {
+          'class': 'gr-hl-linie' + (r.st.gesamt ? ' gr-hl-linie--gesamt' : ''),
+          style: stil, d: d
+        }));
+      }
+      var gr = el('g', {
+        'class': 'gr-hl-punkte', style: 'fill:' + r.st.farbe + ';stroke:' + r.st.farbe
+      });
+      pkte.forEach(function (p) {
+        gr.appendChild(marke(r.st.marker, +p[0].toFixed(1), +p[1].toFixed(1), g.r));
+      });
+      svg.appendChild(gr);
+      if (breit) {
+        var e = pkte[pkte.length - 1];
+        var et = el('text', {
+          'class': 'gr-hl-ende', x: (e[0] + 10).toFixed(1), y: (e[1] + 5).toFixed(1),
+          style: 'fill:' + r.st.farbe
         });
-        return n ? s / n : null;
-      });
+        et.textContent = prozent(e[2]);
+        svg.appendChild(et);
+      }
     });
-    return { zeilen: zeilen, tage: idx.length };
+    return svg;
   }
-  function mittel(zeilen, hersteller, j) {
-    var s = 0, n = 0;
-    zeilen.forEach(function (z, i) {
-      if (hersteller !== null && D.h[i] !== hersteller) return;
-      if (z[j] !== null && z[j] !== undefined) { s += z[j]; n++; }
+  function setzeLegende(rs) {
+    if (!legende) return;
+    legende.innerHTML = '';
+    rs.forEach(function (r) {
+      var li = document.createElement('li');
+      li.className = 'gr-hm-leg' + (r.st.gesamt ? ' gr-hm-leg--gesamt' : '');
+      li.setAttribute('data-hersteller', r.st.name);
+      var s = el('svg', { viewBox: '0 0 30 12', 'aria-hidden': 'true' });
+      s.appendChild(el('line', {
+        x1: 1, y1: 6, x2: 29, y2: 6,
+        style: 'stroke:' + r.st.farbe + ';stroke-width:' + r.st.breite +
+          ';stroke-dasharray:' + r.st.muster
+      }));
+      li.appendChild(s);
+      li.appendChild(document.createTextNode(r.st.name));
+      legende.appendChild(li);
     });
-    return n ? { m: s / n, n: n } : null;
-  }
-  function zeichne(erg) {
-    [].forEach.call(sec.querySelectorAll('.gr-hm-zeile'), function (zeile) {
-      var h = zeile.getAttribute('data-hersteller');
-      var alle = zeile.classList.contains('gr-hm-zeile--alle');
-      [].forEach.call(zeile.querySelectorAll('.gr-hm-zelle'), function (zelle) {
-        var j = D.w.indexOf(zelle.getAttribute('data-anbieter'));
-        var e = j < 0 ? null : mittel(erg.zeilen, alle ? null : h, j);
-        var zahl = zelle.querySelector('.gr-hm-zahl');
-        var balken = zelle.querySelector('.gr-hm-balken');
-        var rr = zelle.querySelector('.gr-hm-r'), mm = zelle.querySelector('.gr-hm-m');
-        zelle.classList.toggle('gr-hm-leer', !e);
-        zelle.classList.toggle('gr-hm-duenn', !!e && e.n < D.klein);
-        if (!e) {
-          zelle.removeAttribute('data-wert'); zelle.removeAttribute('data-n');
-          zahl.textContent = '–'; balken.hidden = true;
-          rr.textContent = ''; mm.textContent = 'kein Preis';
-          return;
-        }
-        var b = Math.min(Math.abs(e.m), D.skala) / D.skala * 50;
-        zelle.setAttribute('data-wert', e.m.toFixed(2));
-        zelle.setAttribute('data-n', String(e.n));
-        zahl.textContent = prozent(e.m);
-        balken.hidden = false;
-        balken.style.left = (e.m >= 0 ? 50 : 50 - b).toFixed(2) + '%';
-        balken.style.width = b.toFixed(2) + '%';
-        rr.textContent = richtung(e.m) + ' · ';
-        mm.textContent = modelle(e.n);
-      });
-    });
-  }
-  function text(erg, v, b) {
-    if (!einheit) return;
-    var s = basis;
-    if (v === null) s += ' · Stand ' + datum(D.stand);
-    else if (!erg.tage) s += ' · Keine Messtage vom ' + datum(v) + ' bis ' + datum(b);
-    else s += ' · Mittel aus ' + erg.tage + (erg.tage === 1 ? ' Messtag' : ' Messtagen') +
-      ', ' + tag(v) + '–' + datum(b);
-    einheit.textContent = s;
   }
   function waehle(modus) {
-    var v = null, b = null, erg;
-    if (modus === 'aktuell') {
-      erg = werteAktuell();
+    var v, b, t;
+    if (modus === 'eigen') {
+      v = von.value || D.tage[0]; b = bis.value || D.stand;
+      if (v > b) { t = v; v = b; b = t; }
     } else {
-      if (modus === 'eigen') {
-        v = von.value || D.tage[0]; b = bis.value || D.stand;
-        if (v > b) { var t = v; v = b; b = t; }
-      } else {
-        b = D.stand; v = plusTage(b, -(+modus - 1));
-      }
-      erg = werteVonBis(v, b);
+      b = D.stand; v = plusTage(b, -(+modus - 1));
     }
+    var idx = [];
+    D.tage.forEach(function (tg, i) { if (tg >= v && tg <= b) idx.push(i); });
     [].forEach.call(zeit.querySelectorAll('button[data-zeit]'), function (k) {
       k.setAttribute('aria-pressed', String(k.getAttribute('data-zeit') === modus));
     });
     eigen.hidden = modus !== 'eigen';
-    zeichne(erg);
-    text(erg, v, b);
+    var rs = idx.length ? reihen(idx) : [];
+    if (leer) leer.hidden = rs.length > 0;
+    ['breit', 'schmal'].forEach(function (art) {
+      var ziel = felder[art];
+      if (!ziel) return;
+      ziel.innerHTML = '';
+      if (rs.length) {
+        ziel.appendChild(zeichne(rs, idx.map(function (k) { return D.tage[k]; }), art === 'breit'));
+      }
+    });
+    setzeLegende(rs);
   }
-  var modus = 'aktuell';
+  var modus = String(D.vorgabe);
   [].forEach.call(zeit.querySelectorAll('button[data-zeit]'), function (k) {
     k.addEventListener('click', function () { modus = k.getAttribute('data-zeit'); waehle(modus); });
   });
@@ -5605,21 +5755,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   });
 })();
 
-/* PORTFOLIO GEGEN VODAFONE (Ziel 3). Der Server schreibt alle Paare ins
-   Dokument; hier zeigt der Umschalter nur das gewählte (Standard: data-standard). */
-(function () {
-  var sec = document.getElementById('portfolio');
-  var wahl = document.getElementById('pf-wahl');
-  if (!sec || !wahl) return;
-  var tasten = [].slice.call(wahl.querySelectorAll('button[data-pf]'));
-  var paare = [].slice.call(sec.querySelectorAll('.gr-pf-paar'));
-  function zeige(name) {
-    paare.forEach(function (p) { p.hidden = p.getAttribute('data-pf') !== name; });
-    tasten.forEach(function (k) { k.setAttribute('aria-pressed', String(k.getAttribute('data-pf') === name)); });
-  }
-  tasten.forEach(function (k) {
-    k.addEventListener('click', function () { zeige(k.getAttribute('data-pf')); });
-  });
-  wahl.hidden = false;
-  zeige(sec.getAttribute('data-standard') || tasten[0].getAttribute('data-pf'));
-})();
+/* PORTFOLIO GEGEN VODAFONE (Ziel 3). Seit 12.12.2026 steht die Tafel als EINE
+   Tabelle im Dokument - alle Wettbewerber auf einen Blick, kein Umschalter und
+   keine Geraetelisten mehr (Antonio: „nicht 17 Modelle ohne Aussage"). Hier
+   bleibt nichts zu tun; der Block ist gefallen. */

@@ -251,11 +251,20 @@ def test_seite_gegenprobe_in_xs_hat_jeder_gemessene_anbieter_einen_tarif(seite):
 
 
 def test_seite_traegt_den_erklaersatz_der_regel(site):
-    html = BeautifulSoup(
+    """Antonio, 12.12.2026: der Satz steht nicht mehr unter der Tabelle der
+    Geräteseite, sondern auf der Methodikseite - derselbe Wortlaut, EIN Feld."""
+    geraete = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
-    absatz = html.select_one("#gr-tarifstufen-regel")
-    assert absatz is not None
+    assert geraete.select_one("#gr-tarifstufen-regel") is None
+    html = BeautifulSoup(
+        (site / "geraete-quellen.html").read_text(encoding="utf-8"), "html.parser"
+    )
+    absatz = next(
+        li
+        for li in html.select("#methodik .list-row")
+        if li.select_one(".list-row-date").text == "Tarifstufen"
+    )
     text = absatz.get_text(" ", strip=True)
     assert "Datenvolumen" in text
     assert "nicht nach dem Namen" in text

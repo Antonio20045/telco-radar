@@ -32,9 +32,20 @@
    Aufklappen (`data-src`); laedt ein Bild nicht (Datei geloescht), steht an seiner
    Stelle "Bild nicht mehr verfuegbar" und `.gr-folge-zahl` zaehlt neu. Die Zuordnung rechnet Python
    (`report/geraete_zeilenbelege.py`). #}
+{#- Antonio, 12.11.2026 (Nachbesserung): die Liste steht JE ANBIETER, auch wenn
+    zu KEINEM Anbieter ein Bild vorliegt. Ein Zwischenstand hatte sie in dem
+    Fall ganz weggelassen ("acht Saetze, die nichts sagen") - damit war aber
+    nicht mehr zu sehen, dass ein Bild FEHLT: "kein Preis" und "kein Bild"
+    waeren eins geworden, und ein Paar-Bild ohne Preiszeile haette unbemerkt
+    als Beleg durchgehen koennen. Der Vermerk bleibt sichtbar auf der Seite,
+    schlicht und ohne Erklaertext (Ziel 1d, 08.11.2026). -#}
 {% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}
 <ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Kombination">
-  <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifband, Laufzeit und Anbieter</li>{% for p in paare %}
+{#- Antonio, 12.12.2026: die Zwischenüberschrift „Screenshots zur gewählten
+    Kombination …" ist gefallen; was die Liste zeigt, sagt jede Zeile selbst
+    (Gerät, Tarif, Laufzeit, Anbieter stehen in ihrer Zusammenfassung). Der
+    Name der Liste lebt als aria-label weiter - für den Screenreader, nicht
+    als Zeile auf dem Schirm. -#}{% for p in paare %}
   <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% for z in p.zeilenbilder %}
     <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
       <summary>{% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge (<span class="gr-folge-zahl">{% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}</span>){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}

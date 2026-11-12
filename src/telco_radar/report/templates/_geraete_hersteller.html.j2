@@ -1,7 +1,12 @@
-{# Preisposition je Hersteller (Antonio, 05.11.2026): die erste Übersichtsgrafik.
-   Daten und Text liefert geraete_hersteller.py; hier steht nur die Hülle. Der
-   Server zeichnet die Ansicht „aktuell“ (lesbar ohne JavaScript); die
-   Zeitraumwahl blendet app.js ein und rechnet aus dem JSON im Dokument. #}
+{# Preisposition je Hersteller (Antonio, 05.11.2026; Liniendiagramm seit
+   12.12.2026): das EINE Preisbild der Seite. Daten, Legende und beide SVG
+   liefert geraete_hersteller.py; hier steht nur die Hülle.
+
+   KEIN Text um das Bild: die Achsenbeschriftung steht IM SVG, den Zeitraum
+   sagen die Knöpfe, das Datum sagt die X-Achse. Antonio, 12.12.2026: „Gutes
+   Design braucht keine Erklärung." Der Server zeichnet den Vorgabe-Zeitraum
+   (ohne JavaScript lesbar), app.js schaltet 7 Tage / 30 Tage / eigener
+   Zeitraum um. #}
 {% set hm = geraete.hersteller %}
 <section class="gr-hm gx-art gx-art--tarif" id="hersteller" aria-labelledby="hm-titel"{% if hm and hm.json %} data-stand="{{ hm.stand }}"{% endif %}>
   <div class="gx-kopf"><h2 id="hm-titel">Preisposition je Hersteller</h2></div>
@@ -10,47 +15,25 @@
   {% elif hm.fehler %}
   <p class="gx-leer">Herstellergrafik nicht verfügbar: {{ hm.fehler }}</p>
   {% elif hm.leer %}
-  <p class="gx-leer">Kein geprüfter Preis in den aktuellen Modellen.</p>
+  <p class="gx-leer">Kein vergleichbarer Messtag in den aktuellen Modellen.</p>
   {% else %}
   <div class="gr-zr-zeitwahl gr-hm-zeit" id="hm-zeit" role="group" aria-label="Zeitraum" hidden>
-    <button type="button" data-zeit="aktuell" aria-pressed="true">Aktuell</button>
     <button type="button" data-zeit="7" aria-pressed="false">7 Tage</button>
-    <button type="button" data-zeit="30" aria-pressed="false">30 Tage</button>
+    <button type="button" data-zeit="30" aria-pressed="true">30 Tage</button>
     <button type="button" data-zeit="eigen" aria-pressed="false">Eigener Zeitraum</button>
   </div>
   <div class="gr-hm-eigen" id="hm-eigen" hidden>
     <label>von <input type="date" id="hm-von" value="{{ hm.tage_von }}" min="{{ hm.tage_von }}" max="{{ hm.tage_bis }}"></label>
     <label>bis <input type="date" id="hm-bis" value="{{ hm.tage_bis }}" min="{{ hm.tage_von }}" max="{{ hm.tage_bis }}"></label>
   </div>
-  <p class="gr-pp-einheit" id="hm-einheit" data-basis="{{ hm.einheit }}" aria-live="polite">{{ hm.einheit }} · Stand {{ hm.stand[8:] }}.{{ hm.stand[5:7] }}.{{ hm.stand[:4] }}</p>
-  <div class="gr-hm-tafel" style="--hm-n:{{ hm.wettbewerber | length }}" role="group" aria-label="Abstand der Vodafone-Kosten zum Wettbewerber in Prozent je Hersteller">
-    <div class="gr-hm-achse">
-      <span></span>
-      {% for w in hm.wettbewerber %}
-      <span class="gr-hm-kopf gr-anb--{{ w.slug }}"><i class="gr-hm-punkt"></i>{{ w.legende }}</span>
-      {% endfor %}
-    </div>
-    <div class="gr-hm-richtung"><span>← Vodafone günstiger</span><span>Vodafone teurer →</span></div>
-    {% for z in hm.zeilen %}
-    <div class="gr-hm-zeile{{ ' gr-hm-zeile--alle' if z.gesamt }}" data-hersteller="{{ z.hersteller }}">
-      <div class="gr-hm-name">{{ z.name }}</div>
-      {% for c in z.zellen %}
-      <div class="gr-hm-zelle gr-anb--{{ c.slug }}{{ ' gr-hm-leer' if c.leer }}{{ ' gr-hm-duenn' if c.duenn }}" data-anbieter="{{ c.name }}"{% if not c.leer %} data-wert="{{ c.wert }}" data-n="{{ c.n }}"{% endif %}>
-        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>{{ c.name }}</span>
-        <span class="gr-hm-zahl">{{ c.text }}</span>
-        <span class="gr-hm-spur"><b class="gr-hm-balken"{% if c.leer %} hidden{% else %} style="left:{{ c.links }}%;width:{{ c.breite }}%"{% endif %}></b></span>
-        <span class="gr-hm-n"><span class="gr-hm-r">{{ c.richtung ~ ' · ' if not c.leer }}</span><span class="gr-hm-m">{{ c.n_text }}</span></span>
-      </div>
-      {% endfor %}
-    </div>
+  <ul class="gr-hm-legende" id="hm-legende" aria-label="Hersteller">
+    {% for l in hm.legende %}
+    <li class="gr-hm-leg{{ ' gr-hm-leg--gesamt' if l.gesamt }}" data-hersteller="{{ l.name }}"><svg viewBox="0 0 30 12" aria-hidden="true"><line x1="1" y1="6" x2="29" y2="6" style="stroke:{{ l.farbe }};stroke-width:{{ l.breite }};stroke-dasharray:{{ l.muster }}"/></svg>{{ l.name }}</li>
     {% endfor %}
-  </div>
-  {% for o in hm.ohne_spalte %}
-  <p class="gr-hm-ohne" data-anbieter="{{ o.name }}">{{ o.text }}</p>
-  {% endfor %}
-  <div class="gr-hm-erklaerung">
-    {% for absatz in hm.erklaerung %}<p>{{ absatz }}</p>{% endfor %}
-  </div>
+  </ul>
+  <div class="gr-hm-bild gr-hm-bild--breit" id="hm-bild-breit">{{ hm.svg_breit | safe }}</div>
+  <div class="gr-hm-bild gr-hm-bild--schmal" id="hm-bild-schmal">{{ hm.svg_schmal | safe }}</div>
+  <p class="gx-leer gr-hm-ohne-tag" id="hm-ohne-tag" hidden>Kein vergleichbarer Messtag im gewählten Zeitraum.</p>
   <script type="application/json" id="hm-daten">{{ hm.json | safe }}</script>
   {% endif %}
 </section>

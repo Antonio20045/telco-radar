@@ -111,11 +111,7 @@ def test_ohne_beleg_ist_es_eine_messluecke_nie_eine_portfolio_luecke():
     p = _paar(_rechne(modelle), "Telekom")
     assert p["n_w"] == 0 and p["n_v"] == 0 and p["n_offen"] == 2
     assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_OHNE
-    assert p["kopf"] == "0 Geräte nur bei Telekom, 0 nur bei Vodafone"
-    assert p["kontext"] == (
-        "Bisher belegt: 0 Geräte; 2 aktuelle Geräte sind noch nicht gemessen "
-        "und werden nicht gezählt."
-    )
+    assert p["namen_w"] == [] and p["namen_v"] == []
     belege = _beleg(anbieter="Vodafone", modell=S26.device_id)
     p = _paar(_rechne(modelle, belege), "Telekom")
     assert p["n_w"] == 1 and p["n_offen"] == 1
@@ -210,22 +206,7 @@ def test_standard_ist_telekom_und_gruppen_haben_die_feste_reihenfolge():
     assert pf.berechne([], katalog, belege, HEUTE)["leer"] is True
 
 
-def test_kopfzeile_und_kontext_nennen_die_zahlen_und_den_singular():
-    assert pf.kopfzeile("Telekom", 3, 0) == (
-        "3 Geräte nur bei Telekom, 0 nur bei Vodafone"
-    )
-    assert pf.kopfzeile("o2", 1, 2).startswith("1 Gerät nur bei o2, 2 nur bei")
-    assert pf.kontext(3, 12) == (
-        "Bisher belegt: 3 Geräte; 12 aktuelle Geräte sind noch nicht gemessen "
-        "und werden nicht gezählt."
-    )
-    assert pf.kontext(1, 1) == (
-        "Bisher belegt: 1 Gerät; 1 aktuelles Gerät ist noch nicht gemessen "
-        "und wird nicht gezählt."
-    )
-
-
-def test_kopfzeilen_zahlen_stimmen_mit_den_listen_ueberein():
+def test_zahlen_stimmen_mit_den_listen_ueberein():
     modelle = [
         _modell(S26, _karte("Telekom")),
         _modell(I18, _karte("Telekom"), _karte("Vodafone")),
@@ -235,8 +216,8 @@ def test_kopfzeilen_zahlen_stimmen_mit_den_listen_ueberein():
     katalog = Katalog(geraete=[S26, I18, _g("Google", "Pixel 11", 11)])
     p = _paar(pf.berechne(modelle, katalog, belege, HEUTE), "Telekom")
     assert (p["n_w"], p["n_v"], p["n_offen"]) == (1, 0, 0)
-    assert p["kopf"] == "1 Gerät nur bei Telekom, 0 nur bei Vodafone"
-    assert p["kontext"].startswith("Bisher belegt: 1 Gerät; 0 aktuelle Geräte")
+    assert [g["name"] for g in p["namen_w"]] == ["Samsung Galaxy S26"]
+    assert p["namen_v"] == []
     assert p["beide"] == 2
 
 
@@ -320,26 +301,6 @@ def _ansicht() -> dict:
     return {**pf.berechne(modelle, KATALOG, belege, HEUTE), "hinweis": ""}
 
 
-def test_vorlage_zeigt_kopf_listen_beleglink_und_messluecken_getrennt():
-    s = _rendern(_ansicht())
-    assert s.select_one("section#portfolio h2").text == "Portfolio gegen Vodafone"
-    assert s.select_one("section#portfolio")["data-standard"] == "Telekom"
-    assert [b["data-pf"] for b in s.select("#pf-wahl button")] == ["Telekom", "o2"]
-    assert s.select_one("#pf-wahl").has_attr("hidden")
-    paar = s.select_one('.gr-pf-paar[data-pf="Telekom"]')
-    assert paar.select_one(".gr-pf-kopf").text == (
-        "1 Gerät nur bei Telekom, 0 nur bei Vodafone"
-    )
-    liste_w = paar.select_one(".gr-pf-liste--w")
-    assert "Galaxy S26" in liste_w.text
-    link = liste_w.select_one("a")
-    assert link["href"] == "https://beispiel.test/beleg.png"
-    offen = paar.select_one("details.gr-pf-offen")
-    assert "Messlücke, zählt nicht" in offen.select_one("summary").text
-    assert "iPhone 18 Pro" in offen.text and "iPhone 18 Pro" not in liste_w.text
-    assert "Galaxy S26" not in offen.text
-
-
 def test_vorlage_benennt_ausfall_leerzustand_und_fehlenden_schluessel():
     assert "nicht verfügbar: kaputt" in _rendern({"fehler": "kaputt"}).text
     leer = _rendern({"fehler": "", "leer": True})
@@ -347,32 +308,7 @@ def test_vorlage_benennt_ausfall_leerzustand_und_fehlenden_schluessel():
     assert "nicht berechnet" in _rendern(None).text
 
 
-def test_vorlage_nennt_eine_leere_liste_und_den_belegausfall():
-    a = _ansicht()
-    a["hinweis"] = "Belegliste nicht lesbar (OSError): keine Lücke belegt"
-    s = _rendern(a)
-    assert "Belegliste nicht lesbar" in s.select_one(".gr-pf-hinweis").text
-    o2 = s.select_one('.gr-pf-paar[data-pf="o2"]')
-    assert "Keine belegte Lücke" in o2.select_one(".gr-pf-liste--v").text
-
-
-def test_seite_zeigt_den_abschnitt_nach_der_herstellergrafik(tmp_path):
-    seite = test_geraete_tco_zustand._baue(tmp_path)
-    ids = [e.get("id") for e in seite.select("section[id]")]
-    assert ids.index("hersteller") < ids.index("portfolio") < ids.index("preisposition")
-    assert seite.select_one("#portfolio .gr-pf-regel").text == pf.REGEL
-
-
 WAHL = ["Telekom", "o2", "congstar"]
-_ZWEI = "2 aktuelle Geräte sind noch nicht gemessen und werden nicht gezählt."
-ERWARTET = {
-    "Telekom": f"Bisher belegt: 0 Geräte; {_ZWEI}",
-    "o2": f"Bisher belegt: 0 Geräte; {_ZWEI}",
-    "congstar": (
-        "Bisher belegt: 0 Geräte; 1 aktuelles Gerät ist noch nicht gemessen "
-        "und wird nicht gezählt."
-    ),
-}
 
 
 def _ansicht_drei(belege: dict | None = None) -> dict:
@@ -389,97 +325,72 @@ def _beleg_s26_vodafone() -> dict:
     return _beleg(anbieter="Vodafone", modell=S26.device_id)
 
 
-def test_jede_kopfzahl_hat_den_kontextsatz_direkt_daneben_mit_den_echten_zahlen():
-    a = _ansicht_drei()
+def test_tafel_zeigt_jeden_wettbewerber_in_einer_zeile_mit_vier_zahlen():
+    """Antonio, 12.12.2026: alles auf einen Blick, kein Umschalter, keine
+    Gerätelisten und kein Satz unter der Tabelle."""
+    s = _rendern(_ansicht_drei())
+    kopf = [th.text for th in s.select(".gr-pf-tafel thead th")]
+    assert kopf == ["Anbieter", "beide", "nur dort", "nur Vodafone", "nicht gemessen"]
+    zeilen = s.select(".gr-pf-tafel tbody tr")
+    assert [z["data-pf"] for z in zeilen] == WAHL
+    for z in zeilen:
+        assert len(z.select("td")) == 4
+    assert s.select_one("#pf-wahl") is None
+    assert s.select_one("details.gr-pf-offen") is None
+    assert s.select_one(".gr-pf-regel") is None
+
+
+def test_die_zahlen_der_tafel_sind_die_zahlen_der_rechnung():
+    a = _ansicht_drei(_beleg_s26_vodafone())
     s = _rendern(a)
-    paare = s.select(".gr-pf-paar")
-    assert [p["data-pf"] for p in paare] == WAHL
-    for p in paare:
-        kopf = p.select_one(".gr-pf-kopf")
-        satz = kopf.find_next_sibling()
-        assert satz.name == "p" and "gr-pf-kontext" in satz["class"]
-        assert satz.text == ERWARTET[p["data-pf"]]
-        assert p.select_one(".gr-pf-kopf").text.startswith("0 Geräte nur bei")
-    assert _paar(a, "Telekom")["n_offen"] == 2 and _paar(a, "congstar")["n_offen"] == 1
-    mit = _rendern(_ansicht_drei(_beleg_s26_vodafone()))
-    t = mit.select_one('.gr-pf-paar[data-pf="Telekom"] .gr-pf-kontext').text
-    assert t.startswith("Bisher belegt: 1 Gerät; 1 aktuelles Gerät ist noch nicht")
-    assert "wird nicht gezählt" in t
-
-
-def test_keine_zahl_nur_bei_ohne_kontext_in_der_ganzen_vorlage():
-    s = _rendern(_ansicht_drei())
-    for kopf in s.select(".gr-pf-kopf"):
-        assert "nur bei Vodafone" in kopf.text
-        nach = kopf.find_next_sibling()
-        assert "Bisher belegt:" in nach.text and "nicht gezählt" in nach.text
-    assert len(s.select(".gr-pf-kontext")) == len(s.select(".gr-pf-kopf")) == 3
-
-
-def test_messluecken_liste_ist_offen_ohne_belegten_unterschied_sonst_zu():
-    s = _rendern(_ansicht_drei())
-    for d in s.select("details.gr-pf-offen"):
-        assert d.has_attr("open")
-    mit = _rendern(_ansicht_drei(_beleg_s26_vodafone()))
-    tk = mit.select_one('.gr-pf-paar[data-pf="Telekom"] details.gr-pf-offen')
-    o2 = mit.select_one('.gr-pf-paar[data-pf="o2"] details.gr-pf-offen')
-    assert not tk.has_attr("open") and not o2.has_attr("open")
-
-
-def test_messluecken_zeile_nennt_wer_es_fuehrt_und_dass_kein_beleg_vorliegt():
-    s = _rendern(_ansicht_drei())
-    zeilen = s.select('.gr-pf-paar[data-pf="o2"] details.gr-pf-offen li')
-    texte = {
-        z.select_one(".gr-pf-geraet").text: z.select_one(".gr-pf-beleg").text
-        for z in zeilen
-    }
-    assert texte["Galaxy S26"] == (
-        "o2 führt es (Preis gemessen). Für Vodafone liegt kein Beleg vor."
+    zeile = s.select_one('.gr-pf-tafel tbody tr[data-pf="Telekom"]')
+    p = _paar(a, "Telekom")
+    assert [td.contents[0].strip() for td in zeile.select("td")] == [
+        str(p["beide"]),
+        str(p["n_w"]),
+        str(p["n_v"]),
+        str(p["n_offen"]),
+    ]
+    assert (zeile["data-nur-w"], zeile["data-offen"]) == (
+        str(p["n_w"]),
+        str(p["n_offen"]),
     )
-    assert texte["iPhone 18 Pro"].startswith("o2 führt es")
+
+
+def test_eine_belegte_luecke_steht_mit_geraetenamen_in_ihrer_zelle():
+    s = _rendern(_ansicht_drei(_beleg_s26_vodafone()))
+    zelle = s.select('.gr-pf-tafel tbody tr[data-pf="Telekom"] td')[1]
+    link = zelle.select_one("small a")
+    assert link.text == "Samsung Galaxy S26"
+    assert link["href"] == "https://beispiel.test/beleg.png"
+    ohne = s.select('.gr-pf-tafel tbody tr[data-pf="Telekom"] td')[2]
+    assert ohne.select_one("small") is None and "gr-pf-null" in ohne["class"]
+
+
+def test_ohne_belegte_luecke_steht_dort_nur_die_null():
+    s = _rendern(_ansicht_drei())
+    for zeile in s.select(".gr-pf-tafel tbody tr"):
+        for td in zeile.select("td")[1:3]:
+            assert td.text.strip() == "0" and "gr-pf-null" in td["class"]
+
+
+def test_belegausfall_steht_als_benannte_luecke_ueber_der_tafel():
     a = _ansicht_drei()
-    eigen = _paar(a, "Telekom")
-    assert eigen["n_offen"] == 2
-    modelle = [
-        _modell(S26, _karte("Vodafone"), _karte("congstar")),
-        _modell(I18, _karte("Vodafone"), _karte("Telekom")),
-    ]
-    s = _rendern({**pf.berechne(modelle, KATALOG, {}, HEUTE), "hinweis": ""})
-    z = s.select_one(
-        '.gr-pf-paar[data-pf="Telekom"] details.gr-pf-offen li .gr-pf-beleg'
-    )
-    assert (
-        z.text
-        == "Vodafone führt es (Preis gemessen). Für Telekom liegt kein Beleg vor."
-    )
+    a["hinweis"] = "Belegliste nicht lesbar (OSError): keine Lücke belegt"
+    s = _rendern(a)
+    assert "Belegliste nicht lesbar" in s.select_one(".gx-leer").text
 
 
-def test_abgelaufener_beleg_nennt_gueltigen_beleg_und_den_ablauf():
-    modelle = [_modell(S26, _karte("congstar"))]
-    abgelaufen = _beleg(bis="2026-11-09", anbieter="Vodafone", modell="*")
-    s = _rendern({**pf.berechne(modelle, KATALOG, abgelaufen, HEUTE), "hinweis": ""})
-    z = s.select_one("details.gr-pf-offen li .gr-pf-beleg").text
-    assert z == (
-        "congstar führt es (Preis gemessen). Für Vodafone liegt kein gültiger "
-        "Beleg vor: Beleg abgelaufen (bis 09.11.2026)."
-    )
-
-
-def test_satz_zu_1und1_und_haendlern_nennt_den_grund_und_stimmt_mit_den_daten():
-    s = _rendern(_ansicht_drei())
-    t = s.select_one(".gr-pf-fehlende").text
-    assert t.startswith("1&1 und Händler fehlen noch")
-    assert "kein frischer, gezählter Preis" in t and "aktuellen Modellen" in t
-    modelle = [
-        _modell(S26, _karte("Telekom"), _karte("1&1"), _karte("o2"), _karte("congstar"))
-    ]
-    a = pf.berechne(modelle, KATALOG, {}, HEUTE)
-    assert "1&1" in [p["name"] for p in a["paare"]]
-    assert a["fehlende"].startswith("Händler fehlt noch")
-    modelle = [_modell(S26, _karte("Telekom"), _karte("MediaMarkt"))]
-    assert pf.berechne(modelle, KATALOG, {}, HEUTE)["fehlende"].startswith(
-        "o2, 1&1 und congstar fehlen"
-    )
+def test_seite_zeigt_die_tafel_nach_der_herstellergrafik_und_die_regel_im_fuss(
+    tmp_path,
+):
+    seite = test_geraete_tco_zustand._baue(tmp_path)
+    ids = [e.get("id") for e in seite.select("section[id]")]
+    assert ids.index("hersteller") < ids.index("portfolio")
+    assert seite.select_one("#portfolio .gr-pf-tafel") is not None
+    fuss = seite.select_one(".dz-foot--stand")
+    assert fuss is not None and pf.REGEL in fuss.text
+    assert pf.REGEL not in seite.select_one("#portfolio").get_text()
 
 
 def test_nicht_verfuegbar_ist_kein_beleg_fuer_nicht_im_portfolio():
@@ -521,21 +432,3 @@ def test_echter_congstar_beleg_belegt_die_geraeteliste_nicht_nur_nicht_verfuegba
     )
     for datei in ("4-apple-uebersicht-links.txt", "5-congstar-sitemap-devices.xml"):
         assert (ordner / datei).is_file()
-
-
-def test_umschalter_hat_alle_paare_und_standard_telekom_im_gerenderten_html():
-    s = _rendern(_ansicht_drei())
-    tasten = s.select("#pf-wahl button[data-pf]")
-    assert [t["data-pf"] for t in tasten] == WAHL
-    assert [t["aria-pressed"] for t in tasten] == ["true", "false", "false"]
-    assert s.select_one("section#portfolio")["data-standard"] == "Telekom"
-    assert [p["data-pf"] for p in s.select(".gr-pf-paar")] == [
-        t["data-pf"] for t in tasten
-    ]
-    assert s.select_one("#pf-wahl").has_attr("hidden")
-    assert not any(p.has_attr("hidden") for p in s.select(".gr-pf-paar"))
-    modelle = [_modell(S26, _karte("o2"), _karte("congstar"))]
-    a = {**pf.berechne(modelle, KATALOG, {}, HEUTE), "hinweis": ""}
-    s = _rendern(a)
-    assert s.select_one("section#portfolio")["data-standard"] == "o2"
-    assert [t["aria-pressed"] for t in s.select("#pf-wahl button")] == ["true", "false"]
