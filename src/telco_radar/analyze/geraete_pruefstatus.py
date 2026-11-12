@@ -85,6 +85,9 @@ REGELN = {
     15: "Zeitraum",
     16: "Frische",
 }
+"""Regel 16 prüft zweierlei mit derselben Folge: das Alter der Zeile und ob eine neuere
+Messung derselben Vertragsform ihren Anschlusspreis widerlegt
+(``geraete_anschluss``). Beides heißt: der Wert ist nicht mehr belegt."""
 FOLGE = {n: QUARANTAENE for n in REGELN} | {10: VERALTET, 16: VERALTET}
 REGEL_SORTIMENT = 17
 """Keine Regel der Prüfstelle, sondern die Marke, die die Seite beim Lesen setzt

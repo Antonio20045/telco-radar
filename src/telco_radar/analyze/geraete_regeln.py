@@ -9,6 +9,11 @@ veralteten Speicher-Nachbarn, bleibt es nur gültig, wenn Regel 11 es ersatzweis
 ``geraete_regel11``); sonst ist es Quarantäne 5 (fail-closed). Regel 12 (gleicher Wert
 bei allen Bündeln eines Anbieters, auch eine Ratenlaufzeit, die bei allen Geräten
 fehlt) ergibt eine Erfassungslücke je Anbieter (``erfassungsluecken``), keinen Status.
+Regel 16 prüft neben dem Alter der Zeile auch ihren Anschlusspreis gegen den Bestand:
+widerlegt eine neuere, hinreichend gestützte Messung derselben Vertragsform (Anbieter,
+Tarif, Zustand, Ratenlaufzeit) den Betrag, ist die Zeile veraltet
+(``geraete_anschluss``). Regel 5 sieht diesen Befund nicht, weil er erst nach
+ihr entsteht; sie vergleicht weiter nach dem Alter.
 Regel 15 gilt im Vergleich (Sieger, Δ); je Bündel wird nur geprüft, ob der Zeitraum H
 bestimmbar ist. Regel 4 prüft das Volumen im Tarifnamen gegen den Tarifbestand; ob
 ein Tarif in ein Band mit mehr Volumen fällt, entscheidet die Bandzuordnung der Ansicht.
@@ -36,6 +41,7 @@ from ..geraete_model import normalisiere
 from ..tarif_model import NUR_MIT_GERAET, vertrag_basis
 from ..tco_model import Buendel, sim_only_id
 from ..tco_model import zeitraum as zeitraum_h
+from .geraete_anschluss import widerlegter_anschluss
 from .geraete_pruefstatus import (
     BUENDEL_NACHLASS,
     CENT,
@@ -95,6 +101,13 @@ def pruefe_bestand(saetze: Iterable[Mapping], k: Kontext) -> dict[str, Prueferge
         if not any(x.regel == 11 for x in e.befunde)
     )
     for bid, befund in speicherstufen(lesbar, k, geprueft).items():
+        ergebnisse[bid].befunde.append(befund)
+    schon_16 = frozenset(
+        bid
+        for bid, e in ergebnisse.items()
+        if any(x.regel == 16 and x.ergebnis == VERLETZT for x in e.befunde)
+    )
+    for bid, befund in widerlegter_anschluss(lesbar, schon_16).items():
         ergebnisse[bid].befunde.append(befund)
     return ergebnisse
 
