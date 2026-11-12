@@ -15,7 +15,10 @@ die Gesamtsumme, sondern drei Dinge:
 * der Gerätepreis liegt nicht mehr als ``REFERENZ_RUECKGANG`` unter dem Höchstwert
   der ``REFERENZ_TAGE`` Tage davor (schleichendes Sinken, ein seit Tagen gleich
   falscher Preis). Ohne ``REFERENZ_MIN_MESSUNGEN`` Messungen im Fenster entfällt
-  dieser Teil.
+  dieser Teil, ebenso wenn derselbe Gerätepreis an ``STABIL_TAGE`` Abruftagen in
+  Folge gelesen wurde (``_stabil``): eine echte Senkung (Vodafone Black Week,
+  Rate 45 € auf 39 €) soll nicht bis zu sieben Tage gesperrt bleiben. Der Sprung
+  zum Vortag und das schleichende Sinken prüfen vorher und bleiben gesperrt.
 """
 
 from __future__ import annotations
@@ -52,6 +55,14 @@ REFERENZ_RUECKGANG = 0.10
 """Regel 11 gegen schleichendes Sinken: der Gerätepreis liegt höchstens so weit unter
 dem Höchstwert der ``REFERENZ_TAGE`` Tage vor dem Abruf (mit mindestens
 ``REFERENZ_MIN_MESSUNGEN`` Messungen im Fenster)."""
+STABIL_TAGE = 3
+"""Regel 11: so viele Abruftage in Folge mit demselben Gerätepreis (der Abruf selbst
+zählt mit) heben den Referenzvergleich auf. Ein Preis, der an drei aufeinander
+folgenden Tagen gleich gelesen wurde, ist kein Ausreißer; Tagessprung und
+schleichendes Sinken prüfen vorher und bleiben gesperrt."""
+STABIL_ABSTAND_EUR = 0.005
+"""Regel 11: zwei Gerätepreise gelten als gleich gelesen, wenn sie auf den Cent
+übereinstimmen."""
 
 
 def _nicht(satz: str) -> Befund:
@@ -81,10 +92,12 @@ def _abstand(neu: float, alt: float) -> float:
     return abs(neu - alt) / alt
 
 
-def _referenz(satz: Mapping, abruf: dt.date, k: Kontext) -> float | None:
-    """Höchster Gerätepreis der letzten ``REFERENZ_TAGE`` Tage vor dem Abruf, gleiche
-    Rechenweise; None ohne ``REFERENZ_MIN_MESSUNGEN`` lesbare Messungen im Fenster."""
-    preise = []
+def _preise_je_tag(
+    satz: Mapping, abruf: dt.date, k: Kontext
+) -> dict[dt.date, list[float | None]]:
+    """Je Messtag der letzten ``REFERENZ_TAGE`` Tage vor dem Abruf die Gerätepreise
+    gleicher Rechenweise; ``None`` für eine Messung, deren Preis nicht lesbar ist."""
+    je_tag: dict[dt.date, list[float | None]] = {}
     for zeile in k.verlauf.get(str(satz.get("id") or ""), ()):
         tag = _tag(zeile.get("datum"))
         if tag is None or not 0 < (abruf - tag).days <= REFERENZ_TAGE:
@@ -93,9 +106,30 @@ def _referenz(satz: Mapping, abruf: dt.date, k: Kontext) -> float | None:
             continue
         b = _zeile(satz, zeile)
         preis = geraetepreis(b) if b else None
-        if preis:
-            preise.append(preis)
+        je_tag.setdefault(tag, []).append(preis or None)
+    return je_tag
+
+
+def _referenz(je_tag: Mapping[dt.date, list[float | None]]) -> float | None:
+    """Höchster Gerätepreis im Fenster; None ohne ``REFERENZ_MIN_MESSUNGEN`` lesbare
+    Messungen."""
+    preise = [p for tag in je_tag.values() for p in tag if p]
     return max(preise) if len(preise) >= REFERENZ_MIN_MESSUNGEN else None
+
+
+def _stabil(
+    je_tag: Mapping[dt.date, list[float | None]], abruf: dt.date, neu: float
+) -> bool:
+    """Wurde ``neu`` an ``STABIL_TAGE`` Abruftagen in Folge gelesen (der Abruf zählt
+    mit)? Fail-closed: ein fehlender Tag, eine unlesbare oder eine abweichende
+    Messung desselben Tages zählt nicht als gleich gelesen."""
+    for vor_tagen in range(1, STABIL_TAGE):
+        preise = je_tag.get(abruf - dt.timedelta(days=vor_tagen))
+        if not preise:
+            return False
+        if any(p is None or abs(p - neu) > STABIL_ABSTAND_EUR for p in preise):
+            return False
+    return True
 
 
 def regel_11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
@@ -131,8 +165,16 @@ def regel_11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     if sprung > AUSREISSER_GERAET_VORTAG:
         text = f"Gerätepreis {eur(neu_g)} statt {eur(alt_g)} am {tag} ({sprung:.0%})"
         return _verletzt(f"{text}, Quarantäne bis zum zweiten Abruf")
-    hoechst = _referenz(satz, abruf, k)
-    if hoechst is not None and neu_g < hoechst * (1 - REFERENZ_RUECKGANG):
+    je_tag = _preise_je_tag(satz, abruf, k)
+    hoechst = _referenz(je_tag)
+    if (
+        hoechst is not None
+        and neu_g < hoechst * (1 - REFERENZ_RUECKGANG)
+        and not _stabil(je_tag, abruf, neu_g)
+    ):
         text = f"Gerätepreis {eur(neu_g)}, in den {REFERENZ_TAGE} Tagen davor bis zu "
-        return _verletzt(f"{text}{eur(hoechst)} ({1 - neu_g / hoechst:.0%} darunter)")
+        text += f"{eur(hoechst)} ({1 - neu_g / hoechst:.0%} darunter)"
+        return _verletzt(
+            f"{text}, Quarantäne bis zu {STABIL_TAGE} gleichen Abruftagen in Folge"
+        )
     return None

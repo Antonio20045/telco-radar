@@ -251,7 +251,7 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon); sie sind auch für Regel 5 kein Partner.
 17. Ausnahme aus Daten, nicht aus Code je Anbieter: Ein Tarif auf `config/tarif_preis_widerspruch.yaml` („Preis am Original widersprüchlich“, mit Beleg) bleibt ohne Stufe, bis der Eintrag gelöscht wird; Stand 09.11. ist die Liste leer.
 
-### Regel 11 im Einzelnen (Stand 10.11.2026)
+### Regel 11 im Einzelnen (Stand 12.11.2026)
 
 Regel 11 ist der einzige Schutz für ein frisches Bündel, dessen Speicher-Nachbar veraltet ist (Regel 5). Der Prüfer von PR 84 zeigte drei Wege, auf denen ein falsch billiger Gerätepreis durchkam: Gerätepreis -27 % gegen gestern (die Gesamtsumme bewegt sich nur um den Geräteanteil), ein seit Tagen gleich falscher Preis und ein schleichendes Sinken. Darum prüft die Regel (`analyze/geraete_regel11.py`, Schwellen in `geraete_pruefstatus`):
 
@@ -260,14 +260,16 @@ Regel 11 ist der einzige Schutz für ein frisches Bündel, dessen Speicher-Nachb
 | Alter des Vorgängers (letzte Messung vor dem Abruf) | höchstens 3 Tage, gleich `ALT_AB_TAGEN` der Seite | älter: Regel nicht anwendbar (nicht prüfbar); beim veralteten Nachbarn Quarantäne 5. Ein Gesamtsprung über 15 % gegen den älteren Vorgänger bleibt Quarantäne 11 wie zuvor |
 | Gesamtsumme 24 Monate gegen den Vorgänger | höchstens 15 % (unverändert) | Quarantäne 11 bis zum zweiten Abruf |
 | Gerätepreis (Zuzahlung plus Raten) gegen den Vorgänger | höchstens 10 % | Quarantäne 11 bis zum zweiten Abruf |
-| Gerätepreis gegen den Höchstwert der 7 Tage davor | höchstens 10 % darunter, ab 3 Messungen im Fenster | Quarantäne 11, bis der Preis aus dem Fenster gewachsen ist (höchstens 7 Tage) |
+| Gerätepreis gegen den Höchstwert der 7 Tage davor | höchstens 10 % darunter, ab 3 Messungen im Fenster; entfällt, sobald derselbe Gerätepreis an 3 Abruftagen in Folge gelesen wurde (`STABIL_TAGE`, der Abruf zählt mit) | Quarantäne 11, bis der Preis an 3 Tagen in Folge gleich gelesen wurde, längstens bis er aus dem Fenster gewachsen ist (7 Tage) |
 
 Begründung der Zahlen aus dem Bestand (Historie 26.10. bis 09.11., 84.212 Paare aufeinanderfolgender Messungen desselben Bündels):
 
 - Der Gerätepreis ändert sich von Messung zu Messung bei 0,9 % der Paare, um mehr als 5 % bei 0,56 %, um mehr als 10 % bei 0,22 % (189 Paare), um mehr als 15 % bei 0,12 %. Die Gesamtsumme dämpft: über 15 % nur 41 Paare. Ein Sprung des Gerätepreises über 10 % ist damit selten genug, um ihn als Verdacht zu behandeln, und deckt die Fehler der Größe aus Regel 5 (17 % und 27 %) ab. Bei 5 % träfe es am Spitzentag (04.11.) 3,0 % der frisch gemessenen Zeilen, bei 10 % 1,3 %.
 - Als Referenz dient der Höchstwert, nicht der Median: der Median sinkt mit einem Preis mit und schlägt auch bei Anstiegen an (Simulation 02. bis 09.11.: 522 Treffer in 8 Tagen gegen 218 beim Höchstwert, Spitzentag 2,0 % gegen 1,6 % der Zeilen). Der Höchstwert ist die einfachste Größe, die schleichendes Sinken fängt (4 % je Tag wird am vierten Tag erkannt) und einen seit Tagen gleich falschen Preis, solange der richtige in den 7 Tagen davor liegt. Sieben Tage statt vierzehn, weil ein dauerhaft gesenkter Preis (Aktion) sonst zwei Wochen in Quarantäne bliebe: mit 14 Tagen träfe es am Bestand 09.11. 27 statt 6 Zeilen, die übrigen 21 führen ihren neuen Preis seit 6 bis 10 Tagen stabil (congstar iPhone 17 256 und 512 GB: 907 auf 685 € am 30.10.). Die Referenz sieht nur Rückgänge: ein höherer Preis ist kein Fall für diese Quarantäne.
+- Drei gleiche Abruftage heben die Referenz auf (`STABIL_TAGE = 3`, seit 12.11.2026): die Vodafone-Senkung der Geräterate von 45 auf 39 € (Black Week, 10.11.) hielt 145 CSV-Zeilen bis zu sieben Tage in Quarantäne, obwohl der neue Preis seit drei Tagen gleich gelesen wurde. Fail-closed: ein fehlender, ein unlesbarer oder ein abweichender Messwert an einem der drei Tage zählt nicht; der Sprung zum Vortag und das schleichende Sinken prüfen vorher und bleiben scharf (Replay 27.10. bis 12.11.: am Senkungstag 10.11. unverändert 1.072 Zeilen Quarantäne, am 11.11. 424, erst am 12.11. 422 → 2). Preis der Lockerung: ein seit drei Tagen gleich falscher Preis kommt durch; im Replay 6 von 494 geänderten Zeilen (Telekom Motorola Edge 70 512 GB, 31.10. bis 02.11., 253 statt 497,80 €).
 - Grenze der Referenz: ein Preis, der länger als 7 Tage gleich falsch ist, bleibt unentdeckt. Das fängt keine Regel aus der Historie; dafür gibt es den Abgleich am Original (CLAUDE.md Regel 11).
 - Wirkung am Bestand 09.11.: 72 von 7.663 bisher gültigen Zeilen (0,94 %) gehen neu in Quarantäne, am Bestand mit Stichtag 10.11. 54 von 7.366 (0,73 %). Keine Zeile wird lockerer; der Richtwert von 2 % ist eingehalten.
+- Wirkung von `STABIL_TAGE` am Bestand 12.11.: 420 von 10.189 Bündeln wechseln von Quarantäne auf gültig (alle Vodafone, gültig 6.907 → 7.327), keines umgekehrt; Regel 11 verletzt 433 → 13.
 
 Umsetzung mit pydantic und pandera in pytest. Kennzahlen je Anbieter und Lauf auf der Quellen-Seite: Abdeckung (je Laufzeit), Frische, Quarantänequote, Konfliktquote, Belegquote.
 
