@@ -86,7 +86,7 @@ REGELN = {
     16: "Frische",
 }
 """Regel 16 prüft zweierlei mit derselben Folge: das Alter der Zeile und ob eine neuere
-Messung desselben Anbieters und Tarifs ihren Anschlusspreis widerlegt
+Messung derselben Vertragsform ihren Anschlusspreis widerlegt
 (``geraete_anschluss``). Beides heißt: der Wert ist nicht mehr belegt."""
 FOLGE = {n: QUARANTAENE for n in REGELN} | {10: VERALTET, 16: VERALTET}
 REGEL_SORTIMENT = 17
