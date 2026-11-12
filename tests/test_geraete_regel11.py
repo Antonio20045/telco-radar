@@ -133,14 +133,111 @@ def test_geraetepreis_minus_9_prozent_gegen_gestern_bleibt_gueltig():
 
 def test_seit_tagen_gleich_falscher_preis_haelt_die_referenz_der_woche():
     """Heute und gestern Rate 22, davor eine Woche lang 30: der Vortag bestätigt den
-    falschen Preis, die Referenz (Höchstwert der sieben Tage davor) nicht."""
+    falschen Preis, die Referenz (Höchstwert der sieben Tage davor) nicht. Der
+    Rückgang (27 %) liegt zudem über ``STABIL_MAX_RUECKGANG``, die Zeile bleibt also
+    unabhängig von den zwei gleichen Abruftagen gesperrt."""
     frisch = _satz(256, rate=22.0)
-    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 22.0, (2, 1))
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 22.0, (1,))
     feld = _lauf(frisch, verlauf[-1], verlauf)
     assert feld["status"] == QUARANTAENE, feld
     assert _gruende(feld)[11] == (
-        "Gerätepreis 529,00 €, in den 7 Tagen davor bis zu 721,00 € (27% darunter)"
+        "Gerätepreis 529,00 €, in den 7 Tagen davor bis zu 721,00 € (27% darunter), "
+        "Rückgang über 25%, gleiche Abruftage heben die Quarantäne nicht auf"
     )
+
+
+def test_drei_gleiche_abruftage_heben_die_referenz_auf():
+    """Heute, gestern und vorgestern derselbe Gerätepreis: eine echte Senkung (Rate
+    30 -> 23, -23 % und damit unter ``STABIL_MAX_RUECKGANG``, Vodafone Black Week)
+    bleibt nicht wegen des Höchstwerts gesperrt."""
+    frisch = _satz(256, rate=23.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 23.0, (2, 1))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == GUELTIG, feld
+    assert 11 not in feld["nicht_pruefbar"], feld
+
+
+def test_rueckgang_ueber_der_obergrenze_bleibt_trotz_drei_gleicher_tage_gesperrt():
+    """Auflage 1 der Prüfung von PR 95: Drei gleiche Abruftage heben die Referenz nur
+    bis ``STABIL_MAX_RUECKGANG`` auf. Rate 30 -> 18 ist ein Gerätepreis 721 -> 433,
+    also -40 % und damit über der Grenze; so lag der falsch gelesene Motorola-Preis
+    (-39,7 % und -49,2 % an drei gleichen Tagen). Die Zeile bleibt Quarantäne."""
+    frisch = _satz(256, rate=18.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 18.0, (2, 1))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == QUARANTAENE, feld
+    assert _gruende(feld)[11] == (
+        "Gerätepreis 433,00 €, in den 7 Tagen davor bis zu 721,00 € (40% darunter), "
+        "Rückgang über 25%, gleiche Abruftage heben die Quarantäne nicht auf"
+    )
+
+
+def test_rueckgang_unter_der_obergrenze_wird_nach_drei_gleichen_tagen_frei():
+    """Gegenstück: Rate 30 -> 24 ist ein Gerätepreis 721 -> 577, also -20 % und damit
+    unter ``STABIL_MAX_RUECKGANG``. Nach drei gleichen Abruftagen wird die Zeile frei,
+    wie es die echten Vodafone-Senkungen der Black Week verlangen."""
+    frisch = _satz(256, rate=24.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 24.0, (2, 1))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == GUELTIG, feld
+    assert 11 not in feld["nicht_pruefbar"], feld
+
+
+def test_rueckgang_genau_an_der_obergrenze_wird_nach_drei_gleichen_tagen_frei():
+    """Grenzfall mit der feinsten Stufe der Rate (Cent): Gerätepreis 540,76 € ist
+    24,9986 % unter dem Höchstwert 721,00 €, auf den Cent die am dichtesten an 25 %
+    liegende Rate, die noch darunter bleibt. ``STABIL_MAX_RUECKGANG`` lässt sie frei."""
+    frisch = _satz(256, rate=22.49)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 22.49, (2, 1))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == GUELTIG, feld
+    assert 11 not in feld["nicht_pruefbar"], feld
+
+
+def test_rueckgang_knapp_ueber_der_obergrenze_bleibt_gesperrt():
+    """Gegenstück: einen Cent weniger Rate, Gerätepreis 540,52 € liegt mit 25,03 %
+    knapp über der Grenze und bleibt trotz drei gleicher Abruftage Quarantäne."""
+    frisch = _satz(256, rate=22.48)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 22.48, (2, 1))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == QUARANTAENE, feld
+
+
+def test_luecke_am_vorvortag_haelt_die_quarantaene():
+    """Gegenprobe: dieselben drei Messwerte, aber der Vorvortag fehlt. Zwei Tage in
+    Folge und ein älterer gleicher Wert genügen nicht."""
+    frisch = _satz(256, rate=22.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 22.0, (3, 1))
+    assert _lauf(frisch, verlauf[-1], verlauf)["status"] == QUARANTAENE
+
+
+def test_abweichender_preis_am_vorvortag_haelt_die_quarantaene():
+    """Gegenprobe: vorgestern 21,50 € Rate statt 22 €. Die drei Tage sind nicht
+    gleich gelesen, also bleibt die Referenz scharf."""
+    frisch = _satz(256, rate=22.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4))
+    verlauf += [_messung(frisch, 21.5, 2), _messung(frisch, 22.0, 1)]
+    assert _lauf(frisch, verlauf[-1], verlauf)["status"] == QUARANTAENE
+
+
+def test_zweite_messung_eines_tages_mit_anderem_preis_haelt_die_quarantaene():
+    """Fail-closed: hat ein Tag zwei Messungen und nur eine passt, zählt der Tag
+    nicht als gleich gelesen."""
+    frisch = _satz(256, rate=22.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4))
+    verlauf += [_messung(frisch, 22.0, 2), _messung(frisch, 25.0, 2)]
+    verlauf += [_messung(frisch, 22.0, 1)]
+    assert _lauf(frisch, verlauf[-1], verlauf)["status"] == QUARANTAENE
+
+
+def test_stabile_tage_heben_den_tagessprung_nicht_auf():
+    """Nirgends lockerer: ein Sprung zum Vortag bleibt Quarantäne, auch wenn die
+    Tage davor denselben neuen Preis trugen (die Stabilität gilt nur der Referenz)."""
+    frisch = _satz(256, rate=22.0)
+    verlauf = _stabil(frisch, 22.0, (3, 2)) + _stabil(frisch, 30.0, (1,))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == QUARANTAENE, feld
+    assert "Quarantäne bis zum zweiten Abruf" in _gruende(feld)[11]
 
 
 def test_gleich_falsch_gegen_30_tage_alten_vorgaenger_ist_nicht_anwendbar():
