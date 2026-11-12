@@ -155,6 +155,32 @@ def test_drei_gleiche_abruftage_heben_die_referenz_auf():
     assert 11 not in feld["nicht_pruefbar"], feld
 
 
+def test_rueckgang_ueber_der_obergrenze_bleibt_trotz_drei_gleicher_tage_gesperrt():
+    """Auflage 1 der Prüfung von PR 95: Drei gleiche Abruftage heben die Referenz nur
+    bis ``STABIL_MAX_RUECKGANG`` auf. Rate 30 -> 18 ist ein Gerätepreis 721 -> 433,
+    also -40 % und damit über der Grenze; so lag der falsch gelesene Motorola-Preis
+    (-39,7 % und -49,2 % an drei gleichen Tagen). Die Zeile bleibt Quarantäne."""
+    frisch = _satz(256, rate=18.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 18.0, (2, 1))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == QUARANTAENE, feld
+    assert _gruende(feld)[11] == (
+        "Gerätepreis 433,00 €, in den 7 Tagen davor bis zu 721,00 € (40% darunter), "
+        "Rückgang über 35%, gleiche Abruftage heben die Quarantäne nicht auf"
+    )
+
+
+def test_rueckgang_unter_der_obergrenze_wird_nach_drei_gleichen_tagen_frei():
+    """Gegenstück: Rate 30 -> 24 ist ein Gerätepreis 721 -> 577, also -20 % und damit
+    unter ``STABIL_MAX_RUECKGANG``. Nach drei gleichen Abruftagen wird die Zeile frei,
+    wie es die echten Vodafone-Senkungen der Black Week verlangen."""
+    frisch = _satz(256, rate=24.0)
+    verlauf = _stabil(frisch, 30.0, (7, 6, 5, 4)) + _stabil(frisch, 24.0, (2, 1))
+    feld = _lauf(frisch, verlauf[-1], verlauf)
+    assert feld["status"] == GUELTIG, feld
+    assert 11 not in feld["nicht_pruefbar"], feld
+
+
 def test_luecke_am_vorvortag_haelt_die_quarantaene():
     """Gegenprobe: dieselben drei Messwerte, aber der Vorvortag fehlt. Zwei Tage in
     Folge und ein älterer gleicher Wert genügen nicht."""

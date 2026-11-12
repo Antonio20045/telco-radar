@@ -16,8 +16,10 @@ die Gesamtsumme, sondern drei Dinge:
   der ``REFERENZ_TAGE`` Tage davor (schleichendes Sinken, ein seit Tagen gleich
   falscher Preis). Ohne ``REFERENZ_MIN_MESSUNGEN`` Messungen im Fenster entfällt
   dieser Teil, ebenso wenn derselbe Gerätepreis an ``STABIL_TAGE`` Abruftagen in
-  Folge gelesen wurde (``_stabil``): eine echte Senkung (Vodafone Black Week,
-  Rate 45 € auf 39 €) soll nicht bis zu sieben Tage gesperrt bleiben. Der Sprung
+  Folge gelesen wurde (``_stabil``) **und** der Rückgang höchstens
+  ``STABIL_MAX_RUECKGANG`` beträgt: eine echte Senkung (Vodafone Black Week,
+  Rate 45 € auf 39 €) soll nicht bis zu sieben Tage gesperrt bleiben, ein seit
+  Tagen gleich falsch gelesener Preis aber auch nicht durchkommen. Der Sprung
   zum Vortag und das schleichende Sinken prüfen vorher und bleiben gesperrt.
 """
 
@@ -63,6 +65,17 @@ schleichendes Sinken prüfen vorher und bleiben gesperrt."""
 STABIL_ABSTAND_EUR = 0.005
 """Regel 11: zwei Gerätepreise gelten als gleich gelesen, wenn sie auf den Cent
 übereinstimmen."""
+STABIL_MAX_RUECKGANG = 0.35
+"""Regel 11: so weit darf der Gerätepreis höchstens unter dem Höchstwert liegen, damit
+``STABIL_TAGE`` gleiche Abruftage den Referenzvergleich aufheben. Darüber bleibt die
+Quarantäne, auch wenn der Preis seit Tagen gleich gelesen wird: ein Lesefehler auf einer
+falschen Seitenvariante steht oft mehrere Tage (Telekom Motorola Edge 70 512 GB,
+30.10.-02.11.2026, -39,7 % und -49,2 %). Die Höhe stammt aus dem Replay der Prüfung von
+PR 95 über alle 524 Freigaben: Bei 35 % bleiben alle 6 falschen Zeilen gesperrt (die
+nächste liegt bei -39,7 %) und 315 der 420 echten Vodafone-Senkungen vom 12.11. werden
+frei; bei 40 % kämen 4 der falschen durch, bei 25 % blieben 225 der 420 echten gesperrt.
+Echte Senkungen reichen bis -45 % (Pixel 10a, am Original belegt), eine saubere Trennung
+gibt es also nicht; die Grenze ist der gewählte Punkt zwischen Abdeckung und Fehler."""
 
 
 def _nicht(satz: str) -> Befund:
@@ -132,6 +145,29 @@ def _stabil(
     return True
 
 
+def _referenz_befund(
+    je_tag: Mapping[dt.date, list[float | None]], abruf: dt.date, neu_g: float
+) -> Befund | None:
+    """Der Abstand zum Höchstwert der ``REFERENZ_TAGE`` Tage davor; None heißt
+    bestanden. Drei gleiche Abruftage heben den Vergleich auf, aber nur bis
+    ``STABIL_MAX_RUECKGANG``."""
+    hoechst = _referenz(je_tag)
+    if hoechst is None or neu_g >= hoechst * (1 - REFERENZ_RUECKGANG):
+        return None
+    rueckgang = 1 - neu_g / hoechst
+    zu_gross = rueckgang > STABIL_MAX_RUECKGANG
+    if not zu_gross and _stabil(je_tag, abruf, neu_g):
+        return None
+    text = f"Gerätepreis {eur(neu_g)}, in den {REFERENZ_TAGE} Tagen davor bis zu "
+    text += f"{eur(hoechst)} ({rueckgang:.0%} darunter)"
+    if zu_gross:
+        ende = f"Rückgang über {STABIL_MAX_RUECKGANG:.0%}, gleiche Abruftage heben "
+        ende += "die Quarantäne nicht auf"
+    else:
+        ende = f"Quarantäne bis zu {STABIL_TAGE} gleichen Abruftagen in Folge"
+    return _verletzt(f"{text}, {ende}")
+
+
 def regel_11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     """Regel 11: Sprung zum Vortag und Abstand zur Referenz; None heißt bestanden."""
     alt = k.vortag.get(str(satz.get("id") or ""))
@@ -165,16 +201,4 @@ def regel_11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     if sprung > AUSREISSER_GERAET_VORTAG:
         text = f"Gerätepreis {eur(neu_g)} statt {eur(alt_g)} am {tag} ({sprung:.0%})"
         return _verletzt(f"{text}, Quarantäne bis zum zweiten Abruf")
-    je_tag = _preise_je_tag(satz, abruf, k)
-    hoechst = _referenz(je_tag)
-    if (
-        hoechst is not None
-        and neu_g < hoechst * (1 - REFERENZ_RUECKGANG)
-        and not _stabil(je_tag, abruf, neu_g)
-    ):
-        text = f"Gerätepreis {eur(neu_g)}, in den {REFERENZ_TAGE} Tagen davor bis zu "
-        text += f"{eur(hoechst)} ({1 - neu_g / hoechst:.0%} darunter)"
-        return _verletzt(
-            f"{text}, Quarantäne bis zu {STABIL_TAGE} gleichen Abruftagen in Folge"
-        )
-    return None
+    return _referenz_befund(_preise_je_tag(satz, abruf, k), abruf, neu_g)
