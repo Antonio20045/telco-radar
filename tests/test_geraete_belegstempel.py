@@ -11,6 +11,7 @@ Bestätigung liefert.
 from __future__ import annotations
 
 import hashlib
+import os
 import subprocess
 from pathlib import Path
 
@@ -51,9 +52,19 @@ STEMPELZWECK = "-addext extendedKeyUsage=critical,timeStamping"
 
 
 def _ssl(befehl: str, ordner: Path) -> bytes:
-    """openssl mit Dateinamen relativ zu ``ordner``; kein Wert enthält Leerzeichen."""
+    """openssl mit Dateinamen relativ zu ``ordner``; kein Wert enthält Leerzeichen.
+
+    ``OPENSSL_CONF=/dev/null`` wie in ``belegstempel._openssl``: ohne System-
+    konfiguration, die auf einem Runner ein fehlendes optionales Paket (z. B.
+    Ubuntus ``crypto-config``) einbinden könnte.
+    """
+    env = {**os.environ, "OPENSSL_CONF": os.devnull}
     lauf = subprocess.run(
-        ["openssl", *befehl.split()], cwd=ordner, capture_output=True, check=True
+        ["openssl", *befehl.split()],
+        cwd=ordner,
+        capture_output=True,
+        check=True,
+        env=env,
     )
     return lauf.stdout
 
