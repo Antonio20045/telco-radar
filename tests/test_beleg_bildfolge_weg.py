@@ -17,6 +17,7 @@ import json
 import os
 import shutil
 import threading
+from collections.abc import Sequence
 from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
@@ -167,16 +168,18 @@ def baue_weg(ordner: Path) -> SimpleNamespace:
     )
 
 
-def baue_seite(ordner: Path, manifest: dict, beleg_id: str) -> Path:
+def baue_seite(
+    ordner: Path, manifest: dict, beleg_id: str, zusatz: Sequence[dict] = ()
+) -> Path:
     """Baut die Seite frisch in ``ordner`` mit diesem Manifest; o2 hat die Position
-    des Belegs. Gibt den Seitenordner zurück."""
+    des Belegs. ``zusatz`` sind weitere Bestandssätze. Gibt den Seitenordner zurück."""
     site = kopf._baue(ordner)
     state = site.parent / "data" / "state"
     bestand = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
     vodafone = [b for b in bestand["buendel"] if b["anbieter"] == "Vodafone"]
     o2 = pos._satz("o2", "O2 Mobile Klein", "o2:klein", 24, 18.0, beleg_id)
     (state / "geraete_tco.json").write_text(
-        json.dumps({"updated": pos.HEUTE, "buendel": [o2, *vodafone]}),
+        json.dumps({"updated": pos.HEUTE, "buendel": [o2, *zusatz, *vodafone]}),
         encoding="utf-8",
     )
     (state / MANIFEST_NAME).write_text(json.dumps(manifest), encoding="utf-8")
@@ -184,8 +187,10 @@ def baue_seite(ordner: Path, manifest: dict, beleg_id: str) -> Path:
     return site
 
 
-def _seite(ordner: Path, manifest: dict, beleg_id: str) -> BeautifulSoup:
-    site = baue_seite(ordner, manifest, beleg_id)
+def _seite(
+    ordner: Path, manifest: dict, beleg_id: str, zusatz: Sequence[dict] = ()
+) -> BeautifulSoup:
+    site = baue_seite(ordner, manifest, beleg_id, zusatz)
     return BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -384,10 +389,31 @@ def test_s1_das_einzelbild_wird_mit_der_kennung_der_position_benannt():
 
 def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
     """Folge der Kennung K, die Zeile gehört zu einer anderen ``beleg_id``: kein Bild,
-    ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile)."""
+    ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile).
+
+    Antonio, 12.12.2026: der Vermerk steht nur noch, wo es daneben etwas zu sehen
+    gibt (ohne EIN Bild im Modell bleibt die Liste ganz weg). Darum trägt Telekom
+    hier einen eigenen, zuordenbaren Beleg - und o2 daneben seinen Grund.
+    """
     fremd_id = "9" * 64
     assert fremd_id[:16] != weg.beleg_id[:16]
-    seite = _seite(tmp_path, weg.manifest, fremd_id)
+    telekom_id = "7" * 64
+    manifest = json.loads(json.dumps(weg.manifest))
+    manifest["belege"].append(
+        {
+            "geraet_id": pos.MODELL,
+            "anbieter_id": "telekom",
+            "datum": pos.HEUTE,
+            "url": _adr(dateiname(pos.MODELL, "telekom", TAG)),
+            "gross": False,
+        }
+    )
+    telekom = pos._satz("Telekom", "MagentaMobil S", "tk:klein", 24, 12.0, telekom_id)
+    seite = _seite(tmp_path, manifest, fremd_id, [telekom])
+    mit_bild = next(
+        li for li in seite.select(".gr-beleg-paar") if li["data-anbieter"] == "Telekom"
+    )
+    assert mit_bild.select(".gr-beleg-zeile img"), "Gegenprobe: Telekom hat sein Bild"
     paar = next(
         li for li in seite.select(".gr-beleg-paar") if li["data-anbieter"] == "o2"
     )

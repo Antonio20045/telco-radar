@@ -1,11 +1,19 @@
 """Das Paar-Bild ist kein Beleg eines Tarifs (Ziel 1d, 08.11.2026), an der Seite.
 
 Ein Bild gehört zum Paar (Modell, Anbieter), nicht zu einer Preiszeile; welchen Tarif es
-zeigt, ist maschinell nicht feststellbar. Darum zeigt die Seite es nie: ohne
-bestätigende Preiszeile steht je Anbieter der Vermerk „Für diese Kombination liegt noch
-kein Screenshot vor“, kein Bild, kein Link, keine Paar-Quote. Feste Daten, nie das
-heutige Datum (CLAUDE.md Regel 7). Die Seite wird mit `render_site` gebaut (kleiner
-Bestand aus `test_geraete_buendel_kopf_zeitraum`), danach wird das DOM gelesen.
+zeigt, ist maschinell nicht feststellbar. Darum zeigt die Seite es nie: kein Bild, kein
+Link, keine Paar-Quote.
+
+Antonio, 12.12.2026: bestätigt KEINE Preiszeile des Modells ein Bild, steht hier auch
+der Vermerk nicht mehr - acht Zeilen „Für diese Kombination liegt noch kein Screenshot
+vor“ unter dem Graphen sagen zusammen nichts. Der Vermerk je Anbieter OHNE Bild steht,
+sobald ein Anbieter des Modells ein Zeilenbild hat; genau dort prüft ihn
+`test_beleg_position` (o2 mit Bild, die übrigen mit Vermerk und Grund). Diese Datei
+prüft den anderen Fall: Paar-Bilder da, keine belegte Zeile - nichts als die Zeilen.
+
+Feste Daten, nie das heutige Datum (CLAUDE.md Regel 7). Die Seite wird mit `render_site`
+gebaut (kleiner Bestand aus `test_geraete_buendel_kopf_zeitraum`), danach wird das DOM
+gelesen.
 """
 
 from __future__ import annotations
@@ -64,30 +72,24 @@ def lager(site) -> BeautifulSoup:
 
 def test_paar_bild_steht_nie_als_beleg_auf_der_seite(seite):
     """Telekom und o2 haben ein Paar-Bild im Manifest, aber keinen Bildsatz: die Seite
-    zeigt kein Bild, nur den Vermerk je Anbieter (nichts Fremdes als Ersatz)."""
-    zone = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
-    assert zone.select("img, details, a") == []
+    zeigt kein Bild, keinen Link, keine Quote - nichts Fremdes als Ersatz."""
+    gruppe = seite.select_one("#gr-bnd-gruppe")
+    assert gruppe.select("img, details.gr-belege, a[href*='releases']") == []
     assert "zeigt nicht jeden Tarif" not in seite.get_text(" ", strip=True)
     assert seite.select_one("#gr-belegquote") is None
     assert seite.select("details.gr-belege") == []
-    namen = [b.get_text(strip=True) for b in seite.select(".gr-beleg-anbieter")]
-    assert sorted(namen) == sorted(MIT_BILD + OHNE_BILD)
+    assert seite.select(".gr-beleg-anbieter") == []
 
 
-def test_jeder_anbieter_ohne_zeilenbild_bekommt_den_sichtbaren_vermerk(seite):
-    """ "Kein Preis" und "kein Bild" sind unterscheidbar, nichts erfunden."""
-    zeilen = seite.select("#gr-bnd-gruppe .gr-beleg-paare li.gr-beleg-paar")
-    je_anbieter = {
-        z.select_one(".gr-beleg-anbieter").get_text(strip=True): z for z in zeilen
-    }
-    assert sorted(je_anbieter) == sorted(MIT_BILD + OHNE_BILD)
-    for z in je_anbieter.values():
-        keins = z.select_one(".gr-beleg-keins")
-        assert keins.get_text(strip=True).startswith(
-            "Für diese Kombination liegt noch kein Screenshot vor."
-        )
-        assert not keins.has_attr("hidden")
-        assert z.select("details, img, a") == []
+def test_ohne_eine_belegte_zeile_steht_keine_belegliste(seite, lager):
+    """Kein Anbieter des Modells hat ein Zeilenbild: weder Liste noch Vermerk, auf
+    der Seite und im Lager. Gegenprobe: die Bündelzeilen des Modells stehen."""
+    assert seite.select("#gr-bnd-gruppe .gr-beleg-paare") == []
+    assert seite.select(".gr-beleg-keins") == []
+    modell = lager.select_one(f'.gr-bnd-lager[data-modell="{MODELL}"]')
+    assert modell.select(".gr-beleg-paare") == []
+    assert modell.select(".gr-bnd"), "Gegenprobe: das Modell hat Bündelzeilen"
+    assert "liegt noch kein Screenshot vor" not in seite.get_text(" ", strip=True)
     assert "ohne Beleg" not in seite.get_text(" ", strip=True)
 
 
@@ -100,12 +102,6 @@ def test_keine_zeile_traegt_einen_beleg_link_oder_vermerk(lager, seite):
         assert z.select(".gr-kk-marke--beleg, .gr-kk-marke--ohnebeleg") == []
         assert "Screenshot" not in z.get_text()
         assert "ohne Beleg" not in z.get_text()
-
-
-def test_lager_traegt_die_paarzeile_fuer_den_modellwechsel(lager):
-    """app.js übernimmt `.gr-beleg-paare` aus dem Lager (wie die Fehlliste)."""
-    paare = lager.select(f'.gr-bnd-lager[data-modell="{MODELL}"] .gr-beleg-paare')
-    assert len(paare) == 1
 
 
 def karte(anbieter: str, tarif: str, laufzeit: int, *, preis: bool = True) -> dict:
@@ -159,8 +155,13 @@ def test_manifest_json_der_fixture_ist_lesbar(site):
     assert len(json.loads(pfad.read_text(encoding="utf-8"))["belege"]) == 2
 
 
-def test_im_browser_steht_je_anbieter_der_vermerk_ohne_bild(site, chromium):
-    """Sichtbar gezählt wie ein Leser, 1440 und 390 px: Vermerke, kein Bild."""
+def test_im_browser_steht_ohne_belegte_zeile_keine_belegstelle(site, chromium):
+    """Sichtbar gezählt wie ein Leser, 1440 und 390 px: kein Bild, kein Vermerk.
+
+    Bis zum 12.12.2026 standen hier die Vermerke je Anbieter. Dass sie sichtbar
+    stehen, SOBALD ein Anbieter ein Bild hat, zählt `test_beleg_kombi` im Browser;
+    hier hat kein Anbieter eines, und dann bleibt die Stelle leer - Gegenprobe:
+    die Fehlliste der Anbieter steht an derselben Stelle sichtbar da."""
     import functools
     import http.server
     import threading
@@ -177,13 +178,11 @@ def test_im_browser_steht_je_anbieter_der_vermerk_ohne_bild(site, chromium):
                 s = ctx.new_page()
                 url = f"http://127.0.0.1:{httpd.server_address[1]}/geraete.html"
                 s.goto(url, wait_until="domcontentloaded")
-                keins = s.locator(
-                    "#gr-bnd-gruppe .gr-beleg-paar:visible .gr-beleg-keins"
-                )
-                assert keins.count() >= 1, breite
-                for i in range(keins.count()):
-                    assert keins.nth(i).is_visible(), breite
-                assert s.locator("#gr-bnd-gruppe .gr-beleg-paare img").count() == 0
+                assert s.locator("#gr-bnd-gruppe .gr-beleg-keins").count() == 0, breite
+                assert s.locator("#gr-bnd-gruppe .gr-beleg-paare").count() == 0, breite
+                assert s.locator("#gr-bnd-gruppe img").count() == 0, breite
+                fehlliste = s.locator("#gr-bnd-gruppe .gr-anb-fehlliste:visible")
+                assert fehlliste.count() == 1, breite
                 assert s.evaluate("document.documentElement.scrollWidth") <= breite, (
                     breite
                 )
