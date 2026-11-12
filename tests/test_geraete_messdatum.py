@@ -162,20 +162,43 @@ def _liste(site):
     }
 
 
-def test_die_seite_nennt_aus_dem_bestand_vodafone_0811_und_telekom_0711(tmp_path):
+def test_die_zeilen_nennen_aus_dem_bestand_vodafone_0811_und_telekom_0711(tmp_path):
     """Ohne die Korrektur rot: die Zukunftssperre nahm `geraete.stand` (07.11., Datum
     des jüngsten Tagesberichts) und verwarf alle Messungen vom 08.11.; Vodafone stand
-    dann als „Messdatum unbekannt“, die Telekom-Lücke blieb unsichtbar."""
+    dann als „Messdatum unbekannt“, die Telekom-Lücke blieb unsichtbar.
+
+    Die acht Zeilen stehen seit dem 12.12.2026 nicht mehr auf der Seite (Antonio:
+    kein Erklärtext oben); gerechnet werden sie weiter, und der jüngste Messtag
+    trägt die Preisstand-Zeile im Fuß."""
     site = _baue_wie_live(tmp_path)
-    _, je = _liste(site)
-    assert je["Vodafone"].startswith("Vodafone: zuletzt gemessen am 08.11.2026"), je
-    assert je["o2"].startswith("o2: zuletzt gemessen am 08.11.2026"), je
-    assert je["congstar"].startswith("congstar: zuletzt gemessen am 08.11.2026"), je
-    assert je["Telekom"].startswith("Telekom: zuletzt gemessen am 07.11.2026"), je
-    assert je["Telekom"].endswith("Stand vom 07.11."), je
-    assert "Stand vom" not in je["Vodafone"] + je["o2"] + je["congstar"]
-    assert "1 von 1 Preisen von diesem Tag (ohne überholte Bündel)" in je["Telekom"]
-    assert je["1&1"] == "1&1: Messdatum unbekannt"
+    suppe, je = _liste(site)
+    assert je == {}, "die Messdatum-Liste gehört nicht mehr auf die Seite"
+    wurzel = site.parent
+    geraete = geraete_view.aufbereiten(
+        wurzel / "data" / "state",
+        lade_quellen(wurzel),
+        lade_katalog(wurzel),
+        heute=BERICHT,
+    )
+    zeilen = {z["name"]: z for z in geraete["messdatum"]["zeilen"]}
+    assert zeilen["Vodafone"]["satz"].startswith(
+        "Vodafone: zuletzt gemessen am 08.11.2026"
+    )
+    assert zeilen["Telekom"]["satz"].startswith(
+        "Telekom: zuletzt gemessen am 07.11.2026"
+    )
+    assert zeilen["Telekom"]["stand"] == "Stand vom 07.11."
+    assert not zeilen["Vodafone"]["stand"] and not zeilen["o2"]["stand"]
+    assert zeilen["Telekom"]["anteil"].startswith("1 von 1 Preisen von diesem Tag")
+    assert zeilen["1&1"]["satz"] == "1&1: Messdatum unbekannt"
+
+
+def test_der_fuss_traegt_den_preisstand_statt_acht_zeilen_oben(tmp_path):
+    site = _baue_wie_live(tmp_path)
+    suppe, _ = _liste(site)
+    fuss = suppe.select_one(".dz-foot--stand")
+    assert fuss is not None
+    assert fuss.text.startswith("Preise Stand 08.11.2026")
 
 
 def test_das_view_feld_traegt_den_messstichtag_nicht_das_berichtsdatum(tmp_path):

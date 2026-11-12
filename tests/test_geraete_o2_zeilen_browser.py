@@ -258,15 +258,12 @@ def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name, request
     Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; gemessen
     wird die erste sichtbare Zeile der fehlenden Anbieter unter dem Graphen.
 
-    Das Preisbild (`#preisposition`) steht seit 02.11.2026 auf Auftrag
-    ganz oben, vor den Reitern; seine Höhe zählt zur Falz nicht mit, sonst
-    wäre jede Änderung an ihm ein Fehlschlag dieser Messung. Dasselbe gilt
-    seit 05.11.2026 für die Herstellergrafik (`#hersteller`), die als erstes
-    Bild noch davor steht (Auftrag Antonio, Preisposition je Hersteller)."""
+    Das EINE Preisbild (`#hersteller`) steht vor den Reitern; seine Höhe
+    zählt zur Falz nicht mit, sonst wäre jede Änderung an ihm ein Fehlschlag
+    dieser Messung. Die Modellgrafik (`#preisposition`) ist am 12.12.2026
+    gefallen und wird nicht mehr abgezogen."""
     s = request.getfixturevalue(fixture_name)
-    preisbild = s.evaluate(
-        "() => document.querySelector('#preisposition').offsetHeight"
-    )
+    preisbild = 0
     herstellerbild = s.evaluate(
         "() => { const e = document.querySelector('#hersteller');"
         " return e ? e.offsetHeight + parseFloat("

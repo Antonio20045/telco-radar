@@ -157,6 +157,20 @@
       Original widersprüchlich ist ({{ widerspruch_stand() }}), gehören zu keiner Stufe – sie
       stehen als eigene Gruppe unter der Bandliste, nicht heimlich in einer Stufe. Unbegrenzte Tarife stehen in
       der obersten Stufe XL.</span></li>
+{# Antonio, 12.12.2026: diese drei Zeilen standen bis dahin als Absätze AUF der
+   Geräteseite (unter der Bündeltabelle und unter dem Preisbild). Der Text ist
+   nicht gestrichen, er ist hierher gezogen - dieselben Python-Felder, kein
+   zweiter Wortlaut. #}
+    <li class="list-row"><span class="list-row-date">Preisposition je Hersteller</span>
+      <span>{{ vergleichstag_satz() }}</span></li>
+    {% if geraete.tco and geraete.tco.tarifstufen_regel %}
+    <li class="list-row"><span class="list-row-date">Tarifstufen</span>
+      <span>{{ geraete.tco.tarifstufen_regel }}</span></li>
+    {% endif %}
+    {% if zeilenquote is defined and geraete.tco %}{% set zq = zeilenquote(geraete.tco.modelle) %}{% if zq.satz %}
+    <li class="list-row"><span class="list-row-date">Belege je Preiszeile</span>
+      <span>{{ zq.satz }}</span></li>
+    {% endif %}{% endif %}
     <li class="list-row"><span class="list-row-date">Radar-Grafik</span>
       <span>Balkenlänge = Abstand in Euro zum Vodafone-Preis (Neugeräte,
       ohne Vertrag); negativ heißt, der Wettbewerber ist günstiger. Die

@@ -58,7 +58,7 @@ def test_geraeteseite_verweist_im_portfolio_auf_den_kategorie_screenshot(belege)
     assert text["original"] == KATEGORIE
     assert "congstar-duo-1011" in text["url"] and text["url"].endswith(".png")
     s = tp._rendern({**a, "hinweis": ""})
-    links = [x["href"] for x in s.select(".gr-pf-beleg a")]
+    links = [x["href"] for x in s.select(".gr-pf-zahl small a")]
     assert links == [text["url"], KATEGORIE]
     assert SOFT_404 not in str(s)
 

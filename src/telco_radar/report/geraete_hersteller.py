@@ -2,29 +2,30 @@
 
 Antonio, 05.11.2026: die erste Übersichtsgrafik der Geräteseite zeigt
 Hersteller (Apple, Samsung, Google, ...) statt einzelner Modelle, mit
-wählbarem Zeitraum (aktuell, 7 Tage, 30 Tage, eigener Zeitraum).
+wählbarem Zeitraum.
+
+Antonio, 12.12.2026: aus der Tafel (eine Zahl je Hersteller x Wettbewerber)
+UND der Punktwolke je Modell wird EIN Liniendiagramm - eine Linie je
+Hersteller über die Zeit, plus die Leitlinie „Alle Hersteller". Die
+Modellgrafik ist gefallen, die Erklärabsätze darunter auch. Gezeichnet wird
+in `geraete_hersteller_grafik`; hier stehen die Zahlen.
 
 KENNZAHL
   Abstand(Modell, Wettbewerber, Tag) = (TCO Vodafone - TCO Wettbewerber)
                                        / TCO Wettbewerber * 100
   TCO ist die Leitzahl der Seite (`LAUFZEIT` Monate, Band `BAND`); plus heißt:
-  Vodafone ist teurer. Eine Zelle (Hersteller x Wettbewerber) ist das Mittel
-  dieser Abstände über die aktuellen Modelle des Herstellers, die Vodafone
-  UND der Wettbewerber mit einem echten Preis führen (je Modell vorher das
-  Mittel über die Messtage des Zeitraums); die Zahl der Modelle steht dabei.
-  Fehlt ein Preis, fehlt die Zelle - nie ein Wert 0.
+  Vodafone ist teurer. Fehlt ein Preis, fehlt der Wert - nie eine 0.
 
 ZEITRAUM
-  aktuell    die Karten, die die Seite heute zeigt (`preise_je_anbieter`)
   7 / 30     Messtage der letzten 7 / 30 Kalendertage bis zum Stand
   eigen      von/bis, vom Browser gerechnet
 
 Nichts wird fest verdrahtet: Modelle, Anbieter, Preise und Messtage kommen zur
-Bauzeit aus den Daten. Wenn ein Anbieter (o2: 24 Raten) neue Preise
-bekommt, füllen sich seine Zellen ohne Eingriff. Der Server rechnet und
-zeichnet die Ansicht „aktuell“ (ohne JavaScript lesbar); die Tageswerte
-liegen als JSON im Dokument, `app.js` schaltet den Zeitraum um. Ein Ausfall
-steht als `fehler` im Bild, nie als leeres Bild.
+Bauzeit aus den Daten. Der Server rechnet und zeichnet den Vorgabe-Zeitraum
+(ohne JavaScript lesbar); die Tageswerte liegen als JSON im Dokument, `app.js`
+schaltet den Zeitraum um und rechnet nach derselben Regel (ein Browsertest
+hält beide zusammen). Ein Ausfall steht als `fehler` im Bild, nie als leeres
+Bild.
 """
 
 from __future__ import annotations
@@ -37,19 +38,15 @@ from pathlib import Path
 from .. import rechenweise
 from ..geraete_model import serie_aus_modell
 from ..tco_model import zeitraum_vergleichbar
+from . import geraete_hersteller_grafik as grafik
 from . import geraete_rechenweg, geraete_zeitreihe
 from .anbieter_farben import legendenname, slug_fuer
 from .geraete_hersteller_text import (
     EIGEN,
     GLEICHAUF,
     KLEIN,
-    NBSP,
-    erklaerung,
-    modell_wort,
-    prozent_text,
-    richtung,
 )
-from .geraete_preisposition_preise import BAND, LAUFZEIT, preise_je_anbieter
+from .geraete_preisposition_preise import BAND, LAUFZEIT
 from .geraete_tco_karten import ist_frisch
 
 log = logging.getLogger(__name__)
@@ -58,6 +55,7 @@ WETTBEWERBER = tuple(a for a in geraete_rechenweg.ANBIETER_FOLGE if a != EIGEN)
 HERSTELLER_VORAN = ("Apple", "Samsung", "Google")
 GESAMT = "Alle"
 FENSTER = (7, 30)
+VORGABE_FENSTER = 30
 SKALA = 40
 
 
@@ -154,10 +152,6 @@ def modelle_waehlen(
     return gewaehlt, ohne
 
 
-def _wert_je_anbieter(karten: dict) -> dict[str, float]:
-    return {a: k["gesamt"] for a, k in karten.items() if k.get("gesamt")}
-
-
 def _abstaende(preise: dict[str, float]) -> list:
     """Abstand zu jedem Wettbewerber (None, wo ein Preis fehlt)."""
     vf = preise.get(EIGEN)
@@ -167,17 +161,11 @@ def _abstaende(preise: dict[str, float]) -> list:
     ]
 
 
-def _mittel(zeilen: list[list], j: int) -> tuple[float | None, int]:
-    werte = [z[j] for z in zeilen if z[j] is not None]
-    return (sum(werte) / len(werte), len(werte)) if werte else (None, 0)
-
-
 def berechne(
     messungen: dict, tco: dict, katalog, heute: str, stand: str | None = None
 ) -> dict:
-    """Alle Zahlen: Modelle, Tageswerte, Werte „aktuell“ (reine Rechnung)."""
+    """Alle Zahlen: Modelle und ihre Tageswerte (reine Rechnung)."""
     modelle, ohne = modelle_waehlen(katalog, tco, messungen)
-    modell_je_id = {m.get("id"): m for m in tco.get("modelle") or []}
     je_modell = {
         m["id"]: tageswerte(messungen.get((m["id"], BAND, LAUFZEIT)) or {})
         for m in modelle
@@ -190,61 +178,12 @@ def berechne(
             _abstaende({a: r[tag] for a, r in je_modell[m["id"]].items() if tag in r})
             for m in modelle
         ]
-    aktuell = [
-        _abstaende(_wert_je_anbieter(preise_je_anbieter(modell_je_id.get(m["id"]))))
-        for m in modelle
-    ]
-    tarife: dict[str, set[str]] = {}
-    for m in modelle:
-        karten = preise_je_anbieter(modell_je_id.get(m["id"]))
-        for anbieter, karte in karten.items():
-            if karte.get("tarif"):
-                tarife.setdefault(anbieter, set()).add(karte["tarif"])
     return {
         "stand": stand,
         "modelle": modelle,
         "ohne": ohne,
-        "tarife": {a: sorted(t) for a, t in tarife.items()},
         "tage": tage,
         "pct": pct,
-        "aktuell": aktuell,
-    }
-
-
-def mittel_ueber_tage(rechnung: dict, von: str, bis: str) -> tuple[list[list], int]:
-    """Je Modell und Wettbewerber das Mittel der Messtage von..bis, plus Tageszahl.
-    Die Referenz der Browser-Rechnung in `app.js` (Tests vergleichen beide)."""
-    tage = [t for t in rechnung["tage"] if von <= t <= bis]
-    zeilen = []
-    for i in range(len(rechnung["modelle"])):
-        zeile = []
-        for j in range(len(WETTBEWERBER)):
-            werte = [
-                rechnung["pct"][t][i][j]
-                for t in tage
-                if rechnung["pct"][t][i][j] is not None
-            ]
-            zeile.append(sum(werte) / len(werte) if werte else None)
-        zeilen.append(zeile)
-    return zeilen, len(tage)
-
-
-def zeitraum(rechnung: dict, tage: int) -> tuple[list[list], int]:
-    """Werte der letzten `tage` Kalendertage bis zum Stand."""
-    bis = date.fromisoformat(rechnung["stand"])
-    von = (bis - timedelta(days=tage - 1)).isoformat()
-    return mittel_ueber_tage(rechnung, von, bis.isoformat())
-
-
-def zellen(rechnung: dict, werte: list[list]) -> dict[str, list]:
-    """{Hersteller (und GESAMT): [(Mittel, Modelle) je Wettbewerber]}."""
-    aus: dict[str, list[list]] = {}
-    for m, zeile in zip(rechnung["modelle"], werte, strict=True):
-        aus.setdefault(m["hersteller"], []).append(zeile)
-        aus.setdefault(GESAMT, []).append(zeile)
-    return {
-        h: [_mittel(zeilen, j) for j in range(len(WETTBEWERBER))]
-        for h, zeilen in aus.items()
     }
 
 
@@ -258,31 +197,13 @@ def reihenfolge(rechnung: dict) -> list[str]:
     return voran + rest
 
 
-def _zelle(w: str, mittel: float | None, n: int) -> dict:
-    """Eine Zelle fürs Template; ohne Preis: benannte Lücke, kein Wert."""
-    zelle = {"slug": slug_fuer(w), "name": w, "legende": legendenname(w)}
-    if mittel is None:
-        return {
-            **zelle,
-            "leer": True,
-            "duenn": False,
-            "text": "–",
-            "n_text": "kein Preis",
-            "n": 0,
-        }
-    breite = min(abs(mittel), SKALA) / SKALA * 50
-    return {
-        **zelle,
-        "leer": False,
-        "duenn": n < KLEIN,
-        "wert": f"{mittel:.2f}",
-        "n": n,
-        "text": prozent_text(mittel),
-        "richtung": richtung(mittel),
-        "n_text": modell_wort(n),
-        "links": f"{50 if mittel >= 0 else 50 - breite:.2f}",
-        "breite": f"{breite:.2f}",
-    }
+def fenster_tage(tage: list[str], stand: str, fenster: int) -> list[str]:
+    """Die Vergleichstage der letzten `fenster` Kalendertage bis `stand`."""
+    if not tage:
+        return []
+    von = (date.fromisoformat(stand) - timedelta(days=fenster - 1)).isoformat()
+    gewaehlt = [t for t in tage if von <= t <= stand]
+    return gewaehlt
 
 
 def ansicht(state_dir, tco: dict, katalog, tarifbestand, heute: str) -> dict:
@@ -311,62 +232,65 @@ def aufbereiten(messungen: dict | None, tco: dict, katalog, heute: str) -> dict:
         return {"fehler": f"{type(exc).__name__}: {exc}", "leer": False}
     if not rechnung["modelle"]:
         return {"fehler": "", "leer": True}
-    aktuell = zellen(rechnung, rechnung["aktuell"])
     belegt = [
         j
         for j in range(len(WETTBEWERBER))
-        if aktuell[GESAMT][j][0] is not None
-        or any(z[j] is not None for t in rechnung["tage"] for z in rechnung["pct"][t])
+        if any(z[j] is not None for t in rechnung["tage"] for z in rechnung["pct"][t])
     ]
     spalten = [WETTBEWERBER[j] for j in belegt]
-    ohne_wb = [w for w in WETTBEWERBER if w not in spalten]
-    zeilen = [
-        {
-            "hersteller": h,
-            "name": "Alle Hersteller" if h == GESAMT else h,
-            "gesamt": h == GESAMT,
-            "zellen": [_zelle(WETTBEWERBER[j], *aktuell[h][j]) for j in belegt],
-        }
-        for h in [*reihenfolge(rechnung), GESAMT]
-    ]
-    nur_ohne = sorted(
-        set(rechnung["ohne"])
-        - {m["hersteller"] for m in rechnung["modelle"]}
-        - set(geraete_rechenweg.ANBIETER_FOLGE)
-    )
+    alle_tage = grafik.vergleichstage(rechnung, belegt)
+    if not alle_tage:
+        return {"fehler": "", "leer": True}
+    ordnung = reihenfolge(rechnung)
+    stand = alle_tage[-1]
+    tage = fenster_tage(alle_tage, stand, VORGABE_FENSTER)
+    reihen = grafik.reihen(rechnung, belegt, tage, ordnung)
+    titel = grafik.achsentitel(LAUFZEIT)
+    titel_kurz = grafik.achsentitel(LAUFZEIT, kurz=True)
     daten = {
-        "stand": rechnung["stand"],
+        "stand": stand,
         "w": list(WETTBEWERBER),
+        "belegt": belegt,
         "h": [m["hersteller"] for m in rechnung["modelle"]],
-        "tage": rechnung["tage"],
-        "pct": [rechnung["pct"][t] for t in rechnung["tage"]],
-        "aktuell": rechnung["aktuell"],
-        "skala": SKALA,
+        "ordnung": ordnung,
+        "gesamtname": grafik.GESAMT_NAME,
+        "tage": alle_tage,
+        "pct": [rechnung["pct"][t] for t in alle_tage],
         "fenster": list(FENSTER),
+        "vorgabe": VORGABE_FENSTER,
         "gleichauf": GLEICHAUF,
         "klein": KLEIN,
+        "stile": grafik.stile(ordnung),
+        "geo": grafik.geometrie(),
+        "titel": titel,
+        "titel_kurz": titel_kurz,
     }
     return {
         "fehler": "",
         "leer": False,
-        "stand": rechnung["stand"],
+        "stand": stand,
         "wettbewerber": [
             {"name": w, "slug": slug_fuer(w), "legende": legendenname(w)}
             for w in spalten
         ],
-        "einheit": (
-            f"Vodafone gegenüber dem Wettbewerber · Gesamtkosten {LAUFZEIT}{NBSP}Monate"
-        ),
-        "ohne_spalte": [
-            {"name": w, "text": f"{legendenname(w)}: kein {LAUFZEIT}-Monats-Preis"}
-            for w in ohne_wb
+        "einheit": titel,
+        "reihen": reihen,
+        "legende": [
+            {
+                "name": r["name"],
+                "farbe": r["farbe"],
+                "muster": r["muster"],
+                "breite": r["breite"],
+                "gesamt": r["gesamt"],
+            }
+            for r in reihen
         ],
-        "zeilen": zeilen,
+        "svg_breit": grafik.svg(reihen, tage, True, titel),
+        "svg_schmal": grafik.svg(reihen, tage, False, titel_kurz),
         "modelle": len(rechnung["modelle"]),
-        "erklaerung": erklaerung(rechnung["tarife"], spalten, ohne_wb, nur_ohne),
         "json": json.dumps(daten, ensure_ascii=False, separators=(",", ":")).replace(
             "</", "<\\/"
         ),
-        "tage_von": rechnung["tage"][0] if rechnung["tage"] else "",
-        "tage_bis": rechnung["tage"][-1] if rechnung["tage"] else "",
+        "tage_von": alle_tage[0],
+        "tage_bis": alle_tage[-1],
     }

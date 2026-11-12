@@ -103,6 +103,15 @@ def seite(site) -> BeautifulSoup:
 
 
 @pytest.fixture(scope="module")
+def methodik(site) -> BeautifulSoup:
+    """Die Belegquote steht seit dem 12.12.2026 auf der Methodikseite, nicht
+    mehr als Absatz unter der Bündeltabelle (Antonio: kein Text-Ballast)."""
+    return BeautifulSoup(
+        (site / "geraete-quellen.html").read_text(encoding="utf-8"), "html.parser"
+    )
+
+
+@pytest.fixture(scope="module")
 def lager(site) -> BeautifulSoup:
     return BeautifulSoup(
         (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
@@ -170,11 +179,18 @@ def test_unklare_zuordnung_zeigt_kein_zeilenbild_sondern_den_grund(lager, seite)
         )
 
 
-def test_quote_nennt_je_anbieter_zeilen_nicht_paare(lager, seite):
-    """Die Seite zählt Zeilen je Anbieter, ehrlich auch bei 0, und sagt, dass die
-    Zuordnung über die Messung läuft und das Bild nur die Preisfelder zeigt."""
+def test_quote_nennt_je_anbieter_zeilen_nicht_paare(lager, seite, methodik):
+    """Die Methodikseite zählt Zeilen je Anbieter, ehrlich auch bei 0, und sagt,
+    dass die Zuordnung über die Messung läuft und das Bild nur die Preisfelder
+    zeigt. Auf der Geräteseite selbst steht der Absatz nicht mehr."""
     n = _anzahl(lager)
-    satz = seite.select_one("#gr-zeilenquote").get_text(strip=True)
+    assert seite.select_one("#gr-zeilenquote") is None
+    zeile = next(
+        li
+        for li in methodik.select("#methodik .list-row")
+        if li.select_one(".list-row-date").text == "Belege je Preiszeile"
+    )
+    satz = zeile.select("span")[1].get_text(strip=True)
     erwartet = (
         "Preiszeilen mit eigenem Screenshot, Zuordnung über die Messung "
         "(aus dem Bild allein nicht ablesbar): "

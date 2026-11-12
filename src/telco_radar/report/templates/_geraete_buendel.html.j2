@@ -32,9 +32,19 @@
    Aufklappen (`data-src`); laedt ein Bild nicht (Datei geloescht), steht an seiner
    Stelle "Bild nicht mehr verfuegbar" und `.gr-folge-zahl` zaehlt neu. Die Zuordnung rechnet Python
    (`report/geraete_zeilenbelege.py`). #}
-{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}
+{#- Antonio, 12.12.2026: liegt fuer dieses Modell zu KEINEM Anbieter ein
+    Screenshot vor, steht hier gar nichts. Bis dahin standen unter dem Graphen
+    acht Zeilen „Fuer diese Kombination liegt noch kein Screenshot vor." - acht
+    Saetze, die zusammen nichts sagen. Sobald ein Anbieter ein Bild hat, steht
+    die Liste wie bisher, samt dem Satz fuer die Anbieter ohne Bild: dann
+    erklaert er eine Luecke neben etwas Vorhandenem. -#}
+{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined and paare | selectattr('zeilenbilder') | list %}
 <ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Kombination">
-  <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifband, Laufzeit und Anbieter</li>{% for p in paare %}
+{#- Antonio, 12.12.2026: die Zwischenüberschrift „Screenshots zur gewählten
+    Kombination …" ist gefallen; was die Liste zeigt, sagt jede Zeile selbst
+    (Gerät, Tarif, Laufzeit, Anbieter stehen in ihrer Zusammenfassung). Der
+    Name der Liste lebt als aria-label weiter - für den Screenreader, nicht
+    als Zeile auf dem Schirm. -#}{% for p in paare %}
   <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% for z in p.zeilenbilder %}
     <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
       <summary>{% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge (<span class="gr-folge-zahl">{% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}</span>){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
