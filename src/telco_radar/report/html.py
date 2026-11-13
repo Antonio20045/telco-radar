@@ -23,7 +23,7 @@ from . import geraete_tco_grafik as _geraete_tco_grafik
 from . import fruehwarnung as fruehwarnung_mod, lieferzeit_view as lieferzeit_view_mod
 from . import glas as glas_mod, ki_vorschau, luecken as luecken_mod
 from . import newsletter_protokoll, rechtstexte as rechtstexte_mod
-from . import geraete_preisposition, seit as seit_mod, verlauf as verlauf_mod
+from . import seit as seit_mod, verlauf as verlauf_mod
 from . import ki_seite, meldungen_seite, startseite as startseite_mod, statik, suchindex
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
@@ -1716,7 +1716,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     (site_dir / "geraete.html").write_text(
         env.get_template("geraete.html.j2").render(
             prefix="",
-            geraete=geraete_preisposition.ergaenze(geraete),
+            geraete=geraete,
             radar=radar_view,
             teurer=geraete_teurer.listen(geraete),
         ),

@@ -37,7 +37,7 @@ from pathlib import Path
 from .. import rechenweise
 from ..geraete_model import serie_aus_modell
 from ..tco_model import zeitraum_vergleichbar
-from . import geraete_rechenweg, geraete_zeitreihe
+from . import geraete_notbremse, geraete_rechenweg, geraete_zeitreihe
 from .anbieter_farben import legendenname, slug_fuer
 from .geraete_hersteller_text import (
     EIGEN,
@@ -107,13 +107,13 @@ def aktuelle_geraete(katalog) -> list:
 
 
 def tageswerte(je_anbieter: dict) -> dict[str, dict[str, float]]:
-    """{Anbieter: {Tag: TCO}} - nur zählende, frische Messungen der
+    """{Anbieter: {Tag: TCO}} - nur an ihrem Tag zählende, frische Messungen der
     Standardlaufzeit; je Tag gilt die jüngste Rechenweise."""
     aus: dict[str, dict[str, float]] = {}
     for anbieter, werte in je_anbieter.items():
         reihe: dict[str, float] = {}
         for tag, m in rechenweise.juengste(werte).items():
-            if not m.get("zaehlt") or m.get("wert") is None:
+            if not geraete_notbremse.zaehlt_am_tag(m) or m.get("wert") is None:
                 continue
             if not zeitraum_vergleichbar(m.get("monate"), LAUFZEIT):
                 continue
@@ -175,21 +175,28 @@ def _mittel(zeilen: list[list], j: int) -> tuple[float | None, int]:
 def berechne(
     messungen: dict, tco: dict, katalog, heute: str, stand: str | None = None
 ) -> dict:
-    """Alle Zahlen: Modelle, Tageswerte, Werte „aktuell“ (reine Rechnung)."""
+    """Alle Zahlen: Modelle, Tageswerte, Werte „aktuell“ (reine Rechnung).
+
+    `tage` sind nur die Tage mit mindestens einem Abstand. Ein Tag ohne eine
+    einzige Zelle zeigt nichts, zählte aber in „Mittel aus N Messtagen“ mit
+    und schob das früheste wählbare Datum des eigenen Zeitraums nach vorn.
+    """
     modelle, ohne = modelle_waehlen(katalog, tco, messungen)
     modell_je_id = {m.get("id"): m for m in tco.get("modelle") or []}
     je_modell = {
         m["id"]: tageswerte(messungen.get((m["id"], BAND, LAUFZEIT)) or {})
         for m in modelle
     }
-    tage = sorted({t for tw in je_modell.values() for r in tw.values() for t in r})
-    stand = stand or heute or (tage[-1] if tage else "")
-    pct: dict[str, list] = {}
-    for tag in tage:
-        pct[tag] = [
+    gemessen = sorted({t for tw in je_modell.values() for r in tw.values() for t in r})
+    alle: dict[str, list] = {}
+    for tag in gemessen:
+        alle[tag] = [
             _abstaende({a: r[tag] for a, r in je_modell[m["id"]].items() if tag in r})
             for m in modelle
         ]
+    tage = [t for t in gemessen if any(w is not None for z in alle[t] for w in z)]
+    pct = {t: alle[t] for t in tage}
+    stand = stand or heute or (tage[-1] if tage else "")
     aktuell = [
         _abstaende(_wert_je_anbieter(preise_je_anbieter(modell_je_id.get(m["id"]))))
         for m in modelle

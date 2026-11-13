@@ -359,7 +359,8 @@ def test_vorlage_nennt_eine_leere_liste_und_den_belegausfall():
 def test_seite_zeigt_den_abschnitt_nach_der_herstellergrafik(tmp_path):
     seite = test_geraete_tco_zustand._baue(tmp_path)
     ids = [e.get("id") for e in seite.select("section[id]")]
-    assert ids.index("hersteller") < ids.index("portfolio") < ids.index("preisposition")
+    assert ids.index("hersteller") < ids.index("portfolio")
+    assert "preisposition" not in ids
     assert seite.select_one("#portfolio .gr-pf-regel").text == pf.REGEL
 
 
