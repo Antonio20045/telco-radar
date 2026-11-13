@@ -28,13 +28,14 @@ einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzt
 Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
 
 Vorrang steht im Bestand, nicht im Lesestand: ``Zusammenfuehrung.buendel`` lässt ein
-Adapterbündel weg, dessen Bestandseintrag eine Klick-Messung von HEUTE ist - oder eine
+Adapterbündel weg, dessen Bestandseintrag eine Klick-Messung von HEUTE ist - oder,
+nur bei congstar (``klick_messtag.ANBIETER_PREISGRENZE``, Befund 13.11.2026), eine
 ältere innerhalb von ``FRISCHEGRENZE_TAGE``, der das heutige Bündel WIDERSPRICHT
 (``klick_messtag``, ``klick_preisgrenze``; Bilanz ``klick_vorrang`` und
-``klick_widerspruch``). Sonst behält die heutige Messung ihren Messtag, auch wenn der
-Klick-Lauf gestört ist, fehlt oder seine Sätze zurückgehalten wurden (Befund
-13.11.2026, siehe ``klick_alter``). Vorrang hat nur, was wirklich ein Klick-Bündel
-wurde.
+``klick_widerspruch``). Bei jedem anderen Anbieter weicht eine solche ältere Messung
+unverändert wie zuvor, ohne Preisvergleich. Sonst behält die heutige Messung ihren
+Messtag, auch wenn der Klick-Lauf gestört ist, fehlt oder seine Sätze zurückgehalten
+wurden (siehe ``klick_alter``). Vorrang hat nur, was wirklich ein Klick-Bündel wurde.
 """
 
 from __future__ import annotations

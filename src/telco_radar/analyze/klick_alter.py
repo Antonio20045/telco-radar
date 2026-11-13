@@ -7,15 +7,16 @@ Messtag. Der Klick-Lauf hatte an diesem Tag alle 45 congstar-Produktseiten geles
 ersetzen - der congstar-Adapter nennt seit dem 12.11.2026 eine EINGERECHNETE Aktion
 (``anschluss_erlassen``), die der Klick nicht liest (``klick_vollstaendig``). Damit
 blieb kein Klick-Bündel von heute übrig, und die zwei Tage alten Einträge vom
-11.11. verdrängten über ``klick_zusammenfuehrung._klickalter`` die frische
-Adaptermessung: der Bestandseintrag behielt sein altes ``last_verified``, das
-Bündel fehlte im Messtag, und der Bündelwächter wurde rot, ohne dass ein Protokoll
-den Grund nannte.
+11.11. verdrängten über ``klick_messtag.klickalter`` die frische Adaptermessung: der
+Bestandseintrag behielt sein altes ``last_verified``, das Bündel fehlte im Messtag,
+und der Bündelwächter wurde rot, ohne dass ein Protokoll den Grund nannte.
 
-Seitdem gilt: eine Klick-Messung, die NICHT von heute ist, verdrängt eine heutige
-Adaptermessung nur, wenn diese ihr widerspricht (``klick_preisgrenze``). Ein
-Widerspruch ist kein stiller Verlust mehr, sondern eine Zeile je Anbieter -
-``widerspruch_zeilen`` (CLAUDE.md Clean Code 5 und 6).
+Seitdem gilt NUR für congstar (``klick_messtag.ANBIETER_PREISGRENZE`` - der Befund
+betraf nur diesen Anbieter): eine Klick-Messung, die NICHT von heute ist, verdrängt
+eine heutige Adaptermessung nur, wenn diese ihr widerspricht (``klick_preisgrenze``).
+Bei jedem anderen Anbieter verdrängt sie weiterhin unbedingt, wie vor diesem Befund.
+Ein congstar-Widerspruch ist kein stiller Verlust mehr, sondern eine Zeile je
+Anbieter - ``widerspruch_zeilen`` (CLAUDE.md Clean Code 5 und 6).
 """
 
 from __future__ import annotations

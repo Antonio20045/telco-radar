@@ -13,6 +13,10 @@ Die Regel steht im Kopf von ``klick_zusammenfuehrung``; hier steht sie als Code.
 Verglichen wird mit der heutigen Klick-Lesung desselben Schlüssels (``gelesen``),
 wenn es sie gibt - sie ist am selben Tag an derselben Seite gemessen und damit der
 belastbarere Zeuge -, sonst mit dem Bestandseintrag selbst.
+
+Die Preisgrenze gilt nur für ``ANBIETER_PREISGRENZE`` (Befund 13.11.2026 betraf nur
+congstar): bei jedem anderen Anbieter weicht eine ältere, frische Klick-Messung
+unverändert wie vor diesem Befund - unabhängig davon, ob sie widerspricht.
 """
 
 from __future__ import annotations
@@ -28,6 +32,10 @@ from .klick_geschwister import Schluessel
 from .klick_preisgrenze import PREISFELDER, widersprueche
 
 Geraet = Callable[[str], tuple[str, int | None]]
+
+ANBIETER_PREISGRENZE = "congstar"
+"""Nur bei diesem Anbieter weicht eine ältere, frische Klick-Messung dem heutigen
+Bündel nicht mehr unbedingt - sondern nur, wenn sie ihm widerspricht."""
 
 
 @dataclass
@@ -53,7 +61,7 @@ def teile_nach_messtag(
         if eintrag is None or alter is None:
             teile.bleiben.append(satz)
             continue
-        if alter == 0:
+        if alter == 0 or satz.anbieter != ANBIETER_PREISGRENZE:
             teile.gewichen.append((satz, eintrag))
             continue
         gemessen = {feld: getattr(satz, feld, None) for feld in PREISFELDER}

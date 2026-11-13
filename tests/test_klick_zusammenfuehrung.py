@@ -347,7 +347,7 @@ def test_gestoerter_oder_alter_anbieter_ersetzt_nichts(adapter, katalog, datei, 
     ("tag1", "buendel_geworden"), [([], 0), (None, 1)], ids=["ohne", "mit"]
 )
 def test_gestrige_lesung_verwirft_die_heutige_adaptermessung_nicht(
-    adapter, katalog, bestand, tmp_path, tag1, buendel_geworden
+    adapter, katalog, bestand, tmp_path, tag1, buendel_geworden, monkeypatch
 ):
     """Tag 1 liest der Klick 256 GB/M Plus/36. Ohne Adaptersatz und mit einem Tarif,
     den der Bestand nicht kennt, wird er kein Bündel (``ohne_tarif``; einen bekannten
@@ -357,7 +357,12 @@ def test_gestrige_lesung_verwirft_die_heutige_adaptermessung_nicht(
     nicht von heute und die heutige Messung widerspricht ihr nicht (Befund
     13.11.2026). Vorrang hat nur eine Messung von HEUTE
     (``test_klickmessung_von_heute_hat_vorrang``) oder ein Widerspruch
-    (``test_gestoerter_tag_laesst_die_frische_klickmessung_stehen``)."""
+    (``test_gestoerter_tag_laesst_die_frische_klickmessung_stehen``). Der Befund
+    betraf nur congstar; die Regel wird hier mit den echten o2-Sätzen nachgestellt,
+    darum steht die Anbieter-Bedingung (``klick_messtag.ANBIETER_PREISGRENZE``) für
+    diesen Test auf ``o2`` (vgl. ``test_o2_bleibt_bei_der_alten_regel``, das denselben
+    Anbieter ohne diese Umstellung prüft)."""
+    monkeypatch.setattr("telco_radar.analyze.klick_messtag.ANBIETER_PREISGRENZE", "o2")
     pfad = tmp_path / "geraete_tco.json"
     erster = adapter if tag1 is None else tag1
     lesung = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
@@ -420,7 +425,7 @@ _ANSCHLUSS_ERLASSEN = {
     ("rate", "widerspruch"), [(None, 0), (22.0, 1)], ids=["gleich", "widerspruch"]
 )
 def test_zurueckgehaltener_klicksatz_kostet_keinen_messtag(
-    adapter, katalog, bestand, tmp_path, rate, widerspruch
+    adapter, katalog, bestand, tmp_path, rate, widerspruch, monkeypatch
 ):
     """Die congstar-Lage vom 13.11.2026, nachgestellt mit den o2-Sätzen: Tag 1 misst
     der Klick, Tag 2 nennt der Adaptersatz eine EINGERECHNETE Aktion, die der Klick
@@ -428,7 +433,11 @@ def test_zurueckgehaltener_klicksatz_kostet_keinen_messtag(
     kein Klick-Bündel von heute. Die heutige Adaptermessung behält trotzdem ihren
     Messtag, weil die heutige Klick-Lesung ihr nicht widerspricht. Gegenprobe:
     widerspricht sie ihr (Rate 22,00 statt 36,50 €), bleibt der ältere Klick-Wert mit
-    seinem Datum stehen - lieber kein Preis als ein falscher."""
+    seinem Datum stehen - lieber kein Preis als ein falscher. Der Befund betraf nur
+    congstar; darum steht die Anbieter-Bedingung
+    (``klick_messtag.ANBIETER_PREISGRENZE``) hier auf ``o2``, dem Anbieter der echten
+    Sätze dieses Tests (vgl. ``test_o2_bleibt_bei_der_alten_regel``)."""
+    monkeypatch.setattr("telco_radar.analyze.klick_messtag.ANBIETER_PREISGRENZE", "o2")
     pfad = tmp_path / "geraete_tco.json"
 
     def passt(s):
@@ -468,6 +477,53 @@ def _eintrag(pfad):
         eintrag["abgerufen_am"],
         eintrag["geraet_monatsrate"],
     )
+
+
+def test_o2_bleibt_bei_der_alten_regel(adapter, katalog, bestand, tmp_path):
+    """Der Befund 13.11.2026 (``klick_messtag.ANBIETER_PREISGRENZE``) betraf nur
+    congstar: bei o2 verdrängt eine gestrige, frische Klick-Messung die heutige
+    Adaptermessung weiterhin UNBEDINGT, wie vor diesem Befund - auch dann, wenn
+    beide Messungen dasselbe sagen und also kein Widerspruch (``klick_preisgrenze``)
+    vorliegt. Gälte die Regel anbieterneutral, bliebe die heutige Adaptermessung
+    hier stehen, denn sie widerspricht der gestrigen nicht; ``test_o2_vorher`` ist
+    mit denselben Sätzen genau dieser PASS-Fall für congstar."""
+    pfad = tmp_path / "geraete_tco.json"
+    lesung = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
+    _tag(pfad, adapter, [lesung], HEUTE, katalog, bestand)
+    vorher = _eintrag(pfad)
+
+    zug, _ = _tag(pfad, adapter, [], MORGEN, katalog, bestand)
+
+    assert vorher == ("klick", HEUTE, 36.5)
+    assert (zug.bilanz["klick_vorrang"], zug.bilanz["klick_widerspruch"]) == (1, 0)
+    assert _eintrag(pfad) == ("klick", HEUTE, 36.5)
+
+
+def test_telekom_bleibt_bei_der_alten_regel(katalog, bestand, tmp_path):
+    """Dieselbe Gegenprobe wie ``test_o2_bleibt_bei_der_alten_regel``, mit Telekom:
+    Adaptersatz und Klick-Lesung nennen hier sogar genau denselben Preis (kein
+    Widerspruch möglich), und trotzdem verdrängt die gestrige Klick-Messung die
+    heutige Adaptermessung unbedingt - die Preisgrenze aus #103 gilt nicht für
+    Telekom."""
+    pfad = tmp_path / "geraete_tco.json"
+    stufe = telekom_lesung("36", "199").werte
+    alt = _telekom_alt(
+        geraet_zuzahlung=stufe.anzahlung,
+        geraet_monatsrate=stufe.rate,
+        tarif_monatlich=stufe.tarifphasen[0].betrag,
+        anschlusspreis=stufe.anschluss,
+    )
+    klick = erfasst(telekom_lesung("36", "199"), laufzeit=36)
+    _tag(pfad, [alt], [_telekom(klick)], HEUTE, katalog, bestand)
+    (vorher,) = TcoDB(pfad).buendel()
+
+    zug, _ = _tag(pfad, [alt], [], MORGEN, katalog, bestand)
+    (nachher,) = TcoDB(pfad).buendel()
+
+    assert (vorher["quelle_art"], vorher["abgerufen_am"]) == ("klick", HEUTE)
+    assert vorher["geraet_monatsrate"] == stufe.rate == alt["geraet_monatsrate"]
+    assert (zug.bilanz["klick_vorrang"], zug.bilanz["klick_widerspruch"]) == (1, 0)
+    assert (nachher["quelle_art"], nachher["abgerufen_am"]) == ("klick", HEUTE)
 
 
 def test_gestoerter_tag_laesst_die_frische_klickmessung_stehen(
