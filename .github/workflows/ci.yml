@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,7 +29,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
       - name: Install poppler-utils for the PDF tests
-        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+        run: |
+          command -v pdftoppm >/dev/null \
+            || sudo apt-get install -y --no-install-recommends poppler-utils \
+            || (sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils)
       # Ohne diesen Schritt ueberspringt sich tests/test_falz_browser.py, und
       # zwar lautlos - ein Skip sieht im Protokoll aus wie ein Erfolg. Genau
       # dieser Test misst, ob die Schlagzeile der Ausgabe ohne Scrollen
@@ -38,20 +41,32 @@ jobs:
       # headless gegen 127.0.0.1 und braucht weder Netz noch Systempakete.
       - name: Install Chromium for the browser tests
         run: playwright install chromium
-      - name: Run tests (Teil ${{ matrix.shard }}/4)
+      - name: Run tests (Teil ${{ matrix.shard }}/12)
         env:
           PYTHONPATH: src
         run: |
           set +e
-          pytest -q -n auto -rs --splits 4 --group ${{ matrix.shard }} \
+          pytest -q -n auto -rs --splits 12 --group ${{ matrix.shard }} \
             --splitting-algorithm least_duration --durations-path .test_durations \
+            --store-durations --clean-durations \
             | tee pytest-ausgabe.txt
           status=${PIPESTATUS[0]}
           set -e
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           tail -n 15 pytest-ausgabe.txt >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+          # Gemessene Zeiten dieses Teils; die Teile lassen sich zu einer neuen
+          # .test_durations zusammenfuegen (siehe docs/betrieb.md).
+          cp .test_durations "durations-teil-${{ matrix.shard }}.json"
           exit "$status"
+      - name: Zeiten dieses Teils ablegen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: durations-teil-${{ matrix.shard }}
+          path: durations-teil-${{ matrix.shard }}.json
+          if-no-files-found: ignore
+          retention-days: 14
 
   test:
     name: test
