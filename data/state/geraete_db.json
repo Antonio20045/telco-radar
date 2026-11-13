@@ -2,8 +2,8 @@
  "updated": "2026-11-13",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 110,
-   "funde_gesamt": 651,
+   "laeufe": 111,
+   "funde_gesamt": 657,
    "letzter_lauf": "2026-11-13",
    "letzte_funde": 6,
    "letzter_fund": "2026-11-13",
@@ -326,10 +326,10 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 108,
-   "funde_gesamt": 18419,
+   "laeufe": 109,
+   "funde_gesamt": 18575,
    "letzter_lauf": "2026-11-13",
-   "letzte_funde": 157,
+   "letzte_funde": 156,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -640,9 +640,9 @@
     ],
     [
      "2026-11-13",
-     157,
+     156,
      "gelesen",
-     655,
+     651,
      46,
      0
     ]
@@ -650,8 +650,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 108,
-   "funde_gesamt": 7287,
+   "laeufe": 109,
+   "funde_gesamt": 7356,
    "letzter_lauf": "2026-11-13",
    "letzte_funde": 69,
    "termine": [
@@ -966,7 +966,7 @@
      "2026-11-13",
      69,
      "gelesen",
-     2051,
+     380,
      0,
      null
     ]
@@ -974,9 +974,9 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 56,
-   "funde_gesamt": 13554,
-   "letzte_funde": 149,
+   "laeufe": 57,
+   "funde_gesamt": 13709,
+   "letzte_funde": 155,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -1284,7 +1284,7 @@
     ],
     [
      "2026-11-13",
-     149,
+     155,
      "gelesen",
      0,
      45,
@@ -1847,10 +1847,10 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 73,
-   "funde_gesamt": 14063,
+   "laeufe": 74,
+   "funde_gesamt": 14198,
    "letzter_lauf": "2026-11-13",
-   "letzte_funde": 136,
+   "letzte_funde": 135,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -2155,9 +2155,9 @@
     ],
     [
      "2026-11-13",
-     136,
+     135,
      "gelesen",
-     904,
+     888,
      45,
      0
     ]
@@ -2165,8 +2165,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 100,
-   "funde_gesamt": 3845,
+   "laeufe": 101,
+   "funde_gesamt": 3884,
    "letzter_lauf": "2026-11-13",
    "letzte_funde": 39,
    "termine": [
@@ -2483,8 +2483,8 @@
    "tote_adressen": 0
   },
   "Telekom": {
-   "laeufe": 13,
-   "funde_gesamt": 128,
+   "laeufe": 14,
+   "funde_gesamt": 138,
    "letzter_lauf": "2026-11-13",
    "letzte_funde": 10,
    "termine": [
@@ -2743,10 +2743,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 96,
-   "funde_gesamt": 1681,
+   "laeufe": 97,
+   "funde_gesamt": 1701,
    "letzter_lauf": "2026-11-13",
-   "letzte_funde": 23,
+   "letzte_funde": 20,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -3050,7 +3050,7 @@
     ],
     [
      "2026-11-13",
-     23,
+     20,
      "gelesen",
      0,
      0,
@@ -3307,8 +3307,8 @@
    "tote_adressen": null
   },
   "MediaMarkt": {
-   "laeufe": 8,
-   "funde_gesamt": 23,
+   "laeufe": 9,
+   "funde_gesamt": 29,
    "funde_nach_tag": [
     [
      "2026-10-11",
@@ -3544,7 +3544,7 @@
     ],
     [
      "2026-11-13",
-     8,
+     6,
      "gelesen",
      0,
      0,
@@ -3553,7 +3553,7 @@
    ],
    "tote_adressen": null,
    "letzter_lauf": "2026-11-13",
-   "letzte_funde": 8,
+   "letzte_funde": 6,
    "termine": [
     "2026-11-06",
     "2026-11-07",
@@ -10472,23 +10472,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-11-03",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1699.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-11-03",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-18-pro-512gb-burgundy-3071604.html",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-18-pro"
    ],
    "titel_roh": "APPLE iPhone 18 Pro 512 GB Burgunder Dual SIM",
-   "preis_ohne_vertrag": 1699.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1699.0
   },
   {
    "id": "saturn--apple-iphone-18-pro-512gb-polar",
@@ -10813,23 +10812,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-11-07",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1599.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-11-07",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-18-pro-max-256gb-black-3071614.html",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-18-pro"
    ],
    "titel_roh": "APPLE iPhone 18 Pro Max 256 GB Schwarz Dual SIM",
-   "preis_ohne_vertrag": 1599.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1599.0
   },
   {
    "id": "saturn--apple-iphone-18-pro-max-256gb-silber",
@@ -10905,15 +10903,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-11-03",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1849.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-11-03",
-   "last_verified": "2026-11-10",
-   "letzter_check": "2026-11-12",
+   "last_verified": "2026-11-13",
+   "letzter_check": "2026-11-13",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-18-pro-max-512gb-glacier-3071621.html",
-   "abgerufen_am": "2026-11-10",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -10921,7 +10919,6 @@
    ],
    "titel_roh": "APPLE iPhone 18 Pro Max 512 GB Polar Dual SIM",
    "preis_ohne_vertrag": 1849.0,
-   "stale_since": "2026-11-11",
    "ended_since": "2026-11-12"
   },
   {
@@ -28310,23 +28307,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-10-10",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1249.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.freenet.de/handys-smartphones/p/P-M-4042129?ds=P-4068968",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S25 Edge 256 GB Icy Blue",
-   "preis_ohne_vertrag": 1249.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1249.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s25-edge-256gb-titanium-jetblack",
@@ -28341,23 +28337,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-10-10",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1249.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.freenet.de/handys-smartphones/p/P-M-4042129?ds=P-4068974",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S25 Edge 256 GB Titanium Jetblack",
-   "preis_ohne_vertrag": 1249.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1249.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s25-edge-256gb-titanium-silver",
@@ -28372,23 +28367,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-10-10",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1249.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.freenet.de/handys-smartphones/p/P-M-4042129?ds=P-4068980",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S25 Edge 256 GB Titanium Silver",
-   "preis_ohne_vertrag": 1249.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1249.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s25-edge-512gb-blau",
@@ -28403,23 +28397,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-10-10",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1369.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.freenet.de/handys-smartphones/p/P-M-4042129?ds=P-4068986",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S25 Edge 512 GB Icy Blue",
-   "preis_ohne_vertrag": 1369.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1369.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s25-edge-512gb-titanium-jetblack",
@@ -28434,23 +28427,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-10-10",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1369.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.freenet.de/handys-smartphones/p/P-M-4042129?ds=P-4068992",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S25 Edge 512 GB Titanium Jetblack",
-   "preis_ohne_vertrag": 1369.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1369.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s25-edge-512gb-titanium-silver",
@@ -28465,23 +28457,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-10-10",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1369.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-11-12",
+   "last_verified": "2026-11-13",
    "letzter_check": "2026-11-13",
    "quelle_url": "https://www.freenet.de/handys-smartphones/p/P-M-4042129?ds=P-4068998",
-   "abgerufen_am": "2026-11-12",
+   "abgerufen_am": "2026-11-13",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S25 Edge 512 GB Titanium Silver",
-   "preis_ohne_vertrag": 1369.0,
-   "stale_since": "2026-11-13"
+   "preis_ohne_vertrag": 1369.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-256gb-cobalt-violet",
