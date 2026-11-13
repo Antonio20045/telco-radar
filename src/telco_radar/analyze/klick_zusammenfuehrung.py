@@ -41,7 +41,6 @@ import os
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
-from datetime import date
 from pathlib import Path
 
 from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE, ORDNER, lies_ergebnisse
@@ -51,6 +50,7 @@ from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
+from .klick_alter import alter_tage, vorrang_ohne_messtag
 from .klick_erfassung import Angebot, erfassungsgruende
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
@@ -139,13 +139,22 @@ class Zusammenfuehrung:
     ) -> Buendelbilanz:
         """Die Bündel; ein Adapterbündel weicht einer frischen Klick-Messung."""
         bilanz = aus_rohsaetzen(self.rohsaetze, bestand, heute)
-        bleiben = [b for b in bilanz.buendel if not _vorrang(b, nach_id(b.id), heute)]
-        vorrang = len(bilanz.buendel) - len(bleiben)
+        bleiben: list = []
+        gewichen: list[tuple] = []
+        for satz in bilanz.buendel:
+            eintrag = nach_id(satz.id)
+            if _vorrang(satz, eintrag, heute):
+                gewichen.append((satz, eintrag))
+            else:
+                bleiben.append(satz)
         bilanz.buendel = bleiben
+        anzahl = len(gewichen)
         if self.bilanz is not None:
-            self.bilanz["klick_vorrang"] = vorrang
-        if vorrang:
-            log.info("Klick-Bündel: %d Adapterbündel weichen frischer Messung", vorrang)
+            self.bilanz["klick_vorrang"] = anzahl
+        if anzahl:
+            log.info("Klick-Bündel: %d Adapterbündel weichen frischer Messung", anzahl)
+        for text in vorrang_ohne_messtag(gewichen, heute):
+            log.warning("%s", text)
         return bilanz
 
 
@@ -259,14 +268,6 @@ def _neu(satz: dict) -> bool:
 def schluesseltext(schluessel: Schluessel) -> str:
     """Der Schlüssel als Text für Bilanz und Protokoll."""
     return "|".join("" if teil is None else str(teil) for teil in schluessel)
-
-
-def alter_tage(datum: object, heute: str) -> int | None:
-    """Tage von ``datum`` bis ``heute``; ``None``, wenn ``datum`` kein ISO-Datum ist."""
-    try:
-        return (date.fromisoformat(heute) - date.fromisoformat(str(datum))).days
-    except ValueError:
-        return None
 
 
 def _datei(
