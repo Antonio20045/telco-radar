@@ -301,6 +301,40 @@ def test_klicksatz_mit_einmalzahlung_ersetzt(katalog):
     assert zug.bilanz["ersetzt"] == 1 and zug.bilanz["gegenprobe"]["gleich"] == 1
 
 
+def test_bilanz_nennt_je_anbieter_was_aus_seinen_saetzen_wurde(katalog):
+    """Zwei Anbieter in einem Lauf: der 1&1-Satz wird zurückgehalten, der
+    Telekom-Satz ersetzt. Die Summenzeile sagt beide Male „1“ und verrät nicht, WER
+    seine Tagesmessung verloren hat (Befund 13.11.2026: 760 zurückgehaltene
+    congstar-Sätze steckten in „1992 Adaptersätze nicht ersetzt“)."""
+    klick = erfasst(telekom_lesung("36", "199"), laufzeit=36)
+
+    zug = fuehre_zusammen(
+        [_einsundeins_alt(), _telekom_alt()],
+        [_einsundeins(None), _telekom(klick)],
+        katalog,
+        HEUTE,
+        _geraet(katalog),
+    )
+
+    assert zug.bilanz["unvollstaendig"]["nicht_ersetzt"] == 1
+    assert zug.bilanz["je_anbieter"] == {
+        "1&1": {
+            "saetze": 1,
+            "ersetzt": 0,
+            "unvollstaendig": 1,
+            "felder": {"geraet_zuzahlung": 1},
+            "ohne_gegenstueck": 0,
+        },
+        "Telekom": {
+            "saetze": 1,
+            "ersetzt": 1,
+            "unvollstaendig": 0,
+            "felder": {},
+            "ohne_gegenstueck": 0,
+        },
+    }
+
+
 @pytest.mark.parametrize(
     ("zweite", "anzahl", "mehrdeutig"),
     [

@@ -23,6 +23,7 @@ Adaptersatz ganz, und die Bilanz zählt ihn unter ``unvollstaendig`` mit den feh
 Feldern: zwei Quellen werden nie feldweise gemischt. Ohne Gegenstück kommt ein
 Klick-Satz, wie er ist (Lücken bleiben ``None``), nur mit dem Namen eines
 Adaptersatzes anderer Laufzeit (``klick_geschwister``).
+Die Bilanz zählt all das zusätzlich je Anbieter (``klick_anbieterbilanz``).
 Nennen zwei Klick-Sätze denselben Schlüssel (ein Zustand außer neu zählt mit), gilt
 einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzte
 Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
@@ -54,6 +55,7 @@ from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
+from . import klick_anbieterbilanz as anbieterbilanz
 from .klick_alter import alter_tage, widerspruch_zeilen
 from .klick_erfassung import Angebot, erfassungsgruende
 from .klick_geraetepreis import gegenprobe_geraet
@@ -88,12 +90,12 @@ class Gegenprobe:
     unvollstaendig: int = 0
     fehlend: Counter[str] = field(default_factory=Counter)
 
-    def unvollstaendig_fuer(self, klick: dict, adapter: dict) -> bool:
-        """Zählt einen Adaptersatz mit Wertfeldern, die der Klick-Satz nicht nennt."""
+    def unvollstaendig_fuer(self, klick: dict, adapter: dict) -> list[str]:
+        """Die Wertfelder, die der Klick-Satz nicht nennt; leer heißt: er ersetzt."""
         felder = fehlend(klick, adapter)
         self.unvollstaendig += bool(felder)
         self.fehlend.update(felder)
-        return bool(felder)
+        return felder
 
     def vergleiche(self, klick: dict, adapter: dict) -> None:
         """Zählt einen ersetzten Adaptersatz; Felder nur, wo beide einen Wert haben."""
@@ -221,18 +223,26 @@ def fuehre_zusammen(
     ersetzt: set[int] = set()
     neu: list[dict] = []
     ohne_gegenstueck = 0
+    je_anbieter: dict[str, anbieterbilanz.Anbieterbilanz] = {}
     for satz in eindeutig:
         schluessel = klickschluessel(satz)
+        zeile = anbieterbilanz.fuer(je_anbieter, satz)
+        zeile.saetze += 1
         treffer = sorted(set(index.get(schluessel, []) if _neu(satz) else []))
         if not treffer:
             ohne_gegenstueck += 1
+            zeile.ohne_gegenstueck += 1
             neu += mit_namen(satz, schluessel, adapter, andere_laufzeit, UEBERNOMMEN)
         for stelle in treffer:
             alt = adapter[stelle]
-            if probe.unvollstaendig_fuer(satz, alt):
+            felder = probe.unvollstaendig_fuer(satz, alt)
+            if felder:
+                zeile.unvollstaendig += 1
+                zeile.fehlend.update(felder)
                 continue
             probe.vergleiche(satz, alt)
             ersetzt.add(stelle)
+            zeile.ersetzt += 1
             uebernommen = {f: alt.get(f) for f in UEBERNOMMEN}
             neu.append({**satz, **uebernommen, **begleitend(satz, alt)})
     vorhanden = {e["anbieter"] for e in eintraege}
@@ -249,6 +259,7 @@ def fuehre_zusammen(
         },
         "mehrdeutig": mehrdeutig,
         "ohne_gegenstueck": ohne_gegenstueck,
+        "je_anbieter": anbieterbilanz.als_daten(je_anbieter),
         "klick_vorrang": 0,
         "klick_widerspruch": 0,
         "gegenprobe": probe.als_daten(),
@@ -383,5 +394,6 @@ def _protokolliere(bilanz: dict) -> None:
         probe["ohne_vergleich"],
         bilanz["ohne_gegenstueck"],
     )
+    anbieterbilanz.protokolliere(bilanz["je_anbieter"])
     for beispiel in probe["beispiele"]:
         log.warning("Klick-Gegenprobe weicht ab: %s", beispiel)
