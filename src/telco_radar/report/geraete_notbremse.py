@@ -177,6 +177,35 @@ def zaehlt(karte: dict) -> bool:
     return karte.get("zaehlt", True)
 
 
+NUR_HEUTE = ("veraltet_aktion", "veraltet_pruefung")
+IMMER = (
+    "schaetzung",
+    "bedingter_tarif",
+    "quarantaene",
+    "pruefung_gescheitert",
+    "nicht_im_sortiment",
+)
+
+
+def zaehlt_am_tag(karte: dict) -> bool:
+    """Zählte die Karte an IHREM eigenen Messtag - die Frage einer Zeitreihe.
+
+    ``zaehlt`` beantwortet die Frage für HEUTE. ``NUR_HEUTE`` sind die Urteile
+    über den heutigen Stand eines Bündels: „veraltet“ heißt, der Preis ist
+    HEUTE zu alt oder die eingerechnete Aktion ist HEUTE abgelaufen. An seinem
+    Messtag war beides nicht so; wer sie rückblickend anwendet, löscht mit dem
+    heutigen Stand die Vergangenheit (Befund 13.11.2026: congstar stand mit 7
+    statt 45 Messtagen in der Herstellergrafik). Ob eine Messung an ihrem Tag
+    frisch war, entscheidet ``geraete_tco_karten.ist_frisch`` je Tag. Was in
+    ``IMMER`` steht, war auch rückblickend nie ein gültiger Vergleich.
+    """
+    if karte.get("zaehlt"):
+        return True
+    if any(karte.get(flag) for flag in IMMER):
+        return False
+    return any(karte.get(flag) for flag in NUR_HEUTE)
+
+
 def zustand(karte: dict) -> dict | None:
     """Der benannte Δ-Zustand einer Karte, die nicht zählt, sonst ``None``.
 

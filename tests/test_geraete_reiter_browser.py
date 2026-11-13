@@ -585,10 +585,10 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     E3: die Radar-Tafel steht mit auf dieser Seite; ihr Platzhalter-
     Gerüst ist bewusst klein (der Inhalt montiert E3 Schritt 2).
 
-    Die Preispositionierung steht als eigenes Bild vor den Reitern (Auftrag
-    02.11.2026) und gehört zu keinem Reiter; wie das Aufmacherbild zählt sie
-    nicht mit. Die Herstellergrafik (`#hersteller`, 05.11.2026) steht als
-    erstes Bild davor und zählt aus demselben Grund nicht mit; ebenso der
+    Die Herstellergrafik (`#hersteller`, 05.11.2026) steht als einziges
+    Preisbild vor den Reitern und gehört zu keinem Reiter; wie das
+    Aufmacherbild zählt sie nicht mit (die Modellgrafik `#preisposition`
+    ist am 13.11.2026 gestrichen worden); ebenso der
     Abschnitt „Portfolio gegen Vodafone“ (`#portfolio`) dahinter; ebenso die
     Zeile „letztes Messdatum je Anbieter“ (`#messdatum`, 08.11.2026), die
     vor den Reitern steht. Die Reiter selbst bleiben unter der Grenze."""
@@ -598,7 +598,6 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     hoehe = _seite.evaluate(
         "document.documentElement.scrollHeight"
         " - document.querySelector('.gx-auftakt').offsetHeight"
-        " - document.querySelector('#preisposition').offsetHeight"
         " - (document.querySelector('#hersteller') || {offsetHeight: 0})"
         ".offsetHeight"
         " - (document.querySelector('#portfolio') || {offsetHeight: 0})"
