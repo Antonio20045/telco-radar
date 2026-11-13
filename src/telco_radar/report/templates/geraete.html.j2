@@ -69,7 +69,7 @@
    .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
    E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist GEFALLEN
    (Doppel-Darstellung zur eigenen Geräteauswahl, §4.6/§4.8). #}
-{% from "_geraete_buendel.html.j2" import belegpaare, fehlzeile %}
+{% from "_geraete_buendel.html.j2" import belegpaare, fehlzeile, echte24luecke %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
 {# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
    `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
@@ -317,8 +317,16 @@
          Wechsel setzt app.js ihn aus dem JSON-Knoten (fertige Zeichen-
          kette, kein zweiter Satzbaumeister im Browser). #}
   <section class="gr-buendel" id="gr-buendel" aria-label="Fehlende Anbieter">
-    <div id="gr-bnd-gruppe">{% if m and m.fehlzeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
-      %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}{% if m %}{{ belegpaare(m) }}{% endif %}</div>
+    {# Fix B (13.11.2026): dasselbe `echte24_fehlzeilen(m)` wie die lazy
+       geladenen Fragmente (`_geraete_buendel.html.j2 buendelgruppe`) - sonst
+       zeigt nur das Vorgabemodell (serverseitig, hier) die echte
+       24-Monats-Lücke nicht, weil diese Stelle die Teilvorlage nicht über
+       das Makro `buendelgruppe` einbindet, sondern Fehlliste und Belege
+       einzeln wiederholt. #}
+    {% set echte24_zeilen = echte24_fehlzeilen(m) if m else [] %}
+    <div id="gr-bnd-gruppe">{% if m and (m.fehlzeilen or echte24_zeilen) %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
+      %}{{ fehlzeile(f) }}{% endfor %}{% for k in echte24_zeilen %}{{
+      echte24luecke(k) }}{% endfor %}</div>{% endif %}{% if m %}{{ belegpaare(m) }}{% endif %}</div>
   {# Ziel 1b: warum ein Anbieter nicht jede Tarifstufe füllt (`geraete_stufen`). #}
   <p class="gr-belegquote" id="gr-tarifstufen-regel">{{
   geraete.tco.tarifstufen_regel }}</p>

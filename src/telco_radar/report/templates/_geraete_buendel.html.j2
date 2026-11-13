@@ -473,7 +473,30 @@
   }}</span><span class="gr-anb-fehlt-zustand">{{ f.kurz }}</span>{% if f.detail
   %}<span class="gr-anb-fehlt-detail">{{ f.detail }}</span>{% endif %}</p>{% endmacro %}
 
+{# Fix B (13.11.2026): die Bündelliste (`.gr-bndliste`, Makro `buendelzeile`)
+   bleibt weg (Entscheidung Antonio, 10.10.2026, siehe `setzeBuendel` in
+   app.js) - sie kommt NICHT zurück. Steht trotzdem eine 1&1-Zeile mit der
+   echten 24-Monats-Lücke (`geraete_laufzeit.REGEL_ECHTE_24_OHNE_ZUZAHLUNG`,
+   gefunden von `echte24_fehlzeilen(m)`, demselben Python-Helfer, den
+   `geraete.html.j2` fürs serverseitige Vorgabemodell ruft - EINE Stelle,
+   kein zweiter Textvergleich in der Vorlage) unter den Zeilen des Modells,
+   bekommt genau dieser Anbieter EINE sichtbare Zeile in der verbliebenen
+   Fehl-/Belegliste (`gr-anb-fehlliste`) - dieselbe Klasse `gr-anb-fehlt` wie
+   `fehlzeile`, damit app.js sie ueber dieselben Selektoren (`stelleZeilen`)
+   nach Band und Laufzeit blendet, ohne die Bündelliste selbst zu brauchen.
+   Andere Lücken-Gründe (veralteter Preis, Plus-Tarif, Quarantäne, …)
+   bekommen hier bewusst KEINE Zeile - nur dieser eine, konkret benannte
+   Satz. #}
+{% macro echte24luecke(k) %}<p class="gr-anb-fehlt gr-anb-fehlt--echte24"
+  data-anbieter="{{ k.anbieter }}"{% if k.band %} data-band="{{ k.band }}"{%
+  endif %}{% if k.laufzeit_sichtbar %} data-lz="{{ k.laufzeit_sichtbar }}"{%
+  endif %} style="--anb:{{ k.anb_farbe }}" title="{{ k.leer_grund
+  }}"><span class="gr-bnd-name">{{ k.anbieter }}</span><span
+  class="gr-anb-fehlt-zustand">Kein Gesamtpreis für diese 24 Monate</span><span
+  class="gr-anb-fehlt-detail">{{ k.leer_grund }}</span></p>{% endmacro %}
+
 {% macro buendelgruppe(m, ids=false) %}
+      {% set echte24_zeilen = echte24_fehlzeilen(m) %}
       {# A3: „alles alt“ steht als EIN Satz über den Zeilen des Modells
          (`alt_hinweis`, in Python gebaut, mit Datum und Grenze) - nicht
          an jeder Zeile einzeln, und nur wenn wirklich KEINE frische
@@ -487,8 +510,9 @@
         {{ laufzeitkoepfe(m.zeilen_band) }}
         {% for k in m.zeilen_band %}{{ buendelzeile(k) }}{% endfor %}
       </div>
-      {% if m.fehlzeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
-        %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}
+      {% if m.fehlzeilen or echte24_zeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
+        %}{{ fehlzeile(f) }}{% endfor %}{% for k in echte24_zeilen %}{{
+        echte24luecke(k) }}{% endfor %}</div>{% endif %}
       {{ belegpaare(m) }}
 
       {# OHNE TARIFBAND (§ 7): Tarife ohne erhobenes Datenvolumen und Tarife mit
