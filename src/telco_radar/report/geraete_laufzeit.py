@@ -17,6 +17,7 @@ from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG
 from ..tco_model import TCO_HORIZONT
 from . import geraete_eigen_pruefung as eigen_pruefung
 from . import geraete_notbremse as notbremse
+from . import geraete_preisstand
 from . import geraete_tco_karten as karten_modul
 
 LAUFZEITEN = (12, 24, 36)
@@ -152,6 +153,28 @@ def regel_echte_24_satz(karten) -> str:
         if any(ist_echte_24_ohne_zuzahlung(k) for k in karten)
         else ""
     )
+
+
+def echte24_fehlzeilen(modell: dict) -> list[dict]:
+    """Die Karten EINES Modells mit der echten 24-Monats-Lücke (Fix B, 13.11.2026).
+
+    Die Bündelliste (`.gr-bndliste`) steht seit 10.10.2026 nicht mehr auf der
+    sichtbaren Seite (`app.js setzeBuendel`); ihr Lückensatz ging damit
+    verloren, obwohl die Regel weiter zutrifft. Diese Funktion liest
+    `m.zeilen_band`/`m.zeilen_ohne_band` - dieselbe Menge, die vorher die
+    Bündelliste zeigte -, wendet `geraete_preisstand.anzeige` an (derselbe
+    Normalisierungsschritt wie `buendelzeile`, denn ein veralteter Preis
+    überschreibt `leer_grund`) und gibt nur die Karten zurück, deren
+    sichtbarer Grund EXAKT `REGEL_ECHTE_24_OHNE_ZUZAHLUNG` ist - kein anderer
+    Lückengrund bekommt hier eine Zeile. `_geraete_buendel.html.j2`
+    (`buendelgruppe`) und `geraete.html.j2` (Vorgabemodell) rufen dieselbe
+    Funktion, damit beide Stellen nie auseinanderlaufen."""
+    ergebnis = []
+    for k in [*modell.get("zeilen_band", []), *modell.get("zeilen_ohne_band", [])]:
+        nk = geraete_preisstand.anzeige(k)
+        if nk.get("leer_grund") == REGEL_ECHTE_24_OHNE_ZUZAHLUNG:
+            ergebnis.append(nk)
+    return ergebnis
 
 
 def _echte_24_satz(b) -> str:

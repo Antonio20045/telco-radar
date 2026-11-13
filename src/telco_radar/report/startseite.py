@@ -15,6 +15,7 @@ import re
 from datetime import date, timedelta
 
 from .bilder import MIND_BREITE_GROSS
+from .geraete_laufzeit import echte24_fehlzeilen
 from .geraete_messdatum import stand_vom
 from .geraete_preisstand import anzeige as preis_anzeige
 from .geraete_stufen import widerspruch_stand
@@ -343,6 +344,7 @@ VORLAGEN_HELFER = {
     "meldung_id": meldung_id,
     "MIND_BREITE_GROSS": MIND_BREITE_GROSS,
     "preis_anzeige": preis_anzeige,
+    "echte24_fehlzeilen": echte24_fehlzeilen,
     "stand_vom": stand_vom,
     "widerspruch_stand": widerspruch_stand,
 }
