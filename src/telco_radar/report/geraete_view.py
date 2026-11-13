@@ -1616,12 +1616,11 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         )
         zeitreihe = geraete_zeitreihe.leer()
         ausfaelle.append(Ausfall.aus_ausnahme(ZEITREIHE_TEIL, exc))
-    hm = geraete_portfolio.hersteller(state_dir, tco, katalog, tarifbestand, tco_heute)
-    zr_erlaubt = {
-        k: b
-        for k, b in ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()
-        if b
-    }
+    hm = geraete_portfolio.hersteller(
+        state_dir, tco, katalog, tarifbestand, tco_heute, tco_db.erfassung
+    )
+    zr_daten = zeitreihe.get("daten") or {}
+    zr_erlaubt = {k: b for k, b in (zr_daten.get("erlaubt") or {}).items() if b}
 
     katalog_modelle = katalog_modellzeilen(
         bestand,

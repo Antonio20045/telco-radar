@@ -41,7 +41,7 @@ import re
 from datetime import date
 
 from ..analyze import buendel_abdeckung
-from ..analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT
+from ..analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT, TRENNER
 from . import geraete_hersteller
 from .anbieter_farben import legendenname, slug_fuer
 from .geraete_hersteller import HERSTELLER_VORAN, aktuelle_geraete
@@ -121,9 +121,20 @@ def _erfassung_datum(satz: str):
         return None
 
 
-def erfassung_je(tco_modelle: list[dict]) -> dict[str, dict[str, dict]]:
-    """{device_id: {Anbieter: Beleg}} aus den `erfassung`-Sätzen eines Modells
-    (`klick_erfassung.fuer_modell`, von `geraete_view` je Modell gesetzt).
+def erfassung_je(
+    tco_modelle: list[dict], erfassung_roh: dict[str, str] | None = None
+) -> dict[str, dict[str, dict]]:
+    """{device_id: {Anbieter: Beleg}} aus dem UNGEFILTERTEN Erfassungs-Speicher
+    (`tco_db.erfassung`; Schlüssel "<Anbieter>|<device_id>" für ein Gerät oder
+    nur "<Anbieter>" für alle Geräte dieses Anbieters, siehe
+    `klick_erfassung.ohne_karte`).
+
+    Anders als die Gerätekarte (die über `klick_erfassung.ohne_karte` einen
+    Erfassungssatz verwirft, sobald irgendeine Karte - auch eine veraltete -
+    einen Betrag trägt) zählt der Portfolio-Vergleich Lücken über FRISCHE
+    Karten (`staende`, PREIS vs. ALT): eine veraltete Karte mit Betrag darf
+    einen Erfassungsbeleg hier nicht verdecken, deshalb wird nicht nach Karten
+    gefiltert.
 
     Nur Sätze der Form `SATZ_NICHT_IM_ANGEBOT` zählen: eine an einem Tag ganz
     gelesene Geräteübersicht, die das Gerät nicht zeigt - dieselbe
@@ -131,10 +142,17 @@ def erfassung_je(tco_modelle: list[dict]) -> dict[str, dict[str, dict]]:
     ohne Screenshot-Link (`_beleg_text` zeigt dann einen Auszug statt eines
     Links). Andere Erfassungsgründe (Seite gesperrt, nur ein Speicher gelesen)
     sagen nichts über das Sortiment und zählen nicht."""
+    erfassung_roh = erfassung_roh or {}
+    eigene = {a: s for a, s in erfassung_roh.items() if TRENNER not in a}
     aus: dict[str, dict[str, dict]] = {}
     for modell in tco_modelle or []:
         device_id = modell.get("device_id") or ""
-        for anbieter, satz in (modell.get("erfassung") or {}).items():
+        je_anbieter = dict(eigene)
+        for schluessel, satz in erfassung_roh.items():
+            anbieter, _, geraet = schluessel.partition(TRENNER)
+            if geraet and geraet == device_id:
+                je_anbieter[anbieter] = satz
+        for anbieter, satz in je_anbieter.items():
             geprueft = _erfassung_datum(satz)
             if geprueft is None:
                 continue
@@ -305,11 +323,17 @@ def fehlende_anbieter(paare: list[dict]) -> str:
     )
 
 
-def berechne(tco_modelle: list[dict], katalog, belege: dict, heute: str) -> dict:
+def berechne(
+    tco_modelle: list[dict],
+    katalog,
+    belege: dict,
+    heute: str,
+    erfassung_roh: dict[str, str] | None = None,
+) -> dict:
     """Reine Rechnung: alle Paare gegen Vodafone."""
     geraete = aktuelle_geraete(katalog)
     je = staende(tco_modelle)
-    erf = erfassung_je(tco_modelle)
+    erf = erfassung_je(tco_modelle, erfassung_roh)
     paare = [
         _paar(w, geraete, je, belege, erf, heute)
         for w in wettbewerber_mit_daten(je, geraete)
@@ -328,7 +352,13 @@ def berechne(tco_modelle: list[dict], katalog, belege: dict, heute: str) -> dict
     }
 
 
-def ansicht(state_dir, tco: dict, katalog, heute: str) -> dict:
+def ansicht(
+    state_dir,
+    tco: dict,
+    katalog,
+    heute: str,
+    erfassung_roh: dict[str, str] | None = None,
+) -> dict:
     """Der Teil-Kontext der Seite; ein Ausfall steht als `fehler`.
 
     Ist die Belegliste nicht lesbar, ist jede Lücke eine Messlücke - die
@@ -342,17 +372,29 @@ def ansicht(state_dir, tco: dict, katalog, heute: str) -> dict:
         log.exception("Belegliste der Portfolio-Ansicht nicht lesbar")
         hinweis = f"Belegliste nicht lesbar ({type(exc).__name__}): keine Lücke belegt"
     try:
-        ergebnis = berechne((tco or {}).get("modelle") or [], katalog, belege, heute)
+        ergebnis = berechne(
+            (tco or {}).get("modelle") or [], katalog, belege, heute, erfassung_roh
+        )
     except (KeyError, TypeError, ValueError, AttributeError) as exc:
         log.exception("Portfolio-Ansicht nicht aufbereitbar")
         return {"fehler": f"{type(exc).__name__}: {exc}", "leer": False}
     return {**ergebnis, "hinweis": hinweis}
 
 
-def hersteller(state_dir, tco: dict, katalog, tarifbestand, heute: str) -> dict:
+def hersteller(
+    state_dir,
+    tco: dict,
+    katalog,
+    tarifbestand,
+    heute: str,
+    erfassung_roh: dict[str, str] | None = None,
+) -> dict:
     """Die Herstellergrafik samt Portfolio-Ansicht (Schlüssel `portfolio`) - ein
     Aufruf für die Seite, damit `geraete_view` nicht wächst."""
     herstellergrafik = geraete_hersteller.ansicht(
         state_dir, tco, katalog, tarifbestand, heute
     )
-    return {**herstellergrafik, "portfolio": ansicht(state_dir, tco, katalog, heute)}
+    return {
+        **herstellergrafik,
+        "portfolio": ansicht(state_dir, tco, katalog, heute, erfassung_roh),
+    }
