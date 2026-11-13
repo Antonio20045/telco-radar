@@ -14,6 +14,7 @@ from pathlib import Path
 from ..geraete_model import Katalog
 from .geraete_store import GELESEN, GeraeteDB
 from .klick_erfassung import Angebot, angebotene_speicher
+from .klick_nachholen import Nachholen, frischer_ordner
 from .klick_zusammenfuehrung import Geraet, Zusammenfuehrung
 from .klick_zusammenfuehrung import zusammenfuehren as _zusammenfuehren
 
@@ -35,9 +36,17 @@ def zusammenfuehren(
     katalog: Katalog,
     heute: str,
     geraet: Geraet,
+    nachholen: Nachholen | None = None,
 ) -> Zusammenfuehrung:
-    """``klick_zusammenfuehrung.zusammenfuehren`` mit ``Zusammenfuehrung.angebot``."""
-    zug = _zusammenfuehren(adapter, ordner, root, katalog, heute, geraet)
+    """``klick_zusammenfuehrung.zusammenfuehren`` mit ``Zusammenfuehrung.angebot``.
+
+    Mit ``nachholen`` zuvor den Klick-Stand von origin holen, wenn der im Arbeitsbaum
+    nicht vom Messtag ist (``klick_nachholen``); der Befund steht in der Bilanz.
+    """
+    with frischer_ordner(nachholen, ordner, root, heute) as frisch:
+        zug = _zusammenfuehren(adapter, frisch or ordner, root, katalog, heute, geraet)
+    if nachholen is not None and nachholen.bilanz and zug.bilanz is not None:
+        zug.bilanz["nachholen"] = nachholen.bilanz
     if (root / ZUSTAND).is_file():
         zug.angebot = angebot_aus(GeraeteDB(root / ZUSTAND), heute)
     return zug
