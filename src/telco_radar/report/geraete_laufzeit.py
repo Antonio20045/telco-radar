@@ -122,6 +122,37 @@ def regel_satz(karten) -> str:
     return REGEL_24_PLUS_12 if any(nur_ueber_24(k) for k in karten) else ""
 
 
+REGEL_ECHTE_24_OHNE_ZUZAHLUNG = (
+    "1&1 bietet dieses Gerät auch über echte 24 Monate an, ohne die 12 "
+    "Monate der Standardlaufzeit „24 + 12“ danach. Für diese echten 24 "
+    "Monate bestätigt 1&1 selbst keine Gerätezuzahlung – nur für „24 + 12“ "
+    "nennt die Produktseite den Betrag. Deshalb zeigt TelcoRadar hier "
+    "keinen Gesamtpreis: kein erfundener Wert, sondern eine benannte Lücke "
+    "(Klick-Erkundung 07.10.2026, `klickkachel`)."
+)
+
+
+def ist_echte_24_ohne_zuzahlung(karte: dict) -> bool:
+    """Eine 1&1-Karte mit echten 24 Monaten (nicht „24 + 12“) ohne bestätigte
+    Gerätezuzahlung - die Lücke `tco_kosten.POSTEN_ZUZAHLUNG`, nie ein Preis von 0.
+    """
+    return (
+        karte.get("anbieter") == "1&1"
+        and karte.get("buendel_monatlich") is not None
+        and karte.get("zuzahlung") is None
+        and karte.get("raten_laufzeit") == TCO_HORIZONT
+    )
+
+
+def regel_echte_24_satz(karten) -> str:
+    """Der Satz zur echten 24-Monats-Lücke, wenn unter den Karten eine ist."""
+    return (
+        REGEL_ECHTE_24_OHNE_ZUZAHLUNG
+        if any(ist_echte_24_ohne_zuzahlung(k) for k in karten)
+        else ""
+    )
+
+
 def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:
     """Warum ein Anbieter mit Bündeln in dieser Laufzeit keine Zeile trägt."""
     if any(
