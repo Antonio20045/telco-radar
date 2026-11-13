@@ -1,24 +1,28 @@
 """Das Alter einer Klick-Messung - und was es kostet, wenn sie trotzdem Vorrang
 hat.
 
-Ein Adapterbündel weicht einer Klick-Messung, die jünger als
-``FRISCHEGRENZE_TAGE`` ist (`klick_zusammenfuehrung._vorrang`). Ist diese Messung
-nicht von HEUTE, behält ihr Bestandseintrag sein altes ``last_verified`` - das
-Bündel fehlt dann im Messtag, obwohl der Adapter es heute am Original gesehen
-hat. Der Bündelwächter liest genau diesen Messtag und wird rot, ohne dass ein
-Protokoll den Grund nennt.
+Befund 13.11.2026 (Lauf 43401542782): congstar verlor 26 von 38 Modellen aus dem
+Messtag. Der Klick-Lauf hatte an diesem Tag alle 45 congstar-Produktseiten gelesen
+(752 erfasste Kombinationen), seine Sätze durften den Adaptersatz aber nicht
+ersetzen - der congstar-Adapter nennt seit dem 12.11.2026 eine EINGERECHNETE Aktion
+(``anschluss_erlassen``), die der Klick nicht liest (``klick_vollstaendig``). Damit
+blieb kein Klick-Bündel von heute übrig, und die zwei Tage alten Einträge vom
+11.11. verdrängten über ``klick_zusammenfuehrung._klickalter`` die frische
+Adaptermessung: der Bestandseintrag behielt sein altes ``last_verified``, das
+Bündel fehlte im Messtag, und der Bündelwächter wurde rot, ohne dass ein Protokoll
+den Grund nannte.
 
-Befund 13.11.2026 (Lauf 43401542782): congstar verlor so 26 von 38 Modellen -
-der Klick-Lauf war seit dem 11.11. überfällig, und seine zwei Tage alten
-Einträge verdrängten die frische Adaptermessung aller 45 Produktseiten.
-
-Die Lücke bleibt ein Befund des Wächters. Sie wird hier nur BENANNT, statt still
-zu bleiben (CLAUDE.md Clean Code 5 und 6).
+Seitdem gilt: eine Klick-Messung, die NICHT von heute ist, verdrängt eine heutige
+Adaptermessung nur, wenn diese ihr widerspricht (``klick_preisgrenze``). Ein
+Widerspruch ist kein stiller Verlust mehr, sondern eine Zeile je Anbieter -
+``widerspruch_zeilen`` (CLAUDE.md Clean Code 5 und 6).
 """
 
 from __future__ import annotations
 
 from datetime import date
+
+BEISPIELE = 3
 
 
 def alter_tage(datum: object, heute: str) -> int | None:
@@ -29,18 +33,29 @@ def alter_tage(datum: object, heute: str) -> int | None:
         return None
 
 
-def vorrang_ohne_messtag(gewichen: list[tuple], heute: str) -> list[str]:
-    """Je Anbieter eine Protokollzeile; eine Klick-Messung von heute kostet
-    keinen Messtag und steht deshalb nicht darin."""
-    je_anbieter: dict[str, list[int]] = {}
-    for satz, eintrag in gewichen:
+def widerspruch_zeilen(widerspruch: list[tuple], heute: str) -> list[str]:
+    """Je Anbieter eine Protokollzeile: wie viele heute gemessene Bündel einer
+    älteren Klick-Messung weichen, weil ihr Preis ihr widerspricht, mit Beispielen.
+
+    ``widerspruch`` ist je Eintrag ``(Bündel, Bestandseintrag, Felder)``. Eine
+    Klick-Messung von heute kostet keinen Messtag und steht deshalb nicht darin.
+    """
+    je_anbieter: dict[str, list[tuple[int, str, list[str]]]] = {}
+    for satz, eintrag, felder in widerspruch:
         alter = alter_tage((eintrag or {}).get("abgerufen_am"), heute)
         if not alter:
             continue
-        je_anbieter.setdefault(satz.anbieter, []).append(alter)
-    return [
-        f"Klick-Vorrang {anbieter}: {len(alter)} heute gemessene Bündel weichen "
-        f"einer Klick-Messung von vor {max(alter)} Tag(en) und fehlen deshalb im "
-        f"Messtag {heute} - der Klick-Lauf dieses Anbieters ist überfällig"
-        for anbieter, alter in sorted(je_anbieter.items())
-    ]
+        je_anbieter.setdefault(satz.anbieter, []).append((alter, satz.id, felder))
+    zeilen = []
+    for anbieter, faelle in sorted(je_anbieter.items()):
+        beispiele = "; ".join(
+            f"{kennung}: {', '.join(felder)}"
+            for _, kennung, felder in faelle[:BEISPIELE]
+        )
+        zeilen.append(
+            f"Klick-Widerspruch {anbieter}: {len(faelle)} heute gemessene Bündel "
+            f"weichen einer Klick-Messung von vor {max(a for a, _, _ in faelle)} "
+            f"Tag(en) und fehlen deshalb im Messtag {heute} - lieber kein Preis als "
+            f"ein falscher ({beispiele})"
+        )
+    return zeilen

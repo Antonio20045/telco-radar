@@ -6,9 +6,10 @@ Adaptersätze: die 48 echten o2-Rohsätze zum iPhone 17 Pro aus dem Sammler
 1&1-Satz der gespeicherten Produktseite (``einsundeins.lies_buendel``). Klick-Sätze:
 Lesungen derselben echten Antworten (``tests/klickergebnisse.py``). Ein Klick-Satz
 ersetzt den Adaptersatz mit gleichem Schlüssel nur, wenn er jedes Wertfeld nennt, und
-übernimmt dessen Bündel-ID; eine frische Klick-Messung im Bestand hat Vorrang auch an
-einem gestörten Tag. Ein gestörter, veralteter oder fehlender Anbieter ersetzt nichts
-und ist benannt.
+übernimmt dessen Bündel-ID; eine Klick-Messung von heute hat Vorrang vor dem
+Adapterbündel, eine ältere nur, wenn die heutige Messung ihr widerspricht
+(``klick_preisgrenze``) - sonst behält die heutige Messung ihren Messtag. Ein
+gestörter, veralteter oder fehlender Anbieter ersetzt nichts und ist benannt.
 """
 
 from __future__ import annotations
@@ -37,7 +38,8 @@ from klickergebnisse import (
 )
 
 from telco_radar import tco_historie
-from telco_radar.analyze.klick_alter import vorrang_ohne_messtag
+from telco_radar.analyze.klick_alter import widerspruch_zeilen
+from telco_radar.analyze.klick_preisgrenze import widersprueche
 from telco_radar.analyze.klick_zusammenfuehrung import (
     UMGEBUNG,
     fuehre_zusammen,
@@ -341,16 +343,21 @@ def test_gestoerter_oder_alter_anbieter_ersetzt_nichts(adapter, katalog, datei, 
     assert warum in zug.bilanz["dateien"][0]["warum_nicht"]
 
 
-@pytest.mark.parametrize(("tag1", "vorrang"), [([], 0), (None, 1)], ids=["ohne", "mit"])
-def test_vorrang_hat_nur_eine_lesung_die_buendel_wurde(
-    adapter, katalog, bestand, tmp_path, tag1, vorrang
+@pytest.mark.parametrize(
+    ("tag1", "buendel_geworden"), [([], 0), (None, 1)], ids=["ohne", "mit"]
+)
+def test_gestrige_lesung_verwirft_die_heutige_adaptermessung_nicht(
+    adapter, katalog, bestand, tmp_path, tag1, buendel_geworden
 ):
     """Tag 1 liest der Klick 256 GB/M Plus/36. Ohne Adaptersatz und mit einem Tarif,
     den der Bestand nicht kennt, wird er kein Bündel (``ohne_tarif``; einen bekannten
     löst ``klick_tarifslug`` seit Pitch 3 selbst auf). Tag 2 liefert der Adapter
     wieder, der Klick liest nur 512 GB/24: der Adaptersatz zu 256 GB/36 kommt in den
-    Bestand. Gegenprobe: wurde die Lesung von Tag 1 ein Bündel, behält der Bestand sie
-    mit ihrem Datum."""
+    Bestand - auch dann, wenn die Lesung von Tag 1 ein Bündel wurde, denn sie ist
+    nicht von heute und die heutige Messung widerspricht ihr nicht (Befund
+    13.11.2026). Vorrang hat nur eine Messung von HEUTE
+    (``test_klickmessung_von_heute_hat_vorrang``) oder ein Widerspruch
+    (``test_gestoerter_tag_laesst_die_frische_klickmessung_stehen``)."""
     pfad = tmp_path / "geraete_tco.json"
     erster = adapter if tag1 is None else tag1
     lesung = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
@@ -367,8 +374,8 @@ def test_vorrang_hat_nur_eine_lesung_die_buendel_wurde(
 
     zug, _ = _tag(pfad, adapter, [zweite], MORGEN, katalog, bestand)
 
-    assert b1.ohne_tarif == 1 - vorrang
-    assert zug.bilanz["klick_vorrang"] == vorrang
+    assert b1.ohne_tarif == 1 - buendel_geworden
+    assert (zug.bilanz["klick_vorrang"], zug.bilanz["klick_widerspruch"]) == (0, 0)
     (eintrag,) = [
         e
         for e in TcoDB(pfad).buendel()
@@ -376,8 +383,91 @@ def test_vorrang_hat_nur_eine_lesung_die_buendel_wurde(
         and e["tarif_name"] == M_PLUS_ADAPTER
         and e["laufzeit_monate"] == 36
     ]
-    erwartet = ("klick", HEUTE) if vorrang else (None, MORGEN)
-    assert (eintrag.get("quelle_art"), eintrag["abgerufen_am"]) == erwartet
+    assert (eintrag.get("quelle_art"), eintrag["abgerufen_am"]) == (None, MORGEN)
+
+
+def test_klickmessung_von_heute_hat_vorrang(adapter, katalog, bestand, tmp_path):
+    """Gegenprobe zum Messtag: der Klick liest HEUTE 256 GB/M Plus/36 und steht mit
+    seinem Datum im Bestand. Ein zweiter Durchgang desselben Tages ohne Klick-Datei
+    überschreibt ihn nicht - eine Messung von heute ist die Hauptquelle des Tages,
+    unabhängig davon, ob der Adapter ihr widerspricht."""
+    pfad = tmp_path / "geraete_tco.json"
+    lesung = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
+    _tag(pfad, adapter, [lesung], HEUTE, katalog, bestand)
+
+    zug, _ = _tag(pfad, adapter, [], HEUTE, katalog, bestand)
+
+    assert (zug.bilanz["klick_vorrang"], zug.bilanz["klick_widerspruch"]) == (1, 0)
+    (eintrag,) = [
+        e
+        for e in TcoDB(pfad).buendel()
+        if e["sku_id"] == "apple-iphone-17-pro-256gb-silber"
+        and e["tarif_name"] == M_PLUS_ADAPTER
+        and e["laufzeit_monate"] == 36
+    ]
+    assert (eintrag.get("quelle_art"), eintrag["abgerufen_am"]) == ("klick", HEUTE)
+
+
+_ANSCHLUSS_ERLASSEN = {
+    "art": "anschluss_erlassen",
+    "bedingung": "Anschlusspreis geschenkt",
+    "eingerechnet": True,
+    "quelle_url": "https://www.o2online.de/",
+}
+
+
+@pytest.mark.parametrize(
+    ("rate", "widerspruch"), [(None, 0), (22.0, 1)], ids=["gleich", "widerspruch"]
+)
+def test_zurueckgehaltener_klicksatz_kostet_keinen_messtag(
+    adapter, katalog, bestand, tmp_path, rate, widerspruch
+):
+    """Die congstar-Lage vom 13.11.2026, nachgestellt mit den o2-Sätzen: Tag 1 misst
+    der Klick, Tag 2 nennt der Adaptersatz eine EINGERECHNETE Aktion, die der Klick
+    nicht liest - sein Satz wird zurückgehalten (``unvollstaendig``), und es entsteht
+    kein Klick-Bündel von heute. Die heutige Adaptermessung behält trotzdem ihren
+    Messtag, weil die heutige Klick-Lesung ihr nicht widerspricht. Gegenprobe:
+    widerspricht sie ihr (Rate 22,00 statt 36,50 €), bleibt der ältere Klick-Wert mit
+    seinem Datum stehen - lieber kein Preis als ein falscher."""
+    pfad = tmp_path / "geraete_tco.json"
+
+    def passt(s):
+        return (
+            s["sku_id"] == "apple-iphone-17-pro-256gb-silber"
+            and s["laufzeit_monate"] == 36
+            and M_PLUS in s["tarif_name"]
+        )
+
+    lesung = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
+    _tag(pfad, adapter, [lesung], HEUTE, katalog, bestand)
+    vorher = _eintrag(pfad)
+    anders = {"aktionen": [_ANSCHLUSS_ERLASSEN]}
+    if rate is not None:
+        anders["geraet_monatsrate"] = rate
+    mit_aktion = [{**s, **anders} if passt(s) else s for s in adapter]
+    morgen = [_o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)), datum=MORGEN)]
+
+    zug, _ = _tag(pfad, mit_aktion, morgen, MORGEN, katalog, bestand)
+
+    assert vorher == ("klick", HEUTE, 36.5)
+    assert zug.bilanz["klick_widerspruch"] == widerspruch
+    erwartet = ("klick", HEUTE, 36.5) if widerspruch else (None, MORGEN, 36.5)
+    assert _eintrag(pfad) == erwartet
+
+
+def _eintrag(pfad):
+    (eintrag,) = [
+        e
+        for e in TcoDB(pfad).buendel()
+        if e["sku_id"] == "apple-iphone-17-pro-256gb-silber"
+        and e["tarif_name"] == M_PLUS_ADAPTER
+        and e["laufzeit_monate"] == 36
+    ]
+    return (
+        eintrag.get("quelle_art"),
+        eintrag["abgerufen_am"],
+        eintrag["geraet_monatsrate"],
+    )
 
 
 def test_gestoerter_tag_laesst_die_frische_klickmessung_stehen(
@@ -550,23 +640,26 @@ def test_klickordner_nur_aus_gesetzter_umgebung():
     assert klickordner({UMGEBUNG: "klick"}) == Path("klick")
 
 
-def test_vorrang_ohne_messtag_benennt_den_anbieter():
-    """Weicht eine heutige Adaptermessung einer ÄLTEREN Klick-Messung, fehlt
-    sie im Messtag - das muss im Protokoll stehen (Befund 13.11.2026)."""
+def test_widerspruch_zeilen_benennen_den_anbieter():
+    """Weicht eine heutige Adaptermessung einer ÄLTEREN Klick-Messung, weil sie ihr
+    widerspricht, fehlt sie im Messtag - das muss im Protokoll stehen
+    (Befund 13.11.2026)."""
 
     class _Satz:
         anbieter = "congstar"
+        id = "buendel--congstar--x--y--24m"
 
-    gewichen = [
-        (_Satz(), {"abgerufen_am": "2026-11-11"}),
-        (_Satz(), {"abgerufen_am": "2026-11-12"}),
+    widerspruch = [
+        (_Satz(), {"abgerufen_am": "2026-11-11"}, ["geraet_monatsrate 12.5 statt 30"]),
+        (_Satz(), {"abgerufen_am": "2026-11-12"}, ["anschlusspreis 0.0 statt 39.9"]),
     ]
-    zeilen = vorrang_ohne_messtag(gewichen, "2026-11-13")
+    zeilen = widerspruch_zeilen(widerspruch, "2026-11-13")
     assert len(zeilen) == 1
     assert "congstar" in zeilen[0]
     assert "2 heute gemessene" in zeilen[0]
     assert "vor 2 Tag(en)" in zeilen[0]
     assert "2026-11-13" in zeilen[0]
+    assert "geraet_monatsrate 12.5 statt 30" in zeilen[0]
 
 
 def test_vorrang_von_heute_ist_keine_meldung():
@@ -574,8 +667,27 @@ def test_vorrang_von_heute_ist_keine_meldung():
 
     class _Satz:
         anbieter = "Telekom"
+        id = "buendel--telekom--x--y--24m"
 
-    assert (
-        vorrang_ohne_messtag([(_Satz(), {"abgerufen_am": "2026-11-13"})], "2026-11-13")
-        == []
-    )
+    heute = [(_Satz(), {"abgerufen_am": "2026-11-13"}, ["egal"])]
+    assert widerspruch_zeilen(heute, "2026-11-13") == []
+
+
+@pytest.mark.parametrize(
+    ("gemessen", "bezug", "felder"),
+    [
+        ({"geraet_monatsrate": 12.5}, {"geraet_monatsrate": 12.6}, []),
+        ({"anschlusspreis": 0.0}, {"anschlusspreis": 39.9}, ["anschlusspreis"]),
+        ({"geraet_monatsrate": 23.63}, {"geraet_monatsrate": 30.8}, ["geraet"]),
+        ({"geraet_zuzahlung": 1000.0}, {"geraet_zuzahlung": 1049.0}, []),
+        ({"geraet_zuzahlung": 900.0}, {"geraet_zuzahlung": 1049.0}, ["geraet"]),
+        ({"geraet_monatsrate": 12.5}, {"anschlusspreis": 0.0}, ["kein gemeinsames"]),
+    ],
+    ids=["cent", "erlassen", "rate", "unter-grenze", "ueber-grenze", "ohne-vergleich"],
+)
+def test_preisgrenze_trennt_aenderung_von_widerspruch(gemessen, bezug, felder):
+    """5 % ODER 50 € trennen eine Preisänderung von einem Widerspruch. 1000 statt
+    1049 € sind 49 € und damit unter beiden Grenzen; 23,63 statt 30,80 € sind 23 %."""
+    texte = widersprueche(gemessen, bezug)
+    assert len(texte) == len(felder)
+    assert all(teil in text for teil, text in zip(felder, texte, strict=True))
