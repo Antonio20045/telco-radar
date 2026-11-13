@@ -9,9 +9,9 @@ veralteten Speicher-Nachbarn, bleibt es nur gültig, wenn Regel 11 es ersatzweis
 ``geraete_regel11``); sonst ist es Quarantäne 5 (fail-closed). Regel 12 (gleicher Wert
 bei allen Bündeln eines Anbieters, auch eine Ratenlaufzeit, die bei allen Geräten
 fehlt) ergibt eine Erfassungslücke je Anbieter (``erfassungsluecken``), keinen Status.
-Regel 16 prüft neben dem Alter der Zeile auch ihren Anschlusspreis gegen den Bestand:
-widerlegt eine neuere, hinreichend gestützte Messung derselben Vertragsform (Anbieter,
-Tarif, Zustand, Ratenlaufzeit) den Betrag, ist die Zeile veraltet
+Regel 16 ist allein das Alter der Zeile. Ihren Anschlusspreis prüft Regel 18 gegen den
+Bestand: widerlegt eine neuere, hinreichend gestützte Messung derselben Vertragsform
+(Anbieter, Tarif, Zustand, Ratenlaufzeit) den Betrag, ist die Zeile nicht mehr belegt
 (``geraete_anschluss``). Regel 5 sieht diesen Befund nicht, weil er erst nach
 ihr entsteht; sie vergleicht weiter nach dem Alter.
 Regel 15 gilt im Vergleich (Sieger, Δ); je Bündel wird nur geprüft, ob der Zeitraum H

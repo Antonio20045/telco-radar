@@ -84,15 +84,17 @@ REGELN = {
     14: "Pflichtfelder",
     15: "Zeitraum",
     16: "Frische",
+    18: "Anschlusspreis widerlegt",
 }
-"""Regel 16 prüft zweierlei mit derselben Folge: das Alter der Zeile und ob eine neuere
-Messung derselben Vertragsform ihren Anschlusspreis widerlegt
-(``geraete_anschluss``). Beides heißt: der Wert ist nicht mehr belegt."""
-FOLGE = {n: QUARANTAENE for n in REGELN} | {10: VERALTET, 16: VERALTET}
+"""Regel 16 ist ALLEIN das Alter der Zeile, 18 allein der widerlegte Anschlusspreis
+(``geraete_anschluss``): gleiche Folge, verschiedener Grund. Unter einer Nummer stand
+an einer frischen Zeile „Preis veraltet: Preis vom 11.11.2026“ (A-RUJNK5, 2 (d))."""
+FOLGE = {n: QUARANTAENE for n in REGELN} | {10: VERALTET, 16: VERALTET, 18: VERALTET}
 REGEL_SORTIMENT = 17
 """Keine Regel der Prüfstelle, sondern die Marke, die die Seite beim Lesen setzt
 (``report/geraete_sortiment``): der Anbieter führt das Gerät laut belegter Lücke nicht
 mehr. Steht darum nicht in ``REGELN`` (Kennzahlen und Regelzähler bleiben bei 16)."""
+REGEL_ANSCHLUSS = 18
 
 PFLICHT_GETRENNT = (
     ("geraet_zuzahlung", "Zuzahlung"),

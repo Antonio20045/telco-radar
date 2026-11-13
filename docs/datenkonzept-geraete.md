@@ -248,7 +248,8 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 13. Beleglink enthält dieselbe Variante.
 14. Pflichtfelder vollständig (Zuzahlung, Rate, Ratenlaufzeit, Tarif, Tarifbindung, Anschluss).
 15. Vergleiche nur bei gleicher Ratenlaufzeit und gleichem Zeitraum H.
-16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon); sie sind auch für Regel 5 kein Partner.
+16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon); sie sind auch für Regel 5 kein Partner. Regel 16 ist ALLEIN das Alter der Zeile.
+18. Anschlusspreis widerlegt: Misst der Anbieter den Anschlusspreis derselben Vertragsform (Anbieter, Tarif, Zustand, Ratenlaufzeit) später anders, ist der frühere Betrag nicht mehr belegt und die Zeile trägt keinen Preis mehr (`analyze/geraete_anschluss.py`). Die Folge ist dieselbe wie bei 16, der Grund ein anderer: bis zum 13.11.2026 trugen beide die Nummer 16, und die Seite schrieb darum an einer frischen Zeile „Preis veraltet: Preis vom 11.11.2026.“ (Analyse A-RUJNK5, Abschnitt 2 (d); 744 congstar-Bündel). Eine Zeile, die schon wegen ihres Alters unter 16 fällt, bekommt keinen zweiten Befund.
 17. Ausnahme aus Daten, nicht aus Code je Anbieter: Ein Tarif auf `config/tarif_preis_widerspruch.yaml` („Preis am Original widersprüchlich“, mit Beleg) bleibt ohne Stufe, bis der Eintrag gelöscht wird; Stand 09.11. ist die Liste leer.
 
 ### Regel 11 im Einzelnen (Stand 12.11.2026)
@@ -320,7 +321,7 @@ Eine Sitzung = ein Paket mit Test, Prüfleiter und Commit.
 | 4. Klick-Crawler-Gerüst | Maschine, Format der Klick-Karte, Mitschnitt, Echo, Screenshot, ein Job je Anbieter, Rotation | 2–3 |
 | 5. Klick-Karten je Anbieter | o2, Vodafone, 1&1, Telekom, congstar, freenet; je Karte Kanarienwert und Strukturwächter | 5–6 |
 | 6. Beleg-Archiv | `beleg_id`, Fundstellen, Manifest, Stempel, Bucket, Belegansicht | 2 |
-| 7. Prüfregeln | die 16 Regeln, Quarantäne, Kennzahlen | 2 |
+| 7. Prüfregeln | die Regeln 1 bis 16 und 18, Quarantäne, Kennzahlen | 2 |
 | 8. Händler und Anker | Otto, Apple, Samsung, MediaMarkt prüfen | 1–2 |
 | 9. Gegenprobe und Abnahme | Goldliste, tägliche Stichprobe, wöchentlicher Abgleich, Protokoll Beispielseite | 1–2 |
 
