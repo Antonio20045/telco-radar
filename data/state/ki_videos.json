@@ -1,6 +1,106 @@
 {
- "stand": "2026-11-12",
+ "stand": "2026-11-13",
  "videos": [
+  {
+   "id": "pfbfZKxUEDQ",
+   "titel": "How Mozilla strengthens Firefox security with GPT-6 Cyber",
+   "kanal": "OpenAI",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 24,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "pfbfZKxUEDQ.jpg"
+  },
+  {
+   "id": "TeoVN_pKduU",
+   "titel": "KI-Update kompakt: Wirbel um Nvidia, Grundrechte, Gemini 4 Hydrogen, Roboter",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 1410,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "TeoVN_pKduU.jpg"
+  },
+  {
+   "id": "PkAmyub12K8",
+   "titel": "How Mozilla uses GPT-6 Cyber to find and fix Firefox vulnerabilities",
+   "kanal": "OpenAI",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 1219,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "PkAmyub12K8.jpg"
+  },
+  {
+   "id": "G_Jrexy_5Bg",
+   "titel": "AI News: Things Will Never Be The Same",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 1631,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "G_Jrexy_5Bg.jpg"
+  },
+  {
+   "id": "G7Bph8i3BVs",
+   "titel": "Fable 5.2 ist zu gut für mein Abo...",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 4944,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "G7Bph8i3BVs.jpg"
+  },
+  {
+   "id": "ErOVIC-MGVA",
+   "titel": "6 Underrated Ways to Use ChatGPT",
+   "kanal": "OpenAI",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 62,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "ErOVIC-MGVA.jpg"
+  },
+  {
+   "id": "Az2aRR51fDU",
+   "titel": "Jensen Huang exits NVIDIA & does Claude Fable 5.2 count as AGI?",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 2155,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Az2aRR51fDU.jpg"
+  },
+  {
+   "id": "7Mk0dCDZHkY",
+   "titel": "Ich habe KI Admin-Rechte auf meine Wohnung gegeben",
+   "kanal": "c't 3003",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 1218,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "7Mk0dCDZHkY.jpg"
+  },
+  {
+   "id": "4pjeaeK4S9o",
+   "titel": "Huang's Nvidia Legacy",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 40,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "4pjeaeK4S9o.jpg"
+  },
+  {
+   "id": "3aNp_oEN7wY",
+   "titel": "KI-Update kompakt: Wirbel um Nvidia, Grundrechte, Gemini 4 Hydrogen, Roboter",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-13",
+   "dauer_sekunden": 1318,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "3aNp_oEN7wY.jpg"
+  },
   {
    "id": "vu3YlUMkvyg",
    "titel": "What Codex Unlocks for Holiday Extras",
@@ -10,6 +110,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "vu3YlUMkvyg.jpg"
+  },
+  {
+   "id": "iTe0IB5Ugf8",
+   "titel": "MASSIVE AI Shake-Up That Changes Everything",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 149,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "iTe0IB5Ugf8.jpg"
   },
   {
    "id": "hvnPWgfmvyI",
@@ -32,6 +142,26 @@
    "bild": "gPNiuyYirfw.jpg"
   },
   {
+   "id": "dSHSsMY8u88",
+   "titel": "My $1,000 Fable 5.2 Workflow (just copy me)",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 1841,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "dSHSsMY8u88.jpg"
+  },
+  {
+   "id": "YmxpxJZvm4M",
+   "titel": "Cyber at the Frontier",
+   "kanal": "OpenAI",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 2078,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "YmxpxJZvm4M.jpg"
+  },
+  {
    "id": "Xinj__6uZwc",
    "titel": "Vibe-Coding überall | c't 4004 #47",
    "kanal": "c't 3003",
@@ -40,6 +170,16 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "Xinj__6uZwc.jpg"
+  },
+  {
+   "id": "WAdkVxs-O4Y",
+   "titel": "Why Laptops Are Getting So Expensive",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-12",
+   "dauer_sekunden": 468,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "WAdkVxs-O4Y.jpg"
   },
   {
    "id": "SxiYOCPW8_c",
@@ -160,233 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "b7l_Dhe1h8M.jpg"
-  },
-  {
-   "id": "Xtb3Pua0e8s",
-   "titel": "The New Ring Camera Flies Around Your House",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 109,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Xtb3Pua0e8s.jpg"
-  },
-  {
-   "id": "U1IVZy9FhVQ",
-   "titel": "What Will You Build With Coding Agents That Don’t Quit? | DevDay 2026",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1629,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "U1IVZy9FhVQ.jpg"
-  },
-  {
-   "id": "QRm7VNMnurA",
-   "titel": "Sites and the Next Generation of Web Apps | DevDay 2026",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1248,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "QRm7VNMnurA.jpg"
-  },
-  {
-   "id": "NuL5VFS8Prs",
-   "titel": "The $6B Binance heist, Meta’s AI bug tests and looming quantum deadlines",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1947,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "NuL5VFS8Prs.jpg"
-  },
-  {
-   "id": "NS220dAaRMo",
-   "titel": "How to request and enable Daybreak Blue",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 348,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "NS220dAaRMo.jpg"
-  },
-  {
-   "id": "Mt54ez7xsiI",
-   "titel": "Fable 5.2 Is Quite Insane!",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 112,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Mt54ez7xsiI.jpg"
-  },
-  {
-   "id": "LoQ9B3EWl_U",
-   "titel": "Lokale KI: So siehts aus",
-   "kanal": "c't 3003",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 37,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "LoQ9B3EWl_U.jpg"
-  },
-  {
-   "id": "CrrpfvbNyMw",
-   "titel": "ChatGPT Images: Three Ways to Get Started",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 171,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "CrrpfvbNyMw.jpg"
-  },
-  {
-   "id": "6e9Spy9JgGs",
-   "titel": "KI-Update kompakt: Nvidia-Affäre, Coding-Agenten, Gemini 4 Carbon, Muse Ember",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1112,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "6e9Spy9JgGs.jpg"
-  },
-  {
-   "id": "5M6mKitVrDQ",
-   "titel": "Noch viermal singen",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 60,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "5M6mKitVrDQ.jpg"
-  },
-  {
-   "id": "vug73goPJaM",
-   "titel": "Is Software Over?",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 386,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "vug73goPJaM.jpg"
-  },
-  {
-   "id": "vdEGZYIvFiI",
-   "titel": "Greg Brockman on how OpenAI uses frontier models for cyber defense",
-   "kanal": "OpenAI",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 58,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "vdEGZYIvFiI.jpg"
-  },
-  {
-   "id": "sSyzj08Cy2U",
-   "titel": "Greg Brockman on how OpenAI uses frontier models for cyber defense",
-   "kanal": "OpenAI",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 21,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "sSyzj08Cy2U.jpg"
-  },
-  {
-   "id": "isqwXApzV5E",
-   "titel": "When you give a humanoid roller skates",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-10",
-   "dauer_sekunden": 91,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "isqwXApzV5E.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-12",
-   "abgerufen": "2026-11-12"
+   "versucht": "2026-11-13",
+   "abgerufen": "2026-11-13"
   }
  },
  "error": null
