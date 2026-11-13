@@ -13,6 +13,7 @@ eigenen Band der Maßstab, und nur, wo Vodafone kein Bündel hat (`modelle()`).
 
 from __future__ import annotations
 
+from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG
 from ..tco_model import TCO_HORIZONT
 from . import geraete_eigen_pruefung as eigen_pruefung
 from . import geraete_notbremse as notbremse
@@ -120,6 +121,64 @@ def nur_ueber_24(karte: dict) -> bool:
 def regel_satz(karten) -> str:
     """Der Satz zur Regel, wenn unter den Karten eine gerechnete 24+12-Zahl ist."""
     return REGEL_24_PLUS_12 if any(nur_ueber_24(k) for k in karten) else ""
+
+
+REGEL_ECHTE_24_OHNE_ZUZAHLUNG = (
+    "1&1 bietet dieses Gerät auch über echte 24 Monate an, ohne die 12 "
+    "Monate der Standardlaufzeit „24 + 12“ danach. Für diese echten 24 "
+    "Monate bestätigt 1&1 selbst keine Gerätezuzahlung – nur für „24 + 12“ "
+    "nennt die Produktseite den Betrag. Deshalb zeigt TelcoRadar hier "
+    "keinen Gesamtpreis: kein erfundener Wert, sondern eine benannte Lücke "
+    "(Stand der Prüfung am Original vom 07.10.2026)."
+)
+
+
+def ist_echte_24_ohne_zuzahlung(karte: dict) -> bool:
+    """Eine 1&1-Karte mit echten 24 Monaten (nicht „24 + 12“) ohne bestätigte
+    Gerätezuzahlung - die Lücke `tco_kosten.POSTEN_ZUZAHLUNG`, nie ein Preis von 0.
+    """
+    return (
+        karte.get("anbieter") == "1&1"
+        and karte.get("buendel_monatlich") is not None
+        and karte.get("zuzahlung") is None
+        and karte.get("raten_laufzeit") == TCO_HORIZONT
+    )
+
+
+def regel_echte_24_satz(karten) -> str:
+    """Der Satz zur echten 24-Monats-Lücke, wenn unter den Karten eine ist."""
+    return (
+        REGEL_ECHTE_24_OHNE_ZUZAHLUNG
+        if any(ist_echte_24_ohne_zuzahlung(k) for k in karten)
+        else ""
+    )
+
+
+def _echte_24_satz(b) -> str:
+    """`regel_echte_24_satz` für EIN Bündel statt eine Kartenliste."""
+    karte = {
+        "anbieter": b.anbieter,
+        "buendel_monatlich": b.buendel_monatlich,
+        "zuzahlung": b.geraet_zuzahlung,
+        "raten_laufzeit": raten_laufzeit(b),
+    }
+    return REGEL_ECHTE_24_OHNE_ZUZAHLUNG if ist_echte_24_ohne_zuzahlung(karte) else ""
+
+
+def leer_grund(b, kosten, belastbar: bool, grund_fn) -> str:
+    """Der Satz zu einer Karte ohne Gesamtpreis - Herleitungs-Hinweis, der
+    Regel-Satz der echten 24-Monats-Lücke, sonst `grund_fn(kosten)`."""
+    if belastbar:
+        return ""
+    if b.herleitung.strip() == HERLEITUNG_EINMALZAHLUNG:
+        return notbremse.herleitung_satz(b.anbieter, b.herleitung)
+    return _echte_24_satz(b) or grund_fn(kosten)
+
+
+def luecke_export_text(b, kosten, veraltet: str) -> str:
+    """Der Text der Export-Spalte „Lücke": der Regel-Satz der echten
+    24-Monats-Lücke bei 1&1, sonst wie bisher die kurzen Postennamen."""
+    return veraltet or _echte_24_satz(b) or ", ".join(kosten.luecken)
 
 
 def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:
