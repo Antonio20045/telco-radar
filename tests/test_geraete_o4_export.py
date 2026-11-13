@@ -929,3 +929,70 @@ def test_p5_telekom_6_raten_geht_trotz_fehlender_restschuld_auf():
     )
     assert soll == pytest.approx(k.gesamt, abs=0.01)
     assert soll == 1657.35, "Beispiel #8 der Analyse: 1 + 24×59,95 + 6×29,60 + 39,95"
+
+
+@pytest.fixture
+def _mit_echtem_versand_nur_hier():
+    """Hebt `_versand_nur_wo_er_gemeint_ist` (tests/conftest.py) für GENAU den
+    einen Test auf, der sie anfordert - das ganze Modul auf die echte Tabelle
+    umzustellen würde andere Zeilen hier zerreißen, die ihre erwarteten Werte
+    fest gegen 0 € Versand geschrieben haben (z.B.
+    test_zwei_farbvarianten_bleiben_zwei_zeilen)."""
+    from telco_radar import versandkosten
+
+    vorher = versandkosten._TABELLE
+    versandkosten._TABELLE = None
+    yield
+    versandkosten._TABELLE = vorher
+
+
+def test_p5_versand_zelle_zeigt_den_echten_betrag_nicht_nur_0(
+    _mit_echtem_versand_nur_hier,
+):
+    """Mutationsprobe (pruefung-pr108-1313.md, Abschnitt 5): eine hart auf ''
+    gesetzte Versand-Zelle in `geraete_export.py` blieb von
+    `test_p5_jede_bepreiste_buendelzeile_geht_mit_versand_auf` unentdeckt,
+    weil die autouse-Fixture in conftest.py den Versand für dieses ganze
+    Modul auf 0 € zwingt - leer und "0,00" sehen dort gleich aus. Dieser Test
+    hebt die Nullung für sich selbst auf (`_mit_echtem_versand_nur_hier`) und
+    prüft die ECHTEN, von Null verschiedenen Beträge aus
+    `config/versandkosten.yaml` (Vodafone 9,98 / o2 6,99 / congstar 4,99 /
+    Saturn·o2-Netz 5,95) GEGEN DIE ZELLE selbst - eine leere Zelle fällt hier
+    durch, eine falsche Rechnung bei
+    test_p5_jede_bepreiste_buendelzeile_geht_mit_versand_auf."""
+    from telco_radar.geraete_model import Katalog
+    from telco_radar.report.geraete_export import tco_csv
+    from telco_radar.report.geraete_tco_view import aufbereiten
+    from telco_radar.tco_model import Buendel
+
+    def _buendel(anbieter: str, sku: str) -> Buendel:
+        return Buendel(
+            sku_id=sku,
+            anbieter=anbieter,
+            tarif_name="Test M",
+            tarif_monatlich=30.0,
+            geraet_zuzahlung=1.0,
+            geraet_monatsrate=20.0,
+            laufzeit_monate=24,
+            anschlusspreis=0.0,
+            quelle_url="https://example.invalid/test",
+            abgerufen_am="2026-11-05",
+        )
+
+    erwartet = {
+        "Vodafone": "9,98",
+        "o2": "6,99",
+        "congstar": "4,99",
+        "Saturn/MediaMarkt · o2-Netz": "5,95",
+    }
+    buendel = [_buendel(a, f"test-versand-{i}") for i, a in enumerate(erwartet)]
+    katalog = Katalog([])
+
+    d = aufbereiten(buendel, [], [], katalog)
+    inhalt, _ = tco_csv(d["export"])
+    zeilen = list(csv.reader(io.StringIO(inhalt), delimiter=";"))[1:]
+    idx = {name: i for i, name in enumerate(SPALTEN_TCO)}
+
+    gesehen = {z[idx["Anbieter"]]: z[idx["Versand EUR"]] for z in zeilen}
+    for anbieter, betrag in erwartet.items():
+        assert gesehen.get(anbieter) == betrag, (anbieter, betrag, gesehen)
