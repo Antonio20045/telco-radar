@@ -38,6 +38,7 @@ from ..analyze.geraete_pruefstatus import (
     ist_schaetzung,
     lies_vermerk,
 )
+from ..tarifwelt_lieferbar import REGEL_NICHT_LIEFERBAR
 from ..tco_model import Aktion, Buendel, aktionen_aus
 
 DELTA_SCHAETZUNG = "nicht direkt genannt"
@@ -82,6 +83,11 @@ DELTA_SORTIMENT = "nicht im Sortiment"
 SATZ_SORTIMENT = (
     "Kein Abstand zur Vodafone-Referenz: der Anbieter führt dieses Gerät nicht mehr."
 )
+DELTA_NICHT_LIEFERBAR = "nicht lieferbar"
+SATZ_NICHT_LIEFERBAR = (
+    "Kein Abstand zur Vodafone-Referenz: dieses Angebot war bei der letzten "
+    "Messung nicht lieferbar."
+)
 DELTA_VERALTET = "veraltet"
 SATZ_VERALTET = "Kein Abstand zur Vodafone-Referenz: dieser Preis ist veraltet."
 DELTA_ANSCHLUSS = "Anschlusspreis nicht mehr belegt"
@@ -95,6 +101,7 @@ SATZ_UNGEPRUEFT = (
 )
 _PRUEFZUSTAENDE = (
     ("nicht_im_sortiment", DELTA_SORTIMENT, SATZ_SORTIMENT),
+    ("nicht_lieferbar", DELTA_NICHT_LIEFERBAR, SATZ_NICHT_LIEFERBAR),
     ("quarantaene", DELTA_QUARANTAENE, SATZ_QUARANTAENE),
     ("anschluss_widerlegt", DELTA_ANSCHLUSS, SATZ_ANSCHLUSS),
     ("veraltet_pruefung", DELTA_VERALTET, SATZ_VERALTET),
@@ -161,12 +168,14 @@ def _felder(
         "quarantaene": status == QUARANTAENE,
         "veraltet_pruefung": status == VERALTET,
         "nicht_im_sortiment": status == VERALTET and REGEL_SORTIMENT in vermerk.regeln,
+        "nicht_lieferbar": status == VERALTET
+        and REGEL_NICHT_LIEFERBAR in vermerk.regeln,
         "anschluss_widerlegt": status == VERALTET and REGEL_ANSCHLUSS in vermerk.regeln,
         "pruefung_gescheitert": status == UNBEKANNT,
         "pruefgruende": [
             f"Regel {n}: {REGELN.get(n, '?')}"
             for n in vermerk.regeln
-            if n != REGEL_SORTIMENT
+            if n not in (REGEL_SORTIMENT, REGEL_NICHT_LIEFERBAR)
         ],
     }
     return {
