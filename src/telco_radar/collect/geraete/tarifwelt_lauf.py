@@ -38,9 +38,9 @@ Je Variante genau eine Anfrage, dazu je Modell eine Uebersicht und je
 Speicher eine Tarifliste. Zwischen zwei Anfragen liegt `PAUSE_SEKUNDEN`.
 Nie `/pks`, nie `/checkout`, keine Konten, kein Warenkorb.
 
-`MODELL_SLUGS` ordnet jedes Pflichtmodell (config/geraete_abdeckung.yaml) der
-Basisseite in https://tarife.mediamarkt.de/sitemap.xml zu (Stand 08.11.2026);
-Seiten mit "-aktion" oder "-online-bonus" sind Aktionen und stehen nie darin.
+Welches Katalogmodell zu welcher Tarifwelt-Seite gehoert, steht in
+`tarifwelt_modelle.MODELL_SLUGS` (ausgelagert, weil die Zuordnungstabelle
+allein schon lang ist - dort auch die Erfassungslücke von Baupaket P6).
 Tarifwahl: unbegrenzt (`dataVolume: 0`) ist `inf`, wie im Tarifbestand.
 Speicher: die Tarifwelt nennt 1 TB "1000 GB" (`KATALOG_SPEICHER`), der Katalog
 und die Speicherprüfung des Wächters 1024; in der SKU steht die Katalogstufe,
@@ -59,6 +59,7 @@ from ...tco_model import Buendel
 from . import tarifwelt
 from .basis import GeraeteAbrufFehler, antwort_text
 from .tarifwelt_merkmale import unvergleichbar_grund, wechselbonus_aktionen
+from .tarifwelt_modelle import MODELL_SLUGS
 from .tarifwelt_pruefung import LAUFZEIT_MONATE, pruefe
 from .tarifwelt_uebersicht import lies_uebersicht
 
@@ -70,62 +71,6 @@ KENNUNG = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 PAUSE_SEKUNDEN = 2.0
 MAX_KANDIDATEN = 3
 KATALOG_SPEICHER = {1000: 1024, 2000: 2048}
-
-MODELL_SLUGS: dict[str, tuple[str, str, str, str]] = {
-    "apple-iphone-18-pro": ("Apple", "iPhone 18 Pro", "apple", "iphone-18-pro"),
-    "apple-iphone-18-pro-max": (
-        "Apple",
-        "iPhone 18 Pro Max",
-        "apple",
-        "iphone-18-pro-max",
-    ),
-    "apple-iphone-17": ("Apple", "iPhone 17", "apple", "iphone-17"),
-    "apple-iphone-17-pro": ("Apple", "iPhone 17 Pro", "apple", "iphone-17-pro"),
-    "apple-iphone-17-pro-max": (
-        "Apple",
-        "iPhone 17 Pro Max",
-        "apple",
-        "iphone-17-pro-max",
-    ),
-    "apple-iphone-17e": ("Apple", "iPhone 17e", "apple", "iphone-17e"),
-    "apple-iphone-duo": ("Apple", "iPhone Duo", "apple", "iphone-duo"),
-    "apple-iphone-air": ("Apple", "iPhone Air", "apple", "iphone-air"),
-    "samsung-galaxy-s26": ("Samsung", "Galaxy S26", "samsung", "galaxy-s26"),
-    "samsung-galaxy-s26-plus": (
-        "Samsung",
-        "Galaxy S26 Plus",
-        "samsung",
-        "galaxy-s26-plus",
-    ),
-    "samsung-galaxy-s26-ultra": (
-        "Samsung",
-        "Galaxy S26 Ultra",
-        "samsung",
-        "galaxy-s26-ultra",
-    ),
-    "samsung-galaxy-z-fold8": (
-        "Samsung",
-        "Galaxy Z Fold8",
-        "samsung",
-        "galaxy-z-fold-8",
-    ),
-    "samsung-galaxy-z-flip8": (
-        "Samsung",
-        "Galaxy Z Flip8",
-        "samsung",
-        "galaxy-z-flip-8",
-    ),
-    "samsung-galaxy-a57": ("Samsung", "Galaxy A57", "samsung", "galaxy-a57"),
-    "google-pixel-11": ("Google", "Pixel 11", "google", "pixel-11"),
-    "google-pixel-11-pro": ("Google", "Pixel 11 Pro", "google", "pixel-11-pro"),
-    "google-pixel-11-pro-xl": (
-        "Google",
-        "Pixel 11 Pro XL",
-        "google",
-        "pixel-11-pro-xl",
-    ),
-    "google-pixel-10a": ("Google", "Pixel 10a", "google", "pixel-10a"),
-}
 
 
 def shop_url(pfad: str, slug: str, speicher: int, tarif_id: str, ids: dict) -> str:
@@ -207,8 +152,11 @@ def lies_modell(
     abgerufen_am: str,
     warte: Callable[[float], None] = time.sleep,
 ) -> Lauf:
-    """Alle Speicher x Netz x Band eines Pflichtmodells."""
-    hersteller, name, pfad, slug = MODELL_SLUGS[modell_id]
+    """Alle Speicher x Netz x Band eines Pflichtmodells (oder eines der
+    zusaetzlichen, nicht ueberwachten Modelle, siehe Moduldoku)."""
+    eintrag = MODELL_SLUGS[modell_id]
+    hersteller, name, pfad, slug = eintrag[:4]
+    api_name = eintrag[4] if len(eintrag) > 4 else name
     lauf = Lauf()
     uebersicht = lies_uebersicht(_abruf(hole, f"{API}/{slug}", lauf, warte))
     if uebersicht is None:
@@ -235,7 +183,7 @@ def lies_modell(
         for (netz, band), kandidaten in sorted(raenge.items()):
             variante = f"{modell_id} {speicher} GB {netz} {band}"
             gefunden = _lies_variante(
-                (slug, speicher, variante, ids, name), kandidaten, hole, lauf, warte
+                (slug, speicher, variante, ids, api_name), kandidaten, hole, lauf, warte
             )
             if gefunden is None:
                 continue

@@ -1,0 +1,142 @@
+{
+ "pixel-10": {
+  "modell_id": "google-pixel-10",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/pixel-10",
+  "name": "Pixel 10",
+  "lieferbare_varianten": 1,
+  "varianten_gesamt": 4
+ },
+ "pixel-10-pro-xl": {
+  "modell_id": "google-pixel-10-pro-xl",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/pixel-10-pro-xl",
+  "name": "Pixel 10 Pro XL",
+  "lieferbare_varianten": 1,
+  "varianten_gesamt": 4
+ },
+ "galaxy-a37": {
+  "modell_id": "samsung-galaxy-a37",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-a37",
+  "name": "Galaxy A37 5G",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 4
+ },
+ "galaxy-s25": {
+  "modell_id": "samsung-galaxy-s25",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s25",
+  "name": "Galaxy S25",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 5
+ },
+ "galaxy-s25-fe": {
+  "modell_id": "samsung-galaxy-s25-fe",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s25-fe",
+  "name": "Galaxy S25 FE",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 4
+ },
+ "galaxy-s25-ultra": {
+  "modell_id": "samsung-galaxy-s25-ultra",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s25-ultra",
+  "name": "Galaxy S25 Ultra",
+  "lieferbare_varianten": 2,
+  "varianten_gesamt": 8
+ },
+ "galaxy-s26-fe": {
+  "modell_id": "samsung-galaxy-s26-fe",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s26-fe",
+  "name": "Galaxy S26 FE",
+  "lieferbare_varianten": 2,
+  "varianten_gesamt": 6
+ },
+ "galaxy-z-fold-8-ultra": {
+  "modell_id": "samsung-galaxy-z-fold8-ultra",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-z-fold-8-ultra",
+  "name": "Galaxy Z Fold8 Ultra",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 3
+ },
+ "600": {
+  "modell_id": "honor-600",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/600",
+  "name": "600",
+  "lieferbare_varianten": 2,
+  "varianten_gesamt": 3
+ },
+ "magic-8-lite": {
+  "modell_id": "honor-magic8-lite",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/magic-8-lite",
+  "name": "Magic 8 Lite",
+  "lieferbare_varianten": 1,
+  "varianten_gesamt": 2
+ },
+ "17": {
+  "modell_id": "xiaomi-17",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/17",
+  "name": "17",
+  "lieferbare_varianten": 1,
+  "varianten_gesamt": 3
+ },
+ "17-ultra": {
+  "modell_id": "xiaomi-17-ultra",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/17-ultra",
+  "name": "17 Ultra",
+  "lieferbare_varianten": 2,
+  "varianten_gesamt": 3
+ },
+ "17t": {
+  "modell_id": "xiaomi-17t",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/17t",
+  "name": "17T",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 4
+ },
+ "17t-pro": {
+  "modell_id": "xiaomi-17t-pro",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/17t-pro",
+  "name": "17T Pro",
+  "lieferbare_varianten": 1,
+  "varianten_gesamt": 3
+ },
+ "redmi-17": {
+  "modell_id": "xiaomi-redmi-17",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-17",
+  "name": "Redmi 17",
+  "lieferbare_varianten": 2,
+  "varianten_gesamt": 3
+ },
+ "redmi-17-c-5g": {
+  "modell_id": "xiaomi-redmi-17c",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-17-c-5g",
+  "name": "Redmi 17C 5G",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 3
+ },
+ "redmi-note-15-pro-plus-5g": {
+  "modell_id": "xiaomi-redmi-note-15-pro-plus",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-note-15-pro-plus-5g",
+  "name": "Redmi Note 15 Pro+ 5G",
+  "lieferbare_varianten": 2,
+  "varianten_gesamt": 3
+ },
+ "redmi-note-17": {
+  "modell_id": "xiaomi-redmi-note-17",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-note-17",
+  "name": "Redmi Note 17",
+  "lieferbare_varianten": 1,
+  "varianten_gesamt": 3
+ },
+ "redmi-note-17-pro-5g": {
+  "modell_id": "xiaomi-redmi-note-17-pro",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-note-17-pro-5g",
+  "name": "Redmi Note 17 Pro 5G",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 3
+ },
+ "redmi-note-17-pro-max-5g": {
+  "modell_id": "xiaomi-redmi-note-17-pro-max",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-note-17-pro-max-5g",
+  "name": "Redmi Note 17 Pro Max 5G",
+  "lieferbare_varianten": 3,
+  "varianten_gesamt": 3
+ }
+}
