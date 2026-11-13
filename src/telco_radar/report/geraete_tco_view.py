@@ -202,7 +202,7 @@ def _export_zeilen(
                 "quelle_url": b.quelle_url,
                 "sku_id": b.sku_id or "",
                 "status": geraete_notbremse.kurz(b, heute),
-                "luecke": veraltet or ", ".join(kosten.luecken),
+                "luecke": geraete_laufzeit.luecke_export_text(b, kosten, veraltet),
             }
         )
     zeilen.sort(key=_nach_ratenlaufzeit)

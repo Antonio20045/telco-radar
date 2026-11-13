@@ -22,6 +22,9 @@ Anzeige dafür fest: ein Satz, der die Lücke erklärt, statt sie stumm zu lasse
 from __future__ import annotations
 
 from telco_radar.report import geraete_laufzeit
+from telco_radar.report import geraete_tco_karten as karten
+from telco_radar.report.geraete_tco_view import aufbereiten
+from telco_radar.tco_model import Buendel
 
 
 def _karte(**overrides) -> dict:
@@ -71,3 +74,56 @@ def test_regel_satz_erscheint_nur_mit_betroffener_karte():
     assert mit == geraete_laufzeit.REGEL_ECHTE_24_OHNE_ZUZAHLUNG
     assert "24 + 12" in mit
     assert "keinen Gesamtpreis" in mit
+
+
+def _einsundeins_echte_24_buendel(**kw) -> Buendel:
+    """Eine echte 1&1-24-Monats-Zeile ohne Zuzahlung - der Store-Fall aus
+    dem Modulkopf (74 von 74 ohne `geraet_zuzahlung`)."""
+    felder = dict(
+        sku_id="einsundeins-iphone-echte24",
+        anbieter="1&1",
+        tarif_name="1&1 Smart 24",
+        buendel_monatlich=59.99,
+        laufzeit_monate=24,
+        geraet_zuzahlung=None,
+        anschlusspreis=0.0,
+        quelle_url="https://1und1.de",
+        abgerufen_am="2026-10-07",
+    )
+    felder.update(kw)
+    return Buendel(**felder)
+
+
+def test_export_zeile_traegt_den_regel_satz_statt_der_stummen_luecke():
+    """Abnahme (b): die Exportzeile (`geraete-tco-*.csv`, Spalte „Lücke“)
+    nennt den erklärenden Satz, nicht nur das kurze Postenwort."""
+    b = _einsundeins_echte_24_buendel()
+    zeile = aufbereiten([b], [], [], katalog=None)["export"]["buendel"][0]
+    assert zeile["luecke"] == geraete_laufzeit.REGEL_ECHTE_24_OHNE_ZUZAHLUNG
+    assert zeile["tco24"] is None, "kein Preis entsteht - nur der benannte Satz"
+
+
+def test_export_zeile_mit_zuzahlung_bleibt_bei_der_alten_kurzform():
+    """Keine Änderung an Zeilen, die nicht vom P4-Fall betroffen sind."""
+    b = _einsundeins_echte_24_buendel(geraet_zuzahlung=49.99)
+    zeile = aufbereiten([b], [], [], katalog=None)["export"]["buendel"][0]
+    assert zeile["luecke"] == ""
+    assert zeile["tco24"] is not None
+
+
+def test_karte_der_seite_traegt_den_regel_satz_statt_der_stummen_luecke():
+    """Abnahme (b): dieselbe Zeile auf der Seite (`leer_grund`, gerendert in
+    `gr-kk-luecke`) trägt denselben Satz."""
+    b = _einsundeins_echte_24_buendel()
+    karte = karten._karte(b, None, None, None, {}, zustand="neu", heute="2026-11-13")
+    assert karte["leer_grund"] == geraete_laufzeit.REGEL_ECHTE_24_OHNE_ZUZAHLUNG
+    assert karte["gesamt"] is None, "kein Preis entsteht - nur der benannte Satz"
+
+
+def test_karte_mit_zuzahlung_bleibt_bei_der_alten_rechnung():
+    """Keine Änderung an Preisen - eine Zeile mit Zuzahlung bekommt weiterhin
+    ihren Gesamtpreis und keinen Lückensatz."""
+    b = _einsundeins_echte_24_buendel(geraet_zuzahlung=49.99)
+    karte = karten._karte(b, None, None, None, {}, zustand="neu", heute="2026-11-13")
+    assert karte["leer_grund"] == ""
+    assert karte["gesamt"] is not None

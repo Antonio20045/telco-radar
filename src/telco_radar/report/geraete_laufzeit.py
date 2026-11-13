@@ -13,6 +13,7 @@ eigenen Band der Maßstab, und nur, wo Vodafone kein Bündel hat (`modelle()`).
 
 from __future__ import annotations
 
+from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG
 from ..tco_model import TCO_HORIZONT
 from . import geraete_eigen_pruefung as eigen_pruefung
 from . import geraete_notbremse as notbremse
@@ -151,6 +152,33 @@ def regel_echte_24_satz(karten) -> str:
         if any(ist_echte_24_ohne_zuzahlung(k) for k in karten)
         else ""
     )
+
+
+def _echte_24_satz(b) -> str:
+    """`regel_echte_24_satz` für EIN Bündel statt eine Kartenliste."""
+    karte = {
+        "anbieter": b.anbieter,
+        "buendel_monatlich": b.buendel_monatlich,
+        "zuzahlung": b.geraet_zuzahlung,
+        "raten_laufzeit": raten_laufzeit(b),
+    }
+    return REGEL_ECHTE_24_OHNE_ZUZAHLUNG if ist_echte_24_ohne_zuzahlung(karte) else ""
+
+
+def leer_grund(b, kosten, belastbar: bool, grund_fn) -> str:
+    """Der Satz zu einer Karte ohne Gesamtpreis - Herleitungs-Hinweis, der
+    Regel-Satz der echten 24-Monats-Lücke, sonst `grund_fn(kosten)`."""
+    if belastbar:
+        return ""
+    if b.herleitung.strip() == HERLEITUNG_EINMALZAHLUNG:
+        return notbremse.herleitung_satz(b.anbieter, b.herleitung)
+    return _echte_24_satz(b) or grund_fn(kosten)
+
+
+def luecke_export_text(b, kosten, veraltet: str) -> str:
+    """Der Text der Export-Spalte „Lücke": der Regel-Satz der echten
+    24-Monats-Lücke bei 1&1, sonst wie bisher die kurzen Postennamen."""
+    return veraltet or _echte_24_satz(b) or ", ".join(kosten.luecken)
 
 
 def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:
