@@ -17,7 +17,7 @@ import test_geraete_tco_zustand
 from bs4 import BeautifulSoup
 
 from telco_radar.analyze.buendel_abdeckung import lade_pflicht
-from telco_radar.analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT
+from telco_radar.analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT, TRENNER
 from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.report import geraete_portfolio as pf
 from telco_radar.report import geraete_sortiment
@@ -73,8 +73,13 @@ I17AIR = _g("Apple", "iPhone Air", 17)
 KATALOG = Katalog(geraete=[S26, I18, _g("Apple", "iPhone 18 Pro Max", 18), I17AIR])
 
 
-def _rechne(modelle: list[dict], belege: dict | None = None, heute: str = HEUTE):
-    return pf.berechne(modelle, KATALOG, belege or {}, heute)
+def _rechne(
+    modelle: list[dict],
+    belege: dict | None = None,
+    heute: str = HEUTE,
+    erfassung_roh: dict[str, str] | None = None,
+):
+    return pf.berechne(modelle, KATALOG, belege or {}, heute, erfassung_roh)
 
 
 def _paar(r: dict, name: str) -> dict:
@@ -543,16 +548,19 @@ def test_umschalter_hat_alle_paare_und_standard_telekom_im_gerenderten_html():
     assert [t["aria-pressed"] for t in s.select("#pf-wahl button")] == ["true", "false"]
 
 
-def _mit_erfassung(modell: dict, **erfassung: str) -> dict:
-    return {**modell, "erfassung": erfassung}
+def _erfassung_roh(device_id: str, **erfassung: str) -> dict[str, str]:
+    """Baut den ungefilterten `tco_db.erfassung`-Speicher für ein Gerät nach:
+    Schlüssel "<Anbieter>|<device_id>" (siehe `klick_erfassung.TRENNER`)."""
+    return {
+        f"{anbieter}{TRENNER}{device_id}": satz for anbieter, satz in erfassung.items()
+    }
 
 
 def test_erfassung_aussage_zaehlt_als_belegte_portfolio_luecke():
     satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
-    modelle = [
-        _mit_erfassung(_modell(S26, _karte("congstar")), Vodafone=satz),
-    ]
-    p = _paar(_rechne(modelle), "congstar")
+    modelle = [_modell(S26, _karte("congstar"))]
+    erf = _erfassung_roh(S26.device_id, Vodafone=satz)
+    p = _paar(_rechne(modelle, erfassung_roh=erf), "congstar")
     assert _namen(p["nur_v"]) == [] and p["n_v"] == 0
     assert _namen(p["nur_w"]) == ["Galaxy S26"] and p["n_offen"] == 0
     beleg = p["nur_w"][0]["geraete"][0]["beleg"]
@@ -563,23 +571,66 @@ def test_erfassung_aussage_zaehlt_als_belegte_portfolio_luecke():
 
 def test_erfassung_geht_einer_config_luecke_nie_vor(tmp_path):
     satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
-    modelle = [_mit_erfassung(_modell(S26, _karte("congstar")), Vodafone=satz)]
+    modelle = [_modell(S26, _karte("congstar"))]
+    erf = _erfassung_roh(S26.device_id, Vodafone=satz)
     belege = _beleg(anbieter="Vodafone", modell=S26.device_id)
-    p = _paar(_rechne(modelle, belege), "congstar")
+    p = _paar(_rechne(modelle, belege, erfassung_roh=erf), "congstar")
     beleg = p["nur_w"][0]["geraete"][0]["beleg"]
     assert beleg["url"].endswith("beleg.png")
 
 
 def test_andere_erfassungsgruende_sind_keine_sortimentsaussage_und_zaehlen_nicht():
-    modelle = [
-        _mit_erfassung(
-            _modell(S26, _karte("congstar")),
-            Vodafone="Vodafone nicht erfasst: Seite sperrt automatisches Lesen "
-            "(HTTP 202, 13.11.2026)",
-        ),
-    ]
-    p = _paar(_rechne(modelle), "congstar")
+    modelle = [_modell(S26, _karte("congstar"))]
+    erf = _erfassung_roh(
+        S26.device_id,
+        Vodafone="Vodafone nicht erfasst: Seite sperrt automatisches Lesen "
+        "(HTTP 202, 13.11.2026)",
+    )
+    p = _paar(_rechne(modelle, erfassung_roh=erf), "congstar")
     assert p["n_w"] == 0 and p["n_offen"] == 1
+    assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_OHNE
+
+
+def test_veraltete_karte_mit_betrag_verdeckt_den_erfassungsbeleg_nicht():
+    """Regression (1313, Befund A): eine VERALTETE Karte mit Betrag darf einen
+    `SATZ_NICHT_IM_ANGEBOT`-Beleg nicht verdecken - anders als an der
+    Gerätekarte (`klick_erfassung.ohne_karte`, dort schlägt jede Karte mit
+    Betrag den Erfassungsgrund), zählt der Portfolio-Vergleich Lücken über
+    FRISCHE Karten (`staende`). Mit `erfassung_je`, das weiterhin nur
+    `modell["erfassung"]` (das display-gefilterte Ergebnis von `ohne_karte`)
+    läse, wäre `Telekom` hier nicht im `erfassung`-Dict (weil die alte Karte
+    mit Betrag es dort herausfiltert) und die Lücke bliebe eine unbelegte
+    Messlücke statt einer belegten Portfolio-Lücke.
+
+    `I18` liefert Telekom anderswo einen frischen Preis, sonst zählt Telekom
+    laut `wettbewerber_mit_daten` gar nicht als Paar - kein Unterschied dort."""
+    satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Telekom", datum="13.11.2026")
+    modelle = [
+        _modell(S26, _karte("Vodafone"), _karte("Telekom", frisch=False)),
+        _modell(I18, _karte("Vodafone"), _karte("Telekom")),
+    ]
+    erf = _erfassung_roh(S26.device_id, Telekom=satz)
+    p = _paar(_rechne(modelle, erfassung_roh=erf), "Telekom")
+    assert p["n_w"] == 0 and p["n_offen"] == 0
+    assert _namen(p["nur_v"]) == ["Galaxy S26"] and p["n_v"] == 1
+    beleg = p["nur_v"][0]["geraete"][0]["beleg"]
+    assert beleg["grund"] == satz
+    assert beleg["geprueft"] == "13.11.2026"
+
+
+def test_veraltete_karte_mit_betrag_und_anderer_erfassungsgrund_bleibt_messluecke():
+    """Gegenprobe: ein Erfassungssatz, der keine `SATZ_NICHT_IM_ANGEBOT`-Form
+    hat ("nur mit 128 GB im Angebot"), zählt auch mit einer veralteten Karte
+    mit Betrag nicht als Beleg - er sagt nichts über das Sortiment."""
+    modelle = [
+        _modell(S26, _karte("Vodafone"), _karte("Telekom", frisch=False)),
+        _modell(I18, _karte("Vodafone"), _karte("Telekom")),
+    ]
+    erf = _erfassung_roh(
+        S26.device_id, Telekom="Bei Telekom nur mit 128 GB im Angebot (13.11.2026)"
+    )
+    p = _paar(_rechne(modelle, erfassung_roh=erf), "Telekom")
+    assert p["n_v"] == 0 and p["n_offen"] == 1
     assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_OHNE
 
 
@@ -632,8 +683,9 @@ def test_quarantaene_satz_steht_als_messluecke_im_gerenderten_html():
 
 def test_erfassung_beleg_zeigt_auszug_statt_link_in_der_vorlage():
     satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
-    modelle = [_mit_erfassung(_modell(S26, _karte("congstar")), Vodafone=satz)]
-    a = {**pf.berechne(modelle, KATALOG, {}, HEUTE), "hinweis": ""}
+    modelle = [_modell(S26, _karte("congstar"))]
+    erf = _erfassung_roh(S26.device_id, Vodafone=satz)
+    a = {**pf.berechne(modelle, KATALOG, {}, HEUTE, erf), "hinweis": ""}
     s = _rendern(a)
     liste_w = s.select_one('.gr-pf-paar[data-pf="congstar"] .gr-pf-liste--w')
     assert liste_w.select_one("a") is None
