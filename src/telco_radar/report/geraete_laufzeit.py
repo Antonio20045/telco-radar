@@ -129,7 +129,7 @@ REGEL_ECHTE_24_OHNE_ZUZAHLUNG = (
     "Monate bestätigt 1&1 selbst keine Gerätezuzahlung – nur für „24 + 12“ "
     "nennt die Produktseite den Betrag. Deshalb zeigt TelcoRadar hier "
     "keinen Gesamtpreis: kein erfundener Wert, sondern eine benannte Lücke "
-    "(Klick-Erkundung 07.10.2026, `klickkachel`)."
+    "(Stand der Prüfung am Original vom 07.10.2026)."
 )
 
 
