@@ -21,7 +21,7 @@ aber nicht von heute, trägt „Preis vom 10.10.2026“; jenseits der Frische gi
 
 from __future__ import annotations
 
-from .geraete_notbremse import DELTA_BEDINGT, zustand
+from .geraete_notbremse import DELTA_BEDINGT, DELTA_NICHT_LIEFERBAR, zustand
 
 
 def marke(abgerufen_am: str, heute: str, frisch: bool) -> str:
@@ -66,6 +66,10 @@ KURZ_SORTIMENT = "nicht im Sortiment"
 SATZ_SORTIMENT = (
     "Gerät bei {anbieter} nicht mehr im Sortiment – belegte Lücke, kein Preis."
 )
+KURZ_NICHT_LIEFERBAR = DELTA_NICHT_LIEFERBAR
+SATZ_NICHT_LIEFERBAR = (
+    "Bei der letzten Messung nicht lieferbar – kein aktueller Preis dieser Stufe."
+)
 KURZ_PRUEFUNG = "Preis in Prüfung"
 SATZ_PRUEFUNG = "Preis in Prüfung."
 KURZ_ANSCHLUSS = "Anschlusspreis nicht mehr belegt"
@@ -98,6 +102,12 @@ def nicht_im_sortiment(karte: dict) -> bool:
     aus ``geraete_sortiment``.) Geht jedem anderen Grund vor: ein Gerät, das es nicht
     gibt, hat keinen „veralteten“ Preis, sondern keinen."""
     return bool(karte.get("nicht_im_sortiment"))
+
+
+def nicht_lieferbar(karte: dict) -> bool:
+    """Las die Tarifwelt diese Stufe nach dem Abruf als nicht lieferbar? (Notbremse,
+    Marke aus ``geraete_sortiment``.) Genauer als „veraltet“: der Grund ist bekannt."""
+    return bool(karte.get("nicht_lieferbar"))
 
 
 def anschluss_widerlegt(karte: dict) -> bool:
@@ -149,6 +159,8 @@ def buendel_luecke(b, heute: str) -> str:
     flags = geraete_notbremse.felder(b, heute)
     if nicht_im_sortiment(flags):
         return SATZ_SORTIMENT.format(anbieter=b.anbieter)
+    if nicht_lieferbar(flags):
+        return SATZ_NICHT_LIEFERBAR
     if flags["bedingter_tarif"]:
         return SATZ_BEDINGT
     if anschluss_widerlegt(flags):
@@ -172,6 +184,8 @@ def anzeige(karte: dict) -> dict:
     if nicht_im_sortiment(karte):
         kurz_ = KURZ_SORTIMENT
         satz = SATZ_SORTIMENT.format(anbieter=karte.get("anbieter") or "dem Anbieter")
+    elif nicht_lieferbar(karte):
+        kurz_, satz = KURZ_NICHT_LIEFERBAR, SATZ_NICHT_LIEFERBAR
     elif ist_bedingt(karte):
         kurz_, satz = KURZ_BEDINGT, SATZ_BEDINGT
     elif anschluss_widerlegt(karte):

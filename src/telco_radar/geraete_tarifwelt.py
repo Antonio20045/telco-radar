@@ -22,7 +22,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from . import tarifwelt_bestand
+from . import tarifwelt_bestand, tarifwelt_lieferbar
 from .collect.geraete import tarifwelt_lauf
 from .collect.geraete.basis import GeraeteAbrufFehler
 from .collect.geraete.buendel_prioritaet import pflicht_modelle
@@ -43,6 +43,7 @@ class Ergebnis:
     buendel: list[Buendel] = field(default_factory=list)
     tarife: dict[str, dict] = field(default_factory=dict)
     luecken: list[tuple[str, str]] = field(default_factory=list)
+    nicht_lieferbar: list[tuple[str, int]] = field(default_factory=list)
     abrufe: int = 0
     modelle: int = 0
     grund: str = ""
@@ -54,6 +55,7 @@ class Ergebnis:
             "buendel": len(self.buendel),
             "tarife": len(self.tarife),
             "luecken": len(self.luecken),
+            "nicht_lieferbar": len(self.nicht_lieferbar),
             "abrufe": self.abrufe,
             "modelle": self.modelle,
             "grund": self.grund,
@@ -74,7 +76,9 @@ def lauf(
     abgerufen_am: str,
     warte: Callable[[float], None] | None = None,
 ) -> Ergebnis:
-    """Alle Pflichtmodelle der Tarifwelt, wenn die Quelle aktiv ist."""
+    """Alle Pflichtmodelle der Tarifwelt, wenn die Quelle aktiv ist. Bricht eine
+    Schutzantwort ein Modell ab, bleiben davon nur die schon gelesenen nicht
+    lieferbaren Stufen, nie halbe Preise."""
     warte = warte or time.sleep
     ergebnis = Ergebnis()
     if not quelle_aktiv(quellen):
@@ -87,11 +91,13 @@ def lauf(
     modelle = [m for m in tarifwelt_lauf.MODELL_SLUGS if m in pflicht_modelle()]
     ergebnis.status = "ok"
     for modell in modelle:
+        teil = tarifwelt_lauf.Lauf()
         try:
-            teil = tarifwelt_lauf.lies_modell(
-                modell, leiter, hole, abgerufen_am, warte=warte
+            tarifwelt_lauf.lies_modell(
+                modell, leiter, hole, abgerufen_am, warte=warte, lauf=teil
             )
         except GeraeteAbrufFehler as fehler:
+            ergebnis.nicht_lieferbar.extend(teil.nicht_lieferbar)
             ergebnis.status = "abgebrochen"
             ergebnis.grund = str(fehler)
             log.warning("Tarifwelt: Lauf abgebrochen bei %s: %s", modell, fehler)
@@ -100,6 +106,7 @@ def lauf(
         ergebnis.buendel.extend(teil.buendel)
         ergebnis.tarife.update(teil.tarife)
         ergebnis.luecken.extend(teil.luecken)
+        ergebnis.nicht_lieferbar.extend(teil.nicht_lieferbar)
         ergebnis.abrufe += teil.abrufe
     return ergebnis
 
@@ -108,8 +115,9 @@ def stufe(
     quellen, bestand, hole: Callable, uhr: Callable, heute: str, zustand, tco
 ) -> dict:
     """Die Stufe im Tageslauf (`geraete_pipeline.run_geraete_stage`): lesen,
-    Buendel und Stammdaten der Tarife (`TcoDB.haendler_tarife`) in den TCO-Store;
-    `tco.save` sichert beides in `geraete_tco.json`.
+    Buendel und Stammdaten der Tarife (`TcoDB.haendler_tarife`) in den TCO-Store,
+    aeltere Buendel nicht lieferbarer Stufen markiert (`tarifwelt_lieferbar`);
+    `tco.save` sichert alles in `geraete_tco.json`.
     Die Abrufe gehen durch dieselbe `Abrufschleuse` (robots.txt, Besuchsfenster)
     wie die uebrigen Quellen. Wirft nie: ein Fehler kostet nur diese Stufe."""
     if not quelle_aktiv(quellen):
@@ -125,11 +133,16 @@ def stufe(
         if ergebnis.buendel:
             tco.upsert_buendel(ergebnis.buendel, heute)
             tco.haendler_tarife.update(ergebnis.tarife)
+        markiert = tarifwelt_lieferbar.markiere(
+            tco.buendel(), ergebnis.nicht_lieferbar, heute
+        )
         log.info(
-            "Tarifwelt: %s, %d Buendel, %d Luecken, %d Abrufe%s",
+            "Tarifwelt: %s, %d Buendel, %d Luecken, %d nicht lieferbar markiert, "
+            "%d Abrufe%s",
             ergebnis.status,
             len(ergebnis.buendel),
             len(ergebnis.luecken),
+            markiert,
             ergebnis.abrufe,
             f" ({ergebnis.grund})" if ergebnis.grund else "",
         )

@@ -24,6 +24,7 @@ import logging
 from datetime import date
 from pathlib import Path
 
+from .. import tarifwelt_lieferbar
 from ..analyze import buendel_abdeckung
 from ..analyze.geraete_pruefstatus import REGEL_SORTIMENT, VERALTET
 from . import klick_ueberholt
@@ -31,6 +32,7 @@ from . import klick_ueberholt
 log = logging.getLogger(__name__)
 
 VERMERK = f"{VERALTET} {REGEL_SORTIMENT}"
+VERMERK_NICHT_LIEFERBAR = f"{VERALTET} {tarifwelt_lieferbar.REGEL_NICHT_LIEFERBAR}"
 ABDECKUNG = ("config", "geraete_abdeckung.yaml")
 GRUND_OHNE = "ohne Beleg"
 GRUND_ABGELAUFEN = "Beleg abgelaufen"
@@ -189,7 +191,23 @@ def markiere(saetze: list[dict] | None, state_dir, heute: str) -> list[dict]:
     return markiere_mit(saetze or [], belege_aus(state_dir), heute)
 
 
+def markiere_nicht_lieferbar(saetze: list[dict]) -> list[dict]:
+    """Bündel einer Stufe, die die Tarifwelt NACH ihrem Abruf als nicht lieferbar
+    gelesen hat (`tarifwelt_lieferbar`), als Kopie mit Vermerk `veraltet 19`."""
+    return [
+        {**s, "pruefung": VERMERK_NICHT_LIEFERBAR}
+        if isinstance(s, dict) and tarifwelt_lieferbar.ist_nicht_lieferbar(s)
+        else s
+        for s in saetze
+    ]
+
+
 def lies(saetze: list[dict], state_dir, heute: str) -> list[dict]:
-    """Die Bündel der Seite: ohne überholte Klick-Bündel, nicht geführte Geräte als
-    Lücke markiert. Eine Stelle für Karten, Export, Katalog und Grafik."""
-    return markiere(klick_ueberholt.ohne_ueberholte(saetze), state_dir, heute)
+    """Die Bündel der Seite: ohne überholte Klick-Bündel, nicht lieferbare Stufen und
+    nicht geführte Geräte als Lücke markiert (die belegte Lücke geht vor). Eine Stelle
+    für Karten, Export, Katalog und Grafik."""
+    return markiere(
+        markiere_nicht_lieferbar(klick_ueberholt.ohne_ueberholte(saetze)),
+        state_dir,
+        heute,
+    )

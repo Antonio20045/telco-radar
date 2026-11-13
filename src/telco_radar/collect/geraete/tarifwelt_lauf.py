@@ -92,12 +92,15 @@ class Lauf:
     """Ergebnis eines Modells: Buendel, benannte Luecken (Variante -> Grund) und
     `tarife` (tarif_id "mediamarkt_tarifwelt:<id>" -> Anbieterzeile, Name,
     Datenvolumen, Grundgebuehr) fuer die Band-Zuordnung im Bericht
-    (`tarifwelt_bestand`)."""
+    (`tarifwelt_bestand`). `nicht_lieferbar`: (device_id, Katalogspeicher) jeder
+    Stufe, die die Uebersicht belegt als nicht lieferbar nennt
+    (`tarifwelt_lieferbar`)."""
 
     buendel: list[Buendel] = field(default_factory=list)
     luecken: list[tuple[str, str]] = field(default_factory=list)
     abrufe: int = 0
     tarife: dict[str, dict] = field(default_factory=dict)
+    nicht_lieferbar: list[tuple[str, int]] = field(default_factory=list)
 
 
 def _abruf(hole: Callable, url: str, lauf: Lauf, warte: Callable[[float], None]) -> str:
@@ -151,13 +154,15 @@ def lies_modell(
     hole: Callable,
     abgerufen_am: str,
     warte: Callable[[float], None] = time.sleep,
+    lauf: Lauf | None = None,
 ) -> Lauf:
     """Alle Speicher x Netz x Band eines Pflichtmodells (oder eines der
-    zusaetzlichen, nicht ueberwachten Modelle, siehe Moduldoku)."""
+    zusaetzlichen, nicht ueberwachten Modelle, siehe Moduldoku). Ein mitgegebener
+    `lauf` wird gefuellt: was vor einer Schutzantwort gelesen war, bleibt dort."""
     eintrag = MODELL_SLUGS[modell_id]
     hersteller, name, pfad, slug = eintrag[:4]
     api_name = eintrag[4] if len(eintrag) > 4 else name
-    lauf = Lauf()
+    lauf = Lauf() if lauf is None else lauf
     uebersicht = lies_uebersicht(_abruf(hole, f"{API}/{slug}", lauf, warte))
     if uebersicht is None:
         lauf.luecken.append((modell_id, "Uebersicht nicht lesbar"))
@@ -165,6 +170,8 @@ def lies_modell(
     geraet = device_id(hersteller, name)
     for speicher in uebersicht["nicht_lieferbar"]:
         lauf.luecken.append((f"{modell_id} {speicher} GB", "nicht lieferbar"))
+    for speicher in uebersicht["belegt_nicht_lieferbar"]:
+        lauf.nicht_lieferbar.append((geraet, KATALOG_SPEICHER.get(speicher, speicher)))
     for speicher, ids in uebersicht["je_speicher"].items():
         listen_url = f"{API}/{ids['ogi']}/tariff?hwi={ids['hwi']}"
         try:
