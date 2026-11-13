@@ -17,6 +17,7 @@ import test_geraete_tco_zustand
 from bs4 import BeautifulSoup
 
 from telco_radar.analyze.buendel_abdeckung import lade_pflicht
+from telco_radar.analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT
 from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.report import geraete_portfolio as pf
 from telco_radar.report import geraete_sortiment
@@ -540,3 +541,101 @@ def test_umschalter_hat_alle_paare_und_standard_telekom_im_gerenderten_html():
     s = _rendern(a)
     assert s.select_one("section#portfolio")["data-standard"] == "o2"
     assert [t["aria-pressed"] for t in s.select("#pf-wahl button")] == ["true", "false"]
+
+
+def _mit_erfassung(modell: dict, **erfassung: str) -> dict:
+    return {**modell, "erfassung": erfassung}
+
+
+def test_erfassung_aussage_zaehlt_als_belegte_portfolio_luecke():
+    satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
+    modelle = [
+        _mit_erfassung(_modell(S26, _karte("congstar")), Vodafone=satz),
+    ]
+    p = _paar(_rechne(modelle), "congstar")
+    assert _namen(p["nur_v"]) == [] and p["n_v"] == 0
+    assert _namen(p["nur_w"]) == ["Galaxy S26"] and p["n_offen"] == 0
+    beleg = p["nur_w"][0]["geraete"][0]["beleg"]
+    assert beleg["grund"] == satz
+    assert beleg["geprueft"] == "13.11.2026"
+    assert "url" not in beleg and "bis" not in beleg
+
+
+def test_erfassung_geht_einer_config_luecke_nie_vor(tmp_path):
+    satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
+    modelle = [_mit_erfassung(_modell(S26, _karte("congstar")), Vodafone=satz)]
+    belege = _beleg(anbieter="Vodafone", modell=S26.device_id)
+    p = _paar(_rechne(modelle, belege), "congstar")
+    beleg = p["nur_w"][0]["geraete"][0]["beleg"]
+    assert beleg["url"].endswith("beleg.png")
+
+
+def test_andere_erfassungsgruende_sind_keine_sortimentsaussage_und_zaehlen_nicht():
+    modelle = [
+        _mit_erfassung(
+            _modell(S26, _karte("congstar")),
+            Vodafone="Vodafone nicht erfasst: Seite sperrt automatisches Lesen "
+            "(HTTP 202, 13.11.2026)",
+        ),
+    ]
+    p = _paar(_rechne(modelle), "congstar")
+    assert p["n_w"] == 0 and p["n_offen"] == 1
+    assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_OHNE
+
+
+def _quarantaene_karte(anbieter: str, **besser) -> dict:
+    return _karte(anbieter, zaehlt=False, quarantaene=True, **besser)
+
+
+def test_quarantaenierte_karte_verbietet_den_satz_kein_beleg_vor():
+    modelle = [_modell(S26, _karte("Telekom"), _quarantaene_karte("Vodafone"))]
+    p = _paar(_rechne(modelle), "Telekom")
+    assert p["n_w"] == 0 and p["n_v"] == 0 and p["n_offen"] == 1
+    zeile = p["offen"][0]["geraete"][0]
+    assert zeile["grund"] == pf.IN_PRUEFUNG
+    assert "liegt kein" not in zeile["satz"]
+    assert "Beleg" not in zeile["satz"]
+    assert zeile["satz"] == (
+        "Telekom führt es (Preis gemessen). Vodafone führt es ebenfalls, der "
+        "Preis steht noch in Prüfung."
+    )
+
+
+def test_quarantaene_sticht_einen_abgelaufenen_beleg_nicht_aus():
+    modelle = [_modell(S26, _karte("congstar"), _quarantaene_karte("Vodafone"))]
+    belege = _beleg(bis="2026-11-09", anbieter="Vodafone", modell=S26.device_id)
+    p = _paar(_rechne(modelle, belege), "congstar")
+    assert p["n_w"] == 0 and p["n_offen"] == 1
+    assert p["offen"][0]["geraete"][0]["grund"] == pf.IN_PRUEFUNG
+
+
+def test_staende_stuft_quarantaene_zwischen_preis_und_alt_ein():
+    modelle = [_modell(S26, _quarantaene_karte("Vodafone"))]
+    je = pf.staende(modelle)
+    assert je[S26.device_id]["Vodafone"] == pf.IN_PRUEFUNG
+    modelle = [_modell(S26, _quarantaene_karte("Vodafone"), _karte("Vodafone"))]
+    assert pf.staende(modelle)[S26.device_id]["Vodafone"] == pf.PREIS
+    modelle = [
+        _modell(S26, _quarantaene_karte("Vodafone"), _karte("Vodafone", frisch=False))
+    ]
+    assert pf.staende(modelle)[S26.device_id]["Vodafone"] == pf.IN_PRUEFUNG
+
+
+def test_quarantaene_satz_steht_als_messluecke_im_gerenderten_html():
+    modelle = [_modell(S26, _karte("Telekom"), _quarantaene_karte("Vodafone"))]
+    a = {**pf.berechne(modelle, KATALOG, {}, HEUTE), "hinweis": ""}
+    s = _rendern(a)
+    offen = s.select_one('.gr-pf-paar[data-pf="Telekom"] details.gr-pf-offen')
+    assert "liegt kein Beleg vor" not in offen.text
+    assert "steht noch in Prüfung" in offen.text
+
+
+def test_erfassung_beleg_zeigt_auszug_statt_link_in_der_vorlage():
+    satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
+    modelle = [_mit_erfassung(_modell(S26, _karte("congstar")), Vodafone=satz)]
+    a = {**pf.berechne(modelle, KATALOG, {}, HEUTE), "hinweis": ""}
+    s = _rendern(a)
+    liste_w = s.select_one('.gr-pf-paar[data-pf="congstar"] .gr-pf-liste--w')
+    assert liste_w.select_one("a") is None
+    assert "Auszug" in liste_w.text and satz in liste_w.text
+    assert "gültig bis" not in liste_w.text
