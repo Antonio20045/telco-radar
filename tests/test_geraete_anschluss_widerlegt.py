@@ -1,4 +1,4 @@
-"""Regel 16: Ein Anschlusspreis, den eine neuere Messung desselben Tarifs widerlegt.
+"""Regel 18: Ein Anschlusspreis, den eine neuere Messung desselben Tarifs widerlegt.
 
 Fall aus der Ist-Aufnahme vom 12.11.2026 (Befund D1): congstar misst am 11.11. den
 Bereitstellungspreis 15,00 € (24 Monate) bzw. 35,00 € (Flex) und am 12.11. am selben
@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import pytest
 
+from telco_radar.analyze.geraete_anschluss import REGEL
 from telco_radar.analyze.geraete_pruefstatus import (
     GUELTIG,
     VERALTET,
@@ -90,7 +91,7 @@ def test_aelterer_anschluss_wird_von_der_juengsten_messung_widerlegt():
     ergebnisse = pruefe_bestand([alt, *_juengste(0.0)], _kontext())
 
     assert _status(ergebnisse, "alt") == VERALTET
-    assert 16 in _regeln(ergebnisse, "alt")
+    assert REGEL in _regeln(ergebnisse, "alt")
     assert _status(ergebnisse, "neu_a") == GUELTIG
 
 
@@ -98,9 +99,9 @@ def test_der_befund_nennt_beide_betraege_und_beide_tage():
     alt = _satz("alt", anschluss=35.0, tag=GESTERN)
 
     ergebnisse = pruefe_bestand([alt, *_juengste(0.0)], _kontext())
-    saetze = [b.satz for b in ergebnisse["alt"].je(VERLETZT) if b.regel == 16]
+    saetze = [b.satz for b in ergebnisse["alt"].je(VERLETZT) if b.regel == REGEL]
 
-    assert saetze, "die Zeile hat keinen Befund 16"
+    assert saetze, "die Zeile hat keinen Befund 18"
     assert "35,00 €" in saetze[0]
     assert "0,00 €" in saetze[0]
     assert "11.11.2026" in saetze[0]
@@ -156,7 +157,7 @@ def test_gegenprobe_zeile_ohne_anschluss_bleibt_unberuehrt():
 
     ergebnisse = pruefe_bestand([alt, *_juengste(0.0)], _kontext())
 
-    assert 16 not in _regeln(ergebnisse, "alt")
+    assert REGEL not in _regeln(ergebnisse, "alt")
 
 
 @pytest.mark.parametrize("anbieter", ["congstar", "o2", "Telekom"])
@@ -222,7 +223,7 @@ def test_uneindeutiger_eigener_messtag_wird_nicht_widerlegt():
     )
 
     assert _status(ergebnisse, "teuer") == GUELTIG
-    assert 16 not in _regeln(ergebnisse, "teuer")
+    assert REGEL not in _regeln(ergebnisse, "teuer")
 
 
 def test_refurbished_widerlegt_keine_neuware():
