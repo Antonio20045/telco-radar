@@ -27,11 +27,15 @@ Nennen zwei Klick-Sätze denselben Schlüssel (ein Zustand außer neu zählt mit
 einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzte
 Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
 
-Vorrang steht im Bestand, nicht im Lesestand: ``Zusammenfuehrung.buendel`` lässt jedes
-Adapterbündel weg, dessen Eintrag im Bestand eine Klick-Messung jünger als
-``FRISCHEGRENZE_TAGE`` trägt (``klick_vorrang``), auch an einem Tag, an dem der
-Klick-Lauf gestört ist oder fehlt. Der Eintrag behält Wert und Datum; keine
-Preisbewegung ohne Preisänderung. Vorrang hat nur, was wirklich ein Klick-Bündel wurde.
+Vorrang steht im Bestand, nicht im Lesestand: ``Zusammenfuehrung.buendel`` lässt ein
+Adapterbündel weg, dessen Bestandseintrag eine Klick-Messung von HEUTE ist - oder,
+nur bei congstar (``klick_messtag.ANBIETER_PREISGRENZE``, Befund 13.11.2026), eine
+ältere innerhalb von ``FRISCHEGRENZE_TAGE``, der das heutige Bündel WIDERSPRICHT
+(``klick_messtag``, ``klick_preisgrenze``; Bilanz ``klick_vorrang`` und
+``klick_widerspruch``). Bei jedem anderen Anbieter weicht eine solche ältere Messung
+unverändert wie zuvor, ohne Preisvergleich. Sonst behält die heutige Messung ihren
+Messtag, auch wenn der Klick-Lauf gestört ist, fehlt oder seine Sätze zurückgehalten
+wurden (siehe ``klick_alter``). Vorrang hat nur, was wirklich ein Klick-Bündel wurde.
 """
 
 from __future__ import annotations
@@ -45,15 +49,16 @@ from pathlib import Path
 
 from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE, ORDNER, lies_ergebnisse
 from ..collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
-from ..collect.geraete.klickrohsatz import QUELLE, ZUSTAND_NEU, tarifschluessel
+from ..collect.geraete.klickrohsatz import ZUSTAND_NEU, tarifschluessel
 from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
-from .klick_alter import alter_tage, vorrang_ohne_messtag
+from .klick_alter import alter_tage, widerspruch_zeilen
 from .klick_erfassung import Angebot, erfassungsgruende
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
+from .klick_messtag import adapterschluessel, lesung_zum_buendel, teile_nach_messtag
 from .klick_teillauf import ausbeute_der_seiten
 from .klick_vollstaendig import CENT, VERGLEICHSFELDER, begleitend, fehlend, nennt
 from .tco_buendel import Buendelbilanz, aus_rohsaetzen
@@ -125,6 +130,8 @@ class Zusammenfuehrung:
     rohsaetze: list[dict]
     bilanz: dict | None = None
     angebot: Angebot = field(default_factory=dict)
+    heutige_messung: dict[Schluessel, dict] = field(default_factory=dict)
+    geraet: Geraet | None = None
 
     @property
     def erfassung(self) -> dict[str, str]:
@@ -137,25 +144,25 @@ class Zusammenfuehrung:
         heute: str,
         nach_id: Callable[[str], dict | None],
     ) -> Buendelbilanz:
-        """Die Bündel; ein Adapterbündel weicht einer frischen Klick-Messung."""
+        """Die Bündel; ein Adapterbündel weicht einer Klick-Messung (Modulkopf)."""
         bilanz = aus_rohsaetzen(self.rohsaetze, bestand, heute)
-        bleiben: list = []
-        gewichen: list[tuple] = []
-        for satz in bilanz.buendel:
-            eintrag = nach_id(satz.id)
-            if _vorrang(satz, eintrag, heute):
-                gewichen.append((satz, eintrag))
-            else:
-                bleiben.append(satz)
-        bilanz.buendel = bleiben
-        anzahl = len(gewichen)
+        teile = teile_nach_messtag(bilanz.buendel, nach_id, heute, self._heute_gelesen)
+        bilanz.buendel = teile.bleiben
+        anzahl = len(teile.gewichen)
         if self.bilanz is not None:
             self.bilanz["klick_vorrang"] = anzahl
+            self.bilanz["klick_widerspruch"] = len(teile.widerspruch)
         if anzahl:
             log.info("Klick-Bündel: %d Adapterbündel weichen frischer Messung", anzahl)
-        for text in vorrang_ohne_messtag(gewichen, heute):
+        for text in widerspruch_zeilen(teile.widerspruch, heute):
             log.warning("%s", text)
         return bilanz
+
+    def _heute_gelesen(self, satz: Buendel) -> dict | None:
+        """Der heutige Klick-Satz zum Schlüssel dieses Bündels, wenn es ihn gibt."""
+        if self.geraet is None or not self.heutige_messung:
+            return None
+        return lesung_zum_buendel(satz, self.heutige_messung, self.geraet)
 
 
 def klickordner(umgebung: Mapping[str, str] | None = None) -> Path | None:
@@ -243,12 +250,16 @@ def fuehre_zusammen(
         "mehrdeutig": mehrdeutig,
         "ohne_gegenstueck": ohne_gegenstueck,
         "klick_vorrang": 0,
+        "klick_widerspruch": 0,
         "gegenprobe": probe.als_daten(),
         "gegenprobe_geraet": gegenprobe_geraet(ohne_tarif, adapter, geraet),
     }
     _protokolliere(bilanz)
     bleiben = [satz for stelle, satz in enumerate(adapter) if stelle not in ersetzt]
-    return Zusammenfuehrung(bleiben + neu, bilanz)
+    gelesen = {klickschluessel(s): s for s in eindeutig if _neu(s)}
+    return Zusammenfuehrung(
+        bleiben + neu, bilanz, heutige_messung=gelesen, geraet=geraet
+    )
 
 
 def klickschluessel(satz: dict, mit_zustand: bool = False) -> Schluessel:
@@ -325,30 +336,6 @@ def _werte(satz: dict) -> tuple:
         for p in satz.get("tarif_phasen") or []
     )
     return (*(satz.get(f) for f in VERGLEICHSFELDER), phasen)
-
-
-def _vorrang(buendel: Buendel, eintrag: dict | None, heute: str) -> bool:
-    """Ein Adapterbündel, dessen Bestandseintrag eine frische Klick-Messung ist."""
-    if buendel.quelle_art == QUELLE or eintrag is None:
-        return False
-    if eintrag.get("quelle_art") != QUELLE:
-        return False
-    alter = alter_tage(eintrag.get("abgerufen_am"), heute)
-    return alter is not None and 0 <= alter < FRISCHEGRENZE_TAGE
-
-
-def adapterschluessel(satz: dict, geraet: Geraet) -> list[Schluessel]:
-    """Je Tarifschreibweise (Name, Slug) ein Schlüssel; nur Geräte im Zustand neu."""
-    if str(satz.get("zustand") or ZUSTAND_NEU) != ZUSTAND_NEU:
-        return []
-    device, speicher = geraet(str(satz.get("sku_id") or ""))
-    if not device:
-        return []
-    speicher = satz.get("speicher_gb") if speicher is None else speicher
-    laufzeit = laufzeit_in_monaten(satz.get("laufzeit_monate"))
-    tarife = {tarifschluessel(satz.get(f)) for f in ("tarif_name", "tarif_slug")}
-    anbieter = str(satz.get("anbieter"))
-    return [(anbieter, device, speicher, t, laufzeit) for t in sorted(tarife) if t]
 
 
 def _zeige(satz: dict) -> str:
