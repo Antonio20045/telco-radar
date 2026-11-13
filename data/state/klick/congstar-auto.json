@@ -1,7 +1,7 @@
 {
  "anbieter": "congstar-auto",
- "datum": "2026-11-12",
- "dauer_sekunden": 47.9,
+ "datum": "2026-11-13",
+ "dauer_sekunden": 47.1,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -24,11 +24,11 @@
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "images.congstar.de": 6,
+     "images.congstar.de": 3,
      "www.congstar.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 6.5,
+    "sekunden": 7.0,
     "takte_ms": 2450,
     "wartet_auf": "load"
    },
@@ -62,7 +62,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bb7c0cb1577fc56cab623e5514b3ffb85981779d8d5820fd30dd955738e95bea",
+      "beleg_id": "9b0fc00059216fa455dfe6af07cbff21e8e14db4c891167078df07546de87b07",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -83,7 +83,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=501",
-      "zeitpunkt": "2026-11-12T07:21:22Z"
+      "zeitpunkt": "2026-11-13T06:27:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -123,7 +123,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "08ea6e675830bfef64d76a505cee68a9db22520246603895818abad9fb1c2a71",
+      "beleg_id": "ab091bf6a801641cc834fc9ba1bd1d18496c13a16b9e14a0ca9255e01e603bf9",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -144,7 +144,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-11-12T07:21:23Z"
+      "zeitpunkt": "2026-11-13T06:27:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -184,7 +184,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ad0267fa8be729970fda3290b30fb193a421d156928e0f7b5000f5352ba62c38",
+      "beleg_id": "66e70a73d75ff48299e8ba0be609148750f38c1c15ca0d757d944d5f66596410",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -205,7 +205,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-11-12T07:21:26Z"
+      "zeitpunkt": "2026-11-13T06:27:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -245,7 +245,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "68ebad9768846219e91d7565701f530b754f977d78da647e5cd938a9c336bc07",
+      "beleg_id": "bb49a2c7dd9ff2deeec40269fbde4cfe0c69a8b1e8d43fbf45ef49f1986400d5",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -266,7 +266,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-11-12T07:21:27Z"
+      "zeitpunkt": "2026-11-13T06:27:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -306,7 +306,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3119fc3f3f089b5b00214ded3b38654c91552cfb20847586650cff97a0c53ebc",
+      "beleg_id": "b99d4adf7e633b4744e13c341e84b9aaaa6cbe924d4b1e95b415ce8c13de6422",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -327,7 +327,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-11-12T07:21:29Z"
+      "zeitpunkt": "2026-11-13T06:27:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -367,7 +367,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "47f2fdd89a6b7928e4676227ebda65e784a604de3d4ec7079f4c5ce93915c5ae",
+      "beleg_id": "69b0c29e1b21a81a540d3905446171b9fb36bc017dbd5df470139bb799efd92c",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -388,7 +388,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-11-12T07:21:31Z"
+      "zeitpunkt": "2026-11-13T06:27:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -428,7 +428,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "46f18f15cb9e8843eefe1af9d98c495aac9fec02df41a137ab20b4bc41dfb6d5",
+      "beleg_id": "e63e33c59902b007ff125993c0876e7e561db957a2f9ddbe42d36cb3dcb3ead8",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -449,7 +449,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-11-12T07:21:32Z"
+      "zeitpunkt": "2026-11-13T06:27:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -489,7 +489,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "56a7877d3bd2ed03b4f1f07c7312e96fe096f2786c4b4bed87407b77b25300d9",
+      "beleg_id": "8148306d86669332013b78e6fca2dc8a0c1ddce26a680604ad4f86ecad72e0f3",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -510,7 +510,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-11-12T07:21:34Z"
+      "zeitpunkt": "2026-11-13T06:27:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -544,17 +544,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 80,
-    "beendet": 77,
+    "anfragen": 63,
+    "beendet": 63,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "images.congstar.de": 10,
-     "www.congstar.de": 4
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 3.9,
-    "takte_ms": 2450,
+    "sekunden": 3.6,
+    "takte_ms": 2400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -577,5 +574,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10260
+ "zeitbudget_sekunden": 10240
 }
