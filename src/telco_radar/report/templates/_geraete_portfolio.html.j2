@@ -9,7 +9,7 @@
       {% for g in gr.geraete %}
       <li><span class="gr-pf-geraet">{{ g.name }}</span>
         {% if mit_beleg %}
-        <span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>{{ g.beleg.grund }}<br>geprüft {{ g.beleg.geprueft }}, gültig bis {{ g.beleg.bis }}</span>
+        <span class="gr-pf-beleg">{% if g.beleg.url %}<a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>{{ g.beleg.grund }}<br>geprüft {{ g.beleg.geprueft }}{% if g.beleg.bis %}, gültig bis {{ g.beleg.bis }}{% endif %}{% else %}Auszug: {{ g.beleg.grund }}<br>gelesen {{ g.beleg.geprueft }}{% endif %}</span>
         {% else %}
         <span class="gr-pf-beleg">{{ g.satz }}</span>
         {% endif %}

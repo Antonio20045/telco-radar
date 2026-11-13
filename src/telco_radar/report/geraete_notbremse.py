@@ -27,6 +27,7 @@ from ..analyze.geraete_pruefstatus import (
     HERLEITUNG_EINMALZAHLUNG,
     HERLEITUNG_PREISLISTE,
     QUARANTAENE,
+    REGEL_ANSCHLUSS,
     REGEL_SORTIMENT,
     REGELN,
     UNBEKANNT,
@@ -83,6 +84,11 @@ SATZ_SORTIMENT = (
 )
 DELTA_VERALTET = "veraltet"
 SATZ_VERALTET = "Kein Abstand zur Vodafone-Referenz: dieser Preis ist veraltet."
+DELTA_ANSCHLUSS = "Anschlusspreis nicht mehr belegt"
+SATZ_ANSCHLUSS = (
+    "Kein Abstand zur Vodafone-Referenz: eine neuere Messung dieses Tarifs nennt "
+    "einen anderen Anschlusspreis."
+)
 DELTA_UNGEPRUEFT = "Prüfung gescheitert"
 SATZ_UNGEPRUEFT = (
     "Kein Abstand zur Vodafone-Referenz: die Prüfung dieses Preises ist gescheitert."
@@ -90,6 +96,7 @@ SATZ_UNGEPRUEFT = (
 _PRUEFZUSTAENDE = (
     ("nicht_im_sortiment", DELTA_SORTIMENT, SATZ_SORTIMENT),
     ("quarantaene", DELTA_QUARANTAENE, SATZ_QUARANTAENE),
+    ("anschluss_widerlegt", DELTA_ANSCHLUSS, SATZ_ANSCHLUSS),
     ("veraltet_pruefung", DELTA_VERALTET, SATZ_VERALTET),
     ("pruefung_gescheitert", DELTA_UNGEPRUEFT, SATZ_UNGEPRUEFT),
 )
@@ -154,6 +161,7 @@ def _felder(
         "quarantaene": status == QUARANTAENE,
         "veraltet_pruefung": status == VERALTET,
         "nicht_im_sortiment": status == VERALTET and REGEL_SORTIMENT in vermerk.regeln,
+        "anschluss_widerlegt": status == VERALTET and REGEL_ANSCHLUSS in vermerk.regeln,
         "pruefung_gescheitert": status == UNBEKANNT,
         "pruefgruende": [
             f"Regel {n}: {REGELN.get(n, '?')}"
