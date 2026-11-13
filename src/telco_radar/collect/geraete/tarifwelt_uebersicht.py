@@ -17,7 +17,10 @@ def lies_uebersicht(text: str) -> dict | None:
     """Je lieferbarer Speicherstufe Gruppen-ID, Angebots-ID und `hwi`. Jede Stufe
     hat ihr EIGENES Angebot; die vorgewaehlte Variante gilt nur, wenn ihre eigene
     Farbe lieferbar ist, sonst die erste lieferbare Farbe der Stufe. Eine Stufe
-    ohne lieferbare Farbe (oder ohne Beleg dafuer) steht in `nicht_lieferbar`.
+    ohne lieferbare Farbe (oder ohne Beleg dafuer) steht in `nicht_lieferbar`;
+    `belegt_nicht_lieferbar` nennt davon nur die Stufen, deren Farben der Filter
+    ALLE ausdruecklich mit `available: false` fuehrt - fehlt der Filter oder eine
+    Angabe, ist die Stufe nicht gelesen, nicht "nicht lieferbar".
     `None`, wenn nichts lesbar ist."""
     try:
         daten = json.loads(text or "")
@@ -29,9 +32,11 @@ def lies_uebersicht(text: str) -> dict | None:
     je_speicher: dict[int, dict] = {}
     gesehen: set[int] = set()
     lieferbar: set[str] = set()
+    angaben: dict[int, list[object]] = {}
     for v in hardware.get("variantFilter") or []:
         if not isinstance(v, dict) or not isinstance(v.get("storage"), int):
             continue
+        angaben.setdefault(v["storage"], []).append(v.get("available"))
         ogi, ofi, hwi = v.get("offerGroupId"), v.get("offerId"), v.get("hwi")
         if not (ogi and ofi and hwi):
             continue
@@ -59,7 +64,13 @@ def lies_uebersicht(text: str) -> dict | None:
             gesehen.add(v["storage"])
     if not je_speicher and not gesehen:
         return None
+    nicht_lieferbar = sorted(gesehen - set(je_speicher))
     return {
         "je_speicher": dict(sorted(je_speicher.items())),
-        "nicht_lieferbar": sorted(gesehen - set(je_speicher)),
+        "nicht_lieferbar": nicht_lieferbar,
+        "belegt_nicht_lieferbar": [
+            s
+            for s in nicht_lieferbar
+            if angaben.get(s) and all(a is False for a in angaben[s])
+        ],
     }

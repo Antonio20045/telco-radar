@@ -93,7 +93,8 @@ class Lauf:
     `tarife` (tarif_id "mediamarkt_tarifwelt:<id>" -> Anbieterzeile, Name,
     Datenvolumen, Grundgebuehr) fuer die Band-Zuordnung im Bericht
     (`tarifwelt_bestand`). `nicht_lieferbar`: (device_id, Katalogspeicher) jeder
-    Stufe, die die Uebersicht als nicht lieferbar nennt (`tarifwelt_lieferbar`)."""
+    Stufe, die die Uebersicht belegt als nicht lieferbar nennt
+    (`tarifwelt_lieferbar`)."""
 
     buendel: list[Buendel] = field(default_factory=list)
     luecken: list[tuple[str, str]] = field(default_factory=list)
@@ -169,6 +170,7 @@ def lies_modell(
     geraet = device_id(hersteller, name)
     for speicher in uebersicht["nicht_lieferbar"]:
         lauf.luecken.append((f"{modell_id} {speicher} GB", "nicht lieferbar"))
+    for speicher in uebersicht["belegt_nicht_lieferbar"]:
         lauf.nicht_lieferbar.append((geraet, KATALOG_SPEICHER.get(speicher, speicher)))
     for speicher, ids in uebersicht["je_speicher"].items():
         listen_url = f"{API}/{ids['ogi']}/tariff?hwi={ids['hwi']}"
