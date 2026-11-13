@@ -37,6 +37,7 @@ from klickergebnisse import (
 )
 
 from telco_radar import tco_historie
+from telco_radar.analyze.klick_alter import vorrang_ohne_messtag
 from telco_radar.analyze.klick_zusammenfuehrung import (
     UMGEBUNG,
     fuehre_zusammen,
@@ -547,3 +548,34 @@ def test_klickordner_nur_aus_gesetzter_umgebung():
     assert klickordner({}) is None
     assert klickordner({UMGEBUNG: ""}) is None
     assert klickordner({UMGEBUNG: "klick"}) == Path("klick")
+
+
+def test_vorrang_ohne_messtag_benennt_den_anbieter():
+    """Weicht eine heutige Adaptermessung einer ÄLTEREN Klick-Messung, fehlt
+    sie im Messtag - das muss im Protokoll stehen (Befund 13.11.2026)."""
+
+    class _Satz:
+        anbieter = "congstar"
+
+    gewichen = [
+        (_Satz(), {"abgerufen_am": "2026-11-11"}),
+        (_Satz(), {"abgerufen_am": "2026-11-12"}),
+    ]
+    zeilen = vorrang_ohne_messtag(gewichen, "2026-11-13")
+    assert len(zeilen) == 1
+    assert "congstar" in zeilen[0]
+    assert "2 heute gemessene" in zeilen[0]
+    assert "vor 2 Tag(en)" in zeilen[0]
+    assert "2026-11-13" in zeilen[0]
+
+
+def test_vorrang_von_heute_ist_keine_meldung():
+    """Gegenprobe: eine Klick-Messung von heute kostet keinen Messtag."""
+
+    class _Satz:
+        anbieter = "Telekom"
+
+    assert (
+        vorrang_ohne_messtag([(_Satz(), {"abgerufen_am": "2026-11-13"})], "2026-11-13")
+        == []
+    )

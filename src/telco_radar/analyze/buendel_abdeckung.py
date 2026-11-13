@@ -16,7 +16,8 @@ Sechs Befundarten, jede für sich rot:
 * ``speicher_fehlt``    eine Speicherstufe, die ein Netzbetreiber (nie eine
                         Händlerzeile) führt, fehlt unbelegt bei einem geprüften
 * ``kombis_weg``        gegenüber dem vorigen Messtag fehlen mehr als
-                        `KOMBI_VERLUST_ANTEIL` der Kombinationen
+                        `KOMBI_VERLUST_ANTEIL` der Kombinationen; verglichen wird
+                        das ANGEBOT ohne Farbe (`angebot_ohne_farbe`)
 * ``preissprung``       die Leitzahl einer Kombination springt um mehr als
                         `PREISSPRUNG_ANTEIL` gegenüber dem vorigen Messtag; über
                         einen Bruch der Rechenweise (`rechenweise`) wird nicht
@@ -35,7 +36,6 @@ Befund, aber eine laute Warnung (``Abdeckung.warnungen``).
 from __future__ import annotations
 
 import json
-import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date, timedelta
@@ -46,6 +46,7 @@ import yaml
 from .. import abdeckung_pflicht as pflichten
 from .. import rechenweise, tco_historie
 from ..geraete_model import normalisiere
+from .buendel_angebot import angebot_ohne_farbe, modell_und_speicher
 
 KOMBI_VERLUST_ANTEIL = 0.10
 KOMBI_VERLUST_MINDEST = 5
@@ -53,8 +54,6 @@ PREISSPRUNG_ANTEIL = 0.25
 BEISPIELE = 8
 LUECKE_MAX_TAGE = 14
 ART_PORTFOLIO = "nicht_im_portfolio"
-
-_SKU_MUSTER = re.compile(r"^(?P<modell>.+?)-(?P<speicher>\d+gb|ohne-speicher)-")
 
 
 @dataclass
@@ -77,15 +76,6 @@ class Abdeckung:
     @property
     def rot(self) -> bool:
         return bool(self.befunde)
-
-
-def modell_und_speicher(sku_id: str) -> tuple[str | None, str | None]:
-    """Katalogmodell und Speicherstufe aus der SKU-ID
-    (`geraete_model.sku_id`: Gerät-Speicher-Farbe[-Zustand])."""
-    treffer = _SKU_MUSTER.match(sku_id or "")
-    if not treffer:
-        return None, None
-    return treffer.group("modell"), treffer.group("speicher")
 
 
 def _datum(eintrag: dict, feld: str) -> date:
@@ -307,7 +297,8 @@ def _vergleiche_vortag(
         vortag = frueher[-1]
         vortage.add(vortag)
         alt, neu = tage[vortag], tage[messtag]
-        weg = sorted(set(alt) - set(neu))
+        noch_da = {angebot_ohne_farbe(bid) for bid in neu}
+        weg = sorted(bid for bid in alt if angebot_ohne_farbe(bid) not in noch_da)
         if len(weg) >= KOMBI_VERLUST_MINDEST and len(weg) > KOMBI_VERLUST_ANTEIL * len(
             alt
         ):

@@ -1,0 +1,131 @@
+{
+ "galaxy-s26-plus": {
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s26-plus",
+  "name": "Galaxy S26+",
+  "variantFilter": [
+   {
+    "storage": 512,
+    "color": "Black",
+    "available": false
+   },
+   {
+    "storage": 512,
+    "color": "Cobalt Violet",
+    "available": false
+   },
+   {
+    "storage": 512,
+    "color": "Sky Blue",
+    "available": false
+   },
+   {
+    "storage": 512,
+    "color": "White",
+    "available": false
+   }
+  ]
+ },
+ "galaxy-a57": {
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-a57",
+  "name": "Galaxy A57",
+  "variantFilter": [
+   {
+    "storage": 128,
+    "color": "Awesome Gray",
+    "available": false
+   }
+  ]
+ },
+ "pixel-10a": {
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/pixel-10a",
+  "name": "Pixel 10a",
+  "variantFilter": [
+   {
+    "storage": 128,
+    "color": "Obsidian",
+    "available": false
+   },
+   {
+    "storage": 128,
+    "color": "Fog",
+    "available": false
+   },
+   {
+    "storage": 128,
+    "color": "Lavender",
+    "available": false
+   },
+   {
+    "storage": 128,
+    "color": "Berry",
+    "available": false
+   },
+   {
+    "storage": 256,
+    "color": "Obsidian",
+    "available": false
+   },
+   {
+    "storage": 256,
+    "color": "Fog",
+    "available": false
+   },
+   {
+    "storage": 256,
+    "color": "Lavender",
+    "available": false
+   },
+   {
+    "storage": 256,
+    "color": "Berry",
+    "available": false
+   }
+  ]
+ },
+ "galaxy-s26": {
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s26",
+  "name": "Galaxy S26",
+  "variantFilter": [
+   {
+    "storage": 256,
+    "color": "Black",
+    "available": true
+   },
+   {
+    "storage": 256,
+    "color": "Cobalt Violet",
+    "available": true
+   },
+   {
+    "storage": 256,
+    "color": "Sky Blue",
+    "available": true
+   },
+   {
+    "storage": 256,
+    "color": "White",
+    "available": true
+   },
+   {
+    "storage": 512,
+    "color": "Black",
+    "available": true
+   },
+   {
+    "storage": 512,
+    "color": "Cobalt Violet",
+    "available": true
+   },
+   {
+    "storage": 512,
+    "color": "Sky Blue",
+    "available": true
+   },
+   {
+    "storage": 512,
+    "color": "White",
+    "available": true
+   }
+  ]
+ }
+}

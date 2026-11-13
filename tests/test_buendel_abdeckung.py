@@ -569,3 +569,66 @@ def test_pflicht_wenn_aktiv_gilt_erst_mit_aktiv_der_quelle(tmp_path):
     ]
     quellen.unlink()
     assert lade_pflicht(tmp_path / "geraete_abdeckung.yaml")["anbieter"] == ["Telekom"]
+
+
+def _tk_hist(farbe, tarife, tag):
+    """Telekom-Historienzeilen einer Speicherstufe, Farbe wechselbar."""
+    return [
+        {
+            "id": f"buendel--telekom--apple-iphone-17-pro-256gb-{farbe}--{t}--36m",
+            "datum": tag,
+            "gesamt": 2306.15,
+            "zustand": "neu",
+            "rechenweise": 1,
+        }
+        for t in tarife
+    ]
+
+
+TK_TARIFE = ("magentamobil-xs", "magentamobil-s", "magentamobil-m")
+
+
+def _tco_telekom():
+    return {
+        "updated": TAG,
+        "buendel": [_buendel("Telekom", "apple-iphone-18-pro-256gb-polar")],
+    }
+
+
+def test_farbwechsel_der_quelle_ist_kein_wegfall():
+    """Dieselbe Kombination mit anderer Farbangabe ist nicht weg.
+
+    Befund 13.11.2026 (Lauf 43401542782): die Telekom-Produktseite
+    `.../apple-iphone-17-pro/tiefblau-256-gb` stand am 12.11. als
+    `cosmic-orange` und am 13.11. als `tiefblau` bzw. `ohne-farbe` in der ID -
+    der Wächter meldete fünf von fünf Kombinationen als weg, obwohl jedes
+    Angebot da war.
+    """
+    tarife = TK_TARIFE + ("magentamobil-l", "magentamobil-xl")
+    historie = _tk_hist("cosmic-orange", tarife, VORTAG) + _tk_hist(
+        "tiefblau", tarife, TAG
+    )
+    assert len(historie) == 2 * (KOMBI_VERLUST_MINDEST + 0)
+    ergebnis = pruefe(_tco_telekom(), historie, _pflicht(anbieter=("Telekom",)))
+    assert [b.art for b in ergebnis.befunde] == []
+
+
+def test_echter_wegfall_bleibt_rot_trotz_farbwechsel():
+    """Gegenprobe: fällt das Angebot selbst weg, hilft die Farbe nicht.
+
+    Die Zeile der 512-GB-Stufe hält den Messtag für die Telekom offen - ohne
+    sie gäbe es keinen Messtag und damit auch keinen Vergleich.
+    """
+    tarife = TK_TARIFE + ("magentamobil-l", "magentamobil-xl")
+    historie = _tk_hist("cosmic-orange", tarife, VORTAG) + _tk_hist("tiefblau", (), TAG)
+    historie += [
+        {
+            "id": "buendel--telekom--apple-iphone-17-pro-512gb-tiefblau--mm-s--36m",
+            "datum": TAG,
+            "gesamt": 2500.0,
+            "zustand": "neu",
+            "rechenweise": 1,
+        }
+    ]
+    ergebnis = pruefe(_tco_telekom(), historie, _pflicht(anbieter=("Telekom",)))
+    assert [b.art for b in ergebnis.befunde] == ["kombis_weg"]

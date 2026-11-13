@@ -326,3 +326,41 @@ belegte_luecken:
     original: https://tarife.mediamarkt.de/smartphones/samsung/galaxy-z-fold-8
     geprueft: "2026-11-08"
     bis: "2026-11-22"
+  # Saturn/MediaMarkt (Tarifwelt): drei Pflichtmodelle haben in KEINEM der drei
+  # Netze ein Bündel. Gleich bei allen heißt nach Regel 11 zuerst
+  # "Erfassungslücke" - deshalb am Original nachgemessen (13.11.2026,
+  # docs/belege/tarifwelt-nicht-lieferbar-1311/, ein GET je Modell mit ehrlicher
+  # Kennung, nur die öffentliche Übersicht, nichts im Warenkorb): in
+  # `hardware.variantFilter` steht bei Galaxy S26+ (512 GB, 4 Farben), Galaxy A57
+  # (128 GB, 1 Farbe) und Pixel 10a (128/256 GB, 8 Farben) JEDE Variante auf
+  # `available: false`. Ohne lieferbare Variante gibt die Tarifwelt keine
+  # Tarifliste heraus - es gibt kein Bündel zu messen; im Lauf-Protokoll steht je
+  # Modell nur der eine Übersichtsabruf. Gegenprobe Galaxy S26: 8 von 8 Varianten
+  # lieferbar, derselbe Leser liest sie einwandfrei.
+  # Die Lücke sagt "nicht lieferbar", NICHT "nicht im Sortiment": deshalb ohne
+  # `art: nicht_im_portfolio`, die Portfolio-Ansicht zeigt sie als Messlücke.
+  # Kommt eine Variante zurück, warnt der Wächter "überholt" - dann streichen.
+  - anbieter: "Saturn/MediaMarkt · Telekom-Netz"
+    modelle:
+      - samsung-galaxy-s26-plus
+      - samsung-galaxy-a57
+      - google-pixel-10a
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · Vodafone-Netz"
+    modelle:
+      - samsung-galaxy-s26-plus
+      - samsung-galaxy-a57
+      - google-pixel-10a
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · o2-Netz"
+    modelle:
+      - samsung-galaxy-s26-plus
+      - samsung-galaxy-a57
+      - google-pixel-10a
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
