@@ -115,16 +115,18 @@ def _widerlegter_anschluss(saetze: list[dict]) -> set:
 
 
 def test_frische_gegen_die_definition_der_seite(geprueft):
-    """Regel 16 trifft jeden gealterten Satz - und sonst nur Sätze, deren Anschluss
-    eine jüngere Messung desselben Tarifs widerlegt (``analyze.geraete_anschluss``)."""
+    """Regel 16 trifft GENAU die gealterten Sätze. Dass eine jüngere Messung desselben
+    Tarifs den Anschlusspreis widerlegt, ist Regel 18 (``analyze.geraete_anschluss``):
+    eine frische Zeile trägt nie die Nummer der Frische."""
     _, saetze, *_ = geprueft
     alt = {s["id"] for s in saetze if not ist_frisch(s["abgerufen_am"], HEUTE)}
     assert alt, "Bestand ohne gealterten Satz: Orakel ohne Fall"
     mit_16 = {s["id"] for s in saetze if 16 in _regel(s)}
-    assert alt <= mit_16, "ein gealterter Satz ohne Regel 16"
+    assert mit_16 == alt, "Regel 16 trifft einen Satz, der gar nicht gealtert ist"
     widerlegt = _widerlegter_anschluss(saetze)
     assert widerlegt, "Bestand ohne widerlegten Anschluss: Orakel ohne Fall"
-    assert mit_16 - alt == widerlegt - alt
+    mit_18 = {s["id"] for s in saetze if 18 in _regel(s)}
+    assert mit_18 == widerlegt - alt
     gueltig = [s for s in saetze if _status(s) == "gueltig"]
     assert not any(s["id"] in alt for s in gueltig), "Gegenprobe: gültig ist frisch"
     assert not any(s["id"] in widerlegt for s in gueltig), (

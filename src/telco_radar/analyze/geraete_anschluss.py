@@ -1,4 +1,4 @@
-"""Regel 16 über den Bestand: ein Anschlusspreis, den eine neuere Messung widerlegt.
+"""Regel 18 über den Bestand: ein Anschlusspreis, den eine neuere Messung widerlegt.
 
 Der Anschlusspreis (congstar: „Bereitstellungspreis Tarif“) gehört dem TARIF IN SEINER
 VERTRAGSFORM, nicht dem Gerät: er ist bei allen Bündeln desselben Anbieters, Tarifs,
@@ -12,10 +12,13 @@ Der Fall vom 12.11.2026 (Ist-Aufnahme, Befund D1): congstar misst am 11.11. 15,0
 vom 11.11. blieben gültig und trugen 15 bzw. 35 € weiter in die Leitzahl.
 
 Die Prüfung ist eine Bestandsprüfung wie Regel 5 und läuft darum neben
-``geraete_regel5.speicherstufen`` in ``geraete_regeln.pruefe_bestand``. Sie trägt die
-Nummer der Frische (16): die Folge ist dieselbe - die Zeile ist veraltet, bis der
-Anbieter sie neu misst. Eine Zeile, die Regel 16 schon wegen ihres Alters verletzt,
-bekommt keinen zweiten Befund.
+``geraete_regel5.speicherstufen`` in ``geraete_regeln.pruefe_bestand``. Sie trägt seit
+dem 13.11.2026 die eigene Nummer 18 (vorher die der Frische, 16): die FOLGE ist
+dieselbe - die Zeile ist nicht mehr belegt, bis der Anbieter sie neu misst -, der
+GRUND aber ein anderer. Unter einer Nummer sagte die Seite an einer Zeile vom 11.11.
+„Preis veraltet: Preis vom 11.11.2026“: frisch und veraltet in einem Satz
+(Analyse A-RUJNK5, Abschnitt 2 (d)). Eine Zeile, die Regel 16 schon wegen ihres
+Alters verletzt, bekommt keinen zweiten Befund.
 
 Drei Hürden, und alle drei fallen im Zweifel nach „niemand wird widerlegt“ aus
 (Prüfung A-DBURQP vom 12.11.2026, Auflagen 1 und 2):
@@ -47,9 +50,16 @@ from collections.abc import Iterable
 from ..geraete_model import normalisiere
 from ..tarif_model import QUELLE_KLICK
 from ..tco_model import Buendel
-from .geraete_pruefstatus import CENT, VERLETZT, Befund, datum, eur
+from .geraete_pruefstatus import (
+    CENT,
+    REGEL_ANSCHLUSS,
+    VERLETZT,
+    Befund,
+    datum,
+    eur,
+)
 
-REGEL = 16
+REGEL = REGEL_ANSCHLUSS
 
 MIN_GERAETE = 2
 """So viele verschiedene Geräte muss der jüngste Messtag tragen, wenn keine seiner
