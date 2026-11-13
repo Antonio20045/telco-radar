@@ -65,6 +65,7 @@ SPALTEN_TCO = [
     "SKU-ID",
     "Status",
     "Lücke",
+    "Versand EUR",
 ]
 
 
@@ -838,3 +839,93 @@ def test_z3_befund4_preisart_nennt_zeitraum_nur_mit_derselben_karte(radar_csv):
         _preisart_netz({"status": "vergleichbar", "vf_gesamt": 1234.56}, gruppe)
         == "Kosten über die Bündellaufzeit"
     )
+
+
+def _o4_dezimal(zelle: str) -> float | None:
+    """Dieselbe Dezimalkomma-Lesung wie die anderen Tests dieser Datei."""
+    return float(zelle.replace(".", "").replace(",", ".")) if zelle else None
+
+
+def test_p5_jede_bepreiste_buendelzeile_geht_mit_versand_auf(tco_csv):
+    """P5 (analyse-abdeckung-1313.md, Abschnitt 3 und 5): jede bepreiste
+    Bündelzeile muss sich allein aus ihren EIGENEN Exportspalten
+    nachrechnen lassen -
+    Zuzahlung + Tarifmonate×Tarif + Laufzeit×Geräterate + Anschluss + Versand
+    = Leitzahl. Bis P5 fehlte der Versandposten als Spalte: er steckt in der
+    Leitzahl, aber in keiner Zelle, und die Rechnung ging deshalb bei JEDER
+    Zeile mit belegtem Versand (4,99 bis 9,98 EUR) nicht auf - rot gegen den
+    Stand vor dieser Änderung.
+
+    Ein Bündelmonatspreis (1&1, `Bündel/Monat EUR`) ersetzt die getrennte
+    Form Tarif/Rate: dort zählt `Bündel/Monat EUR × Tarifmonate` statt
+    `Tarif/Monat EUR × Tarifmonate + Geräterate EUR × Laufzeit`
+    (`tco_kosten._vertrag` gegenüber `_tarif` + `_geraet_und_anschluss`).
+    """
+    kopf, zeilen = tco_csv
+    idx = {name: i for i, name in enumerate(kopf)}
+    buendel = [z for z in zeilen if z[0] == "Bündel" and _o4_leitzahl(z, idx)]
+    assert buendel, "keine belastbare Bündel-Zeile im Export"
+
+    geprueft = 0
+    abweichungen = []
+    for z in buendel:
+        leitzahl = _o4_dezimal(_o4_leitzahl(z, idx))
+        zuzahlung = _o4_dezimal(z[idx["Zuzahlung EUR"]]) or 0.0
+        anschluss = _o4_dezimal(z[idx["Anschlusspreis EUR"]]) or 0.0
+        versand = _o4_dezimal(z[idx["Versand EUR"]]) or 0.0
+        tarifmonate = _o4_dezimal(z[idx["Tarifmonate in der Summe"]]) or 0.0
+        buendel_monat = _o4_dezimal(z[idx["Bündel/Monat EUR"]])
+        if buendel_monat is not None:
+            geraet_und_tarif = round(buendel_monat * tarifmonate, 2)
+        else:
+            tarif = _o4_dezimal(z[idx["Tarif/Monat EUR"]]) or 0.0
+            rate = _o4_dezimal(z[idx["Geräterate EUR"]]) or 0.0
+            laufzeit = _o4_dezimal(z[idx["Laufzeit Monate"]]) or 0.0
+            geraet_und_tarif = round(tarif * tarifmonate, 2) + round(rate * laufzeit, 2)
+        soll = round(zuzahlung + geraet_und_tarif + anschluss + versand, 2)
+        geprueft += 1
+        if soll != pytest.approx(leitzahl, abs=0.01):
+            abweichungen.append((z[idx["Anbieter"]], z[idx["Modell"]], soll, leitzahl))
+
+    assert geprueft > 1000, f"nur {geprueft} bepreiste Bündelzeilen geprüft"
+    assert not abweichungen, f"{len(abweichungen)} Abweichungen: {abweichungen[:5]}"
+
+
+def test_p5_telekom_6_raten_geht_trotz_fehlender_restschuld_auf():
+    """Die Telekom-Zeilen mit 6 Geräteraten (analyse-abdeckung-1313.md,
+    Abschnitt 3, "Offen") stehen im Schnappschuss vom 03.10.2026 nicht mehr
+    drin (`test_p5_jede_bepreiste_buendelzeile_geht_mit_versand_auf` prüft
+    den tatsächlichen Export); dieser Test bildet den Fall direkt nach -
+    Beispiel #8 der Analyse (Motorola edge 70 fusion, 6 × 29,60 EUR). Die
+    Formel summiert nur die gemessenen 6 Raten, keine Restschuld - das ist
+    eine Deckungslücke der Kennzahl (die Raten decken das Gerät nicht ab),
+    kein Rechenfehler: sie geht trotzdem auf."""
+    from telco_radar.tco_kosten import kosten_ueber
+    from telco_radar.tco_model import Buendel
+    from telco_radar.versandkosten import POSTEN_VERSAND
+
+    buendel = Buendel(
+        anbieter="Telekom",
+        sku_id="motorola-edge-70-fusion-256gb",
+        tarif_name="MagentaMobil L",
+        tarif_monatlich=59.95,
+        geraet_monatsrate=29.60,
+        laufzeit_monate=6,
+        geraet_zuzahlung=1.0,
+        anschlusspreis=39.95,
+        tarif_bindung_monate=24,
+    )
+    k = kosten_ueber(buendel)
+    assert not k.luecken, k.luecken
+    versand = k.posten.get(POSTEN_VERSAND, 0.0)
+    assert versand == 0.0, "Telekom ist in config/versandkosten.yaml mit 0 EUR belegt"
+    soll = round(
+        buendel.geraet_zuzahlung
+        + round(buendel.tarif_monatlich * k.tarifmonate, 2)
+        + round(buendel.geraet_monatsrate * buendel.laufzeit_monate, 2)
+        + buendel.anschlusspreis
+        + versand,
+        2,
+    )
+    assert soll == pytest.approx(k.gesamt, abs=0.01)
+    assert soll == 1657.35, "Beispiel #8 der Analyse: 1 + 24×59,95 + 6×29,60 + 39,95"
