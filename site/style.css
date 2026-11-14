@@ -3011,6 +3011,10 @@ b,strong{font-weight:700}
 .gr-anb--medimax{--anb:#a8a297;--anb-marker:#a8a297;--anb-marker-rand:none;--anb-strich:none;--anb-breite:2}
 .gr-anb--electronicpartner{--anb:#a8a297;--anb-marker:#a8a297;--anb-marker-rand:none;--anb-strich:none;--anb-breite:2}
 .gr-anb--saturn{--anb:#a8a297;--anb-marker:#a8a297;--anb-marker-rand:none;--anb-strich:none;--anb-breite:2}
+.gr-anb--mediamarkt{--anb:#a8a297;--anb-marker:#a8a297;--anb-marker-rand:none;--anb-strich:none;--anb-breite:2}
+.gr-anb--saturn-mediamarkt---telekom-netz{--anb:#a8a297;--anb-marker:#a8a297;--anb-marker-rand:none;--anb-strich:7 4;--anb-breite:2}
+.gr-anb--saturn-mediamarkt---vodafone-netz{--anb:#a8a297;--anb-marker:#a8a297;--anb-marker-rand:none;--anb-strich:7 4;--anb-breite:2}
+.gr-anb--saturn-mediamarkt---o2-netz{--anb:#a8a297;--anb-marker:#a8a297;--anb-marker-rand:none;--anb-strich:7 4;--anb-breite:2}
 .gr-anb--ohne-farbe{--anb:#c2bcaf;--anb-marker:#c2bcaf;--anb-marker-rand:none;--anb-strich:1 6;--anb-breite:2}
 /* KEIN `--anb`-Vorgabewert AUF diesen Elementen: sie tragen die
    Anbieterklasse selbst, beide Regeln haetten dieselbe Spezifitaet, und

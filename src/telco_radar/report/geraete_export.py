@@ -43,17 +43,13 @@ waeren der Fehlertyp aus CLAUDE.md §6.
 WARUM SEMIKOLON UND WARUM EIN BOM
 ---------------------------------
 Beides fuer genau einen Zweck: dass die Datei sich in Excel mit deutschem
-Gebietsschema per Doppelklick korrekt oeffnet, ohne Importassistent.
-
-  * Excel liest CSV im deutschen Gebietsschema mit SEMIKOLON als Trenner -
-    das Komma ist dort Dezimaltrenner. Mit Komma getrennt landet die ganze
-    Zeile in Spalte A.
-  * Ohne BOM haelt Excel die Datei fuer Windows-1252: aus "Größe" wird
-    "GrÃ¶ÃŸe". Das BOM ist die einzige Auskunft, die Excel akzeptiert.
-
-Aus demselben Grund tragen Preise ein DEZIMALKOMMA. Eine Zahl mit Punkt
-liest Excel im deutschen Gebietsschema als Text - oder, schlimmer, als
-Tausendertrennung: aus 1.349,90 wuerde 134990.
+Gebietsschema per Doppelklick korrekt oeffnet, ohne Importassistent. Excel
+liest CSV dort mit SEMIKOLON als Trenner (das Komma ist Dezimaltrenner -
+mit Komma getrennt landet die ganze Zeile in Spalte A) und haelt eine
+Datei ohne BOM fuer Windows-1252 (aus "Größe" wird "GrÃ¶ÃŸe"). Aus
+demselben Grund tragen Preise ein DEZIMALKOMMA: ein Punkt liest Excel dort
+als Text - oder, schlimmer, als Tausendertrennung (aus 1.349,90 wuerde
+134990).
 
 DIE PREISART STEHT IN EINER EIGENEN SPALTE, nicht in der Preisspalte. Wer
 eine Tabelle nach Preis sortiert, in der 49,95 (Zuzahlung) neben 1349,90
@@ -168,6 +164,7 @@ SPALTEN_TCO = [
     "SKU-ID",
     "Status",
     "Lücke",
+    "Versand EUR",
 ]
 
 SPALTEN_RADAR = [
@@ -316,6 +313,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 z.get("sku_id", ""),
                 z.get("status", ""),
                 z.get("luecke", ""),
+                _zahl(z.get("versand")),
             ]
         )
     for z in (zeilen or {}).get("sim_only", []):
@@ -343,6 +341,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 ueber_laufzeit,
                 z.get("abgerufen_am", ""),
                 z.get("quelle_url", ""),
+                "",
                 "",
                 "",
                 "",

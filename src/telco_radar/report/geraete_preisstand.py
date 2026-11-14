@@ -1,11 +1,17 @@
 """Der Chip an einer Bündelzeile, deren Preis nicht von heute ist - und die Lücke
 statt einer Zahl, wenn der Preis nicht stehen darf.
 
-Drei Gründe nehmen einer Zeile die Zahl: ein veralteter Preis, ein Preis in
+Vier Gründe nehmen einer Zeile die Zahl: ein veralteter Preis, ein Anschlusspreis, den
+eine neuere Messung widerlegt (Regel 18, ``analyze/geraete_anschluss``), ein Preis in
 Quarantäne (Prüfstelle: eine Regel ist verletzt, z. B. Regel 5) und ein Plus-Tarif,
 dessen Preis ein Zweitprodukt voraussetzt (``ist_bedingter_tarif``; Entscheidung
 05.11.2026, Prüfung PR #38 M1). Maßstab: lieber kein Preis als ein falscher - die
 Zeile nennt ihren Grund, nicht die Regel.
+
+Der widerlegte Anschlusspreis steht vor dem veralteten Preis, weil er der genauere
+Grund ist: die Zeile selbst ist frisch. Solange beides „veraltet“ hieß, schrieb die
+Seite an 372 Zeilen „Preis veraltet: Preis vom 11.11.2026.“ - frisch und veraltet in
+einem Satz (Analyse A-RUJNK5, Abschnitt 2 (d), 13.11.2026).
 
 Preisprüfung 11.10.2026: ein Telekom-Preis vom 10.10. sah aus wie einer von heute.
 Eine Zeile, die frisch genug für den Vergleich ist (``geraete_tco_karten.ist_frisch``),
@@ -15,7 +21,7 @@ aber nicht von heute, trägt „Preis vom 10.10.2026“; jenseits der Frische gi
 
 from __future__ import annotations
 
-from .geraete_notbremse import DELTA_BEDINGT, zustand
+from .geraete_notbremse import DELTA_BEDINGT, DELTA_NICHT_LIEFERBAR, zustand
 
 
 def marke(abgerufen_am: str, heute: str, frisch: bool) -> str:
@@ -60,8 +66,21 @@ KURZ_SORTIMENT = "nicht im Sortiment"
 SATZ_SORTIMENT = (
     "Gerät bei {anbieter} nicht mehr im Sortiment – belegte Lücke, kein Preis."
 )
+KURZ_NICHT_LIEFERBAR = DELTA_NICHT_LIEFERBAR
+SATZ_NICHT_LIEFERBAR = (
+    "Bei der letzten Messung nicht lieferbar – kein aktueller Preis dieser Stufe."
+)
 KURZ_PRUEFUNG = "Preis in Prüfung"
 SATZ_PRUEFUNG = "Preis in Prüfung."
+KURZ_ANSCHLUSS = "Anschlusspreis nicht mehr belegt"
+SATZ_ANSCHLUSS = (
+    "Anschlusspreis vom {datum} nicht mehr belegt: eine neuere Messung dieses "
+    "Tarifs nennt einen anderen Betrag."
+)
+SATZ_ANSCHLUSS_OHNE_DATUM = (
+    "Anschlusspreis nicht mehr belegt: eine neuere Messung dieses Tarifs nennt "
+    "einen anderen Betrag."
+)
 KURZ_BEDINGT = DELTA_BEDINGT
 SATZ_BEDINGT = f"{DELTA_BEDINGT} – nicht vergleichbar"
 
@@ -83,6 +102,27 @@ def nicht_im_sortiment(karte: dict) -> bool:
     aus ``geraete_sortiment``.) Geht jedem anderen Grund vor: ein Gerät, das es nicht
     gibt, hat keinen „veralteten“ Preis, sondern keinen."""
     return bool(karte.get("nicht_im_sortiment"))
+
+
+def nicht_lieferbar(karte: dict) -> bool:
+    """Las die Tarifwelt diese Stufe nach dem Abruf als nicht lieferbar? (Notbremse,
+    Marke aus ``geraete_sortiment``.) Genauer als „veraltet“: der Grund ist bekannt."""
+    return bool(karte.get("nicht_lieferbar"))
+
+
+def anschluss_widerlegt(karte: dict) -> bool:
+    """Hat eine neuere Messung desselben Tarifs den Anschlusspreis der Karte
+    widerlegt? (Regel 18, Flag aus der Notbremse.) Die Zeile ist dabei frisch -
+    Regel 18 greift erst, wenn Regel 16 nicht schon wegen des Alters greift."""
+    return bool(karte.get("anschluss_widerlegt"))
+
+
+def anschluss_grund(abgerufen_am: str) -> str:
+    """Der Satz der Lücke für einen widerlegten Anschlusspreis, mit Abrufdatum."""
+    from .geraete_tco_karten import kurz_datum
+
+    tag = kurz_datum(abgerufen_am) if abgerufen_am else ""
+    return SATZ_ANSCHLUSS.format(datum=tag) if tag else SATZ_ANSCHLUSS_OHNE_DATUM
 
 
 def in_pruefung(karte: dict) -> bool:
@@ -119,8 +159,12 @@ def buendel_luecke(b, heute: str) -> str:
     flags = geraete_notbremse.felder(b, heute)
     if nicht_im_sortiment(flags):
         return SATZ_SORTIMENT.format(anbieter=b.anbieter)
+    if nicht_lieferbar(flags):
+        return SATZ_NICHT_LIEFERBAR
     if flags["bedingter_tarif"]:
         return SATZ_BEDINGT
+    if anschluss_widerlegt(flags):
+        return anschluss_grund(b.abgerufen_am)
     if veraltet(frisch, flags["veraltet_pruefung"]):
         return grund(marke(b.abgerufen_am, heute, frisch), b.abgerufen_am)
     if in_pruefung(flags):
@@ -140,8 +184,12 @@ def anzeige(karte: dict) -> dict:
     if nicht_im_sortiment(karte):
         kurz_ = KURZ_SORTIMENT
         satz = SATZ_SORTIMENT.format(anbieter=karte.get("anbieter") or "dem Anbieter")
+    elif nicht_lieferbar(karte):
+        kurz_, satz = KURZ_NICHT_LIEFERBAR, SATZ_NICHT_LIEFERBAR
     elif ist_bedingt(karte):
         kurz_, satz = KURZ_BEDINGT, SATZ_BEDINGT
+    elif anschluss_widerlegt(karte):
+        kurz_, satz = KURZ_ANSCHLUSS, anschluss_grund(karte.get("abgerufen_am") or "")
     elif preis_veraltet(karte):
         kurz_, satz = (
             KURZ_VERALTET,

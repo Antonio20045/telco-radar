@@ -49,7 +49,7 @@ from datetime import date as _datum
 from typing import Optional
 
 from .. import tco_kosten as _kosten
-from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG, alt_ab_tagen
+from ..analyze.geraete_pruefstatus import alt_ab_tagen
 from ..band_regel import band_der_karte
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import QUELLE_KLICK, Preisphase, vor_dem_blatt
@@ -627,9 +627,7 @@ def _karte(
     luecken = list(kosten.luecken)
     if not b.rabatte and not aktionen:
         luecken.append(POSTEN_RABATTE)
-    leer_grund = "" if belastbar else _grund(kosten)
-    if not belastbar and b.herleitung.strip() == HERLEITUNG_EINMALZAHLUNG:
-        leer_grund = notbremse.herleitung_satz(b.anbieter, b.herleitung)
+    leer_grund = geraete_laufzeit.leer_grund(b, kosten, belastbar, _grund)
     return {
         "leer_grund": leer_grund,
         "sku_id": b.sku_id,
@@ -1356,7 +1354,7 @@ def modelle(
             {k["raten_laufzeit"] for k in karten if k["raten_laufzeit"]}
         )
         naeherung = None
-        if not geraete_laufzeit.zaehlende_eigene(karten):
+        if geraete_laufzeit.naeherung_erlaubt(karten):
             naeherung = _vodafone_referenz(referenzen, tarife, belege_modell)
         for k in karten:
             k["band"] = band_der_karte(band_je_tarif, k)

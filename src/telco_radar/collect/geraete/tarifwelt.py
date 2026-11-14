@@ -127,6 +127,42 @@ def _summe_monat(daten: dict) -> float | None:
     return round(sum(zahlen), 2)
 
 
+def _variante(daten: dict) -> dict:
+    """Die Variante, die die Antwort selbst ausweist (`hardware.variants`) -
+    Geraet, Speicher, Farbe, Barpreis und Lagerbestand dieser EINEN Hardware.
+    Eine Antwort mit genau einer Variante ist die Regel; alles andere traegt
+    `variantenzahl != 1` und wird in `tarifwelt_lauf._pruefe` zur Luecke.
+    Diese Felder sind der Beleg, dass Preis UND Lieferbarkeit zu Geraet und
+    Speicher der Zeile gehoeren - nicht das freie Text-Label des Kostenpostens
+    (Befund A2 vom 12.11.2026)."""
+    hardware = daten.get("hardware") or {}
+    varianten = [v for v in (hardware.get("variants") or []) if isinstance(v, dict)]
+    eine = varianten[0] if len(varianten) == 1 else {}
+    ebootis = eine.get("ebootisId")
+    return {
+        "geraet_name": str(hardware.get("name") or "").strip() or None,
+        "variantenzahl": len(varianten),
+        "variante_hwi": (
+            f"{hardware.get('id')}_{ebootis}"
+            if hardware.get("id") and ebootis
+            else None
+        ),
+        "variante_speicher": (
+            eine.get("storage") if isinstance(eine.get("storage"), int) else None
+        ),
+        "variante_bestand": (
+            eine.get("stock") if isinstance(eine.get("stock"), int) else None
+        ),
+        "variante_preis": (
+            float(eine["price"])
+            if isinstance(eine.get("price"), (int, float))
+            else None
+        ),
+        "variante_farbe": str((eine.get("color") or {}).get("name") or "").strip()
+        or None,
+    }
+
+
 def lies_produktdetail(text: str, url: str = "") -> dict | None:
     """Die SKU-genaue Antwort `/v1/productdetail/<id>?tfi=<tarif_id>` (EIN
     vorgewaehlter Tarif) in einen Buendel-Satz - anders als `lies_tarifliste`
@@ -136,7 +172,8 @@ def lies_produktdetail(text: str, url: str = "") -> dict | None:
     Hardware-Name ist kuerzer als das Item-Label mit Farbe/Speicher), also
     ist er der Posten ohne einen der beiden festen Namen. Gibt es mehr als
     einen (`geraeteposten`), nimmt der Leser keinen davon: `_pruefe` macht
-    daraus eine Luecke."""
+    daraus eine Luecke. Dazu kommen die Merkmale der gelieferten Variante
+    (`_variante`)."""
     try:
         daten = json.loads(text or "")
     except (json.JSONDecodeError, ValueError):
@@ -181,6 +218,7 @@ def lies_produktdetail(text: str, url: str = "") -> dict | None:
         "hinweise": tariff.get("bullets"),
         "quelle": "mediamarkt_tarifwelt",
         "url": url,
+        **_variante(daten),
     }
 
 

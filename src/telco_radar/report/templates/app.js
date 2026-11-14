@@ -2695,7 +2695,12 @@ var TelcoFrage = (function () {
       gruppeLeeren(gruppe);
       /* Die Bündelliste ist weg (Antonio, 10.10.2026): vom Lager kommt nur
          die Zeile der fehlenden Anbieter und die Screenshot-Zeilen je Anbieter
-         (Ziel 1d) auf die Seite. */
+         (Ziel 1d) auf die Seite. Fix B (13.11.2026): die 1&1-Zeile der echten
+         24-Monats-Lücke (`gr-anb-fehlt--echte24`) ist KEIN eigener Selektor
+         hier - sie steht als Kind IN `.gr-anb-fehlliste`
+         (`_geraete_buendel.html.j2`, Makro `echte24luecke`) und kommt darum
+         mit genau diesem einen Selektor mit; eine zweite Selektorzeile dafür
+         waere Wiederholung derselben Montage. */
       if (knotenB) {
         var klon = document.importNode(knotenB, true);
         Array.prototype.forEach.call(

@@ -17,7 +17,7 @@ from orakel.test_seiten_inhalt import lies_seite, render
 
 from telco_radar.analyze import geraete_pruefkennzahlen
 from telco_radar.analyze.geraete_pruefkennzahlen import kennzahlen
-from telco_radar.analyze.geraete_pruefstatus import vermerk
+from telco_radar.analyze.geraete_pruefstatus import REGELN, vermerk
 from telco_radar.analyze.geraete_regeln import erfassungsluecken
 
 HEUTE = "2026-10-03"
@@ -142,7 +142,7 @@ def test_summe_zaehlt_alle_anbieter():
 
 def test_je_regel_zaehlt_nicht_pruefbar_und_luecken():
     regeln = {r["nr"]: r for r in _kennzahlen(_bestand())["regeln"]}
-    assert len(regeln) == 16
+    assert set(regeln) == set(REGELN), "je Regel eine Zeile, auch für Regel 18"
     assert regeln[11]["nicht_pruefbar"] == 4, "nicht prüfbar wird je Regel gezählt"
     assert (regeln[9]["verletzt"], regeln[9]["nicht_pruefbar"]) == (1, 3)
     assert (regeln[13]["verletzt"], regeln[13]["nicht_pruefbar"]) == (1, 2)

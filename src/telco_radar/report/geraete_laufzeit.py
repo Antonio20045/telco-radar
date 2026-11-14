@@ -13,8 +13,11 @@ eigenen Band der Maßstab, und nur, wo Vodafone kein Bündel hat (`modelle()`).
 
 from __future__ import annotations
 
+from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG
 from ..tco_model import TCO_HORIZONT
+from . import geraete_eigen_pruefung as eigen_pruefung
 from . import geraete_notbremse as notbremse
+from . import geraete_preisstand
 from . import geraete_tco_karten as karten_modul
 
 LAUFZEITEN = (12, 24, 36)
@@ -121,6 +124,86 @@ def regel_satz(karten) -> str:
     return REGEL_24_PLUS_12 if any(nur_ueber_24(k) for k in karten) else ""
 
 
+REGEL_ECHTE_24_OHNE_ZUZAHLUNG = (
+    "1&1 bietet dieses Gerät auch über echte 24 Monate an, ohne die 12 "
+    "Monate der Standardlaufzeit „24 + 12“ danach. Für diese echten 24 "
+    "Monate bestätigt 1&1 selbst keine Gerätezuzahlung – nur für „24 + 12“ "
+    "nennt die Produktseite den Betrag. Deshalb zeigt TelcoRadar hier "
+    "keinen Gesamtpreis: kein erfundener Wert, sondern eine benannte Lücke "
+    "(Stand der Prüfung am Original vom 07.10.2026)."
+)
+
+
+def ist_echte_24_ohne_zuzahlung(karte: dict) -> bool:
+    """Eine 1&1-Karte mit echten 24 Monaten (nicht „24 + 12“) ohne bestätigte
+    Gerätezuzahlung - die Lücke `tco_kosten.POSTEN_ZUZAHLUNG`, nie ein Preis von 0.
+    """
+    return (
+        karte.get("anbieter") == "1&1"
+        and karte.get("buendel_monatlich") is not None
+        and karte.get("zuzahlung") is None
+        and karte.get("raten_laufzeit") == TCO_HORIZONT
+    )
+
+
+def regel_echte_24_satz(karten) -> str:
+    """Der Satz zur echten 24-Monats-Lücke, wenn unter den Karten eine ist."""
+    return (
+        REGEL_ECHTE_24_OHNE_ZUZAHLUNG
+        if any(ist_echte_24_ohne_zuzahlung(k) for k in karten)
+        else ""
+    )
+
+
+def echte24_fehlzeilen(modell: dict) -> list[dict]:
+    """Die Karten EINES Modells mit der echten 24-Monats-Lücke (Fix B, 13.11.2026).
+
+    Die Bündelliste (`.gr-bndliste`) steht seit 10.10.2026 nicht mehr auf der
+    sichtbaren Seite (`app.js setzeBuendel`); ihr Lückensatz ging damit
+    verloren, obwohl die Regel weiter zutrifft. Diese Funktion liest
+    `m.zeilen_band`/`m.zeilen_ohne_band` - dieselbe Menge, die vorher die
+    Bündelliste zeigte -, wendet `geraete_preisstand.anzeige` an (derselbe
+    Normalisierungsschritt wie `buendelzeile`, denn ein veralteter Preis
+    überschreibt `leer_grund`) und gibt nur die Karten zurück, deren
+    sichtbarer Grund EXAKT `REGEL_ECHTE_24_OHNE_ZUZAHLUNG` ist - kein anderer
+    Lückengrund bekommt hier eine Zeile. `_geraete_buendel.html.j2`
+    (`buendelgruppe`) und `geraete.html.j2` (Vorgabemodell) rufen dieselbe
+    Funktion, damit beide Stellen nie auseinanderlaufen."""
+    ergebnis = []
+    for k in [*modell.get("zeilen_band", []), *modell.get("zeilen_ohne_band", [])]:
+        nk = geraete_preisstand.anzeige(k)
+        if nk.get("leer_grund") == REGEL_ECHTE_24_OHNE_ZUZAHLUNG:
+            ergebnis.append(nk)
+    return ergebnis
+
+
+def _echte_24_satz(b) -> str:
+    """`regel_echte_24_satz` für EIN Bündel statt eine Kartenliste."""
+    karte = {
+        "anbieter": b.anbieter,
+        "buendel_monatlich": b.buendel_monatlich,
+        "zuzahlung": b.geraet_zuzahlung,
+        "raten_laufzeit": raten_laufzeit(b),
+    }
+    return REGEL_ECHTE_24_OHNE_ZUZAHLUNG if ist_echte_24_ohne_zuzahlung(karte) else ""
+
+
+def leer_grund(b, kosten, belastbar: bool, grund_fn) -> str:
+    """Der Satz zu einer Karte ohne Gesamtpreis - Herleitungs-Hinweis, der
+    Regel-Satz der echten 24-Monats-Lücke, sonst `grund_fn(kosten)`."""
+    if belastbar:
+        return ""
+    if b.herleitung.strip() == HERLEITUNG_EINMALZAHLUNG:
+        return notbremse.herleitung_satz(b.anbieter, b.herleitung)
+    return _echte_24_satz(b) or grund_fn(kosten)
+
+
+def luecke_export_text(b, kosten, veraltet: str) -> str:
+    """Der Text der Export-Spalte „Lücke": der Regel-Satz der echten
+    24-Monats-Lücke bei 1&1, sonst wie bisher die kurzen Postennamen."""
+    return veraltet or _echte_24_satz(b) or ", ".join(kosten.luecken)
+
+
 def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:
     """Warum ein Anbieter mit Bündeln in dieser Laufzeit keine Zeile trägt."""
     if any(
@@ -192,6 +275,15 @@ def zaehlende_eigene(karten: list) -> list:
         for k in filter(notbremse.zaehlt, karten)
         if k["eigen"] and k["belastbar"] and k["vergleichbar"] and k["frisch"]
     ]
+
+
+def naeherung_erlaubt(karten: list) -> bool:
+    """Darf die Näherung (Tarif ohne Gerät plus Barpreis) die Vodafone-Zahl stellen?
+
+    Nur, wenn kein eigenes Bündel zählt und die Prüfstelle auch keines zurückhält:
+    ein Preis in Prüfung wird nicht durch eine Rechnung ersetzt
+    (`geraete_eigen_pruefung`)."""
+    return not zaehlende_eigene(karten) and not eigen_pruefung.zurueckgehalten(karten)
 
 
 def referenzen(karten: list) -> dict:

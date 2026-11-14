@@ -1,0 +1,1482 @@
+{
+ "edge-70": {
+  "modell_id": "motorola-edge-70",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/edge-70",
+  "name": "Edge 70",
+  "variantFilter": [
+   {
+    "colorName": "Gadget Grey",
+    "colorCode": "#898C91",
+    "storage": 512,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50e14276b6bad2635188c8",
+    "offerGroupId": "6a50e0ec8d11a2a67d45ee4d",
+    "hwi": "6909cd3cf81619f5ff7a85c2_HW110440-1",
+    "id": "6909cd3cf81619f5ff7a85c2",
+    "ebootisId": "HW110440-1",
+    "tariffId": "6a27cf946c672e7481dff034",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110440-1_S_1.webp",
+       "medium": "/img/dist/HW110440-1_M_1.webp",
+       "large": "/img/dist/HW110440-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110440-1_S_2.webp",
+       "medium": "/img/dist/HW110440-1_M_2.webp",
+       "large": "/img/dist/HW110440-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110440-1_S_3.webp",
+       "medium": "/img/dist/HW110440-1_M_3.webp",
+       "large": "/img/dist/HW110440-1_L_3.webp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "flip-7": {
+  "modell_id": "samsung-galaxy-z-flip-7",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/flip-7",
+  "name": "Galaxy Z Flip7",
+  "variantFilter": [
+   {
+    "colorName": "Blue Shadow",
+    "colorCode": "#293866",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50e41076b6bad263518985",
+    "offerGroupId": "6a50e3708d11a2a67d45ee4f",
+    "hwi": "68663ef59e8d457361440e49_HW110009-1",
+    "id": "68663ef59e8d457361440e49",
+    "ebootisId": "HW110009-1",
+    "tariffId": "6a4f7fe2e99afc2623440c56",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-1_S_1.webp",
+       "medium": "/img/dist/HW110009-1_M_1.webp",
+       "large": "/img/dist/HW110009-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-1_S_2.webp",
+       "medium": "/img/dist/HW110009-1_M_2.webp",
+       "large": "/img/dist/HW110009-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-1_S_3.webp",
+       "medium": "/img/dist/HW110009-1_M_3.webp",
+       "large": "/img/dist/HW110009-1_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-1_S_4.webp",
+       "medium": "/img/dist/HW110009-1_M_4.webp",
+       "large": "/img/dist/HW110009-1_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Coralred",
+    "colorCode": "#FA6C6E",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50e41076b6bad263518985",
+    "offerGroupId": "6a50e3708d11a2a67d45ee4f",
+    "hwi": "68663ef59e8d457361440e49_HW110009-2",
+    "id": "68663ef59e8d457361440e49",
+    "ebootisId": "HW110009-2",
+    "tariffId": "6a4f7fe2e99afc2623440c56",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-2_S_1.webp",
+       "medium": "/img/dist/HW110009-2_M_1.webp",
+       "large": "/img/dist/HW110009-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-2_S_2.webp",
+       "medium": "/img/dist/HW110009-2_M_2.webp",
+       "large": "/img/dist/HW110009-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-2_S_3.webp",
+       "medium": "/img/dist/HW110009-2_M_3.webp",
+       "large": "/img/dist/HW110009-2_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-2_S_4.webp",
+       "medium": "/img/dist/HW110009-2_M_4.webp",
+       "large": "/img/dist/HW110009-2_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Jetblack",
+    "colorCode": "#2D2C32",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50e41076b6bad263518985",
+    "offerGroupId": "6a50e3708d11a2a67d45ee4f",
+    "hwi": "68663ef59e8d457361440e49_HW110009-3",
+    "id": "68663ef59e8d457361440e49",
+    "ebootisId": "HW110009-3",
+    "tariffId": "6a4f7fe2e99afc2623440c56",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-3_S_1.webp",
+       "medium": "/img/dist/HW110009-3_M_1.webp",
+       "large": "/img/dist/HW110009-3_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-3_S_2.webp",
+       "medium": "/img/dist/HW110009-3_M_2.webp",
+       "large": "/img/dist/HW110009-3_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-3_S_3.webp",
+       "medium": "/img/dist/HW110009-3_M_3.webp",
+       "large": "/img/dist/HW110009-3_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-3_S_4.webp",
+       "medium": "/img/dist/HW110009-3_M_4.webp",
+       "large": "/img/dist/HW110009-3_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Blue Shadow",
+    "colorCode": "#293866",
+    "storage": 512,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50e41076b6bad263518985",
+    "offerGroupId": "6a50e3708d11a2a67d45ee4f",
+    "hwi": "68663ef59e8d457361440e49_HW110009-4",
+    "id": "68663ef59e8d457361440e49",
+    "ebootisId": "HW110009-4",
+    "tariffId": "6a4f7fe2e99afc2623440c56",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-4_S_1.webp",
+       "medium": "/img/dist/HW110009-4_M_1.webp",
+       "large": "/img/dist/HW110009-4_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-4_S_2.webp",
+       "medium": "/img/dist/HW110009-4_M_2.webp",
+       "large": "/img/dist/HW110009-4_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-4_S_3.webp",
+       "medium": "/img/dist/HW110009-4_M_3.webp",
+       "large": "/img/dist/HW110009-4_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-4_S_4.webp",
+       "medium": "/img/dist/HW110009-4_M_4.webp",
+       "large": "/img/dist/HW110009-4_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Coralred",
+    "colorCode": "#FA6C6E",
+    "storage": 512,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50e41076b6bad263518985",
+    "offerGroupId": "6a50e3708d11a2a67d45ee4f",
+    "hwi": "68663ef59e8d457361440e49_HW110009-5",
+    "id": "68663ef59e8d457361440e49",
+    "ebootisId": "HW110009-5",
+    "tariffId": "6a4f7fe2e99afc2623440c56",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-5_S_1.webp",
+       "medium": "/img/dist/HW110009-5_M_1.webp",
+       "large": "/img/dist/HW110009-5_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-5_S_2.webp",
+       "medium": "/img/dist/HW110009-5_M_2.webp",
+       "large": "/img/dist/HW110009-5_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-5_S_3.webp",
+       "medium": "/img/dist/HW110009-5_M_3.webp",
+       "large": "/img/dist/HW110009-5_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-5_S_4.webp",
+       "medium": "/img/dist/HW110009-5_M_4.webp",
+       "large": "/img/dist/HW110009-5_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Jetblack",
+    "colorCode": "#2D2C32",
+    "storage": 512,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50e41076b6bad263518985",
+    "offerGroupId": "6a50e3708d11a2a67d45ee4f",
+    "hwi": "68663ef59e8d457361440e49_HW110009-6",
+    "id": "68663ef59e8d457361440e49",
+    "ebootisId": "HW110009-6",
+    "tariffId": "6a4f7fe2e99afc2623440c56",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-6_S_1.webp",
+       "medium": "/img/dist/HW110009-6_M_1.webp",
+       "large": "/img/dist/HW110009-6_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-6_S_2.webp",
+       "medium": "/img/dist/HW110009-6_M_2.webp",
+       "large": "/img/dist/HW110009-6_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-6_S_3.webp",
+       "medium": "/img/dist/HW110009-6_M_3.webp",
+       "large": "/img/dist/HW110009-6_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110009-6_S_4.webp",
+       "medium": "/img/dist/HW110009-6_M_4.webp",
+       "large": "/img/dist/HW110009-6_L_4.webp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "galaxy-a17": {
+  "modell_id": "samsung-galaxy-a17",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-a17",
+  "name": "Galaxy A17",
+  "variantFilter": [
+   {
+    "colorName": "Schwarz",
+    "colorCode": "#FFFFFF",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4ce56923a2483330f37bb9",
+    "offerGroupId": "6a4ce5436ae16ab57e53d6a5",
+    "hwi": "6900ea4fa8cd43dbff6d64a2_HW110312-1",
+    "id": "6900ea4fa8cd43dbff6d64a2",
+    "ebootisId": "HW110312-1",
+    "tariffId": "694287422201aff5ff3980b2",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-1_S_1.webp",
+       "medium": "/img/dist/HW110312-1_M_1.webp",
+       "large": "/img/dist/HW110312-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-1_S_2.webp",
+       "medium": "/img/dist/HW110312-1_M_2.webp",
+       "large": "/img/dist/HW110312-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-1_S_3.webp",
+       "medium": "/img/dist/HW110312-1_M_3.webp",
+       "large": "/img/dist/HW110312-1_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-1_S_4.webp",
+       "medium": "/img/dist/HW110312-1_M_4.webp",
+       "large": "/img/dist/HW110312-1_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Blau",
+    "colorCode": "#364874",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4ce56923a2483330f37bb9",
+    "offerGroupId": "6a4ce5436ae16ab57e53d6a5",
+    "hwi": "6900ea4fa8cd43dbff6d64a2_HW110312-2",
+    "id": "6900ea4fa8cd43dbff6d64a2",
+    "ebootisId": "HW110312-2",
+    "tariffId": "694287422201aff5ff3980b2",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-2_S_1.webp",
+       "medium": "/img/dist/HW110312-2_M_1.webp",
+       "large": "/img/dist/HW110312-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-2_S_2.webp",
+       "medium": "/img/dist/HW110312-2_M_2.webp",
+       "large": "/img/dist/HW110312-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-2_S_3.webp",
+       "medium": "/img/dist/HW110312-2_M_3.webp",
+       "large": "/img/dist/HW110312-2_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-2_S_4.webp",
+       "medium": "/img/dist/HW110312-2_M_4.webp",
+       "large": "/img/dist/HW110312-2_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Grau",
+    "colorCode": "#8F9094",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4ce56923a2483330f37bb9",
+    "offerGroupId": "6a4ce5436ae16ab57e53d6a5",
+    "hwi": "6900ea4fa8cd43dbff6d64a2_HW110312-3",
+    "id": "6900ea4fa8cd43dbff6d64a2",
+    "ebootisId": "HW110312-3",
+    "tariffId": "694287422201aff5ff3980b2",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-3_S_1.webp",
+       "medium": "/img/dist/HW110312-3_M_1.webp",
+       "large": "/img/dist/HW110312-3_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-3_S_2.webp",
+       "medium": "/img/dist/HW110312-3_M_2.webp",
+       "large": "/img/dist/HW110312-3_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-3_S_3.webp",
+       "medium": "/img/dist/HW110312-3_M_3.webp",
+       "large": "/img/dist/HW110312-3_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110312-3_S_4.webp",
+       "medium": "/img/dist/HW110312-3_M_4.webp",
+       "large": "/img/dist/HW110312-3_L_4.webp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "galaxy-a26": {
+  "modell_id": "samsung-galaxy-a26",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-a26",
+  "name": "Galaxy A26 5G",
+  "variantFilter": [
+   {
+    "colorName": "Black",
+    "colorCode": "#000000",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a5a46d776b6bad263518f87",
+    "offerGroupId": "6a5a42da8d11a2a67d45ee82",
+    "hwi": "67cf03f4f25b2926b62dbb12_HW109551-1",
+    "id": "67cf03f4f25b2926b62dbb12",
+    "ebootisId": "HW109551-1",
+    "tariffId": "69a94be37b0ae26cb719ff68",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-1_S_1.webp",
+       "medium": "/img/dist/HW109551-1_M_1.webp",
+       "large": "/img/dist/HW109551-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-1_S_2.webp",
+       "medium": "/img/dist/HW109551-1_M_2.webp",
+       "large": "/img/dist/HW109551-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-1_S_3.webp",
+       "medium": "/img/dist/HW109551-1_M_3.webp",
+       "large": "/img/dist/HW109551-1_L_3.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "White",
+    "colorCode": "#ffffff",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a5a46d776b6bad263518f87",
+    "offerGroupId": "6a5a42da8d11a2a67d45ee82",
+    "hwi": "67cf03f4f25b2926b62dbb12_HW109551-2",
+    "id": "67cf03f4f25b2926b62dbb12",
+    "ebootisId": "HW109551-2",
+    "tariffId": "69a94be37b0ae26cb719ff68",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-2_S_1.webp",
+       "medium": "/img/dist/HW109551-2_M_1.webp",
+       "large": "/img/dist/HW109551-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-2_S_2.webp",
+       "medium": "/img/dist/HW109551-2_M_2.webp",
+       "large": "/img/dist/HW109551-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-2_S_3.webp",
+       "medium": "/img/dist/HW109551-2_M_3.webp",
+       "large": "/img/dist/HW109551-2_L_3.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Mint",
+    "colorCode": "#44eaea",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a5a46d776b6bad263518f87",
+    "offerGroupId": "6a5a42da8d11a2a67d45ee82",
+    "hwi": "67cf03f4f25b2926b62dbb12_HW109551-3",
+    "id": "67cf03f4f25b2926b62dbb12",
+    "ebootisId": "HW109551-3",
+    "tariffId": "69a94be37b0ae26cb719ff68",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-3_S_1.webp",
+       "medium": "/img/dist/HW109551-3_M_1.webp",
+       "large": "/img/dist/HW109551-3_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-3_S_2.webp",
+       "medium": "/img/dist/HW109551-3_M_2.webp",
+       "large": "/img/dist/HW109551-3_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW109551-3_S_3.webp",
+       "medium": "/img/dist/HW109551-3_M_3.webp",
+       "large": "/img/dist/HW109551-3_L_3.webp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "magic-v6": {
+  "modell_id": "honor-magic-v6",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/magic-v6",
+  "name": "Magic V6",
+  "variantFilter": [
+   {
+    "colorName": "Black",
+    "colorCode": "#1C1C1E",
+    "storage": 512,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e1ad523a2483330f37d4c",
+    "offerGroupId": "6a4e0e0d6ae16ab57e53d6bf",
+    "hwi": "6a4cf7e225d8b19eff77db38_HW111057-1",
+    "id": "6a4cf7e225d8b19eff77db38",
+    "ebootisId": "HW111057-1",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-1_S_1.webp",
+       "medium": "/img/dist/HW111057-1_M_1.webp",
+       "large": "/img/dist/HW111057-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-1_S_2.webp",
+       "medium": "/img/dist/HW111057-1_M_2.webp",
+       "large": "/img/dist/HW111057-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-1_S_3.webp",
+       "medium": "/img/dist/HW111057-1_M_3.webp",
+       "large": "/img/dist/HW111057-1_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-1_S_4.webp",
+       "medium": "/img/dist/HW111057-1_M_4.webp",
+       "large": "/img/dist/HW111057-1_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-1_S_5.webp",
+       "medium": "/img/dist/HW111057-1_M_5.webp",
+       "large": "/img/dist/HW111057-1_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Red",
+    "colorCode": "#8B1E1E",
+    "storage": 512,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e1ad523a2483330f37d4c",
+    "offerGroupId": "6a4e0e0d6ae16ab57e53d6bf",
+    "hwi": "6a4cf7e225d8b19eff77db38_HW111057-2",
+    "id": "6a4cf7e225d8b19eff77db38",
+    "ebootisId": "HW111057-2",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-2_S_1.webp",
+       "medium": "/img/dist/HW111057-2_M_1.webp",
+       "large": "/img/dist/HW111057-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-2_S_2.webp",
+       "medium": "/img/dist/HW111057-2_M_2.webp",
+       "large": "/img/dist/HW111057-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-2_S_3.webp",
+       "medium": "/img/dist/HW111057-2_M_3.webp",
+       "large": "/img/dist/HW111057-2_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-2_S_4.webp",
+       "medium": "/img/dist/HW111057-2_M_4.webp",
+       "large": "/img/dist/HW111057-2_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-2_S_5.webp",
+       "medium": "/img/dist/HW111057-2_M_5.webp",
+       "large": "/img/dist/HW111057-2_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Gold",
+    "colorCode": "#C9A66B",
+    "storage": 512,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e1ad523a2483330f37d4c",
+    "offerGroupId": "6a4e0e0d6ae16ab57e53d6bf",
+    "hwi": "6a4cf7e225d8b19eff77db38_HW111057-3",
+    "id": "6a4cf7e225d8b19eff77db38",
+    "ebootisId": "HW111057-3",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-3_S_1.webp",
+       "medium": "/img/dist/HW111057-3_M_1.webp",
+       "large": "/img/dist/HW111057-3_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-3_S_2.webp",
+       "medium": "/img/dist/HW111057-3_M_2.webp",
+       "large": "/img/dist/HW111057-3_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-3_S_3.webp",
+       "medium": "/img/dist/HW111057-3_M_3.webp",
+       "large": "/img/dist/HW111057-3_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-3_S_4.webp",
+       "medium": "/img/dist/HW111057-3_M_4.webp",
+       "large": "/img/dist/HW111057-3_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW111057-3_S_5.webp",
+       "medium": "/img/dist/HW111057-3_M_5.webp",
+       "large": "/img/dist/HW111057-3_L_5.webp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "pixel-10-pro": {
+  "modell_id": "google-pixel-10-pro",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/pixel-10-pro",
+  "name": "Pixel 10 Pro",
+  "variantFilter": [
+   {
+    "colorName": "Obsidian",
+    "colorCode": "#000000",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e15ab23a2483330f37c58",
+    "offerGroupId": "68a2cae1a0d0292fe23c95c0",
+    "hwi": "6888e80bf1698cceff652131_HW110085-1",
+    "id": "6888e80bf1698cceff652131",
+    "ebootisId": "HW110085-1",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-1_S_1.webp",
+       "medium": "/img/dist/HW110085-1_M_1.webp",
+       "large": "/img/dist/HW110085-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-1_S_2.webp",
+       "medium": "/img/dist/HW110085-1_M_2.webp",
+       "large": "/img/dist/HW110085-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-1_S_3.webp",
+       "medium": "/img/dist/HW110085-1_M_3.webp",
+       "large": "/img/dist/HW110085-1_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-1_S_4.webp",
+       "medium": "/img/dist/HW110085-1_M_4.webp",
+       "large": "/img/dist/HW110085-1_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-1_S_5.webp",
+       "medium": "/img/dist/HW110085-1_M_5.webp",
+       "large": "/img/dist/HW110085-1_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Porcelain",
+    "colorCode": "#ffffff",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e15ab23a2483330f37c58",
+    "offerGroupId": "68a2cae1a0d0292fe23c95c0",
+    "hwi": "6888e80bf1698cceff652131_HW110085-2",
+    "id": "6888e80bf1698cceff652131",
+    "ebootisId": "HW110085-2",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-2_S_1.webp",
+       "medium": "/img/dist/HW110085-2_M_1.webp",
+       "large": "/img/dist/HW110085-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-2_S_2.webp",
+       "medium": "/img/dist/HW110085-2_M_2.webp",
+       "large": "/img/dist/HW110085-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-2_S_3.webp",
+       "medium": "/img/dist/HW110085-2_M_3.webp",
+       "large": "/img/dist/HW110085-2_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-2_S_4.webp",
+       "medium": "/img/dist/HW110085-2_M_4.webp",
+       "large": "/img/dist/HW110085-2_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-2_S_5.webp",
+       "medium": "/img/dist/HW110085-2_M_5.webp",
+       "large": "/img/dist/HW110085-2_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Moonstone",
+    "colorCode": "#73A9C2",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e15ab23a2483330f37c58",
+    "offerGroupId": "68a2cae1a0d0292fe23c95c0",
+    "hwi": "6888e80bf1698cceff652131_HW110085-3",
+    "id": "6888e80bf1698cceff652131",
+    "ebootisId": "HW110085-3",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-3_S_1.webp",
+       "medium": "/img/dist/HW110085-3_M_1.webp",
+       "large": "/img/dist/HW110085-3_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-3_S_2.webp",
+       "medium": "/img/dist/HW110085-3_M_2.webp",
+       "large": "/img/dist/HW110085-3_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-3_S_3.webp",
+       "medium": "/img/dist/HW110085-3_M_3.webp",
+       "large": "/img/dist/HW110085-3_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-3_S_4.webp",
+       "medium": "/img/dist/HW110085-3_M_4.webp",
+       "large": "/img/dist/HW110085-3_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-3_S_5.webp",
+       "medium": "/img/dist/HW110085-3_M_5.webp",
+       "large": "/img/dist/HW110085-3_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Obsidian",
+    "colorCode": "#000000",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e15ab23a2483330f37c58",
+    "offerGroupId": "68a2cae1a0d0292fe23c95c0",
+    "hwi": "6888e80bf1698cceff652131_HW110085-4",
+    "id": "6888e80bf1698cceff652131",
+    "ebootisId": "HW110085-4",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-4_S_1.webp",
+       "medium": "/img/dist/HW110085-4_M_1.webp",
+       "large": "/img/dist/HW110085-4_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-4_S_2.webp",
+       "medium": "/img/dist/HW110085-4_M_2.webp",
+       "large": "/img/dist/HW110085-4_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-4_S_3.webp",
+       "medium": "/img/dist/HW110085-4_M_3.webp",
+       "large": "/img/dist/HW110085-4_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-4_S_4.webp",
+       "medium": "/img/dist/HW110085-4_M_4.webp",
+       "large": "/img/dist/HW110085-4_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-4_S_5.webp",
+       "medium": "/img/dist/HW110085-4_M_5.webp",
+       "large": "/img/dist/HW110085-4_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Porcelain",
+    "colorCode": "#ffffff",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e15ab23a2483330f37c58",
+    "offerGroupId": "68a2cae1a0d0292fe23c95c0",
+    "hwi": "6888e80bf1698cceff652131_HW110085-5",
+    "id": "6888e80bf1698cceff652131",
+    "ebootisId": "HW110085-5",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-5_S_1.webp",
+       "medium": "/img/dist/HW110085-5_M_1.webp",
+       "large": "/img/dist/HW110085-5_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-5_S_2.webp",
+       "medium": "/img/dist/HW110085-5_M_2.webp",
+       "large": "/img/dist/HW110085-5_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-5_S_3.webp",
+       "medium": "/img/dist/HW110085-5_M_3.webp",
+       "large": "/img/dist/HW110085-5_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-5_S_4.webp",
+       "medium": "/img/dist/HW110085-5_M_4.webp",
+       "large": "/img/dist/HW110085-5_L_4.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Moonstone",
+    "colorCode": "#73A9C2",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e15ab23a2483330f37c58",
+    "offerGroupId": "68a2cae1a0d0292fe23c95c0",
+    "hwi": "6888e80bf1698cceff652131_HW110085-6",
+    "id": "6888e80bf1698cceff652131",
+    "ebootisId": "HW110085-6",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-6_S_1.webp",
+       "medium": "/img/dist/HW110085-6_M_1.webp",
+       "large": "/img/dist/HW110085-6_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-6_S_2.webp",
+       "medium": "/img/dist/HW110085-6_M_2.webp",
+       "large": "/img/dist/HW110085-6_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-6_S_3.webp",
+       "medium": "/img/dist/HW110085-6_M_3.webp",
+       "large": "/img/dist/HW110085-6_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-6_S_4.webp",
+       "medium": "/img/dist/HW110085-6_M_4.webp",
+       "large": "/img/dist/HW110085-6_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-6_S_5.webp",
+       "medium": "/img/dist/HW110085-6_M_5.webp",
+       "large": "/img/dist/HW110085-6_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Jade",
+    "colorCode": "#00A86B",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a4e15ab23a2483330f37c58",
+    "offerGroupId": "68a2cae1a0d0292fe23c95c0",
+    "hwi": "6888e80bf1698cceff652131_HW110085-7",
+    "id": "6888e80bf1698cceff652131",
+    "ebootisId": "HW110085-7",
+    "tariffId": "5afd4e3a56b4536a4d6348d8",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-7_S_1.webp",
+       "medium": "/img/dist/HW110085-7_M_1.webp",
+       "large": "/img/dist/HW110085-7_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-7_S_2.webp",
+       "medium": "/img/dist/HW110085-7_M_2.webp",
+       "large": "/img/dist/HW110085-7_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-7_S_3.webp",
+       "medium": "/img/dist/HW110085-7_M_3.webp",
+       "large": "/img/dist/HW110085-7_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-7_S_4.webp",
+       "medium": "/img/dist/HW110085-7_M_4.webp",
+       "large": "/img/dist/HW110085-7_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110085-7_S_5.webp",
+       "medium": "/img/dist/HW110085-7_M_5.webp",
+       "large": "/img/dist/HW110085-7_L_5.webp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "redmi-note-15": {
+  "modell_id": "xiaomi-redmi-note-15",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-note-15",
+  "name": "Redmi Note 15",
+  "variantFilter": [
+   {
+    "colorName": "Black",
+    "colorCode": "#0F1317",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50ed2876b6bad263518af6",
+    "offerGroupId": "6a50ebfb8d11a2a67d45ee5b",
+    "hwi": "69442056dcaef63c4e422138_HW110610-1",
+    "id": "69442056dcaef63c4e422138",
+    "ebootisId": "HW110610-1",
+    "tariffId": "6a4b9af6845bc33e3d327440",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-1_S_1.webp",
+       "medium": "/img/dist/HW110610-1_M_1.webp",
+       "large": "/img/dist/HW110610-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-1_S_2.webp",
+       "medium": "/img/dist/HW110610-1_M_2.webp",
+       "large": "/img/dist/HW110610-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-1_S_3.webp",
+       "medium": "/img/dist/HW110610-1_M_3.webp",
+       "large": "/img/dist/HW110610-1_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-1_S_4.webp",
+       "medium": "/img/dist/HW110610-1_M_4.webp",
+       "large": "/img/dist/HW110610-1_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-1_S_5.webp",
+       "medium": "/img/dist/HW110610-1_M_5.webp",
+       "large": "/img/dist/HW110610-1_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Forest Green",
+    "colorCode": "#CAD5CD",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50ed2876b6bad263518af6",
+    "offerGroupId": "6a50ebfb8d11a2a67d45ee5b",
+    "hwi": "69442056dcaef63c4e422138_HW110610-2",
+    "id": "69442056dcaef63c4e422138",
+    "ebootisId": "HW110610-2",
+    "tariffId": "6a4b9af6845bc33e3d327440",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-2_S_1.webp",
+       "medium": "/img/dist/HW110610-2_M_1.webp",
+       "large": "/img/dist/HW110610-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-2_S_2.webp",
+       "medium": "/img/dist/HW110610-2_M_2.webp",
+       "large": "/img/dist/HW110610-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-2_S_3.webp",
+       "medium": "/img/dist/HW110610-2_M_3.webp",
+       "large": "/img/dist/HW110610-2_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-2_S_4.webp",
+       "medium": "/img/dist/HW110610-2_M_4.webp",
+       "large": "/img/dist/HW110610-2_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-2_S_5.webp",
+       "medium": "/img/dist/HW110610-2_M_5.webp",
+       "large": "/img/dist/HW110610-2_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Glacier Blue",
+    "colorCode": "#AFC6D0",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50ed2876b6bad263518af6",
+    "offerGroupId": "6a50ebfb8d11a2a67d45ee5b",
+    "hwi": "69442056dcaef63c4e422138_HW110610-3",
+    "id": "69442056dcaef63c4e422138",
+    "ebootisId": "HW110610-3",
+    "tariffId": "6a4b9af6845bc33e3d327440",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-3_S_1.webp",
+       "medium": "/img/dist/HW110610-3_M_1.webp",
+       "large": "/img/dist/HW110610-3_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-3_S_2.webp",
+       "medium": "/img/dist/HW110610-3_M_2.webp",
+       "large": "/img/dist/HW110610-3_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-3_S_3.webp",
+       "medium": "/img/dist/HW110610-3_M_3.webp",
+       "large": "/img/dist/HW110610-3_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-3_S_4.webp",
+       "medium": "/img/dist/HW110610-3_M_4.webp",
+       "large": "/img/dist/HW110610-3_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110610-3_S_5.webp",
+       "medium": "/img/dist/HW110610-3_M_5.webp",
+       "large": "/img/dist/HW110610-3_L_5.webp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "redmi-note-15-pro": {
+  "modell_id": "xiaomi-redmi-note-15-pro",
+  "abgerufen": "https://tarife-api2.mediamarkt.de/v1/productdetail/redmi-note-15-pro",
+  "name": "Redmi Note 15 Pro",
+  "variantFilter": [
+   {
+    "colorName": "Black",
+    "colorCode": "#111518",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50ebca76b6bad263518aa0",
+    "offerGroupId": "69679231da4de1fab487304d",
+    "hwi": "694424545d5dca2a8d61fcac_HW110612-1",
+    "id": "694424545d5dca2a8d61fcac",
+    "ebootisId": "HW110612-1",
+    "tariffId": "6a4e4127052ad20f3212c3e6",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-1_S_1.webp",
+       "medium": "/img/dist/HW110612-1_M_1.webp",
+       "large": "/img/dist/HW110612-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-1_S_2.webp",
+       "medium": "/img/dist/HW110612-1_M_2.webp",
+       "large": "/img/dist/HW110612-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-1_S_3.webp",
+       "medium": "/img/dist/HW110612-1_M_3.webp",
+       "large": "/img/dist/HW110612-1_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-1_S_4.webp",
+       "medium": "/img/dist/HW110612-1_M_4.webp",
+       "large": "/img/dist/HW110612-1_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-1_S_5.webp",
+       "medium": "/img/dist/HW110612-1_M_5.webp",
+       "large": "/img/dist/HW110612-1_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Glacier Blue",
+    "colorCode": "#AFC6D0",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50ebca76b6bad263518aa0",
+    "offerGroupId": "69679231da4de1fab487304d",
+    "hwi": "694424545d5dca2a8d61fcac_HW110612-2",
+    "id": "694424545d5dca2a8d61fcac",
+    "ebootisId": "HW110612-2",
+    "tariffId": "6a4e4127052ad20f3212c3e6",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-2_S_1.webp",
+       "medium": "/img/dist/HW110612-2_M_1.webp",
+       "large": "/img/dist/HW110612-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-2_S_2.webp",
+       "medium": "/img/dist/HW110612-2_M_2.webp",
+       "large": "/img/dist/HW110612-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-2_S_3.webp",
+       "medium": "/img/dist/HW110612-2_M_3.webp",
+       "large": "/img/dist/HW110612-2_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-2_S_4.webp",
+       "medium": "/img/dist/HW110612-2_M_4.webp",
+       "large": "/img/dist/HW110612-2_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-2_S_5.webp",
+       "medium": "/img/dist/HW110612-2_M_5.webp",
+       "large": "/img/dist/HW110612-2_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Titanium",
+    "colorCode": "#B5ADA7",
+    "storage": 256,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a50ebca76b6bad263518aa0",
+    "offerGroupId": "69679231da4de1fab487304d",
+    "hwi": "694424545d5dca2a8d61fcac_HW110612-3",
+    "id": "694424545d5dca2a8d61fcac",
+    "ebootisId": "HW110612-3",
+    "tariffId": "6a4e4127052ad20f3212c3e6",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-3_S_1.webp",
+       "medium": "/img/dist/HW110612-3_M_1.webp",
+       "large": "/img/dist/HW110612-3_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-3_S_2.webp",
+       "medium": "/img/dist/HW110612-3_M_2.webp",
+       "large": "/img/dist/HW110612-3_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-3_S_3.webp",
+       "medium": "/img/dist/HW110612-3_M_3.webp",
+       "large": "/img/dist/HW110612-3_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-3_S_4.webp",
+       "medium": "/img/dist/HW110612-3_M_4.webp",
+       "large": "/img/dist/HW110612-3_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110612-3_S_5.webp",
+       "medium": "/img/dist/HW110612-3_M_5.webp",
+       "large": "/img/dist/HW110612-3_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Schwarz",
+    "colorCode": "#111518",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a58a8e676b6bad263518d5a",
+    "offerGroupId": "69679231da4de1fab487304d",
+    "hwi": "69441e145d5dca2a8d61fc72_HW110609-1",
+    "id": "69441e145d5dca2a8d61fc72",
+    "ebootisId": "HW110609-1",
+    "tariffId": "6942ccbfbebbe5e3ff1e28ef",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-1_S_1.webp",
+       "medium": "/img/dist/HW110609-1_M_1.webp",
+       "large": "/img/dist/HW110609-1_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-1_S_2.webp",
+       "medium": "/img/dist/HW110609-1_M_2.webp",
+       "large": "/img/dist/HW110609-1_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-1_S_3.webp",
+       "medium": "/img/dist/HW110609-1_M_3.webp",
+       "large": "/img/dist/HW110609-1_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-1_S_4.webp",
+       "medium": "/img/dist/HW110609-1_M_4.webp",
+       "large": "/img/dist/HW110609-1_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-1_S_5.webp",
+       "medium": "/img/dist/HW110609-1_M_5.webp",
+       "large": "/img/dist/HW110609-1_L_5.webp"
+      }
+     }
+    ]
+   },
+   {
+    "colorName": "Glacier Blue",
+    "colorCode": "#AFC6D0",
+    "storage": 128,
+    "available": false,
+    "stock": 0,
+    "offerId": "6a58a8e676b6bad263518d5a",
+    "offerGroupId": "69679231da4de1fab487304d",
+    "hwi": "69441e145d5dca2a8d61fc72_HW110609-2",
+    "id": "69441e145d5dca2a8d61fc72",
+    "ebootisId": "HW110609-2",
+    "tariffId": "6942ccbfbebbe5e3ff1e28ef",
+    "images": [
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-2_S_1.webp",
+       "medium": "/img/dist/HW110609-2_M_1.webp",
+       "large": "/img/dist/HW110609-2_L_1.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-2_S_2.webp",
+       "medium": "/img/dist/HW110609-2_M_2.webp",
+       "large": "/img/dist/HW110609-2_L_2.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-2_S_3.webp",
+       "medium": "/img/dist/HW110609-2_M_3.webp",
+       "large": "/img/dist/HW110609-2_L_3.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-2_S_4.webp",
+       "medium": "/img/dist/HW110609-2_M_4.webp",
+       "large": "/img/dist/HW110609-2_L_4.webp"
+      }
+     },
+     {
+      "webp": {
+       "small": "/img/dist/HW110609-2_S_5.webp",
+       "medium": "/img/dist/HW110609-2_M_5.webp",
+       "large": "/img/dist/HW110609-2_L_5.webp"
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

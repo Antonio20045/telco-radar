@@ -63,7 +63,7 @@ from . import (
 )
 from . import geraete_delta_wort, geraete_messdatum, geraete_sortiment
 from . import geraete_notbremse as notbremse
-
+from . import geraete_eigen_pruefung as eigen_pruefung
 from .geraete_katalog_buendel import buendel_je_anbieter_modell
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht
 from .geraete_tco_band import band_label
@@ -780,8 +780,8 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     if traeger is not None and traeger.get("delta_kurz"):
         delta_leer, delta_leer_grund = None, None
     elif referenz is None:
-        delta_leer = TCO_DELTA_LEER_KEINE_REFERENZ
-        delta_leer_grund = TCO_DELTA_GRUND_KEINE_REFERENZ
+        ohne = (TCO_DELTA_LEER_KEINE_REFERENZ, TCO_DELTA_GRUND_KEINE_REFERENZ)
+        delta_leer, delta_leer_grund = eigen_pruefung.ohne_referenz(modell_tco, ohne)
     elif not geraete_tco_karten.referenz_ist_frisch(referenz, heute):
         delta_leer = TCO_DELTA_LEER_ALTE_REFERENZ
         delta_leer_grund = TCO_DELTA_GRUND_ALTE_REFERENZ
@@ -1616,12 +1616,11 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         )
         zeitreihe = geraete_zeitreihe.leer()
         ausfaelle.append(Ausfall.aus_ausnahme(ZEITREIHE_TEIL, exc))
-    hm = geraete_portfolio.hersteller(state_dir, tco, katalog, tarifbestand, tco_heute)
-    zr_erlaubt = {
-        k: b
-        for k, b in ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()
-        if b
-    }
+    hm = geraete_portfolio.hersteller(
+        state_dir, tco, katalog, tarifbestand, tco_heute, tco_db.erfassung
+    )
+    zr_daten = zeitreihe.get("daten") or {}
+    zr_erlaubt = {k: b for k, b in (zr_daten.get("erlaubt") or {}).items() if b}
 
     katalog_modelle = katalog_modellzeilen(
         bestand,

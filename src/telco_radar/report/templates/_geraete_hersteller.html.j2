@@ -48,9 +48,8 @@
   {% for o in hm.ohne_spalte %}
   <p class="gr-hm-ohne" data-anbieter="{{ o.name }}">{{ o.text }}</p>
   {% endfor %}
-  <div class="gr-hm-erklaerung">
-    {% for absatz in hm.erklaerung %}<p>{{ absatz }}</p>{% endfor %}
-  </div>
+  {# Kein Erklärtext an der Grafik (Antonio, 13.11.2026). Dieselben Sätze aus
+     demselben Feld stehen auf geraete-quellen.html#methodik. #}
   <script type="application/json" id="hm-daten">{{ hm.json | safe }}</script>
   {% endif %}
 </section>

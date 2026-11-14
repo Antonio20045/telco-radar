@@ -33,10 +33,15 @@ pflicht_anbieter_wenn_aktiv:
     - "Saturn/MediaMarkt · o2-Netz"
 
 # Welche Pflichtmodelle der Wächter für die Zeilen einer vorbereiteten Quelle
-# prüft: genau die, die ihr Leser erfasst (`MODELL_SLUGS` in
-# `collect/geraete/tarifwelt_lauf.py`; Test: Gleichheit beider Listen). Gilt nur
-# für die Zeilen oben, nie für `pflicht_anbieter` - die Netzbetreiber werden
-# immer gegen alle `pflicht_modelle` geprüft. Führt ein Netz ein Modell bei
+# PRUEFT (CI-Gate): eine TEILMENGE der Modelle, die ihr Leser tatsächlich
+# erfasst (`MODELL_SLUGS` in `collect/geraete/tarifwelt_lauf.py`; Test:
+# `pflicht_modelle_wenn_aktiv` ⊆ `MODELL_SLUGS`). Seit 13.11.2026 (Baupaket
+# P6) erfasst der Leser zusätzlich rund 20 weitere, sitemap-bestätigte
+# Modelle, die bewusst NICHT hier stehen: sie würden sonst automatisch zu
+# `pflicht_modelle` (unten) und damit zum CI-Gate für ALLE Netzbetreiber -
+# ein Risiko außerhalb dieses Pakets. Gilt nur für die Zeilen oben, nie für
+# `pflicht_anbieter` - die Netzbetreiber werden immer gegen alle
+# `pflicht_modelle` geprüft. Führt ein Netz ein Pflichtmodell bei
 # Saturn/MediaMarkt nicht, steht das unten als belegte Lücke (Screenshot am
 # Original, höchstens 14 Tage), nicht hier.
 pflicht_modelle_wenn_aktiv:
@@ -326,3 +331,258 @@ belegte_luecken:
     original: https://tarife.mediamarkt.de/smartphones/samsung/galaxy-z-fold-8
     geprueft: "2026-11-08"
     bis: "2026-11-22"
+  # Saturn/MediaMarkt (Tarifwelt): drei Pflichtmodelle haben in KEINEM der drei
+  # Netze ein Bündel. Gleich bei allen heißt nach Regel 11 zuerst
+  # "Erfassungslücke" - deshalb am Original nachgemessen (13.11.2026,
+  # docs/belege/tarifwelt-nicht-lieferbar-1311/, ein GET je Modell mit ehrlicher
+  # Kennung, nur die öffentliche Übersicht, nichts im Warenkorb): in
+  # `hardware.variantFilter` steht bei Galaxy S26+ (512 GB, 4 Farben), Galaxy A57
+  # (128 GB, 1 Farbe) und Pixel 10a (128/256 GB, 8 Farben) JEDE Variante auf
+  # `available: false`. Ohne lieferbare Variante gibt die Tarifwelt keine
+  # Tarifliste heraus - es gibt kein Bündel zu messen; im Lauf-Protokoll steht je
+  # Modell nur der eine Übersichtsabruf. Gegenprobe Galaxy S26: 8 von 8 Varianten
+  # lieferbar, derselbe Leser liest sie einwandfrei.
+  # Die Lücke sagt "nicht lieferbar", NICHT "nicht im Sortiment": deshalb ohne
+  # `art: nicht_im_portfolio`, die Portfolio-Ansicht zeigt sie als Messlücke.
+  # Kommt eine Variante zurück, warnt der Wächter "überholt" - dann streichen.
+  - anbieter: "Saturn/MediaMarkt · Telekom-Netz"
+    modelle:
+      - samsung-galaxy-s26-plus
+      - samsung-galaxy-a57
+      - google-pixel-10a
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · Vodafone-Netz"
+    modelle:
+      - samsung-galaxy-s26-plus
+      - samsung-galaxy-a57
+      - google-pixel-10a
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · o2-Netz"
+    modelle:
+      - samsung-galaxy-s26-plus
+      - samsung-galaxy-a57
+      - google-pixel-10a
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  # Saturn/MediaMarkt (Tarifwelt), Baupaket P6 (13.11.2026, Analyse
+  # "analyse-abdeckung-1313.md"): 486 Modell-Speicher-Zellen standen ohne
+  # Datensatz UND ohne Beleg, davon 103-107 je Netz bei Saturn/MediaMarkt -
+  # weil `MODELL_SLUGS` (collect/geraete/tarifwelt_lauf.py) bis dahin nur die
+  # 18 Pflichtmodelle versuchte. Nachmessung am Original (13.11.2026, ein GET
+  # je Modell an https://tarife-api2.mediamarkt.de/v1/productdetail/<slug>,
+  # ehrliche Kennung, robots.txt von tarife.mediamarkt.de beachtet, nichts im
+  # Warenkorb; Methodik und Rohdaten in
+  # docs/belege/tarifwelt-modelle-1313/README.md):
+  #
+  # acht weitere Katalogmodelle stehen in der Sitemap, aber JEDE Variante war
+  # beim Abruf `available: false` - wie bei den drei oben bereits belegten
+  # Modellen ist das "nicht lieferbar", NICHT "nicht im Sortiment", deshalb
+  # ohne `art: nicht_im_portfolio`. Sie bleiben bewusst aus `MODELL_SLUGS`
+  # draussen (ein taeglicher Leerlauf-Abruf ohne Nutzen); kommt eine Variante
+  # zurueck, ist das beim naechsten Nachmessen zu pruefen.
+  - anbieter: "Saturn/MediaMarkt · Telekom-Netz"
+    modelle:
+      - motorola-edge-70
+      - samsung-galaxy-z-flip-7
+      - samsung-galaxy-a17
+      - samsung-galaxy-a26
+      - honor-magic-v6
+      - google-pixel-10-pro
+      - xiaomi-redmi-note-15
+      - xiaomi-redmi-note-15-pro
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · Vodafone-Netz"
+    modelle:
+      - motorola-edge-70
+      - samsung-galaxy-z-flip-7
+      - samsung-galaxy-a17
+      - samsung-galaxy-a26
+      - honor-magic-v6
+      - google-pixel-10-pro
+      - xiaomi-redmi-note-15
+      - xiaomi-redmi-note-15-pro
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · o2-Netz"
+    modelle:
+      - motorola-edge-70
+      - samsung-galaxy-z-flip-7
+      - samsung-galaxy-a17
+      - samsung-galaxy-a26
+      - honor-magic-v6
+      - google-pixel-10-pro
+      - xiaomi-redmi-note-15
+      - xiaomi-redmi-note-15-pro
+    grund: Keine lieferbare Variante in der Tarifwelt (geprüft 13.11.2026) - in hardware.variantFilter steht jede Farbe jeder Speicherstufe auf available=false, deshalb gibt die Seite keine Tarifliste und kein Bündel heraus
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  # Dieselbe Nachmessung: 43 weitere Katalogmodelle stehen in KEINEM Pfad der
+  # Sitemap https://tarife.mediamarkt.de/sitemap.xml (gespeichert als
+  # docs/belege/tarifwelt-modelle-1313/sitemap-smartphones-2026-11-13.txt,
+  # 93 Smartphone-Einträge) - anders als bei "nicht lieferbar" ist das eine
+  # Sortimentsaussage (dieselbe Lesart wie bei congstar: fehlt ein Gerät in
+  # der Geräteliste/Sitemap des Anbieters, ist es nicht im Sortiment), deshalb
+  # MIT `art: nicht_im_portfolio`. Betrifft vor allem ältere iPhone- und
+  # Motorola-Generationen sowie Marken, die die Tarifwelt gar nicht führt
+  # (AirPods, Fairphone, Nothing, Telekom "T Phone").
+  - anbieter: "Saturn/MediaMarkt · Telekom-Netz"
+    modelle:
+      - apple-airpods-5
+      - fairphone-6
+      - fairphone-6-plus
+      - samsung-galaxy-a27
+      - samsung-galaxy-a36
+      - samsung-galaxy-a56
+      - samsung-galaxy-s23
+      - samsung-galaxy-s24
+      - samsung-galaxy-s24-ultra
+      - samsung-galaxy-s25-edge
+      - samsung-galaxy-s26-enterprise-edition
+      - samsung-galaxy-xcover7-pro-ee
+      - samsung-galaxy-xcover-7-ee
+      - samsung-galaxy-z-fold-7
+      - motorola-edge-60-neo
+      - motorola-edge-70-fusion
+      - motorola-edge-70-fusion-fifa-edition
+      - motorola-moto-g37
+      - motorola-moto-g77
+      - motorola-razr-70
+      - motorola-razr-fold
+      - motorola-razr-fold-fifa-edition
+      - motorola-signature
+      - nothing-phone-3
+      - nothing-phone-4a
+      - nothing-phone-4a-pro
+      - google-pixel-10-pro-fold
+      - google-pixel-11-pro-fold
+      - telekom-t-phone-3
+      - telekom-t-phone-3-pro
+      - xiaomi-15t
+      - apple-iphone-14
+      - apple-iphone-14-pro
+      - apple-iphone-14-pro-max
+      - apple-iphone-15
+      - apple-iphone-15-plus
+      - apple-iphone-15-pro
+      - apple-iphone-15-pro-max
+      - apple-iphone-16
+      - apple-iphone-16-plus
+      - apple-iphone-16-pro
+      - apple-iphone-16-pro-max
+      - apple-iphone-16e
+    grund: Gerät ist in keinem Pfad der MediaMarkt-Tarifwelt-Sitemap (sitemap.xml, 93 Smartphone-Einträge, geprüft 13.11.2026) - Sortimentsaussage, keine Messlücke
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/tarifwelt-modelle-1313/sitemap-smartphones-2026-11-13.txt
+    original: https://tarife.mediamarkt.de/sitemap.xml
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · Vodafone-Netz"
+    modelle:
+      - apple-airpods-5
+      - fairphone-6
+      - fairphone-6-plus
+      - samsung-galaxy-a27
+      - samsung-galaxy-a36
+      - samsung-galaxy-a56
+      - samsung-galaxy-s23
+      - samsung-galaxy-s24
+      - samsung-galaxy-s24-ultra
+      - samsung-galaxy-s25-edge
+      - samsung-galaxy-s26-enterprise-edition
+      - samsung-galaxy-xcover7-pro-ee
+      - samsung-galaxy-xcover-7-ee
+      - samsung-galaxy-z-fold-7
+      - motorola-edge-60-neo
+      - motorola-edge-70-fusion
+      - motorola-edge-70-fusion-fifa-edition
+      - motorola-moto-g37
+      - motorola-moto-g77
+      - motorola-razr-70
+      - motorola-razr-fold
+      - motorola-razr-fold-fifa-edition
+      - motorola-signature
+      - nothing-phone-3
+      - nothing-phone-4a
+      - nothing-phone-4a-pro
+      - google-pixel-10-pro-fold
+      - google-pixel-11-pro-fold
+      - telekom-t-phone-3
+      - telekom-t-phone-3-pro
+      - xiaomi-15t
+      - apple-iphone-14
+      - apple-iphone-14-pro
+      - apple-iphone-14-pro-max
+      - apple-iphone-15
+      - apple-iphone-15-plus
+      - apple-iphone-15-pro
+      - apple-iphone-15-pro-max
+      - apple-iphone-16
+      - apple-iphone-16-plus
+      - apple-iphone-16-pro
+      - apple-iphone-16-pro-max
+      - apple-iphone-16e
+    grund: Gerät ist in keinem Pfad der MediaMarkt-Tarifwelt-Sitemap (sitemap.xml, 93 Smartphone-Einträge, geprüft 13.11.2026) - Sortimentsaussage, keine Messlücke
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/tarifwelt-modelle-1313/sitemap-smartphones-2026-11-13.txt
+    original: https://tarife.mediamarkt.de/sitemap.xml
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"
+  - anbieter: "Saturn/MediaMarkt · o2-Netz"
+    modelle:
+      - apple-airpods-5
+      - fairphone-6
+      - fairphone-6-plus
+      - samsung-galaxy-a27
+      - samsung-galaxy-a36
+      - samsung-galaxy-a56
+      - samsung-galaxy-s23
+      - samsung-galaxy-s24
+      - samsung-galaxy-s24-ultra
+      - samsung-galaxy-s25-edge
+      - samsung-galaxy-s26-enterprise-edition
+      - samsung-galaxy-xcover7-pro-ee
+      - samsung-galaxy-xcover-7-ee
+      - samsung-galaxy-z-fold-7
+      - motorola-edge-60-neo
+      - motorola-edge-70-fusion
+      - motorola-edge-70-fusion-fifa-edition
+      - motorola-moto-g37
+      - motorola-moto-g77
+      - motorola-razr-70
+      - motorola-razr-fold
+      - motorola-razr-fold-fifa-edition
+      - motorola-signature
+      - nothing-phone-3
+      - nothing-phone-4a
+      - nothing-phone-4a-pro
+      - google-pixel-10-pro-fold
+      - google-pixel-11-pro-fold
+      - telekom-t-phone-3
+      - telekom-t-phone-3-pro
+      - xiaomi-15t
+      - apple-iphone-14
+      - apple-iphone-14-pro
+      - apple-iphone-14-pro-max
+      - apple-iphone-15
+      - apple-iphone-15-plus
+      - apple-iphone-15-pro
+      - apple-iphone-15-pro-max
+      - apple-iphone-16
+      - apple-iphone-16-plus
+      - apple-iphone-16-pro
+      - apple-iphone-16-pro-max
+      - apple-iphone-16e
+    grund: Gerät ist in keinem Pfad der MediaMarkt-Tarifwelt-Sitemap (sitemap.xml, 93 Smartphone-Einträge, geprüft 13.11.2026) - Sortimentsaussage, keine Messlücke
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/tarifwelt-modelle-1313/sitemap-smartphones-2026-11-13.txt
+    original: https://tarife.mediamarkt.de/sitemap.xml
+    geprueft: "2026-11-13"
+    bis: "2026-11-27"

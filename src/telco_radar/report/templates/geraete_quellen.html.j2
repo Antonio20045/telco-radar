@@ -133,6 +133,13 @@
 <section class="gr-methode" id="methodik">
   <h2 class="rubrik">Wie die Geräteseite rechnet und gruppiert</h2>
   <ul class="list-card gr-methodenliste">
+    {# 13.11.2026: die Sätze unter „Preisposition je Hersteller“ stehen seit
+       heute hier - dasselbe Feld (`hersteller.erklaerung`), kein zweiter
+       Wortlaut. #}
+    {% for absatz in (geraete.hersteller or {}).get('erklaerung') or [] %}
+    <li class="list-row"><span class="list-row-date">{{ 'Preisposition je Hersteller' if loop.first else '' }}</span>
+      <span>{{ absatz }}</span></li>
+    {% endfor %}
     <li class="list-row"><span class="list-row-date">Zeitreihe</span>
       <span>Ein fehlender Punkt heißt: dieser Anbieter hatte an dem Tag
       kein Bündel in diesem Band – Linien verbinden nur echte

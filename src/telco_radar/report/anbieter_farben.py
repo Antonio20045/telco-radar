@@ -207,6 +207,13 @@ LUECKE = Anbieterstil(
 )
 
 
+_TARIFWELT_NETZE = {"telekom": "quadrat", "vodafone": "kreis", "o2": "dreieck"}
+"""Saturn/MediaMarkt mit Tarif (`collect.geraete.tarifwelt.anbieter_zeile`, seit
+08.11.2026): je Netz eine Zeile. Händlergrau, gestrichelt (ein Bündel mit fremdem
+Tarif, kein Gerätepreis des Händlers), die Markerform ist die des Netzbetreibers.
+Bis 11.11.2026 fehlten sie hier und standen 48-mal als „Farbe nicht hinterlegt“
+auf der Geräteseite."""
+
 ANBIETER_FARBE: dict[str, Anbieterstil] = {
     "vodafone": _stil("vodafone", VODAFONE_ROT, "voll", "kreis", eigen=True),
     "telekom": _stil("telekom", "#e20074", "voll", "quadrat"),
@@ -226,6 +233,13 @@ ANBIETER_FARBE: dict[str, Anbieterstil] = {
     "medimax": _stil("medimax", GRAU_HAENDLER, "voll", "raute"),
     "electronicpartner": _stil("electronicpartner", GRAU_HAENDLER, "voll", "dreieck"),
     "saturn": _stil("saturn", GRAU_HAENDLER, "voll", "sechseck"),
+    "mediamarkt": _stil("mediamarkt", GRAU_HAENDLER, "voll", "ring"),
+    **{
+        f"saturn/mediamarkt · {netz}-netz": _stil(
+            f"saturn-mediamarkt---{netz}-netz", GRAU_HAENDLER, "gestrichelt", marker
+        )
+        for netz, marker in _TARIFWELT_NETZE.items()
+    },
 }
 
 

@@ -27,6 +27,7 @@ from ..analyze.geraete_pruefstatus import (
     HERLEITUNG_EINMALZAHLUNG,
     HERLEITUNG_PREISLISTE,
     QUARANTAENE,
+    REGEL_ANSCHLUSS,
     REGEL_SORTIMENT,
     REGELN,
     UNBEKANNT,
@@ -37,6 +38,7 @@ from ..analyze.geraete_pruefstatus import (
     ist_schaetzung,
     lies_vermerk,
 )
+from ..tarifwelt_lieferbar import REGEL_NICHT_LIEFERBAR
 from ..tco_model import Aktion, Buendel, aktionen_aus
 
 DELTA_SCHAETZUNG = "nicht direkt genannt"
@@ -81,15 +83,27 @@ DELTA_SORTIMENT = "nicht im Sortiment"
 SATZ_SORTIMENT = (
     "Kein Abstand zur Vodafone-Referenz: der Anbieter führt dieses Gerät nicht mehr."
 )
+DELTA_NICHT_LIEFERBAR = "nicht lieferbar"
+SATZ_NICHT_LIEFERBAR = (
+    "Kein Abstand zur Vodafone-Referenz: dieses Angebot war bei der letzten "
+    "Messung nicht lieferbar."
+)
 DELTA_VERALTET = "veraltet"
 SATZ_VERALTET = "Kein Abstand zur Vodafone-Referenz: dieser Preis ist veraltet."
+DELTA_ANSCHLUSS = "Anschlusspreis nicht mehr belegt"
+SATZ_ANSCHLUSS = (
+    "Kein Abstand zur Vodafone-Referenz: eine neuere Messung dieses Tarifs nennt "
+    "einen anderen Anschlusspreis."
+)
 DELTA_UNGEPRUEFT = "Prüfung gescheitert"
 SATZ_UNGEPRUEFT = (
     "Kein Abstand zur Vodafone-Referenz: die Prüfung dieses Preises ist gescheitert."
 )
 _PRUEFZUSTAENDE = (
     ("nicht_im_sortiment", DELTA_SORTIMENT, SATZ_SORTIMENT),
+    ("nicht_lieferbar", DELTA_NICHT_LIEFERBAR, SATZ_NICHT_LIEFERBAR),
     ("quarantaene", DELTA_QUARANTAENE, SATZ_QUARANTAENE),
+    ("anschluss_widerlegt", DELTA_ANSCHLUSS, SATZ_ANSCHLUSS),
     ("veraltet_pruefung", DELTA_VERALTET, SATZ_VERALTET),
     ("pruefung_gescheitert", DELTA_UNGEPRUEFT, SATZ_UNGEPRUEFT),
 )
@@ -154,11 +168,14 @@ def _felder(
         "quarantaene": status == QUARANTAENE,
         "veraltet_pruefung": status == VERALTET,
         "nicht_im_sortiment": status == VERALTET and REGEL_SORTIMENT in vermerk.regeln,
+        "nicht_lieferbar": status == VERALTET
+        and REGEL_NICHT_LIEFERBAR in vermerk.regeln,
+        "anschluss_widerlegt": status == VERALTET and REGEL_ANSCHLUSS in vermerk.regeln,
         "pruefung_gescheitert": status == UNBEKANNT,
         "pruefgruende": [
             f"Regel {n}: {REGELN.get(n, '?')}"
             for n in vermerk.regeln
-            if n != REGEL_SORTIMENT
+            if n not in (REGEL_SORTIMENT, REGEL_NICHT_LIEFERBAR)
         ],
     }
     return {
@@ -175,6 +192,35 @@ def zaehlt(karte: dict) -> bool:
     abgelaufene Aktion und mit Status gültig; Karten ohne die Felder (Listungen ohne
     Bündel) und nie geprüfte Bündel zählen wie bisher."""
     return karte.get("zaehlt", True)
+
+
+NUR_HEUTE = ("veraltet_aktion", "veraltet_pruefung")
+IMMER = (
+    "schaetzung",
+    "bedingter_tarif",
+    "quarantaene",
+    "pruefung_gescheitert",
+    "nicht_im_sortiment",
+)
+
+
+def zaehlt_am_tag(karte: dict) -> bool:
+    """Zählte die Karte an IHREM eigenen Messtag - die Frage einer Zeitreihe.
+
+    ``zaehlt`` beantwortet die Frage für HEUTE. ``NUR_HEUTE`` sind die Urteile
+    über den heutigen Stand eines Bündels: „veraltet“ heißt, der Preis ist
+    HEUTE zu alt oder die eingerechnete Aktion ist HEUTE abgelaufen. An seinem
+    Messtag war beides nicht so; wer sie rückblickend anwendet, löscht mit dem
+    heutigen Stand die Vergangenheit (Befund 13.11.2026: congstar stand mit 7
+    statt 45 Messtagen in der Herstellergrafik). Ob eine Messung an ihrem Tag
+    frisch war, entscheidet ``geraete_tco_karten.ist_frisch`` je Tag. Was in
+    ``IMMER`` steht, war auch rückblickend nie ein gültiger Vergleich.
+    """
+    if karte.get("zaehlt"):
+        return True
+    if any(karte.get(flag) for flag in IMMER):
+        return False
+    return any(karte.get(flag) for flag in NUR_HEUTE)
 
 
 def zustand(karte: dict) -> dict | None:

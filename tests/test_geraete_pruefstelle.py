@@ -84,13 +84,54 @@ def test_jeder_gespeicherte_satz_traegt_einen_status(geprueft):
     assert gezaehlt["quarantaene"] > 0 and gezaehlt["gueltig"] > 0, gezaehlt
 
 
+def _widerlegter_anschluss(saetze: list[dict]) -> set:
+    """Orakel: Sätze, deren Anschlusspreis die jüngste Messung ihres Tarifs widerlegt.
+
+    Unabhängig von ``analyze.geraete_anschluss`` aus den gespeicherten Feldern
+    gerechnet; der Anschlusspreis gehört dem Tarif, nicht dem Gerät.
+    """
+    gruppen: dict[tuple, list[dict]] = {}
+    for s in saetze:
+        if s.get("anschlusspreis") is None or not s.get("abgerufen_am"):
+            continue
+        gruppen.setdefault((s["anbieter"], s.get("tarif_id")), []).append(s)
+    widerlegt = set()
+    for liste in gruppen.values():
+        juengster = max(s["abgerufen_am"] for s in liste)
+        betraege = {
+            round(s["anschlusspreis"], 2)
+            for s in liste
+            if s["abgerufen_am"] == juengster
+        }
+        if len(betraege) != 1:
+            continue
+        belegt = betraege.pop()
+        widerlegt |= {
+            s["id"]
+            for s in liste
+            if s["abgerufen_am"] < juengster and round(s["anschlusspreis"], 2) != belegt
+        }
+    return widerlegt
+
+
 def test_frische_gegen_die_definition_der_seite(geprueft):
+    """Regel 16 trifft GENAU die gealterten Sätze. Dass eine jüngere Messung desselben
+    Tarifs den Anschlusspreis widerlegt, ist Regel 18 (``analyze.geraete_anschluss``):
+    eine frische Zeile trägt nie die Nummer der Frische."""
     _, saetze, *_ = geprueft
     alt = {s["id"] for s in saetze if not ist_frisch(s["abgerufen_am"], HEUTE)}
     assert alt, "Bestand ohne gealterten Satz: Orakel ohne Fall"
-    assert {s["id"] for s in saetze if 16 in _regel(s)} == alt
+    mit_16 = {s["id"] for s in saetze if 16 in _regel(s)}
+    assert mit_16 == alt, "Regel 16 trifft einen Satz, der gar nicht gealtert ist"
+    widerlegt = _widerlegter_anschluss(saetze)
+    assert widerlegt, "Bestand ohne widerlegten Anschluss: Orakel ohne Fall"
+    mit_18 = {s["id"] for s in saetze if 18 in _regel(s)}
+    assert mit_18 == widerlegt - alt
     gueltig = [s for s in saetze if _status(s) == "gueltig"]
     assert not any(s["id"] in alt for s in gueltig), "Gegenprobe: gültig ist frisch"
+    assert not any(s["id"] in widerlegt for s in gueltig), (
+        "Gegenprobe: ein widerlegter Anschlusspreis zählt nicht"
+    )
 
 
 def test_abgelaufene_aktion_gegen_die_rohsaetze(geprueft):

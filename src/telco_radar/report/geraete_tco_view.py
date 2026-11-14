@@ -5,10 +5,9 @@ Gerechnet wird ausschliesslich in `tco_model`. Dieses Modul ruft
 Zwei Rechnungen derselben Zahl sind zwei Zahlen. Widerlegte Bündel: `bereinigt`.
 
 Fehlt ein Posten, steht die benannte Luecke statt einer Zahl: "Wenn kein
-Anschlusspreis bekannt ist, heisst das nicht kostenlos"
-(`report/effektivpreis.py`, `tco_model` § 6.4). Tarifliste, Bereitschaftstabelle
-und Euro-Differenz gegen Vodafone sind seit 02.11.2026 von der Seite genommen.
-"""
+Anschlusspreis bekannt ist, heisst das nicht kostenlos" (`report/effektivpreis.py`,
+`tco_model` § 6.4). Tarifliste, Bereitschaftstabelle und Euro-Differenz gegen
+Vodafone: seit 02.11.2026 von der Seite genommen."""
 
 from __future__ import annotations
 
@@ -24,6 +23,7 @@ from ..tco_model import (
     SimOnlyReferenz,
     kosten_ueber,
 )
+from ..versandkosten import POSTEN_VERSAND
 from . import (
     geraete_laufzeit,
     geraete_notbremse,
@@ -154,13 +154,12 @@ def _export_zeilen(
     Kostenspalte ist `tco_model.kosten_ueber()` wie auf der Karte; Dezimalkomma
     und Semikolon macht `geraete_export.tco_csv`. Eigene Felder: `sku_id` (A4),
     Zeitraum H (`leitzahl_monate`) mit seinen Tarifmonaten, `status` (Notbremse),
-    `luecke` (Posten ohne Zahl) und `raten_laufzeit` (Umschalter); nach
-    Ratenlaufzeit gruppiert. Ein veralteter Preis trägt keinen Betrag.
+    `luecke` (Posten ohne Zahl), `raten_laufzeit` (Umschalter, gruppiert nach
+    ihm) und `versand` (P5). Ein veralteter Preis trägt keinen Betrag.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
     (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
-    `als_buendel()` samt Anschlusspreis, dieselbe Stelle wie bei den Bündeln).
-    """
+    `als_buendel()` samt Anschlusspreis, dieselbe Stelle wie bei den Bündeln)."""
     geraet_je_sku: dict = {}
     for e in eintraege:
         if e.get("sku_id"):
@@ -195,6 +194,7 @@ def _export_zeilen(
                 "laufzeit": b.laufzeit_monate,
                 "raten_laufzeit": geraete_laufzeit.raten_laufzeit(b),
                 "anschlusspreis": None if veraltet else b.anschlusspreis,
+                "versand": None if veraltet else kosten.posten.get(POSTEN_VERSAND, 0.0),
                 "tco24": None if veraltet else kosten.gesamt,
                 "leitzahl_monate": kosten.monate,
                 "tarif_monate": kosten.tarifmonate,
@@ -202,7 +202,7 @@ def _export_zeilen(
                 "quelle_url": b.quelle_url,
                 "sku_id": b.sku_id or "",
                 "status": geraete_notbremse.kurz(b, heute),
-                "luecke": veraltet or ", ".join(kosten.luecken),
+                "luecke": geraete_laufzeit.luecke_export_text(b, kosten, veraltet),
             }
         )
     zeilen.sort(key=_nach_ratenlaufzeit)

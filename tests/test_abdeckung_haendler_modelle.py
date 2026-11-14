@@ -110,14 +110,27 @@ def _echt() -> tuple[dict, dict]:
     return daten, daten["pflicht_modelle_wenn_aktiv"]
 
 
-def test_echte_config_haendlermodelle_sind_genau_die_erfassten_pflichtmodelle():
+def test_echte_config_haendlermodelle_sind_teilmenge_der_erfassten_modelle():
+    """Seit Baupaket P6 (13.11.2026) erfasst `MODELL_SLUGS` mehr Modelle, als
+    der Wächter für Saturn/MediaMarkt policiert: die CI-Pflichtliste bleibt
+    eine TEILMENGE des Lesers (nicht mehr Gleichheit), damit zusätzliche,
+    nicht überwachte Modelle nicht automatisch zu einem CI-Gate für ALLE
+    Netzbetreiber werden (die über `pflicht_modelle` geprüft werden). Die
+    letzten zwei Zeilen prüfen, dass diese zusätzliche, nicht überwachte
+    Abdeckung wirklich existiert und bewusst außerhalb der CI-Pflichtliste
+    bleibt (siehe Moduldoku `tarifwelt_lauf.py`)."""
     daten, je_quelle = _echt()
     modelle = je_quelle["MediaMarkt/Saturn Tarifwelt"]
-    assert set(modelle) == set(MODELL_SLUGS), "Wächter und Leser fordern Verschiedenes"
+    assert set(modelle) <= set(MODELL_SLUGS), (
+        "Wächter fordert ein Modell, das der Leser nicht erfasst"
+    )
     assert set(modelle) <= set(daten["pflicht_modelle"])
     assert len(modelle) == len(set(modelle))
     assert set(je_quelle) <= set(daten["pflicht_anbieter_wenn_aktiv"])
     assert not set(je_quelle) & set(daten["pflicht_anbieter"])
+    zusaetzlich = set(MODELL_SLUGS) - set(modelle)
+    assert len(zusaetzlich) >= 20
+    assert not zusaetzlich & set(daten["pflicht_modelle"])
 
 
 def test_echte_config_prueft_drei_netzzeilen_mit_zwei_belegten_luecken(tmp_path):

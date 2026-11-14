@@ -321,12 +321,22 @@ def test_vorlage_benennt_ausfall_und_leerzustand():
     assert "nicht berechnet" in vorlage.render(geraete={})
 
 
-def test_seite_zeigt_die_herstellergrafik_vor_der_modellgrafik(tmp_path):
+def test_die_herstellergrafik_ist_der_einzige_graph_der_seite(tmp_path):
+    """Antonio, 13.11.2026: die Modellgrafik ist ersatzlos gestrichen; die
+    Herstellersicht ist das einzige Preisbild der Geräteseite."""
     seite = test_geraete_tco_zustand._baue(tmp_path)
     ids = [e.get("id") for e in seite.select("section[id]")]
-    assert "hersteller" in ids and "preisposition" in ids
-    assert ids.index("hersteller") < ids.index("preisposition")
-    assert seite.select_one("#pp-titel").text == "Preispositionierung je Modell"
+    assert "hersteller" in ids
+    assert "preisposition" not in ids
+    assert seite.select_one("#pp-titel") is None
+    assert seite.select_one(".gr-pp-bild") is None
+
+
+def test_an_der_grafik_steht_kein_erklaertext(tmp_path):
+    """Kein Erklärtext an der Grafik; derselbe Wortlaut steht auf der
+    Quellenseite unter „Methodik“."""
+    seite = test_geraete_tco_zustand._baue(tmp_path)
+    assert seite.select_one("#hersteller .gr-hm-erklaerung") is None
 
 
 @contextlib.contextmanager

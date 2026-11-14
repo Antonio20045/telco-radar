@@ -68,8 +68,9 @@ from __future__ import annotations
 from typing import Optional
 
 from ..tco_model import zeitraum_vergleichbar
+from . import geraete_eigen_pruefung, geraete_tco_band, geraete_tco_karten
 from . import geraete_notbremse as notbremse
-from . import geraete_tco_band, geraete_tco_karten
+from .geraete_eigen_pruefung import KURZ_NICHT_ERHOBEN
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
 from .geraete_zeitraum_wort import grund_anderer_zeitraum, zeitraum_der_karte
 
@@ -435,10 +436,7 @@ def netzbetreiber_gruppen(
                     "hersteller": modell["hersteller"],
                     "speicher": modell["speicher"],
                     "vodafone": None,
-                    "vodafone_grund": (
-                        "Keine Vodafone-Kosten für dieses Gerät erhoben – "
-                        "kein Bündel und kein eigener Barpreis."
-                    ),
+                    **geraete_eigen_pruefung.ohne_basis(modell),
                     "zeilen": zeilen,
                     "rang": float("inf"),
                 }
@@ -536,7 +534,7 @@ def modellliste(gruppen: list[dict]) -> dict:
         sprung_band = ""
         if paar is None:
             if g["vodafone"] is None:
-                luecke = "keine Vodafone-Kosten erhoben"
+                luecke = g.get("vodafone_luecke") or KURZ_NICHT_ERHOBEN
             else:
                 luecke = "kein Vergleich"
                 for status in (
@@ -924,9 +922,7 @@ def nicht_erhebbar(quellenlage: dict) -> list[dict]:
     config/geraete_quellen.yaml) - keine zweite Einschätzung."""
     out = []
     for z in (quellenlage or {}).get("zeilen", []):
-        if (z.get("typ") or "") != "handel":
-            continue
-        if z.get("zustand") == "liefert":
+        if (z.get("typ") or "") != "handel" or z.get("zustand") == "liefert":
             continue
         out.append(
             {
@@ -966,7 +962,9 @@ def radar(
         tco.get("modelle", []), band_je_tarif, _band_rang(tco.get("baender_katalog"))
     )
     haendler = haendler_zeilen(vergleich_ohne_vertrag)
-    fehlt = nicht_erhebbar(quellenlage)
+    from .geraete_tarifwelt_lage import ohne_lieferndes
+
+    fehlt = ohne_lieferndes(nicht_erhebbar(quellenlage), quellenlage, tco)
     hat_vergleichbare = any(
         z["prozent"] is not None for g in gruppen for z in g["zeilen"]
     )
