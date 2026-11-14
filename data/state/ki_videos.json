@@ -1,6 +1,36 @@
 {
- "stand": "2026-11-13",
+ "stand": "2026-11-14",
  "videos": [
+  {
+   "id": "x7iwI6WfWS0",
+   "titel": "AI Can Do Everything…Except This",
+   "kanal": "Two Minute Papers",
+   "datum": "2026-11-14",
+   "dauer_sekunden": 363,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "x7iwI6WfWS0.jpg"
+  },
+  {
+   "id": "sZg4uJnU9rU",
+   "titel": "Security's New Reality Check",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-14",
+   "dauer_sekunden": 41,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "sZg4uJnU9rU.jpg"
+  },
+  {
+   "id": "Fz8sFDeF1hk",
+   "titel": "Die wilde Sicherheitslücke hinter einem *",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-11-14",
+   "dauer_sekunden": 764,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "Fz8sFDeF1hk.jpg"
+  },
   {
    "id": "pfbfZKxUEDQ",
    "titel": "How Mozilla strengthens Firefox security with GPT-6 Cyber",
@@ -73,7 +103,7 @@
   },
   {
    "id": "7Mk0dCDZHkY",
-   "titel": "Ich habe KI Admin-Rechte auf meine Wohnung gegeben",
+   "titel": "Home Assistant mit KI: Gruselig und gut",
    "kanal": "c't 3003",
    "datum": "2026-11-13",
    "dauer_sekunden": 1218,
@@ -153,7 +183,7 @@
   },
   {
    "id": "YmxpxJZvm4M",
-   "titel": "Cyber at the Frontier",
+   "titel": "Cyber at the Frontier: Introducing Daybreak Red Team & Daybreak Defense Factory",
    "kanal": "OpenAI",
    "datum": "2026-11-12",
    "dauer_sekunden": 2078,
@@ -183,7 +213,7 @@
   },
   {
    "id": "SxiYOCPW8_c",
-   "titel": "DAS ist die Zukunft der Roboter! Asimovs Gesetze, RSI & Superintelligenz (Ex-DeepMind-Forscher)",
+   "titel": "DAS ist der nächste KI-Durchbruch! Roboter-Selbstverbesserung & Asimovs Gesetze (Markus Wulfmeier)",
    "kanal": "Everlast AI",
    "datum": "2026-11-12",
    "dauer_sekunden": 4251,
@@ -270,123 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "pIW_8VyvCuQ.jpg"
-  },
-  {
-   "id": "jDxKzlGLCas",
-   "titel": "Building with GPT-Live and Image Generation | DevDay 2026",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1358,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "jDxKzlGLCas.jpg"
-  },
-  {
-   "id": "hUhr0JiVZZs",
-   "titel": "How to run your first Codex Security scan",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 408,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hUhr0JiVZZs.jpg"
-  },
-  {
-   "id": "b7l_Dhe1h8M",
-   "titel": "Harness-as-a-Service: Building with the Agents API | DevDay 2026",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1185,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "b7l_Dhe1h8M.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-13",
-   "abgerufen": "2026-11-13"
+   "versucht": "2026-11-14",
+   "abgerufen": "2026-11-14"
   }
  },
  "error": null
