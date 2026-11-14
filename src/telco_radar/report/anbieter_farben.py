@@ -214,6 +214,11 @@ Tarif, kein Gerätepreis des Händlers), die Markerform ist die des Netzbetreibe
 Bis 11.11.2026 fehlten sie hier und standen 48-mal als „Farbe nicht hinterlegt“
 auf der Geräteseite."""
 
+TARIFWELT_ANBIETER = tuple(
+    f"Saturn/MediaMarkt · {netz}-Netz" for netz in ("Telekom", "Vodafone", "o2")
+)
+"""Die Anzeigenamen dieser Zeilen, in der Folge von `_TARIFWELT_NETZE`."""
+
 ANBIETER_FARBE: dict[str, Anbieterstil] = {
     "vodafone": _stil("vodafone", VODAFONE_ROT, "voll", "kreis", eigen=True),
     "telekom": _stil("telekom", "#e20074", "voll", "quadrat"),

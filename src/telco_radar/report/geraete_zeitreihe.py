@@ -48,6 +48,7 @@ from ..tco_model import zeitraum_vergleichbar
 from . import geraete_bewegung, geraete_sortiment
 from . import geraete_notbremse as notbremse
 from . import geraete_zeitreihe_auswahl as zeitreihe_auswahl
+from . import geraete_zeitreihe_etiketten as etiketten
 from . import geraete_zeitreihe_uebertrag as uebertrag
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_antwort import _antwort_html as _antwort_html
@@ -60,11 +61,11 @@ from .geraete_luecken import _alternativen as _alternativen
 from .geraete_luecken import _luecken as _luecken
 from .geraete_luecken import fehlen_im_paar, haenge_an
 from .geraete_rechenweg import _NAEHERUNG_SATZ as _NAEHERUNG_SATZ
+from .geraete_rechenweg import ANBIETER_FOLGE as ANBIETER_FOLGE
 from .geraete_rechenweg import (
-    ANBIETER_FOLGE,
     EIGEN,
+    ZEITREIHE_FOLGE,
     _datum_de,
-    _datum_kurz,
     _esc,
 )
 from .geraete_rechenweg import _buendel_aus_messung as _buendel_aus_messung
@@ -85,24 +86,17 @@ from .geraete_zeitreihe_geometrie import (
     _y_schritt,
     form_pfad,
 )
-from .geraete_zeitreihe_legende import _euro0, _mon_kurz, ohne_alte, ueberholt_html
+from .geraete_zeitreihe_legende import _euro0, ohne_alte, ueberholt_html
 from .geraete_zeitreihe_legende import legende_html as _legende_html
 
 log = logging.getLogger(__name__)
 
 
-def _zr_farbe(anbieter: str) -> str:
-    """Die Linienfarbe - fuer Pfad, Achsen-Name und Legende."""
-    return stil_fuer(anbieter).farbe
-
-
 BREIT_W, BREIT_MIN_H = 1136, 420
 SCHMAL_W, SCHMAL_MIN_H = 358, 380
 KOPF_FREIRAUM_BREIT, KOPF_FREIRAUM_SCHMAL = 18, 10
-MASSSTAB_FREIRAUM_ANTEIL = 0.12
+MASSSTAB_FREIRAUM_ANTEIL, ACHSENBRUCH_ANTEIL = 0.12, 0.10
 TREFFERFLAECHE_RADIUS = 12
-ACHSENBRUCH_ANTEIL = 0.10
-ENDLABEL_RAND = 6
 AUTO_SICHTBAR_AB_MESTAGEN = 2
 
 
@@ -459,7 +453,7 @@ def _svg(
     angenommene (Clean Code 3/4). `laufzeit` ist die Ratenlaufzeit der
     Ansicht; der Kopf des Bildes nennt sie neben dem Zeitraum.
     """
-    anbieter = [a for a in ANBIETER_FOLGE if anbieter_serien.get(a)]
+    anbieter = [a for a in ZEITREIHE_FOLGE if anbieter_serien.get(a)]
     if not anbieter:
         return ""
     zeitraeume = zeitraeume or {}
@@ -469,10 +463,16 @@ def _svg(
     tage = _messtage(anbieter_serien)
     w = BREIT_W if breit else SCHMAL_W
     min_h = BREIT_MIN_H if breit else SCHMAL_MIN_H
-    h = max(min_h, round(w * 0.42))
+    h = max(
+        min_h,
+        round(w * 0.42),
+        etiketten.mindesthoehe(
+            anbieter_serien, anbieter, breit, mon_je, mehrere_zeitraeume
+        ),
+    )
     links, rechts, oben, unten = (
         58,
-        (158 if breit else 96),
+        etiketten.rand_rechts(anbieter, breit),
         (KOPF_FREIRAUM_BREIT if breit else KOPF_FREIRAUM_SCHMAL),
         46,
     )
@@ -638,45 +638,9 @@ def _svg(
         ),
         key=lambda e: e[1],
     )
-    letzte_y = -99.0
-    for x, y, a in enden:
-        bedarf = 44 if not breit else 46
-        mon_text = _mon_kurz(mon_je.get(a) or []) if mehrere_zeitraeume else ""
-        if mon_text:
-            bedarf += 13
-        ty = max(y, letzte_y + bedarf)
-        letzte_y = ty
-        farbe = _zr_farbe(a)
-        url, datum = beleg_je.get(a, ("", ""))
-        lx = w - ENDLABEL_RAND
-        name_html = f"{_esc(a)}<tspan class='gr-zr-pfeil'> ↗</tspan>"
-        if url:
-            teile.append(
-                f"<a class='gr-zr-link' href='{_esc(url)}' "
-                f"target='_blank' rel='noopener' aria-label='Beleg bei "
-                f"{_esc(a)} öffnen'><text class='gr-zr-name' "
-                f"x='{lx:.1f}' y='{ty + 4:.1f}' text-anchor='end' "
-                f"fill='{farbe}'>{name_html}</text></a>"
-            )
-        else:
-            teile.append(
-                f"<text class='gr-zr-name' x='{lx:.1f}' "
-                f"y='{ty + 4:.1f}' text-anchor='end' "
-                f"fill='{farbe}'>{_esc(a)}</text>"
-            )
-        mon = 13 if mon_text else 0
-        if mon_text:
-            teile.append(
-                f"<text class='gr-zr-datum gr-zr-mon' "
-                f"x='{lx:.1f}' y='{ty + 17:.1f}' "
-                f"text-anchor='end'>{_esc(mon_text)}</text>"
-            )
-        if datum:
-            teile.append(
-                f"<text class='gr-zr-datum' x='{lx:.1f}' "
-                f"y='{ty + 17 + mon:.1f}' "
-                f"text-anchor='end'>{_datum_kurz(datum)}</text>"
-            )
+    teile += etiketten.namensetiketten(
+        enden, breit, w, h, beleg_je, mon_je, mehrere_zeitraeume
+    )
     teile.append("</svg>")
     return "".join(teile)
 
@@ -878,7 +842,7 @@ def _paar(
         ),
         "fehlen": fehlen_im_paar(modell, satz, band, laufzeit, band_katalog, h),
         "leer_text": leer,
-        "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
+        "anbieter": [a for a in ZEITREIHE_FOLGE if serien.get(a)],
         "punkte": sum(len(v) for v in serien.values()),
         "wahl": (len(zaehlend), sum(map(len, zaehlend.values()))),
     }

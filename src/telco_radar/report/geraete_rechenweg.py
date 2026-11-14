@@ -23,7 +23,7 @@ from ..tco_model import (
     kosten_ueber,
 )
 from ..versandkosten import POSTEN_VERSAND
-from .anbieter_farben import stil_fuer
+from .anbieter_farben import TARIFWELT_ANBIETER, stil_fuer
 from .geraete_tarif_hinweis import tarif_hinweis
 from .geraete_tco_karten import label_der_leitzahl, tarif_anreichern
 from .verlauf import MONATE_DE
@@ -31,6 +31,8 @@ from .verlauf import MONATE_DE
 log = logging.getLogger(__name__)
 
 ANBIETER_FOLGE = ("Telekom", "Vodafone", "o2", "1&1", "congstar")
+ZEITREIHE_FOLGE = ANBIETER_FOLGE + TARIFWELT_ANBIETER
+"""Wer im Preisverlauf eine Reihe bekommt: die fünf, dann die Händler (Issue 125)."""
 
 
 EIGEN = "Vodafone"
@@ -364,7 +366,7 @@ def _rechenwege_html(
     dieses Paars eine Antwort findet.
     """
     bloecke: list[str] = []
-    for anbieter in ANBIETER_FOLGE:
+    for anbieter in ZEITREIHE_FOLGE:
         saetze = rechenweise.juengste(messungen_paar.get(anbieter) or {})
         if not saetze:
             continue
