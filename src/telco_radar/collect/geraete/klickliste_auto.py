@@ -20,33 +20,38 @@ führt, jeweils auf der kleinsten Stufe (die Seite liest alle Stufen). Befund 09
 das iPhone Duo stand bei Telekom nur mit der Adresse der ersten Fundstelle (Tarif L) in
 der Liste, 24 Raten gab es für XS, S, M und XL nicht.
 
-Ein Bündel des Bestands bleibt Quelle der Adresse, auch wenn seine Messung veraltet ist
-(``pruefung`` „veraltet …“): seine Preise zählt diese Liste nicht, sie liest nur
-Adresse, Gerät und Stufe. Ein Platz, dessen Seite einmal nicht rechtzeitig gelesen
-wurde (Lauf ausgefallen, Messdaten einen Tag später im Bestand), bliebe sonst für immer
-aus der Liste und käme nie zurück, denn nur eine Lesung erneuert das Bündel (Prüfung
-PR 85, 10.11.2026). Das gilt ``QUELLE_HOECHSTALTER_TAGE`` Tage vor dem jüngsten Bündel
-des Bestands; der Bestand löscht nie ein Bündel (``analyze/tco_store``), und ein Gerät,
-das der Anbieter nicht mehr führt (1&1 iPhone 15, Oktober 2026), bliebe sonst ewig als
-tote Seite in der Rotation. Zwei Wochen ohne Lesung sind ein Störfall, kein Ausfalltag.
-Neuere Bündel gehen vor: eine Adresse aus einem veralteten Bündel gilt nur, wo kein
-frisches denselben Platz nennt.
+Ein Bündel bleibt Quelle der Adresse, auch wenn seine Messung veraltet ist
+(``pruefung`` „veraltet …“): diese Liste liest nur Adresse, Gerät und Stufe. Ein Platz,
+dessen Seite einmal nicht rechtzeitig gelesen wurde, bliebe sonst für immer aus der
+Liste, denn nur eine Lesung erneuert das Bündel (Prüfung PR 85, 10.11.2026). Das gilt
+``QUELLE_HOECHSTALTER_TAGE`` Tage vor dem jüngsten Bündel des Anbieters, nicht des
+Gesamtbestands: Läse nur ein Anbieter 15 Tage lang nicht, blieben sonst alle seine
+Seiten für immer weg (Nachprüfung PR 85, S1). Ein Gerät, das der Anbieter nicht mehr
+führt (1&1 iPhone 15), bliebe so nicht ewig als tote Seite: nach der Frist fällt es
+heraus, als Warnung im Lauf-Log (``log.warning``, wie die Hinweise in ``klickziele``).
+Der Anker je Anbieter füllt nur freie Plätze: Zuerst kommen die Plätze, die auch main
+zuließe (Frist ab dem jüngsten Bündel des Gesamtbestands, in main-Reihenfolge), erst
+danach die nur durch ihn zugelassenen. Sonst verdrängte ein 15 Tage altes Bündel ein
+frisch gelesenes Gerät (Prüfung PR 88, 10.11.2026: S25 Ultra gegen iPhone 17 bei
+Telekom). Die Plätze (Gerät und Stufe, bei Telekom je Tarif die kleinste Stufe) wählt
+allein die Regel von main; ``_frischere_adresse`` ersetzt danach nur die Adresse eines
+Platzes durch die eines frischen Bündels derselben Seite. Unter veralteten Bündeln gilt
+das jüngste (``_nutzbar``).
 
 Zeitbudget (CLAUDE.md Regel 8): Die Liste hat keine eigene Seitengrenze, nur die
 Platzgrenze. Bei Telekom hat ein Platz bis zu fünf Seiten, acht Plätze also bis zu 40;
 mehr als ein Matrix-Job von 10.258 s (``klicktageslauf``) lesen kann. Den Rest trägt die
 Rotation im Tageslauf (``klicktageslauf.reihenfolge``): nie gelesene Seiten zuerst, dann
-die am längsten nicht gelesenen, nach dem Lesestand des Laufs; die Fristschleuse hält
-das Budget ein, was nicht passt, heißt ``nicht_besucht`` und kommt am nächsten Tag
-zuerst dran. Eine Seitengrenze, die nach dem Bündelalter im Bestand rotiert (PR 85,
-Stand 2d15fe31), käme erst einen Tag nach dem Lauf an die Daten und bliebe bei einer
-Seite stecken, die kein Bündel mehr liefert (Gerät nicht mehr angeboten): deren Alter
-wächst, sie stünde jeden Tag vorn und verdrängte die übrigen.
+die am längsten nicht gelesenen; was nicht passt, heißt ``nicht_besucht`` und kommt am
+nächsten Tag zuerst dran. Eine Seitengrenze nach dem Bündelalter im Bestand (PR 85,
+Stand 2d15fe31) bliebe bei einer Seite stecken, die kein Bündel mehr liefert: deren
+Alter wächst, sie stünde jeden Tag vorn und verdrängte die übrigen.
 """
 
 from __future__ import annotations
 
 import json
+import logging
 import re
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -69,6 +74,7 @@ _SPEICHER_SKU = re.compile(r"^(\d+)gb-")
 _SPEICHER_URL = re.compile(r"(?<![a-z0-9])(\d+)[-]?(gb|tb)(?![a-z0-9])")
 _GB_JE_TB = 1024
 _Schluessel = tuple[str, str, int, str]
+log = logging.getLogger(__name__)
 
 
 class KlicklisteAutoFehler(ValueError):
@@ -99,15 +105,44 @@ def leite_ab(
     Fehlt der Bestand, gibt es nichts abzuleiten (leere Liste); ist er unlesbar, wirft
     die Funktion ``KlicklisteAutoFehler``.
     """
-    buendel = _lies_buendel(root / BESTAND)
+    buendel, ausgeschieden, wie_main = _lies_buendel(root / BESTAND)
     geraete = {g.device_id: g for g in katalog.geraete if ist_grosse_marke(g)}
+    _warne_anbieter_ohne_frische(buendel + ausgeschieden)
+    kandidaten, frische = _kandidaten(buendel, geraete, vorhanden)
+    _warne_ausgeschieden(_kandidaten(ausgeschieden, geraete, vorhanden)[0], kandidaten)
+    seiten_main = _seiten(_kandidaten(wie_main, geraete, vorhanden)[0])
+    seiten = _seiten(kandidaten)
+    belegt = {_seite_von(s, u) for s, u in seiten_main.items()}
+    nur_anker = {s: u for s, u in seiten.items() if _seite_von(s, u) not in belegt}
+    plaetze = _begrenze({**seiten_main, **nur_anker}, geraete, set(seiten_main))
+    return [_frischere_adresse(s, kandidaten, frische) for s in plaetze]
+
+
+def _seiten(kandidaten: dict[_Schluessel, str]) -> dict[_Schluessel, str]:
+    """Die Regel von main: je Adresse und je Tarif die kleinste Stufe."""
+    return _je_tarif_eine_stufe(_je_adresse_eine_stufe(kandidaten))
+
+
+def _seite_von(schluessel: _Schluessel, url: str) -> tuple[str, str, str]:
+    """Die Seite hinter einem Platz: der Tarif, sonst die Adresse."""
+    anbieter, gid, _, tarif = schluessel
+    return anbieter, gid, tarif or url
+
+
+def _kandidaten(
+    buendel: list[dict], geraete: dict[str, Geraet], vorhanden: set[tuple[str, str]]
+) -> tuple[dict[_Schluessel, str], set[_Schluessel]]:
+    """Adresse je (Anbieter, Gerät, Stufe, Tarif); die erste Nennung gilt, frische
+    Bündel stehen vorn. ``frische`` sind die Schlüssel mit mindestens einem frischen
+    Bündel."""
     kandidaten: dict[_Schluessel, str] = {}
+    frische: set[_Schluessel] = set()
     for eintrag in buendel:
         paar = _paar(eintrag, geraete)
         if paar is None:
             continue
         geraet, speicher = paar
-        anbieter = str(eintrag.get("anbieter") or "").strip()
+        anbieter = _anbieter(eintrag)
         url = str(eintrag.get("quelle_url") or "").strip()
         if not anbieter or (anbieter, geraet.device_id) in vorhanden:
             continue
@@ -120,7 +155,79 @@ def leite_ab(
             _tarif_kennung(anbieter, url),
         )
         kandidaten.setdefault(schluessel, url)
-    return _begrenze(_je_tarif_eine_stufe(_je_adresse_eine_stufe(kandidaten)), geraete)
+        if not _ist_veraltet(eintrag):
+            frische.add(schluessel)
+    return kandidaten, frische
+
+
+def _warne_ausgeschieden(
+    ausgeschieden: dict[_Schluessel, str], kandidaten: dict[_Schluessel, str]
+) -> None:
+    """Warnung je Anbieter für Plätze (Gerät und Stufe), die nur wegen der Grenze
+    ``QUELLE_HOECHSTALTER_TAGE`` keine Seite bekommen."""
+    belegt = {s[:3] for s in kandidaten}
+    verloren: dict[str, set[tuple[str, int]]] = {}
+    for anbieter, gid, speicher, _ in ausgeschieden:
+        if (anbieter, gid, speicher) not in belegt:
+            verloren.setdefault(anbieter, set()).add((gid, speicher))
+    for anbieter, plaetze in sorted(verloren.items()):
+        namen = ", ".join(f"{gid} {gb} GB" for gid, gb in sorted(plaetze))
+        log.warning(
+            "Klickliste auto: %s verliert %d Plätze, deren jüngstes Bündel mehr als "
+            "%d Tage vor dem jüngsten Bündel dieses Anbieters liegt (kein Ausfalltag "
+            "mehr, Gerät nicht mehr angeboten oder Seite tot?): %s",
+            anbieter,
+            len(plaetze),
+            QUELLE_HOECHSTALTER_TAGE,
+            namen,
+        )
+
+
+def _warne_anbieter_ohne_frische(buendel: list[dict]) -> None:
+    """Warnung für jeden Anbieter, dessen Bündel alle veraltet sind: Seine Liste bleibt
+    (Frist je Anbieter), aber er wird nicht mehr gelesen."""
+    frisch = {_anbieter(b) for b in buendel if not _ist_veraltet(b)}
+    letzte: dict[str, date | None] = {}
+    for eintrag in buendel:
+        if name := _anbieter(eintrag):
+            tage = [d for d in (letzte.get(name), _datum(eintrag)) if d]
+            letzte[name] = max(tage, default=None)
+    for name in sorted(set(letzte) - frisch):
+        datum = letzte[name]
+        log.warning(
+            "Klickliste auto: %s hat kein frisches Bündel mehr (jüngstes: %s); seine "
+            "Seiten bleiben in der Liste, solange die Bündel nutzbar sind, werden aber "
+            "nicht mehr gemessen (Sperre, Strukturbruch, Anbieter nicht mehr gelesen?)",
+            name,
+            datum.isoformat() if datum else "ohne Datum",
+        )
+
+
+def _frischere_adresse(
+    seite: AutoSeite, kandidaten: dict[_Schluessel, str], frische: set[_Schluessel]
+) -> AutoSeite:
+    """Die Adresse eines Platzes aus einem frischen Bündel derselben Seite (bei Tarif:
+    derselbe Tarif; sonst dieselbe Adresse), darunter die kleinste Stufe. Der Platz
+    bleibt der, den die Platzgrenze gezählt hat, mit seiner Stufe (die Seite liest alle
+    Stufen, ``speicher_gb`` ist nur die Bezeichnung); nur die Adresse ändert sich, und
+    nur, wo ein frisches Bündel die bisherige Wahl verdrängt."""
+    tarif = _tarif_kennung(seite.anbieter, seite.url)
+
+    def gleiche_seite(schluessel: _Schluessel) -> bool:
+        anbieter, gid, _, kennung = schluessel
+        if (anbieter, gid) != (seite.anbieter, seite.geraet):
+            return False
+        return kennung == tarif if tarif else kandidaten[schluessel] == seite.url
+
+    gewaehlt = (seite.anbieter, seite.geraet, seite.speicher_gb, tarif)
+    beste = min(
+        filter(gleiche_seite, kandidaten),
+        key=lambda s: (s not in frische, s[2]),
+        default=gewaehlt,
+    )
+    if beste == gewaehlt or beste not in frische or gewaehlt in frische:
+        return seite
+    return AutoSeite(seite.anbieter, seite.geraet, seite.speicher_gb, kandidaten[beste])
 
 
 def _tarif_kennung(anbieter: str, url: str) -> str:
@@ -157,11 +264,13 @@ def _je_adresse_eine_stufe(
     return {s: kandidaten[s] for s in einzeln.values()}
 
 
-def _lies_buendel(pfad: Path) -> list[dict]:
+def _lies_buendel(pfad: Path) -> tuple[list[dict], list[dict], list[dict]]:
+    """Nutzbare Bündel, die ``_nutzbar`` ausscheidet, und die davon, die main auch
+    zuließe."""
     try:
         text = pfad.read_text(encoding="utf-8")
     except FileNotFoundError:
-        return []
+        return [], [], []
     except OSError as fehler:
         raise KlicklisteAutoFehler(f"{pfad}: nicht lesbar ({fehler})") from fehler
     try:
@@ -174,22 +283,40 @@ def _lies_buendel(pfad: Path) -> list[dict]:
     return _nutzbar([b for b in liste if isinstance(b, dict)])
 
 
-def _nutzbar(buendel: list[dict]) -> list[dict]:
+def _ist_veraltet(eintrag: dict) -> bool:
+    return str(eintrag.get("pruefung") or "").startswith(PRUEFUNG_VERALTET)
+
+
+def _nutzbar(buendel: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
     """Frische Bündel, dann die veralteten, deren Messung höchstens
-    ``QUELLE_HOECHSTALTER_TAGE`` hinter dem jüngsten Bündel liegt (Reihenfolge sonst
-    wie im Bestand)."""
-    stand = max((d for d in map(_datum, buendel) if d), default=None)
-    grenze = None if stand is None else stand - timedelta(days=QUELLE_HOECHSTALTER_TAGE)
-
-    def veraltet(eintrag: dict) -> bool:
-        return str(eintrag.get("pruefung") or "").startswith(PRUEFUNG_VERALTET)
-
-    def jung_genug(eintrag: dict) -> bool:
+    ``QUELLE_HOECHSTALTER_TAGE`` hinter dem jüngsten Bündel *desselben Anbieters*
+    liegt, das jüngste zuerst (die erste Nennung eines Platzes gilt); dazu die
+    ausgeschiedenen und die nutzbaren, die auch main zuließe (Frist ab dem jüngsten
+    Bündel des Gesamtbestands)."""
+    stand: dict[str, date] = {}
+    for eintrag in buendel:
         datum = _datum(eintrag)
-        return grenze is not None and datum is not None and datum >= grenze
+        if datum is not None:
+            name = _anbieter(eintrag)
+            stand[name] = max(stand.get(name, datum), datum)
+    frist = timedelta(days=QUELLE_HOECHSTALTER_TAGE)
+    gesamt = max(stand.values(), default=None)
 
-    frisch = [b for b in buendel if not veraltet(b)]
-    return frisch + [b for b in buendel if veraltet(b) and jung_genug(b)]
+    def jung_genug(eintrag: dict, anker: date | None) -> bool:
+        datum = _datum(eintrag)
+        return datum is not None and anker is not None and datum >= anker - frist
+
+    frisch = [b for b in buendel if not _ist_veraltet(b)]
+    alt = [b for b in buendel if _ist_veraltet(b)]
+    alt.sort(key=lambda b: _datum(b) or date.min, reverse=True)
+    nutzbar = [b for b in alt if jung_genug(b, stand.get(_anbieter(b)))]
+    wie_main = [b for b in alt if jung_genug(b, gesamt)]
+    rest = [b for b in alt if not jung_genug(b, stand.get(_anbieter(b)))]
+    return frisch + nutzbar, rest, frisch + wie_main
+
+
+def _anbieter(eintrag: dict) -> str:
+    return str(eintrag.get("anbieter") or "").strip()
 
 
 def _datum(eintrag: dict) -> date | None:
@@ -238,16 +365,21 @@ def _passt(url: str, geraet: Geraet, speicher: int) -> bool:
 
 
 def _begrenze(
-    kandidaten: dict[_Schluessel, str], geraete: dict[str, Geraet]
+    kandidaten: dict[_Schluessel, str],
+    geraete: dict[str, Geraet],
+    wie_main: set[_Schluessel],
 ) -> list[AutoSeite]:
     """Höchstens ``HOECHSTE_SEITEN_JE_ANBIETER`` Plätze (Gerät und Stufe) je Anbieter,
-    neueste Geräte zuerst; die Tarifseiten eines Platzes zählen zusammen als einer."""
+    neueste Geräte zuerst; die Tarifseiten eines Platzes zählen zusammen als einer.
+    Zuerst kommen die Plätze, die auch main zuließe (``wie_main``, in main-Reihenfolge),
+    erst danach die nur durch den Anker je Anbieter zugelassenen (Prüfung PR 88, M1)."""
 
     def rang(schluessel: _Schluessel) -> tuple:
         anbieter, gid, speicher, tarif = schluessel
         g = geraete[gid]
         return (
             anbieter,
+            schluessel not in wie_main,
             -(g.generation or 0),
             g.marktstart == "",
             gid,
