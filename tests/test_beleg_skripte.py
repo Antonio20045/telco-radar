@@ -215,6 +215,84 @@ def test_ausfall_wird_im_manifest_vermerkt_und_haengt_nicht_an_der_seite(tmp_pat
     assert lies_manifest(tmp_path / MANIFEST_DATEI).ausfall is None
 
 
+def _api_antwort(tag: str, datei: str) -> subprocess.CompletedProcess:
+    zeile = json.dumps({"tag": tag, "dateien": [datei]})
+    return subprocess.CompletedProcess([], 0, stdout=zeile + "\n", stderr="")
+
+
+def test_ein_voruebergehender_502_bei_release_delete_wird_wiederholt_kein_ausfall(
+    tmp_path, monkeypatch
+):
+    """Lauf 43581672834: ein einzelner 502 bei `gh release delete` machte den
+    Schritt und danach „Render site“ rot. Ein Retry rettet ihn."""
+    modul = lade_skript("belege_manifest")
+    monkeypatch.setattr(modul.time, "sleep", lambda sekunden: None)
+    tag, datei = "belege-2026-11-01", dateiname("g", "o2", date(2026, 11, 1))
+    versuche = {"delete": 0}
+
+    def lauf(argv, **kwargs):
+        if argv[1] == "api":
+            return _api_antwort(tag, datei)
+        if argv[1:3] == ["release", "delete"]:
+            versuche["delete"] += 1
+            if versuche["delete"] == 1:
+                return subprocess.CompletedProcess(
+                    argv, 1, stdout="", stderr="HTTP 502"
+                )
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+        raise AssertionError(f"unerwarteter Aufruf: {argv}")
+
+    argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
+    assert modul.main(argv, lauf=lauf) == 0
+    assert versuche["delete"] == 2
+    assert lies_manifest(tmp_path / MANIFEST_DATEI).ausfall is None
+
+
+def test_dauerhafter_502_bei_release_delete_bleibt_ein_ausfall(tmp_path, monkeypatch):
+    """Nach erschöpften Versuchen gilt weiter Regel 6: der Ausfall steht im
+    Manifest, nicht „still“ weiterlaufen."""
+    modul = lade_skript("belege_manifest")
+    monkeypatch.setattr(modul.time, "sleep", lambda sekunden: None)
+    tag, datei = "belege-2026-11-01", dateiname("g", "o2", date(2026, 11, 1))
+    versuche = {"delete": 0}
+
+    def lauf(argv, **kwargs):
+        if argv[1] == "api":
+            return _api_antwort(tag, datei)
+        if argv[1:3] == ["release", "delete"]:
+            versuche["delete"] += 1
+            return subprocess.CompletedProcess(argv, 1, stdout="", stderr="HTTP 502")
+        raise AssertionError(f"unerwarteter Aufruf: {argv}")
+
+    argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
+    assert modul.main(argv, lauf=lauf) == 0
+    assert versuche["delete"] == modul.VERSUCHE_GH
+    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
+    assert ausfall is not None and "Löschen gescheitert" in ausfall
+
+
+def test_403_bei_release_delete_wird_nicht_wiederholt(tmp_path, monkeypatch):
+    """Ein Logikfehler (403) ist kein Netzproblem: kein Retry, sofort der Ausfall."""
+    modul = lade_skript("belege_manifest")
+    monkeypatch.setattr(modul.time, "sleep", lambda sekunden: None)
+    tag, datei = "belege-2026-11-01", dateiname("g", "o2", date(2026, 11, 1))
+    versuche = {"delete": 0}
+
+    def lauf(argv, **kwargs):
+        if argv[1] == "api":
+            return _api_antwort(tag, datei)
+        if argv[1:3] == ["release", "delete"]:
+            versuche["delete"] += 1
+            return subprocess.CompletedProcess(argv, 1, stdout="", stderr="HTTP 403")
+        raise AssertionError(f"unerwarteter Aufruf: {argv}")
+
+    argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
+    assert modul.main(argv, lauf=lauf) == 0
+    assert versuche["delete"] == 1
+    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
+    assert ausfall is not None and "Löschen gescheitert" in ausfall
+
+
 def test_melde_ausfall_ohne_netz_vermerkt_den_grund(tmp_path):
     modul = lade_skript("belege_manifest")
     argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]

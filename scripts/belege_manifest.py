@@ -34,6 +34,7 @@ in ``GH_TOKEN``. Der Workflow committet die Manifestdatei, dieses Skript nicht.
 from __future__ import annotations
 
 import argparse
+import re
 import signal
 import subprocess
 import sys
@@ -88,6 +89,18 @@ FEHLER_FRIST_ODER_LAUF = (
 Manifest, nie ein Abbruch des Schritts. Programmierfehler gehören nicht dazu."""
 
 
+VERSUCHE_GH = 3
+"""Höchstens so viele Versuche je einzelnem ``gh``-Aufruf dieses Skripts."""
+PAUSEN_GH_S = (2.0, 5.0)
+"""Pause vor dem 2. und 3. Versuch (Lauf 43581672834: ein einzelner 502 bei
+``gh release delete`` machte den Schritt und danach „Render site“ rot)."""
+_WIEDERHOLBAR_MUSTER = re.compile(
+    r"HTTP 5\d\d|connection reset|connection refused|timed? ?out", re.IGNORECASE
+)
+"""5xx und Netzfehler lohnen eine Wiederholung; 403/404 sind Logikfehler und laufen
+unverändert durch."""
+
+
 class Gesamtfrist(Exception):
     """``GESAMT_FRIST_S`` ist abgelaufen, bevor das Skript fertig war."""
 
@@ -111,6 +124,28 @@ def wachhund(sekunden: float) -> Iterator[None]:
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
         signal.signal(signal.SIGALRM, alt)
+
+
+def lauf_mit_wiederholung(
+    lauf: Callable[..., subprocess.CompletedProcess[str]],
+    schlaf: Callable[[float], None] = time.sleep,
+) -> Callable[..., subprocess.CompletedProcess[str]]:
+    """Wiederholt einen einzelnen ``gh``-Aufruf (``VERSUCHE_GH``, ``PAUSEN_GH_S``),
+    nur bei einem vorübergehenden Fehler (5xx/Netzfehler); 403/404 und andere
+    Logikfehler gehen beim ersten Versuch durch."""
+
+    def aufruf(argv: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        fertig = lauf(argv, **kwargs)
+        for pause in PAUSEN_GH_S:
+            if fertig.returncode == 0 or not _WIEDERHOLBAR_MUSTER.search(
+                fertig.stderr or ""
+            ):
+                break
+            schlaf(pause)
+            fertig = lauf(argv, **kwargs)
+        return fertig
+
+    return aufruf
 
 
 def entscheide_veraltete(anhaenge: dict[str, list[str]], gh: Releases) -> Veraltet:
@@ -206,7 +241,7 @@ def main(
         vermerke_ausfall(args.root, args.melde_ausfall, heute)
         return OK
     ende = time.monotonic() + GESAMT_FRIST_S - SCHREIB_RESERVE_S
-    gh = gh or Gh(runner_mit_frist(ende, lauf=lauf))
+    gh = gh or Gh(runner_mit_frist(ende, lauf=lauf_mit_wiederholung(lauf)))
     try:
         with wachhund(GESAMT_FRIST_S):
             grund = erneuere(args.root, heute, args.nur_lesen, gh)
