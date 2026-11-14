@@ -160,7 +160,7 @@ def namensetiketten(
     ideal = [y for _x, y, _a in enden]
     unten = h - _unten(folge[-1], breit, mon_je, mehrere) if folge else h
     tys = _gestapelt(ideal, abstaende)
-    if _irrefuehrend(tys, ideal, unten):
+    if any(zweizeilig(a) for a in folge) and _irrefuehrend(tys, ideal, unten):
         tys = _platziere(ideal, abstaende, ETIKETT_OBEN, unten)
     teile: list[str] = []
     lx = w - ENDLABEL_RAND
