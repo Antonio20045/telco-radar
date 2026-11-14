@@ -134,11 +134,12 @@ class Zusammenfuehrung:
     angebot: Angebot = field(default_factory=dict)
     heutige_messung: dict[Schluessel, dict] = field(default_factory=dict)
     geraet: Geraet | None = None
+    erfassung_zusatz: dict[str, str] = field(default_factory=dict)
 
     @property
     def erfassung(self) -> dict[str, str]:
         """Je Anbieter der Grund eines gestörten Klick-Laufs (``klick_erfassung``)."""
-        return erfassungsgruende(self.bilanz)
+        return {**erfassungsgruende(self.bilanz), **self.erfassung_zusatz}
 
     def buendel(
         self,

@@ -15,7 +15,15 @@ mit dieser Geräte-ID statt eines Anbietergrundes. Ebenso bekommt jedes Gerät, 
 Lauf von heute gelesen hat (``speicher_gelesen``), gestört oder nicht, den Satz „Bei
 Telekom nur mit 256 GB gelesen (10.10.2026)“: ein Modell mit anderem Speicher fehlt
 dort, weil die Übersicht je Gerät einen Speicher zeigt, nicht weil die Seite sperrt.
-"""
+
+Vodafone hat keine Klick-Übersicht (die Karte klickt nur Produktseiten), darum nie
+einen Eintrag der obigen Art. Seine vollständige Geräteliste kommt stattdessen aus dem
+Adapter-Lauf selbst (``collect.geraete.vodafone.ernte``, Bestand ``geraete_db.json``,
+``GeraeteDB.lesezustand``); ``angebotene_speicher`` baut daraus schon das ``Angebot``
+je heute ganz gelesenem Anbieter. ``nicht_im_angebot_aus_angebot`` zieht denselben
+Satz „Bei Vodafone nicht im Angebot (…)“ aus einem Katalog-Gerät, das in diesem
+Angebot an keinem Schlüssel steht - dieselbe Aussage wie oben, nur aus der
+Adapterliste statt einer Klick-Übersicht."""
 
 from __future__ import annotations
 
@@ -192,3 +200,34 @@ def ohne_karte(
 def fuer_modell(gruende: dict[str, str], modell: dict) -> dict[str, str]:
     """``ohne_karte`` für ein Modell der Geräteseite (Karten und Geräte-ID)."""
     return ohne_karte(gruende, modell.get("karten") or [], modell.get("device_id"))
+
+
+ANBIETER_OHNE_UEBERSICHT = ("Vodafone",)
+"""Anbieter ohne Klick-Übersicht; ihr Angebot kommt nur aus der Adapterliste."""
+
+
+def nicht_im_angebot_aus_angebot(
+    angebot: Angebot,
+    katalog,
+    heute: str,
+    anbieter: tuple[str, ...] = ANBIETER_OHNE_UEBERSICHT,
+) -> dict[str, str]:
+    """``SATZ_NICHT_IM_ANGEBOT`` je Katalog-Gerät außerhalb der heute ganz
+    gelesenen Adapterliste eines Anbieters ohne Klick-Übersicht (Modulkopf).
+
+    ``angebot`` trägt nur Anbieter, deren Geräteliste heute ganz gelesen wurde
+    (``klick_angebot.angebot_aus``); ein Anbieter, der dort fehlt - Lauf
+    gestört, leer oder unvollständig -, bekommt keinen Satz: lieber eine
+    Lücke als ein falscher Beleg."""
+    datum = date.fromisoformat(heute).strftime("%d.%m.%Y")
+    alle = {g.device_id for g in katalog.geraete}
+    saetze: dict[str, str] = {}
+    for name in anbieter:
+        gesehen = angebot.get(name)
+        if gesehen is None:
+            continue
+        satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter=name, datum=datum)
+        saetze.update(
+            {f"{name}{TRENNER}{g}": satz for g in sorted(alle - set(gesehen))}
+        )
+    return saetze
