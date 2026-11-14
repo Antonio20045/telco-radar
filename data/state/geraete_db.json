@@ -2,8 +2,8 @@
  "updated": "2026-11-14",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 112,
-   "funde_gesamt": 663,
+   "laeufe": 113,
+   "funde_gesamt": 669,
    "letzter_lauf": "2026-11-14",
    "letzte_funde": 6,
    "letzter_fund": "2026-11-14",
@@ -327,8 +327,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 110,
-   "funde_gesamt": 18731,
+   "laeufe": 111,
+   "funde_gesamt": 18887,
    "letzter_lauf": "2026-11-14",
    "letzte_funde": 156,
    "termine": [
@@ -652,8 +652,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 110,
-   "funde_gesamt": 7425,
+   "laeufe": 111,
+   "funde_gesamt": 7494,
    "letzter_lauf": "2026-11-14",
    "letzte_funde": 69,
    "termine": [
@@ -977,8 +977,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 58,
-   "funde_gesamt": 13864,
+   "laeufe": 59,
+   "funde_gesamt": 14019,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1851,8 +1851,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 75,
-   "funde_gesamt": 14333,
+   "laeufe": 76,
+   "funde_gesamt": 14468,
    "letzter_lauf": "2026-11-14",
    "letzte_funde": 135,
    "termine": [
@@ -2170,8 +2170,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 102,
-   "funde_gesamt": 3923,
+   "laeufe": 103,
+   "funde_gesamt": 3962,
    "letzter_lauf": "2026-11-14",
    "letzte_funde": 39,
    "termine": [
@@ -2489,8 +2489,8 @@
    "tote_adressen": 0
   },
   "Telekom": {
-   "laeufe": 15,
-   "funde_gesamt": 148,
+   "laeufe": 16,
+   "funde_gesamt": 158,
    "letzter_lauf": "2026-11-14",
    "letzte_funde": 10,
    "termine": [
@@ -2750,8 +2750,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 98,
-   "funde_gesamt": 1720,
+   "laeufe": 99,
+   "funde_gesamt": 1739,
    "letzter_lauf": "2026-11-14",
    "letzte_funde": 19,
    "termine": [
@@ -3315,8 +3315,8 @@
    "tote_adressen": null
   },
   "MediaMarkt": {
-   "laeufe": 10,
-   "funde_gesamt": 38,
+   "laeufe": 11,
+   "funde_gesamt": 47,
    "funde_nach_tag": [
     [
      "2026-10-12",
@@ -10560,23 +10560,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-11-03",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1699.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-11-03",
-   "last_verified": "2026-11-13",
+   "last_verified": "2026-11-14",
    "letzter_check": "2026-11-14",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-18-pro-512gb-glacier-3071605.html",
-   "abgerufen_am": "2026-11-13",
+   "abgerufen_am": "2026-11-14",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-18-pro"
    ],
    "titel_roh": "APPLE iPhone 18 Pro 512 GB Polar Dual SIM",
-   "preis_ohne_vertrag": 1699.0,
-   "stale_since": "2026-11-14"
+   "preis_ohne_vertrag": 1699.0
   },
   {
    "id": "saturn--apple-iphone-18-pro-512gb-schwarz",
