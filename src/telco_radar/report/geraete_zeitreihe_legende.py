@@ -10,7 +10,16 @@ from __future__ import annotations
 from ..tco_kosten import ZEITRAUM_OHNE_BINDUNG
 from . import geraete_notbremse as notbremse
 from . import geraete_preisstand as preisstand
-from .geraete_rechenweg import ANBIETER_FOLGE, _esc, _zr_marker_farbe
+from .geraete_rechenweg import ZEITREIHE_FOLGE, _esc, _zr_marker_farbe
+
+NAMEN_TRENNER = " · "
+"""Ein Name mit Zusatz („Saturn/MediaMarkt · Telekom-Netz“) ist lang: im Bild
+zweizeilig, in der Legende darf seine Zahl umbrechen."""
+
+
+def zweizeilig(name: str) -> bool:
+    """Trägt der Name einen Zusatz hinter dem Trenner (Händler · Netz)?"""
+    return NAMEN_TRENNER in name
 
 
 def _euro0(betrag) -> str:
@@ -83,7 +92,7 @@ def schaetzung_html(satz: dict | None, mess: dict, serien: dict) -> str:
         if k.get("sku_id") and (k.get("zustand") or "neu") == "neu"
     ]
     saetze = []
-    for anbieter in ANBIETER_FOLGE:
+    for anbieter in ZEITREIHE_FOLGE:
         serie, tage = serien.get(anbieter), mess.get(anbieter)
         if not serie or not tage:
             continue
@@ -141,7 +150,7 @@ def ueberholt_html(
         f"<span class='gr-zr-leg-ueberholt'><i style='background:"
         f"{_zr_marker_farbe(a)}'></i>{_esc(a)} · {_esc(luecken[a]['kurz'])}"
         f", frühere Preise überholt und nicht gezeigt</span>"
-        for a in ANBIETER_FOLGE
+        for a in ZEITREIHE_FOLGE
         if a in luecken and mess.get(a) and not serien.get(a)
     ) + schaetzung_html(satz, mess, serien)
 
@@ -168,12 +177,13 @@ def legende_html(
         }
     )
     eintraege = []
-    for anbieter in ANBIETER_FOLGE:
+    for anbieter in ZEITREIHE_FOLGE:
         serie = anbieter_serien.get(anbieter)
         if not serie:
             continue
+        umbruch = " style='white-space:normal'" if zweizeilig(anbieter) else ""
         zusatz = (
-            f" <span class='gr-zr-leg-wert'>anfangs {_euro0(serie[0][1])}"
+            f" <span class='gr-zr-leg-wert'{umbruch}>anfangs {_euro0(serie[0][1])}"
             f" · zuletzt {_euro0(serie[-1][1])}</span>"
         )
         mon_text = (
