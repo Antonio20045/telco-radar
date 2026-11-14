@@ -29,6 +29,7 @@ Ein Beleg kann eine Bildfolge sein (``beleg_bildfolge``).
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -45,6 +46,19 @@ from .ausfall import Ausfall
 from .geraete_preisstand import anzeige as preis_anzeige
 
 TEIL = "Belegbilder"
+SATZ_FEHLEN = "Die Belegbilder fehlen heute; die Preise sind davon nicht betroffen."
+
+
+def satz_stand(erstellt: date | None) -> str:
+    """Der Satz der Seite, wenn die Bilderliste nicht erneuert wurde (Issue 130)."""
+    if erstellt is None:
+        return SATZ_FEHLEN
+    return (
+        f"Die Belegbilder sind auf dem Stand vom {erstellt:%d.%m.%Y}; "
+        "die Preise sind davon nicht betroffen."
+    )
+
+
 TEIL_ZEILEN = "Zeilenbelege"
 BESTAND = "geraete_tco.json"
 ZEILEN_STAND = "_zeilenbelege"
@@ -133,10 +147,11 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
                 Ausfall(
                     TEIL,
                     f"Manifest nicht erneuert, Stand von zuvor: {manifest.ausfall}",
+                    satz_stand(manifest.erstellt if manifest.belege else None),
                 )
             )
     except BelegManifestFehler as fehler:
-        ausfaelle.append(Ausfall.aus_ausnahme(TEIL, fehler))
+        ausfaelle.append(replace(Ausfall.aus_ausnahme(TEIL, fehler), satz=SATZ_FEHLEN))
         je_preis = {}
         manifest_ok = False
     env.globals["belege_fuer"] = lambda geraet_id, anbieter: je_preis.get(

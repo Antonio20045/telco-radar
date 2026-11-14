@@ -129,7 +129,9 @@ def test_nur_lesen_loescht_nichts_zeigt_aber_auf_die_neue_position(tmp_path):
     assert kennungen(lies(tmp_path)) == {K2[:16]}
 
 
-def test_scheitert_das_loeschen_zeigt_das_manifest_trotzdem_auf_die_neue(tmp_path):
+def test_scheitert_das_loeschen_zeigt_das_manifest_trotzdem_auf_die_neue(
+    tmp_path, capsys
+):
     class Haengt(ProtokollGh):
         def asset_loeschen(self, tag: str, datei: str) -> None:
             raise GhFehler(f"gh release delete-asset {tag}: Exit 1: kaputt")
@@ -138,7 +140,8 @@ def test_scheitert_das_loeschen_zeigt_das_manifest_trotzdem_auf_die_neue(tmp_pat
     assert manifest_lauf(tmp_path, gh) == 0
     manifest = lies(tmp_path)
     assert kennungen(manifest) == {K2[:16]}
-    assert "Löschen gescheitert" in manifest["ausfall"]
+    assert "ausfall" not in manifest
+    assert "::error::Belege: Löschen gescheitert" in capsys.readouterr().err
 
 
 def test_monats_release_wird_mitgeraeumt(tmp_path):

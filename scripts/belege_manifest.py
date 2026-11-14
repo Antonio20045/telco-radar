@@ -27,7 +27,9 @@ alles andere. Jeder Fehler, auch ein Zeitüberschreiten, steht auf stderr und al
 ``ausfall`` im Manifest (die Seite nennt ihn; die letzten Bilder bleiben stehen,
 CLAUDE.md Clean Code 5), und der Exit-Code ist 0. Nur ein falscher Aufruf (argparse)
 endet mit 2. Löschen, das scheitert, schreibt das Manifest trotzdem: die nicht
-gelöschten Bilder sind abgelaufen und fallen darin schon heraus. Das Token liegt nur
+gelöschten Bilder sind abgelaufen und fallen darin schon heraus. Es ist deshalb kein
+``ausfall`` (die Seite ist vollständig), steht als ``::error::`` im Protokoll, und der
+nächste Lauf löscht erneut. Das Token liegt nur
 in ``GH_TOKEN``. Der Workflow committet die Manifestdatei, dieses Skript nicht.
 """
 
@@ -210,9 +212,7 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
     for paar in veraltet.offen:
         print(f"Belege: zwei Positionen, keine Reihenfolge: {paar}", file=sys.stderr)
     for zeile in bilanz.fehler:
-        print(f"Belege: {zeile}", file=sys.stderr)
-    if bilanz.fehler:
-        return f"Löschen gescheitert ({len(bilanz.fehler)}): {bilanz.fehler[0]}"
+        print(f"::error::Belege: Löschen gescheitert: {zeile}", file=sys.stderr)
     return None
 
 
