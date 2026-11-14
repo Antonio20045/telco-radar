@@ -61,6 +61,7 @@ from .geraete_luecken import _alternativen as _alternativen
 from .geraete_luecken import _luecken as _luecken
 from .geraete_luecken import fehlen_im_paar, haenge_an
 from .geraete_rechenweg import _NAEHERUNG_SATZ as _NAEHERUNG_SATZ
+from .geraete_rechenweg import ANBIETER_FOLGE as ANBIETER_FOLGE
 from .geraete_rechenweg import (
     EIGEN,
     ZEITREIHE_FOLGE,
@@ -94,9 +95,8 @@ log = logging.getLogger(__name__)
 BREIT_W, BREIT_MIN_H = 1136, 420
 SCHMAL_W, SCHMAL_MIN_H = 358, 380
 KOPF_FREIRAUM_BREIT, KOPF_FREIRAUM_SCHMAL = 18, 10
-MASSSTAB_FREIRAUM_ANTEIL = 0.12
+MASSSTAB_FREIRAUM_ANTEIL, ACHSENBRUCH_ANTEIL = 0.12, 0.10
 TREFFERFLAECHE_RADIUS = 12
-ACHSENBRUCH_ANTEIL = 0.10
 AUTO_SICHTBAR_AB_MESTAGEN = 2
 
 
