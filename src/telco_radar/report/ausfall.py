@@ -15,6 +15,9 @@ class Ausfall:
 
     teil: str
     grund: str
+    satz: str | None = None
+    """Was die Seite statt Teil und Grund zeigt (ganzer deutscher Satz, ohne Befehle
+    und Statuscodes); der technische ``grund`` bleibt in Rückgabe und Protokoll."""
 
     @classmethod
     def aus_ausnahme(cls, teil: str, exc: BaseException) -> "Ausfall":

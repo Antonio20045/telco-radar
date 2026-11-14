@@ -65,7 +65,7 @@
   <main id="inhalt">
     {% block buehne %}{% endblock %}
     <div class="{{ wrap_class | default('wrap') }}">
-      {% if ausfaelle %}<p class="ausfall-hinweis" id="ausfaelle">Nicht neu gebaut: {% for a in ausfaelle %}{{ a.teil }} ({{ a.grund | truncate(160) }}){% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
+      {% if ausfaelle %}{% set technisch = ausfaelle | rejectattr('satz') | list %}<p class="ausfall-hinweis" id="ausfaelle">{% if technisch %}Nicht neu gebaut: {% for a in technisch %}{{ a.teil }} ({{ a.grund | truncate(160) }}){% if not loop.last %} · {% endif %}{% endfor %}{% endif %}{% for a in ausfaelle | selectattr('satz') %}{% if technisch or not loop.first %} {% endif %}{{ a.satz }}{% endfor %}</p>{% endif %}
       {% block content %}{% endblock %}
     </div>
   </main>

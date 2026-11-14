@@ -96,8 +96,7 @@ def test_loeschfehler_endet_mit_null_manifest_wird_geschrieben_und_nennt_ihn(tmp
     )
     assert manifest_lauf(tmp_path, gh) == 0
     assert lies(tmp_path / MANIFEST_DATEI) == []
-    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
-    assert ausfall is not None and "Löschen gescheitert" in ausfall
+    assert lies_manifest(tmp_path / MANIFEST_DATEI).ausfall is None
 
 
 def satz(tarif: float, beleg_id: str, anbieter: str = "Telekom") -> dict:
@@ -248,9 +247,12 @@ def test_ein_voruebergehender_502_bei_release_delete_wird_wiederholt_kein_ausfal
     assert lies_manifest(tmp_path / MANIFEST_DATEI).ausfall is None
 
 
-def test_dauerhafter_502_bei_release_delete_bleibt_ein_ausfall(tmp_path, monkeypatch):
-    """Nach erschöpften Versuchen gilt weiter Regel 6: der Ausfall steht im
-    Manifest, nicht „still“ weiterlaufen."""
+def test_dauerhafter_502_bei_release_delete_steht_im_protokoll(
+    tmp_path, monkeypatch, capsys
+):
+    """Nach erschöpften Versuchen läuft nichts „still“ weiter: der Fehler steht als
+    ``::error::`` im Protokoll. Die Seite nennt ihn nicht (Issue #130), weil das
+    Manifest von heute geschrieben ist."""
     modul = lade_skript("belege_manifest")
     monkeypatch.setattr(modul.time, "sleep", lambda sekunden: None)
     tag, datei = "belege-2026-11-01", dateiname("g", "o2", date(2026, 11, 1))
@@ -267,12 +269,12 @@ def test_dauerhafter_502_bei_release_delete_bleibt_ein_ausfall(tmp_path, monkeyp
     argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
     assert modul.main(argv, lauf=lauf) == 0
     assert versuche["delete"] == modul.VERSUCHE_GH
-    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
-    assert ausfall is not None and "Löschen gescheitert" in ausfall
+    assert lies_manifest(tmp_path / MANIFEST_DATEI).ausfall is None
+    assert "::error::Belege: Löschen gescheitert" in capsys.readouterr().err
 
 
-def test_403_bei_release_delete_wird_nicht_wiederholt(tmp_path, monkeypatch):
-    """Ein Logikfehler (403) ist kein Netzproblem: kein Retry, sofort der Ausfall."""
+def test_403_bei_release_delete_wird_nicht_wiederholt(tmp_path, monkeypatch, capsys):
+    """Ein Logikfehler (403) ist kein Netzproblem: kein Retry, sofort der Fehler."""
     modul = lade_skript("belege_manifest")
     monkeypatch.setattr(modul.time, "sleep", lambda sekunden: None)
     tag, datei = "belege-2026-11-01", dateiname("g", "o2", date(2026, 11, 1))
@@ -289,8 +291,8 @@ def test_403_bei_release_delete_wird_nicht_wiederholt(tmp_path, monkeypatch):
     argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
     assert modul.main(argv, lauf=lauf) == 0
     assert versuche["delete"] == 1
-    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
-    assert ausfall is not None and "Löschen gescheitert" in ausfall
+    assert lies_manifest(tmp_path / MANIFEST_DATEI).ausfall is None
+    assert "::error::Belege: Löschen gescheitert" in capsys.readouterr().err
 
 
 def test_melde_ausfall_ohne_netz_vermerkt_den_grund(tmp_path):

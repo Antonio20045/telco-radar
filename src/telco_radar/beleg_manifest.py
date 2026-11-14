@@ -61,6 +61,8 @@ class Manifest:
 
     belege: list[Beleg]
     ausfall: str | None = None
+    erstellt: date | None = None
+    """Tag der letzten gelungenen Erneuerung; ``None``, wenn es keine Datei gibt."""
 
 
 @dataclass(frozen=True)
@@ -256,7 +258,8 @@ def lies_manifest(pfad: Path) -> Manifest:
             for b in daten["belege"]
         ]
         ausfall = daten.get("ausfall")
-        return Manifest(belege, str(ausfall) if ausfall else None)
+        erstellt = date.fromisoformat(daten["erstellt"])
+        return Manifest(belege, str(ausfall) if ausfall else None, erstellt)
     except (OSError, ValueError, KeyError, TypeError) as fehler:
         raise BelegManifestFehler(f"{pfad}: {fehler}") from fehler
 
