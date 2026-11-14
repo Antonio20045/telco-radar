@@ -15,12 +15,11 @@ gescheitertes Paket steht in der Bilanz, die übrigen laufen weiter (Clean Code 
 nach ``AUFBEWAHRUNG_GROSS_TAGE`` löschen; in jüngeren Monats-Releases einzelne Bilder,
 die älter sind. Was nicht im Schema liegt, rührt nichts an.
 
-Ein Paket kann halb ankommen (``gh`` lädt die Dateien parallel und bricht beim ersten
-Fehler ab) und frisch angelegte Releases antworten kurz mit 404. Darum liest
-``veroeffentliche`` nach einem Fehler die Anhänge, zählt, was angekommen ist, und lädt
-bei vorübergehenden Fehlern (404, „already exists“, 429, 5xx) nur den Rest mit Pause
-erneut (``VERSUCHE``). Was fehlt, steht als ``fehlgeschlagen`` mit Fehlerzeile;
-``ausgelassen`` heißt nur: Zeit abgelaufen.
+Ein Paket kann halb ankommen (``gh`` lädt parallel, bricht beim ersten Fehler ab),
+frisch angelegte Releases antworten kurz mit 404. ``veroeffentliche`` liest danach die
+Anhänge, zählt das Angekommene und lädt bei vorübergehenden Fehlern (404, „already
+exists“, 429, 5xx, Rate-Limit) nur den Rest erneut (``VERSUCHE``, Pause ``BACKOFF_S``
+oder ``Retry-After``). Fehlendes ist ``fehlgeschlagen``, ``ausgelassen``: Zeit vorbei.
 
 ``frist_ende`` ist die monotone Zeit, bis zu der ein neues Paket beginnen darf
 (CLAUDE.md Regel 8); der Rest heißt ``ausgelassen``. Außer ``gh`` gibt es kein Netz; das
@@ -30,6 +29,7 @@ Token liegt nur in der Umgebung (``GH_TOKEN``), nie in Argumenten oder Ausgaben.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import time
 from collections import Counter
@@ -57,9 +57,8 @@ PAKET = 40
 ZEIT_JE_AUFRUF_S = 300
 VERSUCHE = 5
 """Hochladeversuche je Paket bei vorübergehenden Fehlern."""
-PAUSE_S = 5.0
-"""Pause vor Versuch n+1: ``PAUSE_S * n`` Sekunden, nur solange die Frist es zulässt."""
-VORUEBERGEHEND = ("HTTP 404", "already exists", "HTTP 429", "HTTP 50")
+BACKOFF_S, PAUSE_ZWISCHEN_PAKETEN_S = (10.0, 30.0, 60.0, 120.0), 1.0
+VORUEBERGEHEND = ("HTTP 404", "already exists", "HTTP 429", "HTTP 50", "rate limit")
 """Teile einer ``GhFehler``-Meldung, die eine Wiederholung lohnen."""
 Runner = Callable[[Sequence[str]], "subprocess.CompletedProcess[str]"]
 Anhaenge = Mapping[str, Sequence[str]]
@@ -283,7 +282,8 @@ def _lade_paket(
         offen = [b for b in offen if b not in angekommen]
         if not offen or versuch == VERSUCHE or not ist_voruebergehend(letzter):
             break
-        pause = PAUSE_S * versuch
+        m = re.search(r"retry.{0,20}?(\d+)\s*second", str(letzter), re.I)
+        pause = float(m[1]) if m else BACKOFF_S[min(versuch - 1, len(BACKOFF_S) - 1)]
         if frist_ende is not None and uhr() + pause >= frist_ende:
             break
         schlaf(pause)
@@ -318,11 +318,13 @@ def _lade_tag(
             bilanz.fehlgeschlagen += len(eintraege)
             return
         vorhanden[tag] = []
-    for start in range(0, len(eintraege), PAKET):
+    for i, start in enumerate(range(0, len(eintraege), PAKET)):
         paket = eintraege[start : start + PAKET]
         if frist_ende is not None and uhr() >= frist_ende:
             bilanz.ausgelassen += len(paket)
             continue
+        if i:
+            schlaf(PAUSE_ZWISCHEN_PAKETEN_S)
         angekommen = len(
             _lade_paket(tag, paket, vorhanden, gh, bilanz, frist_ende, uhr, schlaf)
         )

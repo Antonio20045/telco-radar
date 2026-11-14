@@ -123,7 +123,7 @@ def test_pakete_und_volles_release_bekommt_zaehler(tmp_path, monkeypatch):
     monkeypatch.setattr(beleg_ablage, "MAX_ANHAENGE_JE_RELEASE", 3)
     gh = AttrappeReleases()
     bilder = [bild(tmp_path, f"g{i}", "o2") for i in range(5)]
-    veroeffentliche(bilder, HEUTE, gh)
+    veroeffentliche(bilder, HEUTE, gh, schlaf=lambda s: None)
     assert sorted(gh.stand) == ["belege-2026-11-10", "belege-2026-11-10-2"]
     assert [len(gh.stand[t]) for t in sorted(gh.stand)] == [3, 2]
     assert [len(d) for _, d in gh.hochgeladen] == [2, 1, 2]
@@ -367,7 +367,7 @@ def test_404_nach_dem_anlegen_wird_mit_pause_wiederholt(tmp_path):
     bilanz = veroeffentliche(viele(tmp_path, 3), HEUTE, gh, schlaf=pausen.append)
     assert len(gh.stand["belege-2026-11-10"]) == 3
     assert (bilanz.hochgeladen, bilanz.fehlgeschlagen, bilanz.fehler) == (3, 0, [])
-    assert pausen == [beleg_ablage.PAUSE_S, 2 * beleg_ablage.PAUSE_S]
+    assert pausen == [beleg_ablage.BACKOFF_S[0], beleg_ablage.BACKOFF_S[1]]
 
 
 def test_halb_angekommenes_paket_zaehlt_und_laedt_nur_den_rest_nach(tmp_path):
@@ -415,6 +415,41 @@ def test_wiederholung_beachtet_die_frist(tmp_path):
     )
     assert pausen == [] and gh.versuche == 1
     assert (bilanz.fehlgeschlagen, bilanz.ausgelassen) == (2, 0)
+
+
+def test_sekundaeres_rate_limit_wird_mit_backoff_wiederholt(tmp_path):
+    meldung = "HTTP 403: You have exceeded a secondary rate limit, please wait"
+    gh = FlakyReleases(meldung, 2)
+    pausen: list[float] = []
+    bilanz = veroeffentliche(viele(tmp_path, 3), HEUTE, gh, schlaf=pausen.append)
+    assert len(gh.stand["belege-2026-11-10"]) == 3
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen, bilanz.fehler) == (3, 0, [])
+    assert pausen == [beleg_ablage.BACKOFF_S[0], beleg_ablage.BACKOFF_S[1]]
+
+
+def test_sekundaeres_rate_limit_mit_retry_after_nimmt_die_genannte_zeit(tmp_path):
+    meldung = "HTTP 403: secondary rate limit, retry after 42 seconds"
+    gh = FlakyReleases(meldung, 1)
+    pausen: list[float] = []
+    veroeffentliche(viele(tmp_path, 2), HEUTE, gh, schlaf=pausen.append)
+    assert pausen == [42.0]
+
+
+def test_echtes_403_ohne_rate_limit_wird_nicht_wiederholt(tmp_path):
+    gh = FlakyReleases("HTTP 403: Resource not accessible by integration", 99)
+    bilanz = veroeffentliche(viele(tmp_path, 2), HEUTE, gh, schlaf=lambda s: None)
+    assert gh.versuche == 1
+    assert (bilanz.fehlgeschlagen, bilanz.ausgelassen) == (2, 0)
+
+
+def test_kleine_pause_zwischen_paketen_desselben_releases(tmp_path, monkeypatch):
+    monkeypatch.setattr(beleg_ablage, "PAKET", 1)
+    pausen: list[float] = []
+    bilanz = veroeffentliche(
+        viele(tmp_path, 3), HEUTE, AttrappeReleases(), schlaf=pausen.append
+    )
+    assert bilanz.hochgeladen == 3
+    assert pausen == [beleg_ablage.PAUSE_ZWISCHEN_PAKETEN_S] * 2
 
 
 def test_vorhandene_datei_gilt_nicht_als_angekommen(tmp_path):
