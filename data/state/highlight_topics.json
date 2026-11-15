@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-14",
+ "updated": "2026-11-15",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -1040,8 +1040,8 @@
    ],
    "first_seen": "2026-11-11",
    "last_active": "2026-11-11",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://www.broadbandtvnews.com/2026/11/11/disney-launches-ad-supported-subscription-tier-in-austria/",
@@ -1082,7 +1082,8 @@
      "week": "2026-11-11",
      "relevance": 4
     }
-   ]
+   ],
+   "ended": "2026-11-15"
   }
  ]
 }

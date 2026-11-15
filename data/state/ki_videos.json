@@ -1,6 +1,36 @@
 {
- "stand": "2026-11-14",
+ "stand": "2026-11-15",
  "videos": [
+  {
+   "id": "_l6gzItCF80",
+   "titel": "Claude Fable 5.2: DAS kann es wirklich! + Die Folgen des NVIDIA-Dramas | KI-NEWS",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-15",
+   "dauer_sekunden": 2282,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "_l6gzItCF80.jpg"
+  },
+  {
+   "id": "X3r-mZtPfP8",
+   "titel": "The Self-Driving Car With Balls",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-15",
+   "dauer_sekunden": 60,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "X3r-mZtPfP8.jpg"
+  },
+  {
+   "id": "K6ffYKrlPdU",
+   "titel": "AI Model Debugging: Find the First Divergence Across AI Accelerators",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-15",
+   "dauer_sekunden": 870,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "K6ffYKrlPdU.jpg"
+  },
   {
    "id": "x7iwI6WfWS0",
    "titel": "AI Can Do Everything…Except This",
@@ -213,7 +243,7 @@
   },
   {
    "id": "SxiYOCPW8_c",
-   "titel": "DAS ist der nächste KI-Durchbruch! Roboter-Selbstverbesserung & Asimovs Gesetze (Markus Wulfmeier)",
+   "titel": "DAS ist der nächste Durchbruch! GPT-7, Roboter-RSI & Asimovs Gesetze (Markus Wulfmeier)",
    "kanal": "Everlast AI",
    "datum": "2026-11-12",
    "dauer_sekunden": 4251,
@@ -270,123 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "uND6iY2qp_c.jpg"
-  },
-  {
-   "id": "shpOEg__ICo",
-   "titel": "Google AI Studio Voice Generator – Text to Speech Tutorial",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 345,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "shpOEg__ICo.jpg"
-  },
-  {
-   "id": "pvl3z_GyU2Y",
-   "titel": "How To Build An AI Operating System For Your Life",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1664,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "pvl3z_GyU2Y.jpg"
-  },
-  {
-   "id": "pIW_8VyvCuQ",
-   "titel": "Build What’s Next on the ChatGPT Platform with Plugins | DevDay 2026",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1665,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "pIW_8VyvCuQ.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-14",
-   "abgerufen": "2026-11-14"
+   "versucht": "2026-11-15",
+   "abgerufen": "2026-11-15"
   }
  },
  "error": null
