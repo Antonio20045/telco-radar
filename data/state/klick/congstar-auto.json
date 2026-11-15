@@ -1,7 +1,7 @@
 {
  "anbieter": "congstar-auto",
- "datum": "2026-11-14",
- "dauer_sekunden": 42.4,
+ "datum": "2026-11-15",
+ "dauer_sekunden": 45.8,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -14,21 +14,22 @@
    "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/",
    "geraet": "samsung-galaxy-s25-fe",
    "gescheitert": 0,
-   "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details",
+   "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details,/geraete/samsung/?redirectFrom=device-details",
    "http_status": 200,
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 26,
-    "beendet": 25,
+    "anfragen": 86,
+    "beendet": 85,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "images.congstar.de": 5,
      "www.congstar.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 4.6,
-    "takte_ms": 2850,
+    "sekunden": 7.0,
+    "takte_ms": 2700,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -61,7 +62,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a1fa200fd0d624094548a117315d338f4b3c908e4c75c8718b3684333f467f37",
+      "beleg_id": "108655d980a52182e25693f96462c6e7bcc43d5703c7f4419c0c38c7de1dc95d",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -82,7 +83,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=543",
-      "zeitpunkt": "2026-11-14T06:33:31Z"
+      "zeitpunkt": "2026-11-15T06:37:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -122,7 +123,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "56e6627a07e7049ede506117792f37cff88f6b07552292bb3f0ca9ef8cfc47ee",
+      "beleg_id": "da0117eb970872e28f6d63388b5222f8fa69a1f283e44130a6441eb6e4dedc87",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -143,7 +144,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-11-14T06:33:32Z"
+      "zeitpunkt": "2026-11-15T06:37:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -183,7 +184,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fb8b4ff962f39f1f153f774f560773ab977f29a2d0668d0f5806cce9c2c4bae9",
+      "beleg_id": "bb3ca2da47b35b4b2a7e40eaabe281c5be9e9cf45d6ef3d691022a0c1cccfaa9",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -204,7 +205,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-11-14T06:33:34Z"
+      "zeitpunkt": "2026-11-15T06:38:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -244,7 +245,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c0312c77c229385837323d8afe7ed02c0790ef0ba8b49bf87ed44d245965c439",
+      "beleg_id": "ab9ec129fa4e5161789d06f931fb6328f47ee974ede4e9121477b129ad0c6f3c",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -265,7 +266,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-11-14T06:33:36Z"
+      "zeitpunkt": "2026-11-15T06:38:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -305,7 +306,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3b47cf0bc83a4ba9d95182594de7fb563e829f39cbd4038456b9c8a79d6817a8",
+      "beleg_id": "c997e3feff033f0bd27207ccca9eb4f59e870d4a2f9cfb0bfcdb69068ec7266e",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -326,7 +327,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-11-14T06:33:37Z"
+      "zeitpunkt": "2026-11-15T06:38:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -366,7 +367,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "311ed2d9d0447f74533525c5ab24a40590744908daedd4333120af6e6e6582b8",
+      "beleg_id": "ec1528b442d3ebe3bd4c1734b9fe877d545837261c2959d6f82ef2d3a444f1ca",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -387,7 +388,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-11-14T06:33:39Z"
+      "zeitpunkt": "2026-11-15T06:38:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -427,7 +428,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1cddb8e1c037fa0c22c8a98f581b55f30470e17ba114024a00df30a466c755cd",
+      "beleg_id": "619f523cd43a97471aa40955c32f6fa6905604e3a83e580b6e3ce7590d6d4809",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -448,7 +449,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-11-14T06:33:41Z"
+      "zeitpunkt": "2026-11-15T06:38:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -488,7 +489,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b8280cce26de361929dfd6a32625112c2aa20bc11bf0fee0e689405e656f6fea",
+      "beleg_id": "2b56fbc9f8dd6ce1e6a53e7b736b9d0bffa1af63817cb8149486a82343d98dfb",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -509,7 +510,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-11-14T06:33:42Z"
+      "zeitpunkt": "2026-11-15T06:38:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -543,16 +544,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 76,
-    "beendet": 73,
+    "anfragen": 63,
+    "beendet": 63,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "www.congstar.de": 3
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 3.9,
-    "takte_ms": 2500,
+    "offen": {},
+    "ohne_antwort_ms": 150,
+    "sekunden": 3.8,
+    "takte_ms": 2800,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -575,5 +574,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10248
+ "zeitbudget_sekunden": 10268
 }
