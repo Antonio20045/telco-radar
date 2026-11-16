@@ -70,6 +70,8 @@ from .basis import _einstieg_gelesen as _einstieg_gelesen
 from .basis import umgesetzte_methoden as umgesetzte_methoden
 from .buendel_prioritaet import nach_prioritaet as _nach_prioritaet
 from .robots import RobotsWaechter
+from .sammelbudget import MINDEST_JE_ANBIETER as _MINDEST_JE_ANBIETER
+from .sammelbudget import sammelanteile
 from .strukturdaten import ist_lockpreis, produkte_aus_html
 
 log = logging.getLogger(__name__)
@@ -957,9 +959,6 @@ def _als_listung_satz(
     return listung
 
 
-_MINDEST_JE_ANBIETER = 120.0
-
-
 def sammle(
     quellen,
     katalog: Katalog,
@@ -977,11 +976,12 @@ def sammle(
     robots.txt), und zwei parallele Collector gegen denselben Betreiber
     waeren effektiv der halbe Abstand - also ein Bruch der Vorgabe.
 
-    Das Zeitbudget ist keine gemeinsame Weide: jeder Anbieter darf hoechstens
-    so viel verbrauchen, dass jedem NACH ihm noch `_MINDEST_JE_ANBIETER`
-    Sekunden bleiben. Gezaehlt werden dabei nur Anbieter, die wirklich
-    crawlen werden (aktiv, crawlbar, Adapter vorhanden) - ein uebersprungener
-    kostet nichts und reserviert nichts.
+    Das Zeitbudget ist keine gemeinsame Weide: es wird VOR dem ersten Abruf
+    nach Bedarf aufgeteilt (`sammelbudget`, dort der Befund vom 16.11.2026).
+    Jeder bekommt mindestens seinen Anteil und obendrauf, was die Vorgaenger
+    NICHT brauchten - hoechstens so viel, dass jedem NACH ihm noch
+    `_MINDEST_JE_ANBIETER` Sekunden bleiben. Gezaehlt werden nur Anbieter, die
+    wirklich crawlen; ueber das Budget geht nichts (Regel 8, `min(frist_bis)`).
 
     `jetzt` ist der Beginn des Laufs. Die daraus gestellte Uhr wird EINMAL
     gebaut und an jeden Anbieter durchgereicht: der vierte Anbieter soll
@@ -994,20 +994,20 @@ def sammle(
     frist_bis = (time.monotonic() + frist_sekunden) if frist_sekunden else None
 
     sortiert = sorted(quellen.anbieter, key=lambda a: (a.crawl_rang, a.name))
-    crawlt = [
-        a.name for a in sortiert if a.crawlbar and ADAPTER.get(a.methode) is not None
-    ]
+    crawler = [a for a in sortiert if a.crawlbar and ADAPTER.get(a.methode) is not None]
+    crawlt = [a.name for a in crawler]
+    anteile = sammelanteile(crawler, frist_sekunden)
 
     bilanzen = []
     for anbieter in sortiert:
         eigene_frist = frist_bis
-        if frist_bis is not None and anbieter.name in crawlt:
+        if frist_bis is not None and anbieter.name in anteile:
             nach_mir = len(crawlt) - crawlt.index(anbieter.name) - 1
             rest = frist_bis - time.monotonic()
             eigene_frist = min(
                 frist_bis,
                 time.monotonic()
-                + max(_MINDEST_JE_ANBIETER, rest - nach_mir * _MINDEST_JE_ANBIETER),
+                + max(anteile[anbieter.name], rest - nach_mir * _MINDEST_JE_ANBIETER),
             )
         bilanzen.append(
             sammle_anbieter(

@@ -21,6 +21,7 @@ from urllib.parse import urljoin
 import yaml
 
 from .geraete_felder import ERFASSUNG_UNBEKANNT, als_zahl, lese_erfassung
+from .geraete_felder import lese_sammelbedarf as _lese_sammelbedarf
 from .geraete_model import Geraet, Katalog, normalisiere
 
 log = logging.getLogger(__name__)
@@ -93,6 +94,8 @@ class Anbieter:
     basis_url: str = ""
     max_produkte: int = _MAX_PRODUKTE_STANDARD
     rate_limit_sekunden: float = _RATE_LIMIT_STANDARD
+    sammelbedarf_sekunden: float | None = None
+    """Sammelzeit in Sekunden; `None` = unbekannt (`collect.geraete.sammelbudget`)."""
     hinweis: str = ""
     kopfzeilen: dict = field(default_factory=dict)
     user_agent: str = ""
@@ -381,6 +384,7 @@ def lade_quellen(root: Path) -> QuellenConfig:
                     name,
                     "rate_limit_sekunden",
                 ),
+                sammelbedarf_sekunden=_lese_sammelbedarf(a, name),
                 hinweis=str(a.get("hinweis") or "").strip(),
                 kopfzeilen={
                     str(k): str(v) for k, v in (a.get("kopfzeilen") or {}).items()

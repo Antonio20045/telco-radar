@@ -49,3 +49,26 @@ def als_zahl(wert, standard: float, anbieter: str, feld: str) -> float:
             standard,
         )
         return standard
+
+
+def lese_sammelbedarf(eintrag: dict, name: str) -> float | None:
+    """`sammelbedarf_sekunden` eines Anbieters; `None` heisst unbekannt.
+
+    Die Angabe teilt das Sammelbudget auf (`collect.geraete.sammelbudget`). Eine
+    fehlende bleibt `None` und wird dort geschaetzt; eine unlesbare oder nicht
+    positive meldet sich und bleibt ebenfalls `None` - eine geratene Null waere
+    eine Nullzuteilung (Clean Code 3).
+    """
+    roh = eintrag.get("sammelbedarf_sekunden")
+    if roh is None or str(roh).strip() == "":
+        return None
+    wert = als_zahl(roh, 0.0, name, "sammelbedarf_sekunden")
+    if wert <= 0:
+        log.warning(
+            "geraete_quellen: %s hat sammelbedarf_sekunden=%r - keine positive "
+            "Zahl, der Bedarf wird geschaetzt",
+            name,
+            roh,
+        )
+        return None
+    return wert
