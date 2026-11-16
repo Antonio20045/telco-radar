@@ -1,6 +1,86 @@
 {
- "stand": "2026-11-15",
+ "stand": "2026-11-16",
  "videos": [
+  {
+   "id": "vVVdxMwPBuA",
+   "titel": "How Check Point speeds up vulnerability research with Daybreak | OpenAI for Cybersecurity",
+   "kanal": "OpenAI",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 65,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "vVVdxMwPBuA.jpg"
+  },
+  {
+   "id": "soNLXvgUqNY",
+   "titel": "La Cousinade",
+   "kanal": "OpenAI",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 30,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "soNLXvgUqNY.jpg"
+  },
+  {
+   "id": "kGtpPvAb7q0",
+   "titel": "KI-Update kompakt: Nvidia-Drama, Berufseinstieg, Siri AI, Home Assistant mit KI",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 1091,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "kGtpPvAb7q0.jpg"
+  },
+  {
+   "id": "iv32wI3MBpw",
+   "titel": "Software Supply Chain Security: What AI Coding Changes",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 579,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "iv32wI3MBpw.jpg"
+  },
+  {
+   "id": "Zbv70lLBHgo",
+   "titel": "How Check Point speeds up vulnerability research with Daybreak | OpenAI for Cybersecurity",
+   "kanal": "OpenAI",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 23,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Zbv70lLBHgo.jpg"
+  },
+  {
+   "id": "MZrItvHnTGU",
+   "titel": "KI-Update kompakt: Nvidia-Drama, Berufseinstieg, Siri AI, Home Assistant mit KI",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 1058,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "MZrItvHnTGU.jpg"
+  },
+  {
+   "id": "ETw45WHQ6Z4",
+   "titel": "3D Printing Entire Buildings is So Wild To Me",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 66,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "ETw45WHQ6Z4.jpg"
+  },
+  {
+   "id": "1X4rF_o60mY",
+   "titel": "Tatort: ChatGPT",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-16",
+   "dauer_sekunden": 81,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "1X4rF_o60mY.jpg"
+  },
   {
    "id": "_l6gzItCF80",
    "titel": "Claude Fable 5.2: DAS kann es wirklich! + Die Folgen des NVIDIA-Dramas | KI-NEWS",
@@ -30,6 +110,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "K6ffYKrlPdU.jpg"
+  },
+  {
+   "id": "7-Tj5qaOUbc",
+   "titel": "Build your own open-source Grok Bot, here’s how",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-15",
+   "dauer_sekunden": 3415,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "7-Tj5qaOUbc.jpg"
   },
   {
    "id": "x7iwI6WfWS0",
@@ -210,183 +300,93 @@
    "stufe": "Fortgeschritten",
    "sprache": "en",
    "bild": "dSHSsMY8u88.jpg"
-  },
-  {
-   "id": "YmxpxJZvm4M",
-   "titel": "Cyber at the Frontier: Introducing Daybreak Red Team & Daybreak Defense Factory",
-   "kanal": "OpenAI",
-   "datum": "2026-11-12",
-   "dauer_sekunden": 2078,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "YmxpxJZvm4M.jpg"
-  },
-  {
-   "id": "Xinj__6uZwc",
-   "titel": "Vibe-Coding überall | c't 4004 #47",
-   "kanal": "c't 3003",
-   "datum": "2026-11-12",
-   "dauer_sekunden": 4348,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "Xinj__6uZwc.jpg"
-  },
-  {
-   "id": "WAdkVxs-O4Y",
-   "titel": "Why Laptops Are Getting So Expensive",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-11-12",
-   "dauer_sekunden": 468,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "WAdkVxs-O4Y.jpg"
-  },
-  {
-   "id": "SxiYOCPW8_c",
-   "titel": "DAS ist der nächste Durchbruch! GPT-7, Roboter-RSI & Asimovs Gesetze (Markus Wulfmeier)",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-12",
-   "dauer_sekunden": 4251,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "SxiYOCPW8_c.jpg"
-  },
-  {
-   "id": "IehCboBcYsA",
-   "titel": "How to automate your photo library",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-12",
-   "dauer_sekunden": 71,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "IehCboBcYsA.jpg"
-  },
-  {
-   "id": "33-u5Iht67Q",
-   "titel": "Microsoft Foundry Toolbox Tool Search",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-11-12",
-   "dauer_sekunden": 40,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "33-u5Iht67Q.jpg"
-  },
-  {
-   "id": "zjQ_O2srSRM",
-   "titel": "KI-Update kompakt: Nvidia-Affäre, Coding-Agenten, Gemini 4 Carbon, Muse Ember",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 1152,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "zjQ_O2srSRM.jpg"
-  },
-  {
-   "id": "vdBDMj2UhDg",
-   "titel": "How to enable PR security reviews with Codex Security",
-   "kanal": "OpenAI",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 391,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "vdBDMj2UhDg.jpg"
-  },
-  {
-   "id": "uND6iY2qp_c",
-   "titel": "AlphaGenome 2: Teaching AI to read the entire human genome",
-   "kanal": "Google DeepMind",
-   "datum": "2026-11-11",
-   "dauer_sekunden": 2387,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "uND6iY2qp_c.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-15",
-   "abgerufen": "2026-11-15"
+   "versucht": "2026-11-16",
+   "abgerufen": "2026-11-16"
   }
  },
  "error": null

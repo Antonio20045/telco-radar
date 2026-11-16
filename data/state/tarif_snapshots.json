@@ -45,7 +45,6 @@
    "|30gb",
    "|30tage",
    "|34.99€",
-   "|39.98€",
    "|39.99€",
    "|49.98€",
    "|50gb",
@@ -53,7 +52,7 @@
    "|5gb",
    "|5€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -82,7 +81,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -115,7 +114,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -146,7 +145,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -176,7 +175,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -203,7 +202,7 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -235,28 +234,28 @@
    "|59.99€",
    "|99€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
-   "ab monat|12.99€",
-   "ab monat|19.99€",
-   "ab monat|9.99€",
    "du innerhalb der ersten|19monate",
-   "max.|50mb",
-   "monat laufzeit anschlusspreis|29.99€",
-   "monate laufzeit anschlusspreis|0€",
+   "max.|100mb",
+   "monat laufzeit anschlusspreis|9.99€",
+   "monate laufzeit anschlusspreis|9.99€",
    "normal surfer|40gb",
    "viel surfer|280gb",
    "wenig surfer|10gb",
    "|1monat",
    "|24monate",
-   "|33%",
-   "|52%",
-   "|55%",
+   "|56%",
+   "|60%",
+   "|62%",
+   "|66%",
+   "|67%",
+   "|71%",
    "|99€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -273,7 +272,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -498,7 +497,7 @@
    "|96€",
    "|999.99€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -515,7 +514,7 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  },
  "https://www.telekom.de/mobilfunk/tarife": {
   "werte": [
@@ -547,6 +546,6 @@
    "|74.95€",
    "|84.95€"
   ],
-  "stand": "2026-11-15"
+  "stand": "2026-11-16"
  }
 }
