@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-auto",
- "datum": "2026-11-15",
- "dauer_sekunden": 1149.0,
+ "datum": "2026-11-16",
+ "dauer_sekunden": 1095.1,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -26,7 +26,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "df474f109d2538424a93fb74ac9740607b924c2f494b9e7125685dd08db1ab67",
+      "beleg_id": "0e4780dbf75053485e4b6395907d95da9b6a632c0b4fab3d483d2b9f1a4e79ba",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -42,12 +42,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 81,05 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 80,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
-      "zeitpunkt": "2026-11-15T06:14:32Z"
+      "zeitpunkt": "2026-11-16T06:12:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -64,7 +64,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 51.1,
+      "rate": 51.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -78,7 +78,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.6&instalmentId=24",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
@@ -86,7 +86,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bbb5e78d86a2901ee1a6eaec3bfdc015c9c6069fcced2391d56900ab28a3f593",
+      "beleg_id": "45b586219c7c04731bab8a79e09f48747d113f524d171029a144190501a93784",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -102,12 +102,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 106,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 106,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.6&instalmentId=24",
-      "zeitpunkt": "2026-11-15T06:14:35Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
+      "zeitpunkt": "2026-11-16T06:12:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -124,7 +124,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 76.6,
+      "rate": 76.5,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -138,7 +138,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153.3&instalmentId=12",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "256 GB",
@@ -146,7 +146,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2e10ce34ec5ca4d88097a50381db95eb23bdfbcf5913428b5149a46ff2c8bb62",
+      "beleg_id": "d5faa922725226823841a625698cbf9e40a948b5cc0c69a1cda6d2cc80a63376",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -162,12 +162,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 183,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 182,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153.3&instalmentId=12",
-      "zeitpunkt": "2026-11-15T06:14:37Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
+      "zeitpunkt": "2026-11-16T06:12:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -184,7 +184,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 153.3,
+      "rate": 153.0,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -206,7 +206,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "53e10cdde3e39dd42c3771127476ca0d7c958c2886bf798566d2f1ae43e3d603",
+      "beleg_id": "768496ce995e3e2c48fe0119da5471e777f2037c732cebd36b464c6ea2f997d3",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -222,12 +222,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 87,15 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 86,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-15T06:14:40Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-11-16T06:12:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -244,7 +244,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 57.2,
+      "rate": 57.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -266,7 +266,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5e0a12ad9f233fc07f69a3a0a33d46d451a409958918d0adc839a710b01a3382",
+      "beleg_id": "9e10ce9e26b869059abeda319b1a56f1728992f02631f3c08841205f0a1fb167",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -282,12 +282,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 115,75 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 115,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=85.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:14:43Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=85.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:12:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -304,7 +304,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 85.8,
+      "rate": 85.5,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -326,7 +326,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c00b098365cbbe83f18baae096f4a99a148b81e5bdad5c6109b81e4c4925aef6",
+      "beleg_id": "ef36f1f4a95c31fd16620e67bc6a87fc5a272d2b736ab15718e7e685e5cf9e38",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -342,12 +342,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 201,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 201,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:14:45Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:12:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -364,7 +364,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 171.6,
+      "rate": 171.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -386,7 +386,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a89b448ca2a464b746c7dbfb2d4adefcd6dbc0c26e3ea5aebe97fb7ccf756491",
+      "beleg_id": "9e48a1e9b1c690b882af9c54c79ca7d3cc7b88222f2ed2171d716f184b441360",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -402,12 +402,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 100,15 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 99,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-15T06:14:48Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-11-16T06:12:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -424,7 +424,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 70.2,
+      "rate": 70.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -446,7 +446,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1b70a3e3eca7751f8d4dc4cbaa59171a53a7d5ff46c7d30805ec7721cd4d6cb1",
+      "beleg_id": "ba80316bb4235d2361d6f8bf308b1b12ac2197e77b82265d9bb5c29d63b5eef2",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -462,12 +462,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 135,35 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 134,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=105.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:14:50Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=105&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:12:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -484,7 +484,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 105.4,
+      "rate": 105.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -506,7 +506,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4ae2c33cf41d82efd8c36d8fb6ea8472f6516b14f8e182d84df46fc1d76555de",
+      "beleg_id": "765dcc8f5af729e670d95945287aaaae0ada7f40aed6f31a2cdb420c30b70a0e",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -522,12 +522,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 240,75 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 240,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:14:53Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:12:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -544,7 +544,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 210.8,
+      "rate": 210.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -566,7 +566,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7eb9c9c31bd6bfe86a765567929c0f0f7a45758ed0f0fd2af75e59d21c7d35bc",
+      "beleg_id": "127ea601b358ce2c5353b564f789f742581be32ca8f46507664cc9f48eb4f511",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -582,12 +582,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 119,65 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 119,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-15T06:14:56Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
+      "zeitpunkt": "2026-11-16T06:12:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -604,7 +604,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 89.7,
+      "rate": 89.5,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -626,7 +626,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a8f34521d197de23fd86e8de37f3a400102729346a30e88912a3e81ab804092e",
+      "beleg_id": "9c7f632312f06b203f52d3c09f27c21d712086ff45b923dee9a8fb87b24f55c8",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -647,7 +647,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=134.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:14:58Z"
+      "zeitpunkt": "2026-11-16T06:13:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -686,7 +686,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cd554bd67806ae6d84bf7a9f3d5a1d1b6ffd5a5831819486ce39e0520634f93e",
+      "beleg_id": "d7062baab944630adf5f8ca464d3a6d94111808c77bd8101ebb61123573ee2ea",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -702,12 +702,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 299,05 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 298,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=269.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:15:00Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=269&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-11-16T06:13:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -724,7 +724,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 269.1,
+      "rate": 269.0,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -740,17 +740,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 101,
-    "beendet": 93,
+    "anfragen": 100,
+    "beendet": 89,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "bf72977jfz.bf.dynatrace.com": 1,
      "embed.binkies3d.com": 1,
-     "www.telekom.de": 5
+     "www.telekom.de": 6
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 147.1,
+    "sekunden": 146.5,
     "takte_ms": 800,
     "wartet_auf": "load"
    },
@@ -766,7 +766,7 @@
     "knoepfe_gefunden": 72,
     "knoepfe_gesucht": 72
    },
-   "verworfen": 72
+   "verworfen": 67
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
@@ -784,7 +784,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "633e3304cf3747ff392152872db107da7f6f4d2ac8d8e8b53b73daa15f642db5",
+      "beleg_id": "0a7bf5777bd4f0a9060ece15bbef21613fc3cc541659612711a35f82659848dd",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -800,12 +800,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 91,05 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 90,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
-      "zeitpunkt": "2026-11-15T06:18:30Z"
+      "zeitpunkt": "2026-11-16T06:16:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -822,7 +822,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 51.1,
+      "rate": 51.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -836,7 +836,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.6&instalmentId=24",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
@@ -844,7 +844,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2d16ce408ac644876a54664e2facffc7d61a0519e40d1718797eede987d1d6cc",
+      "beleg_id": "62cb22aca35630133ae7de62dbcd60d75d949d50744953d48c1cb2102ae8e3b4",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -860,12 +860,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 116,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 116,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.6&instalmentId=24",
-      "zeitpunkt": "2026-11-15T06:18:32Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
+      "zeitpunkt": "2026-11-16T06:16:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -882,7 +882,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 76.6,
+      "rate": 76.5,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -896,7 +896,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153.3&instalmentId=12",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "256 GB",
@@ -904,7 +904,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d2f513e9a4c5743f3fe7b0ea4c032e84026a7b73db5b105e1aadd52711678933",
+      "beleg_id": "7f4f0eb4a613ec389c4c51f23a70020c55e94a6be051531fd808dd615bdd58c5",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -920,12 +920,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 193,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 192,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153.3&instalmentId=12",
-      "zeitpunkt": "2026-11-15T06:18:35Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
+      "zeitpunkt": "2026-11-16T06:16:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -942,7 +942,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 153.3,
+      "rate": 153.0,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -964,7 +964,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0841e1d5a5244816957d77542fb9ef32c0a43792542dff680fc4fed59b839257",
+      "beleg_id": "ebb78c0977027bffa8af3c2baec0edfb731be9209d47ac1d02f4981d39c80345",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -980,12 +980,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 97,15 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 96,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-15T06:18:38Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-11-16T06:16:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1002,7 +1002,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 57.2,
+      "rate": 57.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1024,7 +1024,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d92441c7fc734b6250dc5b08a30548de9f419a1bd46b17ebfb025c4bd449ee36",
+      "beleg_id": "7dc45b85b178f317f29718ce5d5ca7fda0e11d052b05e5909d12af407806399c",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1040,12 +1040,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 125,75 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 125,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=85.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:18:41Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=85.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:16:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1062,7 +1062,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 85.8,
+      "rate": 85.5,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1084,7 +1084,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8f1392acf362bc23674b3349fe1b2c1cea463ea5478af5959e2c54be7f4d06b8",
+      "beleg_id": "038238e910e246b334b028dc40475c6748d0a2804734270dcb341e6d417cf95d",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1100,12 +1100,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 211,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 211,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:18:43Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:16:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1122,7 +1122,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 171.6,
+      "rate": 171.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1144,7 +1144,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2b723ae569ba4ed07c57209c5bca38f427e704d8edcea11d5df3449b02164767",
+      "beleg_id": "0e841a13f923bbdc9bf83f51495ceac4e808446ae1e81dffeb25ea2a02d8c0cd",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1160,12 +1160,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 110,15 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 109,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-15T06:18:47Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-11-16T06:16:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1182,7 +1182,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 70.2,
+      "rate": 70.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1204,7 +1204,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2975921b70f96d13e66502ebc91cf036819388db84b5cc86820f3e998411d1d9",
+      "beleg_id": "a2f2d35c8cace9c144ea011c03763d0a2f8c6030574e38d45e5cdc0340db4a03",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1220,12 +1220,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 145,35 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 144,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=105.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:18:49Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=105&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:16:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1242,7 +1242,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 105.4,
+      "rate": 105.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1264,7 +1264,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7a02bdcaadb07b838e947be8220174f010a970959ebf6620f8210bbd1c993c74",
+      "beleg_id": "02441a28164b03718936d7873191db6beb0ad62d9f8e7cce5857d1b048297289",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1280,12 +1280,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 250,75 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 250,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:18:52Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:16:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1302,7 +1302,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 210.8,
+      "rate": 210.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1324,7 +1324,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dc9fefdd2c48881b763ec08985e72fd3a7c9466d44eb7fb74b2f80d13f01da68",
+      "beleg_id": "5ca3cc29e265104f6da88389b1be9f0eb9b0b6b98dee85b386ae5c7092f82309",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1340,12 +1340,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 129,65 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 129,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-15T06:18:56Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
+      "zeitpunkt": "2026-11-16T06:16:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1362,7 +1362,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 89.7,
+      "rate": 89.5,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1384,7 +1384,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b547a76cd8d5861c1ce07268750a540ab8f46299bc8c72caee247aecc28adae2",
+      "beleg_id": "78a717d467b70aeb932bea2ed01716d3c2cc68705a15568d878ba583a2007fd2",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1405,7 +1405,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=134.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:18:58Z"
+      "zeitpunkt": "2026-11-16T06:16:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1444,7 +1444,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ebbe12c1394b0b57cb7761812733059bcb9541ed6160e2e221d481faeb98e774",
+      "beleg_id": "e126b5db30a0b4303d15c5b432d341740973c85c142ef24700b9c1673044a868",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1460,12 +1460,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 309,05 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 308,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=269.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:19:00Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=269&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-11-16T06:16:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1482,7 +1482,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 269.1,
+      "rate": 269.0,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1498,18 +1498,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 104,
-    "beendet": 101,
+    "anfragen": 93,
+    "beendet": 91,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 144.0,
-    "takte_ms": 1550,
+    "sekunden": 143.7,
+    "takte_ms": 1700,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1524,7 +1523,7 @@
     "knoepfe_gefunden": 72,
     "knoepfe_gesucht": 72
    },
-   "verworfen": 97
+   "verworfen": 36
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48.3&instalmentId=36",
@@ -1542,7 +1541,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fcae258f11165b81ce28ce0f9d4d1a5ca492b5dc230114ac8e0c4976d9df49a5",
+      "beleg_id": "a1b5aad9a5de48a0407a7239b293ca83b8b4712bfc1d8f783d8b2748b0921428",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1558,12 +1557,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 98,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 97,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48.3&instalmentId=36",
-      "zeitpunkt": "2026-11-15T06:22:30Z"
+      "zeitpunkt": "2026-11-16T06:20:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1580,7 +1579,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 48.3,
+      "rate": 48.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1602,7 +1601,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "72f83a7880e44834b4a58a1b20d1e1004c38d1da43236b0ee9d5099d1cc7793d",
+      "beleg_id": "4ecdfb0b25efa00245616e25cabaa1e03cc12c47915fbabd44afdcb58ff54e52",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1623,7 +1622,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.5&instalmentId=24",
-      "zeitpunkt": "2026-11-15T06:22:33Z"
+      "zeitpunkt": "2026-11-16T06:20:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1662,7 +1661,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ca74c4ae1f295da3b8d5b94600e5621fd63f88e2349f59a1983bff652c25d371",
+      "beleg_id": "39d193b841bb8fbdb02b3f81ee9c3220a9a5d3bb08562b97b1625255b5fbd161",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1683,7 +1682,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=145&instalmentId=12",
-      "zeitpunkt": "2026-11-15T06:22:35Z"
+      "zeitpunkt": "2026-11-16T06:20:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1722,7 +1721,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "47d05ff7d9563230f9a8aab195e8de4ef7509c7672eec1a7c80d9f8e343a9d49",
+      "beleg_id": "b0a8f41e09cd2ef492fee5d512467cc617675919eed63edaf884c13ac2d6b592",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1738,12 +1737,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 104,35 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 103,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=145&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-15T06:22:38Z"
+      "zeitpunkt": "2026-11-16T06:20:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1760,7 +1759,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 54.4,
+      "rate": 54.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1782,7 +1781,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fce350b3e79a3e243badcc2d9b416635f52845a99e3995684590185081e6ffe8",
+      "beleg_id": "75a1990a68f4303ae3c5f912b97c5ac5bff71786db540679cc95356239d8e0f3",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1798,12 +1797,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 131,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 131,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=81.6&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:22:41Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=81.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:20:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1820,7 +1819,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 81.6,
+      "rate": 81.5,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1842,7 +1841,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3d44cd6d483912c2f615811a1bc303266aa1e257f8cac842e9466aaad9e5c034",
+      "beleg_id": "cf6bf72ef4fa06a691223c713183b3f0ed954abc1bd3dec9aae64cac269a56ee",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1858,12 +1857,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 213,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 212,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=163.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:22:43Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=163&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:20:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1880,7 +1879,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 163.3,
+      "rate": 163.0,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -1902,7 +1901,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f74102469a17a50dbb90fb0af4c734bf91156a20d7219e642b1396e81b1f1444",
+      "beleg_id": "f7340ceb4ace18dcb5907e51784e7f8f2c54833d91d802ef3543f78ac4c9ced8",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1922,8 +1921,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=163.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-15T06:22:46Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=163&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-11-16T06:20:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1962,7 +1961,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5a3403e2027f647a41e1c1baa21ce93c89cac82145dda1d71e979eae3104a276",
+      "beleg_id": "728e9c9724c9f7b9a3a157426909a763fea7a2c36aa57683895552f01789bdb0",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1978,12 +1977,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 151,15 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 150,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=101.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:22:49Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=101&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:20:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2000,7 +1999,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 101.2,
+      "rate": 101.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2022,7 +2021,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4bc853a7612ebde616f81bbf3d3adb24fb822d3c17694c5ef05ce79a9f55e4e1",
+      "beleg_id": "7da6763291a7fdd49e948a5aca9cc75d1c39e0420b35f27ff455ac278ba951d1",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2043,7 +2042,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=202.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:22:51Z"
+      "zeitpunkt": "2026-11-16T06:20:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2082,7 +2081,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cd3078d948e3ea5b261e32203f50f792314b4f098d011b419370ae8f98ceb237",
+      "beleg_id": "bff9ba35a8acfe29c78fc6de9c9ee8e09ea7372fa8de204e717a9c5e78693dd3",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2098,12 +2097,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 136,85 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 136,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=202.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-15T06:22:54Z"
+      "zeitpunkt": "2026-11-16T06:20:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2120,7 +2119,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 86.9,
+      "rate": 86.5,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2142,7 +2141,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2266c327ad81ce119f9d0f3e7f9eb37b9b7fa52303426b54b5134de221fcb0d6",
+      "beleg_id": "bacb6f4bff78d10f81f3856ea9da18c2a6c3d8753ce6cc058022c998ea067354",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2158,12 +2157,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 180,35 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 179,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=130.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:22:57Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=130&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-11-16T06:20:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2180,7 +2179,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 130.4,
+      "rate": 130.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2202,7 +2201,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a601e80cf2b53f730b67b235641febbd352c1ddd731a6d511231898ee2b0981d",
+      "beleg_id": "884399f1800e40c04bad0510de46d6bcfc56a98116928fec775e398de2df2267",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2218,12 +2217,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 310,75 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 310,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=260.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:22:59Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=260.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-11-16T06:20:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2240,7 +2239,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 260.8,
+      "rate": 260.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2256,17 +2255,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 103,
-    "beendet": 100,
+    "anfragen": 88,
+    "beendet": 85,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 143.9,
-    "takte_ms": 1450,
+    "sekunden": 144.2,
+    "takte_ms": 1700,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2281,7 +2281,7 @@
     "knoepfe_gefunden": 72,
     "knoepfe_gesucht": 72
    },
-   "verworfen": 95
+   "verworfen": 36
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
@@ -2291,7 +2291,7 @@
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -2299,7 +2299,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4b81730330fa19e8af03eaede8e3aa837f29d786dd0dd0274fa53371372acd79",
+      "beleg_id": "590dee010c7593ca79f7412aad6ae21cfba7b7bf3a8765f60fbd1321927aa114",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2319,8 +2319,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
-      "zeitpunkt": "2026-11-15T06:26:31Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
+      "zeitpunkt": "2026-11-16T06:24:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2351,7 +2351,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68.3&instalmentId=24",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
@@ -2359,7 +2359,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9b872d8b1dd5cf054cbba5420bc0a4a9a8886bfb955a952129c86a364a8eced3",
+      "beleg_id": "34833d5686ccc49aa615fb964aed4e2e0ccf0db8c163c135341167fec5cbc4a3",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2375,12 +2375,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 128,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 127,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68.3&instalmentId=24",
-      "zeitpunkt": "2026-11-15T06:26:34Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
+      "zeitpunkt": "2026-11-16T06:24:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2397,7 +2397,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 68.3,
+      "rate": 68.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2411,7 +2411,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "256 GB",
@@ -2419,7 +2419,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "97e9ca9822f2d3333ce3f55ff319562d325b53a6165e528611dcbbb40a4d5848",
+      "beleg_id": "e019c3d29a16b8a19aef4ab7fee661c0313cd20b2a9929d4797db44d9d63a8cb",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2435,12 +2435,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 196,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 196,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
-      "zeitpunkt": "2026-11-15T06:26:37Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
+      "zeitpunkt": "2026-11-16T06:24:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2457,7 +2457,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 136.6,
+      "rate": 136.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2479,7 +2479,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "36e62743ccc8e14cd87bb86bb0ba918a8bfb8512e11075cc3746354e9661ee63",
+      "beleg_id": "6c0db1c2c4bb111b894a68af78c1b577eb675d0024d4ae0d1c80b94d8d5b31a0",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2495,12 +2495,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 111,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 111,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-15T06:26:40Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-11-16T06:24:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2517,7 +2517,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 51.6,
+      "rate": 51.5,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2539,7 +2539,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4187d5c1ac6434c3b73770867acd9a3b1073910a5729188b92eeafd392d4f1a6",
+      "beleg_id": "2516b88f20c595d571fd080671c50b5cd589c88255eab75ba763c4e24fb5f052",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2560,7 +2560,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=77.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:26:42Z"
+      "zeitpunkt": "2026-11-16T06:24:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2599,7 +2599,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "217773bcff460af693cd7d2440c984cef66a147992d9fc6084519289337e6f01",
+      "beleg_id": "d1cd7f7a8338a8de42a6c5276e00f51afc112cc574a9d5a25281cd3de0485289",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2620,7 +2620,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=155&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:26:45Z"
+      "zeitpunkt": "2026-11-16T06:24:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2659,7 +2659,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a6654863f18f904eead197badaa17447d6b7112868cbf847888201f11b0b9c25",
+      "beleg_id": "bf81269d1a00d9e911d471332bc2b0f1888b328e24d95ab0c792dab9f8f3b81c",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2675,12 +2675,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 124,65 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 124,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=155&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-15T06:26:48Z"
+      "zeitpunkt": "2026-11-16T06:24:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2697,7 +2697,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 64.7,
+      "rate": 64.5,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2719,7 +2719,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "92867805b3788f3278d48c7a62f4b1bcb689cdf0e5701fe5dea3217b43ad18af",
+      "beleg_id": "877977ef469135ffe992b271a1076490d2545e004938a76aabe0646853a92821",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2740,7 +2740,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=97&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:26:51Z"
+      "zeitpunkt": "2026-11-16T06:24:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2779,7 +2779,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "45a9df65f43bbd4cec8c851b7c301db1d3c0e1e5c754a17b86492d993b8bf8d2",
+      "beleg_id": "c428c151f690cf097c05bba11f7ac77d56ebc7ff3a553bd5cdeb04c64000e67b",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2795,12 +2795,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 254,05 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 253,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=194.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:26:53Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=194&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:24:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2817,7 +2817,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 194.1,
+      "rate": 194.0,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2839,7 +2839,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5c34cf53cd00f2aeadab4c2aac5463f8714e8c236e6806971fa1b6c1f89c82a2",
+      "beleg_id": "c3ac4c0e8b389db8165cb43d5f1da00fdf1e1fb224f9b45bb33314ee6a3bce96",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2855,12 +2855,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 144,05 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 143,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=194.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-15T06:26:56Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=194&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
+      "zeitpunkt": "2026-11-16T06:24:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2877,7 +2877,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 84.1,
+      "rate": 84.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2899,7 +2899,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4bbc445b090604bd95dda9f8ab48e97348fc820d161b454e1633659dcd4d9097",
+      "beleg_id": "c4e36881a6c29a9ad6f70afead60fa732a131613d905c7c78f240f8a25644abe",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2915,12 +2915,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 186,15 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 185,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=126.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:26:59Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=126&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-11-16T06:24:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2937,7 +2937,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 126.2,
+      "rate": 126.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -2959,7 +2959,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6fe9eeaac92cb76d45c2552d4955a759c7fa35f4efde463258bad87d00e0d3be",
+      "beleg_id": "c5b92b1a883edade868a5049ac8b2c5763d3c5b87094e06f9224c766757495c3",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2980,7 +2980,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=252.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:27:02Z"
+      "zeitpunkt": "2026-11-16T06:24:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3013,17 +3013,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 102,
-    "beendet": 99,
+    "anfragen": 100,
+    "beendet": 97,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 144.3,
-    "takte_ms": 1650,
+    "sekunden": 143.9,
+    "takte_ms": 1950,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3035,10 +3035,10 @@
     "anteil_knoepfe": 1.0,
     "felder_gefunden": 72,
     "felder_gesucht": 84,
-    "knoepfe_gefunden": 75,
-    "knoepfe_gesucht": 75
+    "knoepfe_gefunden": 72,
+    "knoepfe_gesucht": 72
    },
-   "verworfen": 103
+   "verworfen": 35
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
@@ -3048,7 +3048,7 @@
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -3056,7 +3056,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6f4e0c21a3bff69c8f8c249dbfda077722059f8e556cd65017c216b65d23fbaa",
+      "beleg_id": "ea31866d88551bd760774c37e2ce14c92661fa5548de78e476f55354ee43adb5",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3076,8 +3076,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
-      "zeitpunkt": "2026-11-15T06:30:35Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
+      "zeitpunkt": "2026-11-16T06:27:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3108,7 +3108,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68.3&instalmentId=24",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
@@ -3116,7 +3116,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1f987b12382268eef890d3701135f18c499608afd6328a4beedd0435d217e459",
+      "beleg_id": "33c1b2b7741d8b69526dbed3645d123fd222aa155011ac7961513f5c5cdfb32d",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3132,12 +3132,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 338,95 € · monatlich 153,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 338,95 € · monatlich 152,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68.3&instalmentId=24",
-      "zeitpunkt": "2026-11-15T06:30:37Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
+      "zeitpunkt": "2026-11-16T06:28:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3154,7 +3154,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 299.0,
-      "rate": 68.3,
+      "rate": 68.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3168,7 +3168,7 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "256 GB",
@@ -3176,7 +3176,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "46d373b94d80241f978f75251453cd6b8975a7335778a8d682337b7f4d920984",
+      "beleg_id": "2b513296505451d89fe69001127f4bda3a79c8b4f4e0d848f1d2342afe64be43",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3192,12 +3192,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 338,95 € · monatlich 221,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 338,95 € · monatlich 221,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12",
-      "zeitpunkt": "2026-11-15T06:30:40Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
+      "zeitpunkt": "2026-11-16T06:28:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3214,7 +3214,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 299.0,
-      "rate": 136.6,
+      "rate": 136.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3236,7 +3236,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d55d6f96e2f5bc40b135bcd37b4280d366e8ce0114df1bed2afb1ec2d6b25b04",
+      "beleg_id": "7301469015b00b0753751c3ca11a095773436c4c45339b0b0b34c5270fb6425f",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3252,12 +3252,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 133,75 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 133,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-15T06:30:44Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-11-16T06:28:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3274,7 +3274,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 48.8,
+      "rate": 48.5,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3296,7 +3296,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "25aed7628014c050a7aa892b07258705668503146d3e0e801e5840391cf6a494",
+      "beleg_id": "268660bd247800ed0ad9f36d5fabea2b9dba0e29a4d11d5fdc5b5461958c772b",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3312,12 +3312,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 158,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 157,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=73.3&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:30:46Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=73&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:28:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3334,7 +3334,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 73.3,
+      "rate": 73.0,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3356,7 +3356,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f64aa47e889ff7dc2566a9c4dba7a3f9395521fc493f4d86a969570dc02c01b0",
+      "beleg_id": "f61c3672bef4c1ffd40c1266ad2df060f2aeaaf17afa5310cb75ed759b9225a6",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3372,12 +3372,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 231,55 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 231,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=146.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-15T06:30:50Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=146.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-16T06:28:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3394,7 +3394,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 146.6,
+      "rate": 146.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3416,7 +3416,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "827a8d5b01c1726bd389b6338ae24c1930a30de84332e2b6d16087faf6004f8f",
+      "beleg_id": "c3765d3773f314f4975913da40eb5757af6cf9bcd116cb085bfd7a0f6721cf22",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3432,12 +3432,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 146,85 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 146,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=146.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-15T06:30:53Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=146.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-11-16T06:28:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3454,7 +3454,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 61.9,
+      "rate": 61.5,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3476,7 +3476,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ac98a69f7d0cf49a38572aeb5a6c5e2fe1fba901bf87dd4f6acd89cc8e5a2224",
+      "beleg_id": "c715437ab7473340f946a1d4492f582d20c900c42aa34eebdae8becac3ce61af",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3492,12 +3492,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 177,85 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 177,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=92.9&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:30:55Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:28:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3514,7 +3514,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 92.9,
+      "rate": 92.5,
       "ratenzahl": 24,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3536,7 +3536,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "380c1e167d5292fcf74cbaeafc624bae7e4addeedf9ba4e36f7b2257bbcd555a",
+      "beleg_id": "fbf62f87c1de8f3e76206f048cea1bcf7966c1be524e34ffed1520714cc2439a",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3552,12 +3552,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 270,75 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 270,45 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=185.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-15T06:30:58Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=185.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-11-16T06:28:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3574,7 +3574,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 185.8,
+      "rate": 185.5,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3596,7 +3596,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "06603db042fce7f7d44f804c80e67ec7415de31b63f5c6ef36f07aa95dbc2b42",
+      "beleg_id": "0cae66d6059860db50cf0882ba0248eb91ba49f7d5bedfea90399ce9573624be",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3612,12 +3612,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 166,25 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 165,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=185.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-15T06:31:01Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=185.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
+      "zeitpunkt": "2026-11-16T06:28:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3634,7 +3634,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 81.3,
+      "rate": 81.0,
       "ratenzahl": 36,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3656,7 +3656,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "75ca769ed8e71a6df4c7d8bd7e2701375b94c7ddd1592cc41bcb754a583a04b3",
+      "beleg_id": "6dcaa8f89ac2e5fe5d88eb3da995f9e6d8b7dda0b5a9c5f8174f380b2e19da7d",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3677,7 +3677,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=122&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:31:04Z"
+      "zeitpunkt": "2026-11-16T06:28:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3716,7 +3716,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6af58bc6d0526f3a2ebe1ef466da9a3ae062d6724c1a6dd7b22fa424b4c15efc",
+      "beleg_id": "d86f5718242fdd124a0c74926dfa7c81524d87654071e4eb6e48c84494f706e8",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -3732,12 +3732,12 @@
        },
        {
         "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 329,05 € (Gerät und Tarif zusammen)"
+        "text": "Im Bild: einmalig 438,95 € · monatlich 328,95 € (Gerät und Tarif zusammen)"
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=244.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-15T06:31:07Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=244&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-11-16T06:28:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3754,7 +3754,7 @@
      "werte": {
       "anschluss": 39.95,
       "anzahlung": 399.0,
-      "rate": 244.1,
+      "rate": 244.0,
       "ratenzahl": 12,
       "tarifbindung": null,
       "tarifphasen": [
@@ -3770,18 +3770,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 103,
-    "beendet": 101,
+    "anfragen": 93,
+    "beendet": 91,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 143.9,
-    "takte_ms": 1450,
+    "sekunden": 143.5,
+    "takte_ms": 1600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3793,14 +3792,14 @@
     "anteil_knoepfe": 1.0,
     "felder_gefunden": 72,
     "felder_gesucht": 84,
-    "knoepfe_gefunden": 75,
-    "knoepfe_gesucht": 75
+    "knoepfe_gefunden": 72,
+    "knoepfe_gesucht": 72
    },
-   "verworfen": 103
+   "verworfen": 36
   }
  ],
  "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10252
+ "zeitbudget_sekunden": 10263
 }
