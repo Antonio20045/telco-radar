@@ -18,7 +18,7 @@ wenn der gelesene Tarif in Vergleichsform (``klickrohsatz.tarifschluessel``) dem
 oder dem Slug des Adaptersatzes entspricht. Ein Klick-Satz ersetzt einen Adaptersatz
 mit seinem Schlüssel (nur Zustand neu), wenn er jedes Wertfeld nennt, das der
 Adaptersatz nennt (``klick_vollstaendig``); dann übernimmt er dessen SKU, Tarifnamen,
-Slug und nicht eingerechnete Aktionen, die Bündel-ID bleibt. Sonst bleibt der
+Slug und dessen offene und belegte Aktionen, die Bündel-ID bleibt. Sonst bleibt der
 Adaptersatz ganz, und die Bilanz zählt ihn unter ``unvollstaendig`` mit den fehlenden
 Feldern: zwei Quellen werden nie feldweise gemischt. Ohne Gegenstück kommt ein
 Klick-Satz, wie er ist (Lücken bleiben ``None``), nur mit dem Namen eines
@@ -90,9 +90,9 @@ class Gegenprobe:
     unvollstaendig: int = 0
     fehlend: Counter[str] = field(default_factory=Counter)
 
-    def unvollstaendig_fuer(self, klick: dict, adapter: dict) -> list[str]:
+    def unvollstaendig_fuer(self, klick: dict, alt: dict, tag: str = "") -> list[str]:
         """Die Wertfelder, die der Klick-Satz nicht nennt; leer heißt: er ersetzt."""
-        felder = fehlend(klick, adapter)
+        felder = fehlend(klick, alt, tag)
         self.unvollstaendig += bool(felder)
         self.fehlend.update(felder)
         return felder
@@ -235,8 +235,8 @@ def fuehre_zusammen(
             zeile.ohne_gegenstueck += 1
             neu += mit_namen(satz, schluessel, adapter, andere_laufzeit, UEBERNOMMEN)
         for stelle in treffer:
-            alt = adapter[stelle]
-            felder = probe.unvollstaendig_fuer(satz, alt)
+            alt, tag = adapter[stelle], str(satz.get("abgerufen_am") or heute)
+            felder = probe.unvollstaendig_fuer(satz, alt, tag)
             if felder:
                 zeile.unvollstaendig += 1
                 zeile.fehlend.update(felder)
@@ -245,7 +245,7 @@ def fuehre_zusammen(
             ersetzt.add(stelle)
             zeile.ersetzt += 1
             uebernommen = {f: alt.get(f) for f in UEBERNOMMEN}
-            neu.append({**satz, **uebernommen, **begleitend(satz, alt)})
+            neu.append({**satz, **uebernommen, **begleitend(satz, alt, tag)})
     vorhanden = {e["anbieter"] for e in eintraege}
     bilanz = {
         "dateien": eintraege,
