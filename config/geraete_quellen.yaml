@@ -744,6 +744,18 @@ anbieter:
     aktiv: true
     basis_url: https://www.o2online.de
     rate_limit_sekunden: 2
+    # Was der o2-Lauf WIRKLICH braucht, aus seinem eigenen Abrufmuster
+    # gerechnet (siehe den Einstieg `kind: buendel` weiter unten): 93 Geräte
+    # aus der einen Katalogantwort, je Gerät seine Speicher- und
+    # Laufzeitschalter (gemessen rund drei Speicher × zwei Laufzeiten) plus
+    # einmal elf Abrufe für den Referenzdurchlauf der Tarife - rund 570
+    # Abrufe à 2 s Abstand. Ohne diese Angabe schätzte die Aufteilung aus
+    # `max_produkte` 124 Abrufe und gäbe o2 den Anteil eines Händlers.
+    # Die Zahl teilt das Sammelbudget auf; sie verlängert es nie
+    # (CLAUDE.md Regel 8). Befund 16.11.2026: das Budget des Tageslaufs
+    # (--frist 1500) deckt diesen Bedarf nicht, deshalb fehlten von rund
+    # 2.500 o2-Preisen am 14./15.11. je rund 1.100.
+    sammelbedarf_sekunden: 1140
     kopfzeilen:
       # Der Endpunkt weist diesen Medientyp in der Nutzlast von /e-shop/
       # selbst aus. Mit `Accept: application/json` antwortet er mit einer
