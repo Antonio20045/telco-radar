@@ -1722,7 +1722,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         ),
         encoding="utf-8",
     )
-    fragmente = geraete_fragmente.vorbereiten(site_dir, env, geraete)
+    fragmente = geraete_fragmente.vorbereiten(site_dir, env, geraete, radar_view)
     for fragment_pfad, fragment_text in fragmente.items():
         fragment_pfad.write_text(fragment_text, encoding="utf-8")
     (site_dir / "geraete-quellen.html").write_text(

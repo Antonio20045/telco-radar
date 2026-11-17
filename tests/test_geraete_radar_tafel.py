@@ -353,14 +353,31 @@ def _seite(tmp_path: pathlib.Path) -> str:
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return {
+    dateien = {
         name: (site / name).read_text(encoding="utf-8")
         for name in ("geraete.html", "wettbewerbsradar.html")
     }
+    dateien["geraete-radar.html"] = (site / "data" / "geraete-radar.html").read_text(
+        encoding="utf-8"
+    )
+    return dateien
 
 
 def _suppe(tmp_path) -> BeautifulSoup:
-    return BeautifulSoup(_seite(tmp_path)["geraete.html"], "html.parser")
+    """`geraete.html` mit dem nachgeladenen Radar-Fragment zusammengesetzt.
+
+    UI-1717 Aufgabe 5: `#gr-radar-inhalt` steht im First Paint leer (app.js
+    holt ihn erst beim Sichtbarwerden aus `data/geraete-radar.html`) - die
+    Tests setzen hier denselben Inhalt ein, den der Browser zur Laufzeit
+    einfügt, damit jede bestehende Prüfung an derselben Stelle greift.
+    """
+    seiten = _seite(tmp_path)
+    suppe = BeautifulSoup(seiten["geraete.html"], "html.parser")
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    assert inhalt is not None, "gr-radar-inhalt fehlt - Test prüft nichts"
+    for knoten in list(BeautifulSoup(seiten["geraete-radar.html"], "html.parser")):
+        inhalt.append(knoten)
+    return suppe
 
 
 def _text(el) -> str:
@@ -698,6 +715,10 @@ def test_die_alt_url_ist_weiterleitung_und_der_lifecycle_ist_mitgezogen(tmp_path
     assert alt.select_one(".gr-a-zeile") is None, "die Alt-URL trägt noch Alarmzeilen"
     geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
     tafel = geraete.select_one("#tafel-radar")
+    inhalt = tafel.select_one("#gr-radar-inhalt")
+    assert inhalt is not None, "gr-radar-inhalt fehlt - Test prüft nichts"
+    for knoten in list(BeautifulSoup(seiten["geraete-radar.html"], "html.parser")):
+        inhalt.append(knoten)
     lifecycle = tafel.select_one("#lifecycle")
     assert lifecycle is not None, (
         "die Lifecycle-Sektion fehlt im Radar-Reiter (Inhaltsverlust)"

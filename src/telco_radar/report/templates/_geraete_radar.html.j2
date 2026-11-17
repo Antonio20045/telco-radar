@@ -63,6 +63,7 @@
    Teilvorlage `_geraete_alarme.html.j2` ( dieselbe Tabelle wie auf der
    Schwesterseite, kein Drift). #}
 {% from "_geraete_alarme.html.j2" import alarmtafel with context %}
+{% from "_geraete_buendel.html.j2" import haendlername %}
 
 {# ==========================================================================
    SEKTION 2: die Modell-Liste. EINE Hauptzeile je Modell (S2: „die ganzen
@@ -121,7 +122,7 @@
       <span class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if z.prozent < 0 else ' wr-prozent--positiv' }}{% if spitze %} wr-prozent--spitze{% endif %}">{{ z.prozent_text }} %</span>
       <span class="gr-a-euro">{{ z.euro_text }} €</span>
       {% else %}<span class="gr-a-klein">{{ z.luecke }}</span>{% endif %}</td>
-    <td>{% if z.anbieter %}{{ z.anbieter }}
+    <td>{% if z.anbieter %}{{ haendlername(z.anbieter) }}
       {% if z.tarif %}<span class="gr-a-klein">{{ z.tarif }}</span>{% endif %}
       {% if z.band_label %}<span class="gr-a-klein">Band {{ z.band_label }}</span>{% endif %}
       {% else %}–{% endif %}</td>
@@ -174,7 +175,7 @@
       <tbody>
         {% for s in z.gruppe_zeilen %}
         <tr class="wr-status--{{ s.status }}">
-          <td>{{ s.anbieter }}</td>
+          <td>{{ haendlername(s.anbieter) }}</td>
           <td class="wr-tarif">{% if s.tarif %}{{ s.tarif }}{% else %}–{% endif %}</td>
           <td class="num">{% if s.gesamt is not none %}{{ s.gesamt | euro }}{% if s.zeitraum %} <span class="gr-a-klein">{{ s.zeitraum }}</span>{% endif %}{% else %}–{% endif %}</td>
           <td>{{ s.band_label or '–' }}{% if s.status == 'vergleichbar' and s.vf_gesamt is not none %} · VF {{ s.vf_gesamt | euro }}{% endif %}</td>
@@ -205,7 +206,7 @@
    eigenstaendigen Schwesterseite uebernommen. #}
 {% macro nachfolgerzeile(n, zustand_spalte) %}
   <tr><td>{{ n.modell }}</td>
-    <td>{{ n.get('anbieter') or '–' }}</td>
+    <td>{{ haendlername(n.get('anbieter')) if n.get('anbieter') else '–' }}</td>
     {% if zustand_spalte %}<td>{{ n.get('zustand') or '–' }}</td>{% endif %}
     <td>{{ n.nachfolger_modell }}{% if n.marktstart %}, {{ n.marktstart | date_de }}{% endif %}</td>
     <td class="num">{% if n.basis %}{{ '%.0f'|format(n.basis) }} €{% else %}–{% endif %}</td>
@@ -261,7 +262,7 @@
       <tbody>
         {% for b in port.auffaellig.bewegungen %}
         <tr>
-          <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
+          <td>{{ b.modell }}</td><td>{{ haendlername(b.anbieter) }}</td>
           <td class="num">{{ b.von | euro }}</td>
           <td class="num">{{ b.auf | euro }}</td>
           <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
@@ -498,7 +499,7 @@
       {% macro wr_haendler_zeile(h) %}
       <tr class="wr-zeile">
         <td>{{ h.hersteller }} {{ h.modell }}{% if h.speicher %} · {{ h.speicher }} GB{% endif %}</td>
-        <td>{{ h.anbieter }}</td>
+        <td>{{ haendlername(h.anbieter) }}</td>
         <td class="num">{{ h.vodafone_preis | euro }}</td>
         <td class="num">{{ h.preis | euro }}</td>
         <td class="num wr-prozent{{ ' wr-prozent--negativ' if h.prozent < 0 else ' wr-prozent--positiv' }}">{{ '%+.1f'|format(h.prozent)|replace('.', ',') }} %</td>
@@ -583,7 +584,7 @@
     {% set tiefstes = port.lifecycle.portfolio[0].generationen or 1 %}
     {% for t in port.lifecycle.portfolio %}
     <li{% if t.eigen %} class="gr-eigen"{% endif %}>
-      <span class="dz-balken-name">{{ t.anbieter }}</span>
+      <span class="dz-balken-name">{{ haendlername(t.anbieter) }}</span>
       <span class="dz-balken-spur"><span class="dz-balken-fuell"
         style="width:{{ (100 * t.generationen / tiefstes) | round | int }}%"></span></span>
       <span class="dz-balken-n gr-tiefe-n"><span class="gr-tiefe-gen">{{
@@ -600,7 +601,7 @@
   <ul class="list-card gr-dauern">
     {% for d in port.lifecycle.dauern[:port.lifecycle_sichtbar] %}
     <li class="list-row"><span class="list-row-date">{{ d.tage }} Tage</span>
-      {{ d.modell }} bei {{ d.anbieter }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
+      {{ d.modell }} bei {{ haendlername(d.anbieter) }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
     {% endfor %}
   </ul>
   {% if port.lifecycle.dauern | length > port.lifecycle_sichtbar %}
@@ -608,7 +609,7 @@
   <ul class="list-card gr-dauern">
     {% for d in port.lifecycle.dauern[port.lifecycle_sichtbar:] %}
     <li class="list-row"><span class="list-row-date">{{ d.tage }} Tage</span>
-      {{ d.modell }} bei {{ d.anbieter }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
+      {{ d.modell }} bei {{ haendlername(d.anbieter) }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
     {% endfor %}
   </ul>
   </details>
@@ -620,7 +621,7 @@
   <ul class="list-card gr-verfall">
     {% for v in port.lifecycle.trends[:port.lifecycle_sichtbar] %}
     <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
-      {{ v.modell }} bei {{ v.anbieter }}: {{ v.erstpreis | euro }}
+      {{ v.modell }} bei {{ haendlername(v.anbieter) }}: {{ v.erstpreis | euro }}
       (seit {{ v.erstpreis_am | date_de }}) auf {{ v.aktuell | euro }}
       <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
     {% endfor %}
@@ -630,7 +631,7 @@
   <ul class="list-card gr-verfall">
     {% for v in port.lifecycle.trends[port.lifecycle_sichtbar:] %}
     <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
-      {{ v.modell }} bei {{ v.anbieter }}: {{ v.erstpreis | euro }}
+      {{ v.modell }} bei {{ haendlername(v.anbieter) }}: {{ v.erstpreis | euro }}
       (seit {{ v.erstpreis_am | date_de }}) auf {{ v.aktuell | euro }}
       <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
     {% endfor %}

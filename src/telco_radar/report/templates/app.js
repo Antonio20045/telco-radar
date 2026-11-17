@@ -2035,6 +2035,46 @@ var TelcoFrage = (function () {
   window.addEventListener('hashchange', ausHash);
 })();
 
+/* UI-1717 Aufgabe 5: #tafel-radar steht ohne Navi-Knopf nie im First
+ * Paint - sein Inhalt kommt deshalb erst beim Sichtbarwerden (Klick oder
+ * Deep-Link-Hash, siehe `gr-tafel-sichtbar` oben) als fertiges Markup aus
+ * `data/geraete-radar.html` (`geraete_radar_fragment.html.j2`, derselbe
+ * Datenkontext `radar` wie zuvor inline). Einmal geladen bleibt es stehen,
+ * ein Fehlschlag nennt den Ausfall statt eine leere Tafel zu zeigen.
+ *
+ * `grFilterleiste('wr-alarme', …)`/`('wr-abweichung', …)` (weiter unten in
+ * dieser Datei) verdrahten Filter, Sortierung und Zeilenklick beim ERSTEN
+ * Scriptlauf - zu dem Zeitpunkt ist `#gr-radar-inhalt` noch leer, finden
+ * also nichts. Nach dem Einsetzen des Fragments ruft `lade()` beide darum
+ * noch einmal auf; `grFilterleiste` ist eine globale Funktionsdeklaration
+ * (gehoisted), hier also schon aufrufbar, auch wenn sie im Dateitext erst
+ * spaeter steht.
+ */
+(function () {
+  var tafel = document.getElementById('tafel-radar');
+  var inhalt = document.getElementById('gr-radar-inhalt');
+  var url = inhalt && inhalt.getAttribute('data-radar-fragment');
+  if (!tafel || !inhalt || !url) return;
+  var geladen = false;
+  function lade() {
+    if (geladen) return;
+    geladen = true;
+    fetch(url).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    }).then(function (txt) {
+      inhalt.innerHTML = txt;
+      grFilterleiste('wr-alarme', 'gr-mehr');
+      grFilterleiste('wr-abweichung', 'gr-wmehr');
+    }).catch(function () {
+      geladen = false;
+      inhalt.innerHTML = '<p class="gr-zr-keine">Dieser Reiter konnte nicht geladen werden.</p>';
+    });
+  }
+  tafel.addEventListener('gr-tafel-sichtbar', lade);
+  if (!tafel.classList.contains('gr-tafel--aus')) lade();
+})();
+
 /* P3 (Strategie Geraete v3, 17.09.2026): der EINE Ansichts-Umschalter
  * des Gerätekatalogs - Einzelgerätpreis <-> Gesamtkosten (TCO-24).
  *

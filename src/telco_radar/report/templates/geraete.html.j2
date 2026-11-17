@@ -75,7 +75,7 @@
    `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
    `wochenkarte` („Was diese Woche auffällt") - dieselbe Teilvorlage,
    aber aufgerufen im REITER PREISVERLAUF (siehe den Kommentar dort). #}
-{% from "_geraete_radar.html.j2" import radar_tafel, wochenkarte with context %}
+{% from "_geraete_radar.html.j2" import wochenkarte with context %}
 
 {% import "_design.html.j2" as d %}
 {% set buehne = true %}
@@ -151,7 +151,8 @@
 <li class="gr-anb--{{ t.klasse }}">{% if tarif %}<a class="gr-sprung gx-t" href="?modell={{ t.id }}{% if t.band %}&amp;band={{ t.band }}{% endif %}#tafel-tco"
   data-modell="{{ t.id }}"{% if t.band %} data-band="{{ t.band }}"{% endif %}>{% else %}<a class="gx-vsprung gx-t" href="?modell={{ t.id }}#tafel-verlauf"
   data-geraet="{{ t.id }}">{% endif %}<span class="gx-t-name">{{ t.titel }}</span>
-  <span class="gx-t-wer"><span class="gx-nw"><i aria-hidden="true"></i>{{ haendlername(t.anbieter) }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %} {{ t.preis | euro }}</span>
+  <span class="gx-t-wer"><span class="gx-t-haendler"><i aria-hidden="true"></i>{{ haendlername(t.anbieter) }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %}</span>
+  <span class="gx-nw">{{ t.preis | euro }}</span>
   <span class="gx-nw">Vodafone {{ t.vodafone | euro }}</span></span>
   {# UI-1717 Aufgabe 2: ein riesiger roter Betrag an JEDER Zeile dieser
      Liste wirkte wie ein Alarm-Dauerton (bis zu 46px, fast doppelt so
@@ -431,7 +432,11 @@
      (siehe _geraete_radar.html.j2) - als Absatz zwischen Leitzahl und
      Bild war sie der Rueckstand der Ruecke: der Reiter beginnt mit der
      Leitzahl, dann kommt das Bild (Ruhe; Sicht-Prufer Kleineres 9). #}
-  <div id="gr-radar-inhalt">{{ radar_tafel(radar) }}</div>
+  {# UI-1717 Aufgabe 5: dieser Reiter steht ohne Navi-Knopf nie im First
+     Paint (1,57 MB ungesehenes Markup) - app.js laedt den Inhalt erst
+     beim Wechsel auf den Reiter aus `data/geraete-radar.html` nach
+     (`geraete_radar_fragment.html.j2`, derselbe Datenkontext `radar`). #}
+  <div id="gr-radar-inhalt" data-radar-fragment="{{ prefix }}data/geraete-radar.html"></div>
 </section>
 </div>
 
@@ -959,9 +964,9 @@
           {% for z in m.zeilen %}
           <tr>
             <td>{% if z.url %}<a class="gr-a-quelle" href="{{ z.url }}" rel="noopener"
-                 title="Quelle bei {{ z.anbieter }} öffnen">{{ z.anbieter }}<span
+                 title="Quelle bei {{ haendlername(z.anbieter) }} öffnen">{{ haendlername(z.anbieter) }}<span
                  class="gr-a-pfeil" aria-hidden="true">↗</span></a>
-              {% else %}{{ z.anbieter }}{% endif %}
+              {% else %}{{ haendlername(z.anbieter) }}{% endif %}
               {% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}</td>
             <td>{{ z.farbe or '–' }}</td>
             <td class="num">{% if z.preis is not none

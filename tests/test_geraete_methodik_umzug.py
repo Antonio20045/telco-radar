@@ -34,6 +34,10 @@ def _gebaut(tmp_path: pathlib.Path) -> tuple[BeautifulSoup, BeautifulSoup]:
     """geraete.html UND geraete-quellen.html derselben Site."""
     seiten = _seite(tmp_path)
     geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
+    inhalt = geraete.select_one("#gr-radar-inhalt")
+    if inhalt is not None:
+        for knoten in list(BeautifulSoup(seiten["geraete-radar.html"], "html.parser")):
+            inhalt.append(knoten)
     quellen_pfad = tmp_path / "site-bau" / "site" / "geraete-quellen.html"
     quellen = BeautifulSoup(quellen_pfad.read_text(encoding="utf-8"), "html.parser")
     return geraete, quellen

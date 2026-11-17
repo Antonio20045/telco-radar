@@ -617,9 +617,25 @@ def _baue(
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return BeautifulSoup(
+    suppe = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
+    _radar_fragment_einsetzen(suppe, site)
+    return suppe
+
+
+def _radar_fragment_einsetzen(suppe: BeautifulSoup, site: pathlib.Path) -> None:
+    """UI-1717 Aufgabe 5: #gr-radar-inhalt steht im First Paint leer - app.js
+    holt sein Markup erst beim Sichtbarwerden aus data/geraete-radar.html;
+    hier wird derselbe Inhalt an derselben Stelle eingesetzt."""
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    radar_fragment = site / "data" / "geraete-radar.html"
+    if inhalt is None or not radar_fragment.exists():
+        return
+    for knoten in list(
+        BeautifulSoup(radar_fragment.read_text(encoding="utf-8"), "html.parser")
+    ):
+        inhalt.append(knoten)
 
 
 def fragment(tmp_path: pathlib.Path, erneuert: bool = True) -> BeautifulSoup:

@@ -1,0 +1,6 @@
+{# UI-1717 Aufgabe 5: der Inhalt von #gr-radar-inhalt (geraete.html.j2),
+   ausgelagert, weil #tafel-radar ohne Navi-Knopf nie beim ersten Rendern
+   sichtbar ist - app.js laedt diese Datei erst beim Wechsel auf den
+   Reiter (holeRadar in app.js). Derselbe Datenkontext `wr` wie bisher. #}
+{% from "_geraete_radar.html.j2" import radar_tafel with context %}
+{{ radar_tafel(wr) }}

@@ -5802,6 +5802,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-t:hover{background:var(--paper-2);padding-left:14px;padding-right:14px}
 .gx-t-name{grid-area:name;font:500 clamp(19px,1.8vw,24px)/1.2 var(--sans);letter-spacing:-.01em}
 .gx-t-wer{grid-area:wer;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--ink-3)}
+.gx-t-haendler{min-width:0}
 .gx-nw{white-space:nowrap}
 .gx-t-wer i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--anb,var(--ink-4));margin-right:7px;vertical-align:0}
 .gx-t-plus{grid-area:plus;align-self:center;font:500 clamp(32px,3.2vw,46px)/1 var(--sans);letter-spacing:-.03em;color:var(--red-text);font-variant-numeric:tabular-nums;white-space:nowrap}
