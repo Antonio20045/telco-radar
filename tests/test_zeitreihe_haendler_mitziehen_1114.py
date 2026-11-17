@@ -65,11 +65,13 @@ def _belege() -> dict:
 
 @pytest.mark.parametrize("breit", [True, False], ids=["breit", "schmal"])
 def test_kein_etikett_unter_der_linie_des_naechsten(breit):
+    """UI-D-1717: eine Handelsreihe traegt zusaetzlich `gr-zr--handel` (optisch
+    zurueckgenommen) - die Klassenliste des Endpunkts bleibt darum offen."""
     svg = gz._svg(_serien(), breit, _belege(), None, laufzeit=24)
     linie = {
         html.unescape(a): float(cy)
         for cy, a in re.findall(
-            r"<circle class='gr-zr-punkt gr-zr-ende' cx='[^']*' cy='([-0-9.]+)'"
+            r"<circle class='gr-zr-punkt gr-zr-ende[^']*' cx='[^']*' cy='([-0-9.]+)'"
             r"[^>]*data-anb='([^']*)'",
             svg,
         )

@@ -334,7 +334,11 @@ def test_a3_anbieter_ohne_tarif_in_der_stufe_steht_nicht_mit_kein_screenshot(
                 assert s.locator("#gr-zr-baender button[data-band='m']").is_enabled()
                 s.click("#gr-zr-baender button[data-band='m']")
                 stufe_s = kombi._sichtbar(s, "o2")
-                assert stufe_s == {"anbieter": False}, (breite, stufe_s)
+                assert stufe_s["anbieter"] is False, (breite, stufe_s)
+                assert stufe_s["bilder"] == 0 and stufe_s["zeilen"] == [], (
+                    breite,
+                    stufe_s,
+                )
             finally:
                 ctx.close()
     finally:

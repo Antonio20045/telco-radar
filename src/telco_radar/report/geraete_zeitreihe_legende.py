@@ -144,29 +144,44 @@ def ueberholt_html(
     """Legendeneintrag je Anbieter, dessen Preise eine belegte Lücke überholt hat
     (`geraete_sortiment`, Vermerk `veraltet 17`): gemessen wurde, die Reihe fehlt
     aber, weil der Preis nicht mehr zählt. Ohne den Eintrag fehlte der Anbieter
-    in der Grafik kommentarlos; die Zahl bleibt weg (kein „zuletzt 2.001 €“)."""
+    in der Grafik kommentarlos; die Zahl bleibt weg (kein „zuletzt 2.001 €“).
+
+    UI-D-1717: die kurzen Lücken-Sätze (ein Halbsatz) bleiben offen sichtbar;
+    die langen Vergleichssätze aus `schaetzung_html` (mehrere Satzteile je
+    Anbieter, auf 390 px eine Textwand) stehen hinter einem Aufklapper
+    „So gelesen“, erst auf Nachfrage - dieselbe Zahl bleibt erreichbar,
+    ohne den Graphkopf zu sprengen (Antonios Befund zu PR 148)."""
     luecken = modell.get("belegte_luecken") or {}
-    return "".join(
+    luecken_html = "".join(
         f"<span class='gr-zr-leg-ueberholt'><i style='background:"
         f"{_zr_marker_farbe(a)}'></i>{_esc(a)} · {_esc(luecken[a]['kurz'])}"
         f", frühere Preise überholt und nicht gezeigt</span>"
         for a in ZEITREIHE_FOLGE
         if a in luecken and mess.get(a) and not serien.get(a)
-    ) + schaetzung_html(satz, mess, serien)
+    )
+    saetze = schaetzung_html(satz, mess, serien)
+    if saetze:
+        saetze = (
+            "<details class='gr-zr-leg-so'><summary>So gelesen</summary>"
+            f"{saetze}</details>"
+        )
+    return luecken_html + saetze
 
 
 def legende_html(
     anbieter_serien: dict, zeitraeume: dict | None = None, ueberholt: str = ""
 ) -> str:
     """EINE Zeile ueber dem Graphen: Name mit Farb-Punkt, Vodafone rot und
-    benannt. Der „anfangs"-Wert (erster Messbetrag, F9) steht im eigenen Span, der
-    auf dem breiten Bild ausgeblendet ist - dort traegt ihn das kleine
-    Erst-Label im SVG, und eine Zahl steht je Ort genau EINMAL.
+    benannt. Je Eintrag hoechstens „Name · zuletzt <Preis>" (UI-D-1717,
+    Antonios Befund zu PR 148: auf 390 px war „anfangs X · zuletzt Y"
+    je Anbieter eine Textwand und nahm der Kurve ihre Breite). Der
+    Anfangswert bleibt am Kurvenanfang im breiten Bild erkennbar; eine
+    zweite Zahl am selben Ort braucht es nicht.
 
     P0-B-z1: kommen im Bild mehrere Zeitraeume vor, traegt jeder Eintrag
-    seinen - „ab 2.019,54 € · zuletzt 2.019,54 €" ohne Zeitraum liest
-    sich sonst als 24-Monats-Betrag. Gelesen wird derselbe Wert wie am
-    Kurvenende (`_zeitraeume_aus`), nicht nachgerechnet."""
+    seinen Zeitraum zusaetzlich - ohne ihn liest sich der Betrag sonst
+    als 24-Monats-Betrag. Gelesen wird derselbe Wert wie am Kurvenende
+    (`_zeitraeume_aus`), nicht nachgerechnet."""
     zeitraeume = zeitraeume or {}
     vorhanden = sorted(
         {
@@ -183,8 +198,8 @@ def legende_html(
             continue
         umbruch = " style='white-space:normal'" if zweizeilig(anbieter) else ""
         zusatz = (
-            f" <span class='gr-zr-leg-wert'{umbruch}>anfangs {_euro0(serie[0][1])}"
-            f" · zuletzt {_euro0(serie[-1][1])}</span>"
+            f" <span class='gr-zr-leg-wert'{umbruch}>zuletzt "
+            f"{_euro0(serie[-1][1])}</span>"
         )
         mon_text = (
             _mon_kurz(zeitraeume.get(anbieter) or []) if len(vorhanden) > 1 else ""

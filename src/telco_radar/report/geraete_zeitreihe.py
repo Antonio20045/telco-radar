@@ -50,7 +50,7 @@ from . import geraete_notbremse as notbremse
 from . import geraete_zeitreihe_auswahl as zeitreihe_auswahl
 from . import geraete_zeitreihe_etiketten as etiketten
 from . import geraete_zeitreihe_uebertrag as uebertrag
-from .anbieter_farben import STRICHMUSTER, stil_fuer
+from .anbieter_farben import STRICHMUSTER, TARIFWELT_ANBIETER, stil_fuer
 from .geraete_antwort import _antwort_html as _antwort_html
 from .geraete_antwort import _leitzahl_html as _leitzahl_html
 from .geraete_antwort import _rechnung_html as _rechnung_html
@@ -448,6 +448,20 @@ def _svg(
     nennt das Bild GAR KEINEN Zeitraum - lieber keine Angabe als eine
     angenommene (Clean Code 3/4). `laufzeit` ist die Ratenlaufzeit der
     Ansicht; der Kopf des Bildes nennt sie neben dem Zeitraum.
+
+    UI-D-1717 (Antonio, 17.11.2026), zwei Regeln fuer ein ruhiges Bild:
+
+    - Der ENDWERT steht am Namensetikett (`etiketten.namensetiketten`,
+      `wert_je`), nicht mehr frei neben dem letzten Punkt. Frei gesetzt wich er
+      seinen Nachbarn aus und stand bei sieben Linien als schwarze Zahlensaeule
+      mitten im Bild, ohne Farbe und ohne Zuordnung zu seiner Kurve. Auf dem
+      schmalen Bild traegt die Zahl weiter die Legende (`wert_je` bleibt
+      `None`) - eine Zahl steht je Ort genau einmal.
+    - Eine HANDELSREIHE („Saturn/MediaMarkt · o2-Netz“, erkannt am stabilen
+      Namen aus `anbieter_farben.TARIFWELT_ANBIETER`, nicht am Trennzeichen
+      im Titeltext - Clean Code 2) ist dasselbe Netz, nur beim Haendler
+      gekauft: Linie, Punkte, Markerform treten mit `gr-zr--handel` zurueck
+      (CSS). Zurueckgenommen heisst nicht weg - Reihe/Etikett bleiben ganz.
     """
     anbieter = [a for a in ZEITREIHE_FOLGE if anbieter_serien.get(a)]
     if not anbieter:
@@ -547,6 +561,7 @@ def _svg(
         serie = anbieter_serien[a]
         stil = stil_fuer(a)
         farbe, marker_farbe = stil.farbe, stil.marker_farbe
+        handel = " gr-zr--handel" if a in TARIFWELT_ANBIETER else ""
         if len(punkte) > 1:
             tage_a = [d for d, _p in serie]
             for lauf, ist_luecke in _linien_laeufe(punkte, tage_a):
@@ -554,14 +569,14 @@ def _svg(
                 if ist_luecke:
                     luecken_muster = STRICHMUSTER["gepunktet"]
                     muster = f" stroke-dasharray='{luecken_muster}'"
-                    klasse = "gr-zr-linie gr-zr-linie--luecke"
+                    klasse = f"gr-zr-linie gr-zr-linie--luecke{handel}"
                 else:
                     muster = (
                         f" stroke-dasharray='{stil.muster}'"
                         if stil.muster != "none"
                         else ""
                     )
-                    klasse = "gr-zr-linie"
+                    klasse = f"gr-zr-linie{handel}"
                 teile.append(
                     f"<path class='{klasse}' d='{pfad}' stroke='{farbe}'{muster}/>"
                 )
@@ -579,14 +594,14 @@ def _svg(
                 )
             teile.append(
                 f"<circle class='gr-zr-punkt"
-                f"{' gr-zr-ende' if ende else ''}' cx='{x:.1f}' "
+                f"{' gr-zr-ende' if ende else ''}{handel}' cx='{x:.1f}' "
                 f"cy='{y:.1f}' r='{r}' fill='{marker_farbe}'"
                 f"{daten}/>"
             )
             form = form_pfad(stil.marker, x, y, r) if (breit or ende) else None
             if form:
                 teile.append(
-                    f"<g class='gr-zr-form gr-zr-form--{stil.marker}' "
+                    f"<g class='gr-zr-form gr-zr-form--{stil.marker}{handel}' "
                     f"fill='none' stroke='{marker_farbe}' "
                     f"stroke-width='1.4'>{form}</g>"
                 )
@@ -599,34 +614,6 @@ def _svg(
                 f"{_euro0(wert)}{einmal}</title></circle>"
             )
 
-    abstand = 15 if not breit else 13
-
-    def _label(kandidaten: list, klasse: str, dx: float, anker: str):
-        kandidaten.sort(key=lambda k: k[1])
-        belegt: list[float] = []
-        for i, (x, y, text) in enumerate(kandidaten):
-            ziel = y - 11 if (i % 2 == 0 or not breit) else y + 18
-
-            def frei(t: float) -> bool:
-                return all(abs(b - t) >= abstand for b in belegt)
-
-            if not frei(ziel):
-                ziel = y - 11 if frei(y - 11) else y + 18
-            schritte = 0
-            while not frei(ziel) and schritte < 5:
-                ziel += 15 if ziel > y else -15
-                schritte += 1
-            belegt.append(ziel)
-            teile.append(
-                f"<text class='{klasse}' x='{x + dx:.1f}' "
-                f"y='{ziel:.1f}' text-anchor='{anker}'>"
-                f"{_euro0(text)}</text>"
-            )
-
-    if breit:
-        letzte = [_punkte(anbieter_serien[a])[-1] for a in anbieter]
-        _label(letzte, "gr-zr-wert", -10, "end")
-
     enden = sorted(
         (
             (_punkte(anbieter_serien[a])[-1][0], _punkte(anbieter_serien[a])[-1][1], a)
@@ -634,8 +621,9 @@ def _svg(
         ),
         key=lambda e: e[1],
     )
+    wert_je = {a: anbieter_serien[a][-1][1] for a in anbieter} if breit else None
     teile += etiketten.namensetiketten(
-        enden, breit, w, h, beleg_je, mon_je, mehrere_zeitraeume
+        enden, breit, w, h, beleg_je, mon_je, mehrere_zeitraeume, wert_je
     )
     teile.append("</svg>")
     return "".join(teile)
@@ -725,7 +713,13 @@ def fenster_serien(serien: dict, fenster: str, heute: str = "") -> dict:
 def _fenster_html(
     serien: dict, beleg_je: dict, zeitraeume: dict, laufzeit: int, ueberholt: str = ""
 ) -> str:
-    """Fertige Grafik, die app.js unveraendert einhaengt."""
+    """Fertige Grafik, die app.js unveraendert einhaengt.
+
+    UI-D-1717: der `title` am ganzen Bild ist gefallen. Er legte sich als graue
+    Sprechblase ueber die Grafik, sobald der Zeiger irgendwo darin stand.
+    Dieselbe Auskunft steht auf der Methodik-Seite („Ein fehlender Punkt heisst
+    …“, `geraete_quellen.html.j2`); eine ECHTE Messluecke nennt `_luecken_satz`
+    unter dem Bild, mit Datum."""
     if not _messtage(serien):
         return (
             "<p class='gr-zr-keine'>Für diesen Zeitraum liegen keine Messungen vor.</p>"
@@ -735,9 +729,7 @@ def _fenster_html(
     legende = _legende_html(serien, zeitraeume, ueberholt)
     return (
         legende
-        + '<div class="gr-zr-bild" id="gr-zr-bild" '
-        + 'title="Ein fehlender Punkt bedeutet: keine Messung an diesem Tag. '
-        + 'Lange Zeiträume zeigen ausgewählte echte Messtage, keine Mittelwerte.">'
+        + '<div class="gr-zr-bild" id="gr-zr-bild">'
         + breit
         + schmal
         + "</div>"

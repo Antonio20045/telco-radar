@@ -525,8 +525,14 @@ def test_f9_einsundeins_ablose_zaehlt_nicht_zusaetzlich_zu_monat_25_bis_36():
     assert geraetepreis(b) == 1587.54
 
 
-def test_f9_legende_nennt_den_ersten_wert_anfangs():
+def test_f9_legende_nennt_nur_noch_den_letzten_wert():
+    """UI-D-1717 (Antonios Befund zu PR #148): die Legende nannte je Anbieter
+    "anfangs X · zuletzt Y" - auf 390 px eine Textwand. Sie nennt jetzt
+    höchstens "Name · zuletzt Y"; den Anfangswert trägt auf dem breiten Bild
+    weiterhin der Kurvenanfang selbst, eine zweite Zahl am selben Ort braucht
+    es nicht."""
     from telco_radar.report import geraete_zeitreihe as zr
 
     html = zr._legende_html({"congstar": [("2026-09-29", 1243.0), (HEUTE, 1117.0)]})
-    assert "anfangs 1.243 €" in html and "ab 1.243" not in html, html
+    assert "zuletzt 1.117 €" in html, html
+    assert "anfangs" not in html and "ab 1.243" not in html, html

@@ -290,10 +290,21 @@ _FUENF_STRUKTUR = {
 Punkte und (Name, y) der Namensetiketten für `_serien(FUENF)`."""
 
 _FUENF_SHA = {
-    "breit": "7cd10fe1ead88a25537c4a5874b9d4c5e494f641c7707c20b5ac3f611f8685c8",
-    "schmal": "6de33c266dff7615a36866576b978ed1629290314159b67155c1415cf28a9e9d",
-    "legende": "b7e6341ef486fc5476865b487948598a92c918eab0ddbcb20c795619d3736ca4",
+    "breit": "624306d7fd6d1a9470391778ceb7696ef8fb4741782ef5261527a03a9c8df082",
+    "schmal": "a94184ab7ffd764defebc70f7a8a6adb043acc5c542b51304d53c5187b9f6e84",
+    "legende": "c8c06662fb0180d5c57bca378ac0a26eefcd764c85e1563350830ba8cf270f60",
 }
+"""Nachgezogen am 17.11.2026, zweimal am selben Tag (UI-D-1717): zuerst stand
+der Endwert unter seinem Namen am rechten Rand statt frei im Bild, das
+Abrufdatum am Etikett fiel. Dann Antonios Befund zu PR #148 (390 px: Rand
+der Etikettenspalte zu breit, Legende eine Textwand) - schmal trägt der
+einzeilige Name jetzt 11 statt 15 px (schmälerer Rand, breitere Kurve), die
+Legende nennt nur noch „zuletzt", nicht mehr „anfangs · zuletzt". Die
+STRUKTUR (Zeichenreihenfolge und Etikettenhöhen,
+`test_gegenprobe_fuenf_ohne_haendler_struktur_unveraendert`) ist dabei
+unverändert geblieben - nur die Textknoten des Bildes sind andere; die Legende
+berührt der Umbau nicht und trägt ihre alte Prüfsumme weiter."""
+
 _PAAR_OHNE_STRUKTUR = {
     "svg_breit": (
         ["Vodafone", "o2", "1&1", "congstar"],

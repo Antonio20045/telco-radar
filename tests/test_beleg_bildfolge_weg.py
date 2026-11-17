@@ -384,7 +384,13 @@ def test_s1_das_einzelbild_wird_mit_der_kennung_der_position_benannt():
 
 def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
     """Folge der Kennung K, die Zeile gehört zu einer anderen ``beleg_id``: kein Bild,
-    ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile)."""
+    sondern GENAU EINE Zeile mit dem Grund in Alltagsworten (kein Bild unter der
+    falschen Zeile).
+
+    Prüferbefund PR #148: eine frühere Fassung hatte diesen Grund von der Seite
+    genommen (nur noch im Log); das macht diesen Fall ununterscheidbar vom Fall
+    "kein Bild überhaupt" - das widerspricht Antonios Auftrag. Kennungen gehören
+    trotzdem nie in den Text (fail-closed bleibt stumm über die ``beleg_id``)."""
     fremd_id = "9" * 64
     assert fremd_id[:16] != weg.beleg_id[:16]
     seite = _seite(tmp_path, weg.manifest, fremd_id)
@@ -392,12 +398,17 @@ def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
         li for li in seite.select(".gr-beleg-paar") if li["data-anbieter"] == "o2"
     )
     assert paar.select("img") == [] and paar.select(".gr-bildfolge") == []
-    keins = paar.select_one(".gr-beleg-keins")
-    assert "hidden" not in keins.attrs
-    text = keins.get_text(" ", strip=True)
+    assert not paar.has_attr("hidden")
+    gruende = paar.select(".gr-beleg-grund")
+    assert len(gruende) == 1, gruende
+    text = gruende[0].get_text(" ", strip=True)
+    assert text == pos.zeilen.grund_satz(pos.zeilen.GRUND_FREMD, "")
     assert "gehört zu einer anderen Messung" in text
     assert weg.beleg_id[:16] not in text and fremd_id[:16] not in text, text
     assert "Messung " + fremd_id[:4] not in text
+    liste = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
+    keins = liste.select_one("li.gr-beleg-keins")
+    assert "hidden" in keins.attrs, "der Anbieter hat ja einen Grund-Hinweis gezeigt"
 
 
 def _adr(name: str) -> str:
@@ -659,7 +670,7 @@ def test_ein_geloeschtes_einzelbild_wird_zum_vermerk(weg, tmp_path, chromium):
 
     def erwartet(z, breite):
         assert z["bilder"] == 0 and z["direkt"] == [VERMERK], z
-        assert "Screenshot zu dieser Preiszeile" in z["summary"]
+        assert z["summary"].startswith("Beleg: Screenshot vom "), z["summary"]
 
     _pruefe_ladefehler(
         weg, tmp_path, chromium, manifest, ["__"], erwartet, (1440, 390), "einzel"
