@@ -46,6 +46,17 @@ name: Klick-Tageslauf
 #
 # PARALLELLAUF: eigene concurrency-Gruppe `klick` ohne Abbruch (Regel 9).
 # Die Klick-Erkundung weicht diesem Lauf aus (klickparallel.WORKFLOWS).
+#
+# CRON HIER BEWUSST UNVERAENDERT (P1717): gemessen wurden ueber 30 Tage
+# Verzuege von 5h41 bis 7h38 fuer DIESEN Lauf und vergleichbare Verzuege fuer
+# geraete.yml (02:17, 09:47, 15:47) und radar.yml (11:00) - alle Minuten
+# gleich betroffen, kein Tagesmuster (`arbeit/zeitplan-vorher-1717.md`). Das
+# ist GitHubs Warteschlangenverzoegerung fuer geplante Laeufe, keine
+# Eigenschaft der Minute 00:05 - ein anderer Cron-Wert haette denselben
+# Verzug. Seit P1717 haengt sich geraete.yml per `workflow_run` an das Ende
+# DIESES Laufs (nur bei `conclusion == success`), statt auf seinen eigenen,
+# unabhaengig verzoegerten Cron zu warten - das verkuerzt die Kette um eine
+# zweite Zufallsverzoegerung, auch wenn dieser Lauf selbst spaet startet.
 
 on:
   schedule:

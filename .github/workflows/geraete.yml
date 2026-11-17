@@ -83,6 +83,22 @@ on:
     # bekommt also genau einen Crawl, nicht drei.
     - cron: "47 9 * * *"
     - cron: "47 15 * * *"
+  # PRIMAERPFAD seit P1717: direkt nach einem gruenen Klick-Tageslauf, statt
+  # auf den naechsten eigenen (ebenso verzoegerten) Cron zu warten. Beleg
+  # (`arbeit/zeitplan-vorher-1717.md`): Klick- und Geraete-Cron werden
+  # unabhaengig voneinander um 5-10 h verspaetet: GitHub verzoegert
+  # geplante Laeufe unter Warteschlangenlast um mehrere Stunden, UNABHAENGIG
+  # von der gewaehlten Minute (:05, :17, :47, :00 sind alle gleich betroffen)
+  # - ein anderer Cron-Wert aendert daran nichts. Der Geraetelauf traf das
+  # medimax/ep-Fenster (02:00-08:00) dadurch an praktisch keinem Tag.
+  # `workflow_run` haengt den Geraetelauf an das Ende des Klick-Laufs statt
+  # an eine zweite, unabhaengig verzoegerte Uhr - er startet dann so frueh,
+  # wie es der (weiterhin verzoegerte) Klick-Lauf zulaesst, nicht spaeter.
+  # Nur bei `conclusion == success` (Job-Bedingung unten); bei Rot bleiben
+  # die drei Cron-Termine als Rueckfall (naechster Absatz).
+  workflow_run:
+    workflows: ["Klick-Tageslauf"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       frist:
@@ -103,6 +119,10 @@ concurrency:
 
 jobs:
   geraete:
+    # Bei workflow_run nur bei gruenem Klick-Lauf; ein roter oder
+    # abgebrochener Klick-Lauf lost hier NICHTS aus, das Nachholen bleibt
+    # den drei Cron-Terminen (Anforderung "robust bei Ausfall", P1717).
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     # Grosszuegig, weil die Bremse hier nicht die Rechenzeit ist, sondern die
     # Crawl-delay: zehn Sekunden je Abruf mal zwanzig Produktseiten sind
@@ -115,16 +135,21 @@ jobs:
           # Datei fuer neu und bricht mit "CONFLICT (add/add)" ab.
           fetch-depth: 0
 
-      # Nur fuer geplante Laeufe: ist der Bestand heute schon gemessen
-      # (`updated` in geraete_tco.json ist das heutige UTC-Datum), endet
-      # der Ersatztermin hier. Ein Lauf von Hand misst immer.
+      # Nur fuer geplante Laeufe und den workflow_run-Anschluss an den
+      # Klick-Lauf: ist der Bestand heute schon gemessen (`updated` in
+      # geraete_tco.json ist das heutige UTC-Datum), endet der Lauf hier -
+      # das gilt fuer die drei Cron-Ersatztermine GENAUSO wie fuer einen
+      # zweiten workflow_run am selben Tag (Klick-Erkundung oder ein
+      # erneuter gruener Klick-Lauf koennten sonst denselben Haendler am
+      # selben Tag doppelt anstossen, Anforderung "kein Haendler doppelt",
+      # P1717). Ein Lauf von Hand (`workflow_dispatch`) misst immer.
       - name: Heute schon gemessen?
         id: heute
         run: |
           heute=$(date -u +%Y-%m-%d)
           stand=$(python3 -c "import json; print(json.load(open('data/state/geraete_tco.json')).get('updated',''))" 2>/dev/null || true)
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$stand" = "$heute" ]; then
-            echo "Bestand ist vom $stand - dieser Ersatztermin crawlt nicht."
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$stand" = "$heute" ]; then
+            echo "Bestand ist vom $stand - dieser Anstoss crawlt nicht."
             echo "fertig=true" >> "$GITHUB_OUTPUT"
           else
             echo "Bestand ist vom ${stand:-unbekannt}, heute ist $heute - es wird gemessen."
