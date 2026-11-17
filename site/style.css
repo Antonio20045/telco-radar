@@ -4328,22 +4328,6 @@ body:not(.mit-buehne) main{padding-top:112px}
 .kopf .kopf-newsletter:hover,.kopf .kopf-newsletter.on{background:var(--glas-stark)}
 .uc-promo .subbar.subnav:not(.navi){display:none}
 
-/* UI-1717 Aufgabe 3: auf der Geräteseite bleibt die Kopfleiste blickdicht -
-   kein "Liquid Glass" (transparent + Unschärfe-Filter), sondern ein
-   deckender Hintergrund. Seitenscoped über .seite-geraete (aus dem
-   body-Klassennamen, `active == 'geraete'`, siehe base.html.j2), damit
-   Wochenbericht und die anderen Seiten ihr Glas-Design behalten. */
-.seite-geraete .kopf.topbar{background:var(--paper-2);border-bottom:1px solid var(--rule)}
-.seite-geraete .kopf .brand,.seite-geraete .kopf .navi,.seite-geraete .kopf .gsearch,
-.seite-geraete .kopf .kopf-newsletter{
-  background:var(--paper-2);border-color:var(--rule);
-  -webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;
-}
-.seite-geraete .kopf.kopf--gerollt .brand,.seite-geraete .kopf.kopf--gerollt .navi,
-.seite-geraete .kopf.kopf--gerollt .gsearch,.seite-geraete .kopf.kopf--gerollt .kopf-newsletter{
-  background:var(--paper-2);
-}
-
 /* ------------------------------------------------------------- BUEHNE -- */
 .buehne{position:relative;height:100vh;height:100svh;min-height:660px;overflow:hidden;
   background:var(--himmel-tag);color:var(--glas-text)}
