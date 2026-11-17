@@ -23,4 +23,18 @@
 #     datei: apple-iphone-18-pro.jpg
 #     quelle: Apple Presseportal, 09.09.2026
 #     lizenz: Pressebild, redaktionelle Nutzung
-bilder: {}
+bilder:
+  google-pixel-10-pro:
+    datei: google-pixel-10-pro.jpg
+    quelle: https://store.google.com/product/pixel_10_pro (Produktseite Google Store), 17.11.2026
+    lizenz: interne Nutzung, Quelle genannt
+
+  samsung-galaxy-s25-ultra:
+    datei: samsung-galaxy-s25-ultra.jpg
+    quelle: https://www.samsung.com/de/smartphones/galaxy-s25-ultra/buy/ (Produktseite Samsung, Farbauswahl-Galerie, zugeschnitten auf die Vorderansicht), 17.11.2026
+    lizenz: interne Nutzung, Quelle genannt
+
+  samsung-galaxy-z-fold8:
+    datei: samsung-galaxy-z-fold8.jpg
+    quelle: https://www.samsung.com/de/smartphones/galaxy-z-fold8/buy/ (Produktseite Samsung, Abschnitt "Lieferumfang", zugeschnitten auf das Gerät), 17.11.2026
+    lizenz: interne Nutzung, Quelle genannt
