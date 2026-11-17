@@ -69,7 +69,7 @@
    .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
    E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist GEFALLEN
    (Doppel-Darstellung zur eigenen Geräteauswahl, §4.6/§4.8). #}
-{% from "_geraete_buendel.html.j2" import belegpaare, fehlzeile, echte24luecke %}
+{% from "_geraete_buendel.html.j2" import belegpaare, fehlzeile, echte24luecke, haendlername %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
 {# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
    `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
@@ -151,9 +151,16 @@
 <li class="gr-anb--{{ t.klasse }}">{% if tarif %}<a class="gr-sprung gx-t" href="?modell={{ t.id }}{% if t.band %}&amp;band={{ t.band }}{% endif %}#tafel-tco"
   data-modell="{{ t.id }}"{% if t.band %} data-band="{{ t.band }}"{% endif %}>{% else %}<a class="gx-vsprung gx-t" href="?modell={{ t.id }}#tafel-verlauf"
   data-geraet="{{ t.id }}">{% endif %}<span class="gx-t-name">{{ t.titel }}</span>
-  <span class="gx-t-wer"><span class="gx-nw"><i aria-hidden="true"></i>{{ t.anbieter }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %} {{ t.preis | euro }}</span>
+  <span class="gx-t-wer"><span class="gx-nw"><i aria-hidden="true"></i>{{ haendlername(t.anbieter) }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %} {{ t.preis | euro }}</span>
   <span class="gx-nw">Vodafone {{ t.vodafone | euro }}</span></span>
-  <span class="gx-t-plus">+{{ t.abstand | round | int }}&nbsp;€</span></a></li>
+  {# UI-1717 Aufgabe 2: ein riesiger roter Betrag an JEDER Zeile dieser
+     Liste wirkte wie ein Alarm-Dauerton (bis zu 46px, fast doppelt so
+     gross wie der Geraetename daneben). Die Farbe bleibt (echte
+     Abweichung ueber der Schwelle), die Groesse sinkt auf die des Namens
+     - als `style`-Attribut, weil `style.css` fuer diesen Auftrag nur die
+     Kopfleiste (Aufgabe 3) aendern darf; so bleibt es auch am Telefon
+     wirksam, wo dieselbe Klasse sonst auf 30px zurueckspringt. #}
+  <span class="gx-t-plus" style="font:600 clamp(19px,1.8vw,24px)/1.2 var(--sans);letter-spacing:-.01em">+{{ t.abstand | round | int }}&nbsp;€</span></a></li>
 {% endmacro %}
 {% macro teuerliste(zeilen, tarif) %}
 {% if zeilen %}
@@ -250,7 +257,7 @@
            aria-label="Modell-Vorschau"></div>
     </div>
     <div class="gr-zr-feld gr-zr-feld--band">
-      <label id="gr-zr-band-label">Tarifband</label>
+      <label id="gr-zr-band-label">Tarifstufe</label>
       <div class="gr-zr-baender" role="group" aria-labelledby="gr-zr-band-label" id="gr-zr-baender">
         {# Die Stufen der Tarifleiter; nicht erlaubte werden vom Client
            DEAKTIVIERT, nicht entfernt (Angebot, nicht Existenz) - dieselbe
@@ -268,7 +275,7 @@
        ganze Tafel (Antwort, Graph, Zeilen, Δ); Standard 24, im Link
        als ?laufzeit=. „alle“ zeigt die Zeilen gruppiert, ohne Sieger und Δ. #}
     <div class="gr-zr-feld gr-zr-feld--lz">
-      <label id="gr-zr-lz-label">Ratenlaufzeit</label>
+      <label id="gr-zr-lz-label">Laufzeit</label>
       <div class="gr-zr-baender gr-zr-laufzeiten" role="group"
            aria-labelledby="gr-zr-lz-label" id="gr-zr-laufzeiten">
         {% for lz in zr.daten.laufzeiten %}<button type="button" data-lz="{{ lz }}"
@@ -595,6 +602,14 @@
 
   <div class="gr-vbild" id="gr-vbild" hidden></div>
   <p class="gr-vlegende" id="gr-vlegende" hidden></p>
+  {# UI-1717 Aufgabe 6: liegen zwei Linien auf (fast) derselben Höhe,
+     zeichnet app.js die zweite ausdrücklich gestrichelt (stroke-dasharray
+     "4 8"), damit sie nicht spurlos unter der ersten verschwindet - das
+     bleibt so. Der Satz hier erklärt den Strich generisch (gilt für jedes
+     Gerät gleich) und steht NUR, wenn app.js am geladenen Gerät wirklich
+     eine verdeckte Linie gefunden hat (`setzeGraph`, `r.verdeckt`). #}
+  <p class="gr-erklaer" id="gr-vverdeckt-hinweis" hidden>Gestrichelt: eine
+    Linie liegt (fast) genau auf einer anderen - beide bleiben sichtbar.</p>
 
   {# EINE ZAHL ZUR ZEIT. `app.js` schreibt diesen Satz bei einer Auswahl
      auf das GEWAEHLTE Geraet um („… liegen 11 Messtermine vor, vom 10.8.
@@ -755,7 +770,7 @@
      jeder Zelle (dort fehlt der Kopf, die Zeile steht als Karte). #}
   {% set spalten = {'anbieter': 'Händler', 'spanne': 'Spanne',
     'tco': 'Kosten über ' ~ geraete.tco.horizont ~ ' Monate',
-    'monat': 'Ø €/Monat', 'delta': 'Δ zu Vodafone', 'band': 'Band'} %}
+    'monat': 'Ø €/Monat', 'delta': 'Unterschied zu Vodafone', 'band': 'Stufe'} %}
   <table class="src-table gr-alarm gr-katalog-mod" id="gr-katalogtabelle">
     {# Dieselbe Sortiermechanik wie im Radar - `grFilterleiste` traegt
        beide Tabellen. Sortiert wird nach dem ROHWERT (`data-s-*`); eine
@@ -846,9 +861,9 @@
             m.ab_preis | euro }}</span>
           {% if m.ab_beleg and m.ab_beleg.quelle_url %}<a
             class="gr-a-quelle" href="{{ m.ab_beleg.quelle_url }}"
-            rel="noopener" title="Quelle bei {{ m.ab_anbieter }} öffnen">bei
-            {{ m.ab_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
-          {% else %}<span class="gr-a-klein">bei {{ m.ab_anbieter }}</span>{% endif %}
+            rel="noopener" title="Quelle bei {{ haendlername(m.ab_anbieter) }} öffnen">bei
+            {{ haendlername(m.ab_anbieter) }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+          {% else %}<span class="gr-a-klein">bei {{ haendlername(m.ab_anbieter) }}</span>{% endif %}
           {% if m.ab_beleg and m.ab_beleg.abgerufen_am %} <span
             class="gr-a-klein gr-a-datum">{{ m.ab_beleg.abgerufen_am | date_de }}</span>{% if not m.ab_alt %}{% set sv = stand_vom(m.ab_beleg.abgerufen_am, geraete.einzel_stichtag) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}{% endif %}{% endif %}
           {% if m.ab_alt %} <span class="gr-spalten-marke gr-spalten-marke--alt">{{
@@ -857,7 +872,7 @@
           <span class="gr-k-ab">nur im Bündel</span>
           <span class="gr-a-klein">ab {{ m.buendel_monat | euro }}/Monat{{
             m.buendel_raten_zusatz }}{% if m.buendel_anbieter %}
-            bei {{ m.buendel_anbieter }}{% endif %}{% if m.buendel_beleg and m.buendel_beleg.quelle_url %} · <a
+            bei {{ haendlername(m.buendel_anbieter) }}{% endif %}{% if m.buendel_beleg and m.buendel_beleg.quelle_url %} · <a
             class="gr-a-quelle" href="{{ m.buendel_beleg.quelle_url }}" rel="noopener"
             title="Bündel beim Anbieter öffnen">Beleg<span class="gr-a-pfeil"
             aria-hidden="true">↗</span></a>{% endif %}{% if m.buendel_tarif %} · {{ m.buendel_tarif }}{% endif %}</span>
@@ -868,7 +883,8 @@
            den Zeilentext und findet damit auch Haendlernamen. #}
         <td class="gr-sp--barpreis" data-k="{{ spalten.anbieter }}"><span class="gr-k-anzahl">{{
           m.anbieterzahl }}</span>
-          <span class="gr-a-klein">{{ m.anbieter | join(' · ') }}</span></td>
+          <span class="gr-a-klein">{% for n in m.anbieter %}{{ haendlername(n)
+            }}{% if not loop.last %} · {% endif %}{% endfor %}</span></td>
         {# Spanne: nur wenn WESSENTLICH verschieden (C1). Ein Modell mit
            EINEM Händler hat gar keine zweite Zahl, die eine Spanne stellen
            könnte - das sagt die Zelle selbst statt eines stummen "–"
@@ -896,9 +912,9 @@
           <span class="gr-k-ab">ab {{ m.tco_ab | euro }}</span>
           {% if m.tco_beleg and m.tco_beleg.quelle_url %}<a
             class="gr-a-quelle" href="{{ m.tco_beleg.quelle_url }}"
-            rel="noopener" title="Quelle bei {{ m.tco_anbieter }} öffnen">bei
-            {{ m.tco_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
-          {% else %}<span class="gr-a-klein">bei {{ m.tco_anbieter }}</span>{% endif %}
+            rel="noopener" title="Quelle bei {{ haendlername(m.tco_anbieter) }} öffnen">bei
+            {{ haendlername(m.tco_anbieter) }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+          {% else %}<span class="gr-a-klein">bei {{ haendlername(m.tco_anbieter) }}</span>{% endif %}
           {% if m.tco_band_label %}<span class="gr-a-klein gr-k-tarif">Tarif {{ m.tco_band_label }}</span>{% endif %}
           {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
             class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% set sv = stand_vom(m.tco_beleg.abgerufen_am, geraete.messdatum.juengster) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}{% endif %}
@@ -907,7 +923,7 @@
           m.tco_monat | euro }}{% else %}–{% endif %}</td>
         <td class="gr-sp--tco" data-k="{{ spalten.delta }}">{% if m.tco_delta_kurz %}<span
           class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if m.tco_delta is not none and m.tco_delta < 0 else ' wr-prozent--positiv' }}"{%
-          if m.tco_delta_anbieter %} title="Vodafone ist am günstigsten – Δ ist der Abstand des günstigsten Wettbewerber-Angebots ({{ m.tco_delta_anbieter }}) zur Vodafone-Referenz"{% endif %}>{{
+          if m.tco_delta_anbieter %} title="Vodafone ist am günstigsten – Δ ist der Abstand des günstigsten Wettbewerber-Angebots ({{ haendlername(m.tco_delta_anbieter) }}) zur Vodafone-Referenz"{% endif %}>{{
           m.tco_delta_wort }}</span>{% elif m.tco_delta_leer %}<span
             class="gr-a-klein" title="{{ m.tco_delta_leer_grund }}">{{ m.tco_delta_leer }}</span>{% else %}–{% endif %}</td>
         <td class="gr-sp--tco" data-k="{{ spalten.band }}"><span class="gr-k-band">{{

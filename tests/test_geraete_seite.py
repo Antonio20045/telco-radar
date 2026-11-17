@@ -1039,8 +1039,8 @@ def test_der_katalog_ist_eine_tabelle_auf_modellebene(tmp_path):
         "Spanne",
         "Kosten über 24 Monate",
         "Ø €/Monat",
-        "Δ zu Vodafone",
-        "Band",
+        "Unterschied zu Vodafone",
+        "Stufe",
     ], kopf
 
     zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")

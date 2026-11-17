@@ -226,7 +226,7 @@ def test_methodik_nennt_bei_leerer_ausnahmeliste_derzeit_kein_tarif(tmp_path):
     assert band_regel.preis_widerspruch() == {}
     _, quellen = _gebaut(tmp_path)
     eintrag = next(
-        z for z in quellen.select("li.list-row") if "Ohne Tarifband" in z.get_text()
+        z for z in quellen.select("li.list-row") if "Ohne Tarifstufe" in z.get_text()
     )
     assert "widersprüchlich ist (derzeit kein Tarif)" in " ".join(
         eintrag.get_text(" ", strip=True).split()
@@ -242,5 +242,5 @@ def test_tooltip_ohne_tarifband_nennt_den_stand_der_ausnahmeliste(tmp_path):
             "h4.gr-ohneband-kopf"
         )
     ]
-    assert kopf, "kein Fragment trägt „Ohne Tarifband“ - der Test prüft nichts"
+    assert kopf, "kein Fragment trägt „Ohne Tarifstufe“ - der Test prüft nichts"
     assert all("(derzeit kein Tarif)" in k["title"] for k in kopf)

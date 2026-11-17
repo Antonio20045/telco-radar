@@ -9,6 +9,8 @@ from __future__ import annotations
 import math
 from datetime import date
 
+from .geraete_rechenweg import _esc
+
 MIN_XTICK_ABSTAND = 34
 MIN_XTICK_ABSTAND_SCHMAL = 62
 
@@ -214,3 +216,37 @@ def form_pfad(marker: str, x: float, y: float, r: float) -> str | None:
             f"M{x:.1f} {y - s:.1f}L{x:.1f} {y + s:.1f}'/>"
         )
     return None
+
+
+def _tag_monat(iso: str) -> str:
+    """„12.9." - das X-Achsen-Format des Prototyps (echtes deutsches)."""
+    y, m, d = iso.split("-")
+    return f"{int(d)}.{int(m)}."
+
+
+def _luecken_satz(serien: dict, schwelle_tage: int = LUECKE_TAGE_SCHWELLE) -> str:
+    """UI-1717 Aufgabe 6: die gepunktete Linie (`gr-zr-linie--luecke`) ist eine
+    ECHTE Messluecke - kein Darstellungsfehler. Ein Satz erklaert sie, aber
+    NUR wenn diese konkrete Serie wirklich eine Unterbrechung ueber
+    `schwelle_tage` zeigt (dieselbe Schwelle wie `_linien_laeufe`), und mit
+    dem Datum, das die Messung selbst traegt - nie hart codiert (Clean Code 3).
+    Mehrere Luecken (mehrere Anbieter, oder mehrfach bei einem) stehen alle
+    im selben Satz, keine zweite Stelle behauptet dieselbe Aussage."""
+    saetze = []
+    for anbieter in sorted(serien):
+        tage = sorted(serien[anbieter], key=lambda punkt: punkt[0])
+        for i in range(1, len(tage)):
+            davor = date.fromisoformat(tage[i - 1][0])
+            jetzt = date.fromisoformat(tage[i][0])
+            if (jetzt - davor).days > schwelle_tage:
+                saetze.append(
+                    f"{_esc(anbieter)} {_tag_monat(tage[i - 1][0])}–"
+                    f"{_tag_monat(tage[i][0])} nicht gemessen"
+                )
+    if not saetze:
+        return ""
+    return (
+        "<p class='gr-erklaer gr-zr-luecken-hinweis'>Gepunktet: echte Messlücke – "
+        + "; ".join(saetze)
+        + ".</p>"
+    )

@@ -51,7 +51,12 @@ import threading
 
 from test_geraete_tco_zustand import _baue, lager, vorlage_text
 
-BEGRIFFE = {"TCO-24", "Tarifband", "Bündel", "Abweichungs-Vorzeichen (+/−) zu Vodafone"}
+BEGRIFFE = {
+    "TCO-24",
+    "Tarifstufe",
+    "Bündel",
+    "Abweichungs-Vorzeichen (+/−) zu Vodafone",
+}
 
 
 @contextlib.contextmanager

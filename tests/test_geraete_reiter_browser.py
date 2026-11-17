@@ -1497,7 +1497,11 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
     zusammen halten es lesbar, ohne es beliebig weit vom Punkt zu schieben.
 
     Der Fall wird gestellt - die Fixture haelt ihre Preise bewusst weit
-    auseinander. Gerechnet wird trotzdem vom echten `app.js`."""
+    auseinander. Gerechnet wird trotzdem vom echten `app.js`.
+
+    UI-1717 Aufgabe 6: derselbe Fall prueft zusaetzlich den generischen
+    Hinweis zur gestrichelten Linie - er steht, sobald app.js wirklich eine
+    verdeckte Linie gefunden hat."""
     seite = _eigene_seite
     tage = list(_MESSTAGE)
     _stelle_daten(
@@ -1549,6 +1553,13 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
         f"genau eine der drei Linien liegt verdeckt: {striche}"
     )
 
+    hinweis = seite.evaluate("""() => {
+        const h = document.getElementById('gr-vverdeckt-hinweis');
+        return h && { versteckt: h.hidden, text: h.textContent };
+    }""")
+    assert hinweis and hinweis["versteckt"] is False, hinweis
+    assert hinweis["text"].strip(), "der Hinweis steht sichtbar, aber ohne Text"
+
     etiketten = seite.eval_on_selector_all(
         "#gr-vbild .gr-vetikett", "e => e.map(x => x.textContent)"
     )
@@ -1590,6 +1601,51 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
         f"das Etikett laeuft aus dem Bild: {lage['rechts']} > {lage['breite']}"
     )
     assert lage["groesse"] >= MIN_SCHRIFT, lage["groesse"]
+
+
+def test_ohne_verdeckte_linie_bleibt_der_hinweis_versteckt(_eigene_seite):
+    """Gegenprobe zu `test_eine_verdeckte_linie_wird_sichtbar_gemacht`: liegen
+    die Linien klar auseinander, verdeckt keine die andere - der generische
+    Hinweis zur gestrichelten Linie (UI-1717 Aufgabe 6) bleibt dann `hidden`,
+    sonst behauptet er etwas, das am Bild nicht vorliegt."""
+    seite = _eigene_seite
+    tage = list(_MESSTAGE)
+    _stelle_daten(
+        seite,
+        {
+            "id": "probe",
+            "label": "Probefall 128 GB",
+            "hersteller": "Probe",
+            "speicher": 128,
+            "suchtext": "probefall",
+            "min": 500,
+            "max": 1500,
+            "anbieter": 2,
+            "messpunkte": 2 * len(tage),
+            "messtermine": len(tage),
+            "tage": tage,
+            "aktuell": [],
+            "reihen": [
+                {
+                    "anbieter": "Telekom",
+                    "farbe": "#e20074",
+                    "eigen": False,
+                    "punkte": [{"datum": t, "preis": 1500.0} for t in tage],
+                },
+                {
+                    "anbieter": "Vodafone",
+                    "farbe": "#e60000",
+                    "eigen": True,
+                    "punkte": [{"datum": t, "preis": 500.0} for t in tage],
+                },
+            ],
+        },
+    )
+    hinweis = seite.evaluate("""() => {
+        const h = document.getElementById('gr-vverdeckt-hinweis');
+        return h && h.hidden;
+    }""")
+    assert hinweis is True, hinweis
 
 
 def test_telekom_farbe_kommt_aus_der_einen_quelle_und_ist_magenta(_eigene_seite):

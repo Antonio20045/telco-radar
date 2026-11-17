@@ -3982,6 +3982,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   var tabelle = document.getElementById('gr-vtabelle');
   var zukurz = document.getElementById('gr-vzukurz');
   var stand = document.getElementById('gr-vstand');
+  var verdecktHinweis = document.getElementById('gr-vverdeckt-hinweis');
   /* Die zwei Schwellen kommen aus `report/geraete_verlauf.py` und stehen als
      data-Attribute am Satz. Sie hier zu wiederholen waeren zwei Zahlen fuer
      dieselbe Regel - genau der Fehler, den CLAUDE.md 6 fuer die
@@ -4257,6 +4258,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     legende.innerHTML = '';
     tabelle.innerHTML = '';
     if (zukurz) { zukurz.hidden = true; zukurz.textContent = ''; }
+    if (verdecktHinweis) { verdecktHinweis.hidden = true; }
     if (!reihen.length) {
       leer.hidden = false;
       leer.textContent = 'Für diesen Zeitraum liegen keine Messpunkte vor.';
@@ -4446,6 +4448,14 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       gelegt.push({ anbieter: r.anbieter, ys: meine });
       r.verdeckt = verdeckt;
     });
+    /* UI-1717 Aufgabe 6: der generische Hinweis zur gestrichelten Linie
+       (siehe `geraete.html.j2`, `#gr-vverdeckt-hinweis`) steht nur, wenn
+       an DIESEM Gerät wirklich eine Linie hinter einer anderen verdeckt
+       gezeichnet wird - kein Satz ueber eine Moeglichkeit, die hier nicht
+       vorliegt. */
+    if (verdecktHinweis) {
+      verdecktHinweis.hidden = !reihen.some(function (r) { return r.verdeckt; });
+    }
 
     /* K (QA-Fix 24.09.2026): KEINE RESERVIERTE ZEICHENFLAECHE MEHR FUER
        DAS ENDLABEL. Die alte Fassung reservierte pauschal 210 Einheiten

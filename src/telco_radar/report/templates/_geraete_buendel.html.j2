@@ -34,19 +34,29 @@
    (`report/geraete_zeilenbelege.py`). #}
 {% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}
 <ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Kombination">
-  <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifband, Laufzeit und Anbieter</li>{% for p in paare %}
-  <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% for z in p.zeilenbilder %}
+  <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifstufe, Laufzeit und Anbieter</li>{% for p in paare %}
+  <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ haendlername(p.anbieter) }}</b>{% for z in p.zeilenbilder %}
     <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
       <summary>{% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge (<span class="gr-folge-zahl">{% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}</span>){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
       <ol class="gr-bildfolge">{% for f in z.bildfolge %}
         {% if not f.url %}<li class="gr-bildfolge-luecke"><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span><span class="gr-bildfolge-text">Kein Bild: {{ f.fehlt }}</span></li>{% else %}<li><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span>{% if f.text %}<span class="gr-bildfolge-text">{{ f.text }}</span>{% endif %}
-          <img data-src="{{ f.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}, vom {{ z.datum | date_de }}" width="640" height="400"></li>{% endif %}{% endfor %}
+          <img data-src="{{ f.url }}" alt="Screenshot {{ haendlername(p.anbieter) }}, {{ z.tarif }}, Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}, vom {{ z.datum | date_de }}" width="640" height="400"></li>{% endif %}{% endfor %}
       </ol>{% else %}
-      <img data-src="{{ z.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, vom {{ z.datum | date_de }}" width="640" height="400">{% endif %}
+      <img data-src="{{ z.url }}" alt="Screenshot {{ haendlername(p.anbieter) }}, {{ z.tarif }}, vom {{ z.datum | date_de }}" width="640" height="400">{% endif %}
     </details></div>{% endfor %}
     <span class="gr-beleg-keins" role="status"{% if p.zeilenbilder %} hidden{% endif %}>Für diese Kombination liegt noch kein Screenshot vor.{% if p.zeilen_grund %} ({{ p.zeilen_grund }}){% endif %}</span>
   </li>{% endfor %}
 </ul>{% endif %}{% endif %}{% endmacro %}
+
+{# UI-1717 Aufgabe 4: mobilcom-debitel.de leitet vollstaendig auf freenet.de -
+   derselbe Laden (siehe `shop` in config/geraete_quellen.yaml). Alarmtabelle,
+   Haendlertabelle und Preisverlauf-Grafik nennen ihn seit F9 (14.10.2026)
+   schon "freenet" (`report/geraete_vergleich.py`/`geraete_verlauf.py`, Feld
+   `shop`). Die Buendel-ZEILE allein las bisher `k.anbieter` roh und zeigte
+   "mobilcom-debitel" - zwei Namen fuer einen Haendler auf derselben Seite.
+   Dieses Makro ist die EINE Stelle, die die Anzeige nachzieht; `data-
+   anbieter`, Slug und Farbe (stabile Schluessel, Clean Code 2) bleiben roh. #}
+{% macro haendlername(n) %}{{ 'freenet' if n == 'mobilcom-debitel' else n }}{% endmacro %}
 
 {% macro buendelzeile(k) %}
 {# Ein Plus-Tarif („nur mit Zweitprodukt“), ein veralteter Preis und ein Preis in
@@ -101,7 +111,7 @@
             nur gesetzt, nicht neu definiert). #}
          style="--anb:{{ k.anb_farbe }}">
   <summary>
-    <span class="gr-bnd-an"><span class="gr-bnd-name">{{ k.anbieter }}</span>{%
+    <span class="gr-bnd-an"><span class="gr-bnd-name">{{ haendlername(k.anbieter) }}</span>{%
       if k.zustand_etikett %} <span class="gr-kk-marke gr-kk-marke--zustand">{{
       k.zustand_etikett }}</span>{% endif %}{#
       Notbremse (Datenkonzept Geräteradar, Schritt 1): eine Karte, die
@@ -229,7 +239,7 @@
     </div>
     {% endif %}
     {% if k.geraetepreis_art == 'finanzierung' or k.geraetepreis is none %}
-    <p class="gr-bnd-rw-bar">Gerät ohne Vertrag: bei {{ k.anbieter }} nicht
+    <p class="gr-bnd-rw-bar">Gerät ohne Vertrag: bei {{ haendlername(k.anbieter) }} nicht
     erhoben{% if k.geraetepreis_art == 'finanzierung' %} – die Finanzierung
     gilt nur im Tarifbund dieses Angebots{% endif %}</p>
     {% endif %}
@@ -423,7 +433,7 @@
       beim Namen steht.</p>
     {% endif %}
     {% if k.quelle_url %}<p class="gr-basis--duenn"><a href="{{ k.quelle_url }}"
-      rel="nofollow noopener" target="_blank">Beleg {{ k.anbieter }}<span
+      rel="nofollow noopener" target="_blank">Beleg {{ haendlername(k.anbieter) }}<span
       class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
       if k.abgerufen_am %} · {{ 'vom Crawler abgelesen' if k.vom_crawler else
       'abgerufen' }} {{ k.abgerufen_am | date_de }}{% endif
@@ -434,7 +444,7 @@
   {# B.2.5: ein Anbieter ohne Zahl steht DA, mit seinem Grund. #}
     <p class="gr-kk-luecke">{{ k.leer_grund }}</p>
     {% if k.quelle_url %}<p class="gr-basis--duenn"><a href="{{ k.quelle_url }}"
-      rel="nofollow noopener" target="_blank">Beleg {{ k.anbieter }}<span
+      rel="nofollow noopener" target="_blank">Beleg {{ haendlername(k.anbieter) }}<span
       class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
       if k.abgerufen_am %} · {{ 'vom Crawler abgelesen' if k.vom_crawler else
       'abgerufen' }} {{ k.abgerufen_am | date_de }}{% endif
@@ -469,8 +479,8 @@
    Tooltip. #}
 {% macro fehlzeile(f) %}<p class="gr-anb-fehlt" data-anbieter="{{ f.anbieter }}"
   data-band="{{ f.band }}" data-fehlt-lz="{{ f.laufzeit }}" style="--anb:{{
-  f.anb_farbe }}" title="{{ f.satz }}"><span class="gr-bnd-name">{{ f.anbieter
-  }}</span><span class="gr-anb-fehlt-zustand">{{ f.kurz }}</span>{% if f.detail
+  f.anb_farbe }}" title="{{ f.satz }}"><span class="gr-bnd-name">{{
+  haendlername(f.anbieter) }}</span><span class="gr-anb-fehlt-zustand">{{ f.kurz }}</span>{% if f.detail
   %}<span class="gr-anb-fehlt-detail">{{ f.detail }}</span>{% endif %}</p>{% endmacro %}
 
 {# Fix B (13.11.2026): die Bündelliste (`.gr-bndliste`, Makro `buendelzeile`)
@@ -491,7 +501,7 @@
   data-anbieter="{{ k.anbieter }}"{% if k.band %} data-band="{{ k.band }}"{%
   endif %}{% if k.laufzeit_sichtbar %} data-lz="{{ k.laufzeit_sichtbar }}"{%
   endif %} style="--anb:{{ k.anb_farbe }}" title="{{ k.leer_grund
-  }}"><span class="gr-bnd-name">{{ k.anbieter }}</span><span
+  }}"><span class="gr-bnd-name">{{ haendlername(k.anbieter) }}</span><span
   class="gr-anb-fehlt-zustand">Kein Gesamtpreis für diese 24 Monate</span><span
   class="gr-anb-fehlt-detail">{{ k.leer_grund }}</span></p>{% endmacro %}
 
@@ -531,7 +541,7 @@
         {# D4a (24.09.2026): der Erklärsatz („Unbegrenzte Tarife … § 7")
            ist GEFALLEN - dieselbe Auskunft steht als `title` an der
            Zwischenüberschrift (Tooltip) und auf der Methodik-Seite. #}
-        <h4 class="gr-ohneband-kopf" title="Tarife ohne erhobenes Datenvolumen und Tarife mit am Original widersprüchlichem Preis ({{ widerspruch_stand() }}) gehören zu keiner Stufe der Vodafone-Tarifleiter – sie stehen hier, nicht heimlich in einem Band.">Ohne Tarifband</h4>
+        <h4 class="gr-ohneband-kopf" title="Tarife ohne erhobenes Datenvolumen und Tarife mit am Original widersprüchlichem Preis ({{ widerspruch_stand() }}) gehören zu keiner Stufe der Vodafone-Tarifleiter – sie stehen hier, nicht heimlich in einer Tarifstufe.">Ohne Tarifstufe</h4>
         {# P0-B-z2: derselbe Spaltenname wie über der Bandliste (siehe
            `geraete.html.j2`) - der Zeitraum steht am Etikett JEDER Zeile,
            nicht im Kopf. Zwei Köpfe mit zwei Texten wären die nächste
@@ -539,7 +549,7 @@
         <div class="gr-bnd-kopf gr-bnd-kopf--ohne" aria-hidden="true">
           <span>Anbieter</span><span>Tarif · Volumen</span><span>Kosten mit
           Tarif</span>
-          <span class="gr-bnd-kopf-delta">Δ zu Vodafone</span><span>Gerät ohne Vertrag</span><span></span>
+          <span class="gr-bnd-kopf-delta">Unterschied zu Vodafone</span><span>Gerät ohne Vertrag</span><span></span>
         </div>
         <div class="gr-bndliste">
           {{ laufzeitkoepfe(m.zeilen_ohne_band) }}
