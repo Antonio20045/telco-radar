@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Was diese Woche im Markt passiert ist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vf-red:#e60000; --vf-red-deep:#ac1811; --vf-ink:#25282b;
+    --vf-mute:#7e7e7e; --vf-canvas:#ffffff; --vf-neutral:#f2f2f2;
+    --font-display:'Inter','Helvetica Neue',Arial,sans-serif;
+    --slide-w:1920px; --slide-h:1080px;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
+  body{background:var(--vf-canvas);color:var(--vf-ink);
+    font-family:var(--font-display);font-size:22px}
+  .deck{position:fixed;inset:0;background:var(--vf-canvas);overflow:hidden}
+  .stage{position:absolute;width:var(--slide-w);height:var(--slide-h);
+    transform-origin:0 0;background:var(--vf-canvas);overflow:hidden}
+  .slide{position:absolute;inset:0;padding:120px;background:var(--vf-canvas);
+    opacity:0;visibility:hidden;transition:opacity 420ms var(--ease);
+    display:flex;flex-direction:column;justify-content:center}
+  .slide.active{opacity:1;visibility:visible}
+  .kicker{font-size:18px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--vf-mute);margin:0 0 28px}
+  .cover-title{font-size:104px;font-weight:800;letter-spacing:-.018em;
+    line-height:1.02;margin:0;max-width:1500px}
+  .cover-date{font-size:20px;color:var(--vf-mute);margin:38px 0 0;
+    letter-spacing:.06em}
+  .headline{font-size:60px;font-weight:800;letter-spacing:-.015em;
+    line-height:1.05;margin:0 0 56px;max-width:1500px}
+  .accent{color:var(--vf-red)}
+  .checklist{list-style:none;padding:0;margin:0;max-width:1500px}
+  .checklist li{font-size:30px;font-weight:500;line-height:1.4;
+    padding:0 0 26px 52px;position:relative}
+  .checklist li::before{content:"";position:absolute;left:0;top:16px;
+    width:26px;height:3px;background:var(--vf-red)}
+  .lede{font-size:30px;font-weight:500;line-height:1.4;margin:0 0 26px;
+    max-width:1400px}
+  .quellen{list-style:none;padding:0;margin:0;columns:2;column-gap:70px}
+  .quellen li{font-size:17px;line-height:1.45;color:var(--vf-ink);
+    margin:0 0 15px;break-inside:avoid}
+  .quellen a{color:var(--vf-mute);text-decoration:none;display:block;
+    font-size:14px;word-break:break-all}
+  .fussnote{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--vf-mute);margin:44px 0 0}
+  .footer{position:absolute;left:120px;right:120px;bottom:56px;
+    display:flex;justify-content:space-between;font-size:14px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--vf-mute)}
+  .progress{position:fixed;left:0;top:0;height:3px;background:var(--vf-red);
+    width:0;transition:width 300ms var(--ease);z-index:9}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck"><div class="stage" id="stage">
+<section class="slide" data-slide="1">
+  <p class="kicker">Telco Radar · Wochenbericht</p>
+  <h1 class="cover-title">Was diese Woche im Markt <span class="accent">passiert</span> ist</h1>
+  <p class="cover-date">Stand 2026-11-17</p>
+
+  <div class="footer"><span>Telco Radar · 2026-11-17</span><span>01 / 04</span></div>
+</section>
+<section class="slide" data-slide="2">
+  <h2 class="headline">Was diese Woche <span class="accent">passiert</span> ist</h2>
+  <ul class="checklist">
+    <li>T-Mobile Polen verschenkt fünf Gigabyte Datenvolumen in App</li>
+    <li>Vodafone UK startet Kampagne gegen Betrug im Weihnachtsgeschaeft</li>
+    <li>T-Mobile startet Black Week mit Geräterabatten in Polen</li>
+  </ul>
+
+  <div class="footer"><span>Telco Radar · 2026-11-17</span><span>02 / 04</span></div>
+</section>
+<section class="slide" data-slide="3">
+  <h2 class="headline">Was das für uns <span class="accent">bedeutet</span></h2>
+  <p class="lede">Vorlage fuer ein eigenes App-basiertes Loyalitaets-Extra, um Prepaid-Kunden digital zu binden und die App-Nutzung zu steigern.</p>
+  <p class="lede">Guter Ansatz für Vodafone zur Kundenkommunikation im Bereich Sicherheit und Betrugsschutz während der umsatzstarken Weihnachtssaison.</p>
+  <p class="lede">Liefert Einblicke in die aggressive Preissetzung der Deutschen Telekom bei Flaggschiff-Smartphones im Vorfeld des Weihnachtsgeschäfts.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-11-17</span><span>03 / 04</span></div>
+</section>
+<section class="slide" data-slide="4">
+  <h2 class="headline">Quellen zum <span class="accent">Nachlesen</span></h2>
+  <ul class="quellen">
+    <li>Telepolis (Polen): T-Mobile Polen verschenkt fünf Gigabyte Datenvolumen in App<a href="https://www.telepolis.pl/wiadomosci/t-mobile-na-karte-5g-za-darmo-listopad-2026">https://www.telepolis.pl/wiadomosci/t-mobile-na-karte-5g-za-darmo-listopad-2026</a></li>
+    <li>Vodafone UK: Vodafone UK startet Kampagne gegen Betrug im Weihnachtsgeschaeft<a href="https://www.vodafone.co.uk/newscentre/press-release/brits-more-likely-to-open-scam-messages-at-christmas/">https://www.vodafone.co.uk/newscentre/press-release/brits-more-likely-to-open-scam-messages-at-christmas/</a></li>
+    <li>Telepolis (Polen): T-Mobile startet Black Week mit Geräterabatten in Polen<a href="https://www.telepolis.pl/tech/sprzet/t-mobile-black-week-nizsze-ceny-smartfonow-black-friday-2026">https://www.telepolis.pl/tech/sprzet/t-mobile-black-week-nizsze-ceny-smartfonow-black-friday-2026</a></li>
+    <li>TechCrunch AI: Google startet Gemini Tasks für Anrufe und Einkäufe<a href="https://techcrunch.com/2026/11/17/google-expands-access-to-gemini-tasks-which-can-help-with-calls-purchases/">https://techcrunch.com/2026/11/17/google-expands-access-to-gemini-tasks-which-can-help-with-calls-purchases/</a></li>
+    <li>heise KI: Apple limitiert Künstliche-Intelligenz-Funktionen und Siri ab Version 27.3<a href="https://www.heise.de/news/Nutzungsbegrenzungen-Apple-limitiert-bald-KI-Funktionen-und-Siri-AI-11527526.html?wt_mc=rss.red.ho.themen.k%C3%BCnstliche+intelligenz.beitrag.beitrag">https://www.heise.de/news/Nutzungsbegrenzungen-Apple-limitiert-bald-KI-Funktionen-und-Siri-AI-11527526.html?wt_mc=rss.red.ho.themen.k%C3%BCnstliche+intelligenz.beitrag.beitrag</a></li>
+    <li>Vodafone Group: Vier italienische Telkos starten gemeinsame Betrugsschutz-APIs<a href="https://www.telesemana.com/blog/2026/11/17/fastwebvodafone-e-iliad-se-suman-a-tim-y-windtre-para-offere-apis-antifraude-en-italia/">https://www.telesemana.com/blog/2026/11/17/fastwebvodafone-e-iliad-se-suman-a-tim-y-windtre-para-offere-apis-antifraude-en-italia/</a></li>
+    <li>Telepolis (Polen): Play bietet Geschäftskunden ein Jahr Glasfaser kostenlos<a href="https://www.telepolis.pl/wiadomosci/play-dla-firm-swiatlowod-rok-za-darmo">https://www.telepolis.pl/wiadomosci/play-dla-firm-swiatlowod-rok-za-darmo</a></li>
+    <li>Univers Freebox: SFR startet neue Mittelklasse-Box mit Wi-Fi 7<a href="https://www.universfreebox.com/article/601496/sfr-lance-une-nouvelle-box-internet-a-3699e-mois-pour-mieux-rivaliser-avec-les-freebox-livebox-et-bbox">https://www.universfreebox.com/article/601496/sfr-lance-une-nouvelle-box-internet-a-3699e-mois-pour-mieux-rivaliser-avec-les-freebox-livebox-et-bbox</a></li>
+    <li>Mobile Europe: Onlinerieter AO relauncht traditionsreiche Marke Phones 4u<a href="https://www.mobileeurope.co.uk/phones4u-revive-ao/">https://www.mobileeurope.co.uk/phones4u-revive-ao/</a></li>
+    <li>Broadband TV News: Sky startet grosses TV-Betriebssystem-Update mit Sprachsuche<a href="https://www.broadbandtvnews.com/2026/11/17/sky-os-upgrade-adds-conversational-search-and-greater-recording-control/">https://www.broadbandtvnews.com/2026/11/17/sky-os-upgrade-adds-conversational-search-and-greater-recording-control/</a></li>
+    <li>The Verge AI: Google benennt Spark in Tasks um und macht es kostenlos<a href="https://www.theverge.com/tech/1035756/google-spark-ai-tasks-free">https://www.theverge.com/tech/1035756/google-spark-ai-tasks-free</a></li>
+    <li>Meta: Meta bringt persönlichen KI-Agenten Muse auf den Markt<a href="https://about.fb.com/news/2026/11/muse-is-now-available-in-australia/">https://about.fb.com/news/2026/11/muse-is-now-available-in-australia/</a></li>
+  </ul>
+  <p class="fussnote">Jede Aussage dieses Foliensatzes steht in einer der oben verlinkten Quellen.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-11-17</span><span>04 / 04</span></div>
+</section>
+</div></div>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var progress = document.getElementById('progress');
+  var current = 0, total = slides.length;
+  function fitStage() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var scale = Math.min(vw / 1920, vh / 1080);
+    stage.style.left = ((vw - 1920 * scale) / 2) + 'px';
+    stage.style.top = ((vh - 1080 * scale) / 2) + 'px';
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+  function show(i) {
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    slides.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+    current = i;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') show(current + 1);
+    if (e.key === 'ArrowLeft') show(current - 1);
+  });
+  document.addEventListener('click', function (e) {
+    show(current + (e.clientX < window.innerWidth / 3 ? -1 : 1));
+  });
+  window.addEventListener('resize', fitStage);
+  fitStage(); show(0);
+})();
+</script>
+</body>
+</html>
