@@ -1,7 +1,7 @@
 {
  "anbieter": "vodafone",
- "datum": "2026-11-16",
- "dauer_sekunden": 3608.6,
+ "datum": "2026-11-17",
+ "dauer_sekunden": 3176.9,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -18,7 +18,7 @@
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -26,7 +26,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8458d25c03d4992d4f6989d0d3a68e162e714e2aebca374bce8d052f0be8beb0",
+      "beleg_id": "c269f7b258ecf0303418ae395ff47a3f7707468262b516e5ab9adf79a6843692",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -39,7 +39,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:11:10Z"
+      "zeitpunkt": "2026-11-17T07:46:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -77,7 +77,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -85,7 +85,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e4e92b04d588ec5a8a16b685c808b57c14dbd3fc708bdbb4c4ab4e9a3e174502",
+      "beleg_id": "5c01efed5e736acb73542135f958ca9cb3dccfad53ff852450efb7f1033f64f1",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -98,7 +98,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:11:10Z"
+      "zeitpunkt": "2026-11-17T07:46:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -136,7 +136,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -144,7 +144,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "88d9be5e29abaea2775240a069882663671cb8dec03159cb8f422045d3c4ec11",
+      "beleg_id": "6a8e28fa5ff538f0a6a8e61795fdd5bcf76b10be00733939fec4302db47b5a88",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -157,7 +157,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:11:11Z"
+      "zeitpunkt": "2026-11-17T07:46:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -195,7 +195,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
@@ -203,7 +203,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "12bf22951fe05602c33ce2a2e3801e6a915412832cedace4c6351b05ee81e731",
+      "beleg_id": "8f932752c03f201539101da59444b4eaed52b8f9846f84be5937e5606dd7090f",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -216,7 +216,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:12:04Z"
+      "zeitpunkt": "2026-11-17T07:46:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -254,7 +254,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
@@ -262,7 +262,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "efacb7748c92dcd1e6f9efd59ddd6ddcccee537a687a4345caf101b04fdda4be",
+      "beleg_id": "2df991b30239a7cee84f4386b9494d618d4da679753a4728910fea427c584a4d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -275,7 +275,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:12:05Z"
+      "zeitpunkt": "2026-11-17T07:46:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -313,7 +313,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
@@ -321,7 +321,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a28c52eabcf5556bc04d6331e0ca9f3d939b475148793a0d3d238bb9d82c040c",
+      "beleg_id": "2ee0568a2c661923f22a3877f185810aa76ade96738805844543ea8ae369e483",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -334,7 +334,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:12:05Z"
+      "zeitpunkt": "2026-11-17T07:46:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -372,7 +372,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "256 GB",
@@ -380,7 +380,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1c3bd1ab4af8939a3f2b4379276bfed8f306f03f95c3972ac743646ea5ca8da0",
+      "beleg_id": "66ebbea7db5a71570387ebb30a346f1328d88d2bdc3f28287f1ae9302ca66622",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -393,7 +393,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:12:58Z"
+      "zeitpunkt": "2026-11-17T07:47:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -431,7 +431,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "256 GB",
@@ -439,7 +439,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "21ba8a914666ef253617b784497c991365ed91035efdba7029fd6b76f731ba49",
+      "beleg_id": "b0ab9041458b93afa8026ceb0a480b39030a87630c5adbf80a84bb4cc79e8143",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -452,7 +452,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:12:58Z"
+      "zeitpunkt": "2026-11-17T07:47:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -490,7 +490,7 @@
      }
     },
     {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57557&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "256 GB",
@@ -507,7 +507,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "20a844dd5c37a822df10ae5d673094c9cd0afb3ca1fba78c32826d694bdac03f",
+      "beleg_id": "d23c65c507da7c00fb172f3e8adba6fd8e087c78503264e92335e7ef33136fac",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -520,7 +520,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:12:59Z"
+      "zeitpunkt": "2026-11-17T07:47:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -547,552 +547,22 @@
       "tarifphasen": null,
       "volumen_gb": null
      }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "267"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "365cfb7ee5952b013f00c1924be5a9106a8c9cd9d5acce586db3846a0c8add0e",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 59,95 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:13:45Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil XS"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "267"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 40.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        19.95
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "268"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "f3613234ac93972454dd29dae2197caeec001f4a2f83bd03d8d78723dddfb38c",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 64,95 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:13:46Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil S"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "268"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 40.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        24.95
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=36",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "271"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "cb21c7242afac91689e2a719371866273f32f682dbb6d6349f0bce08d7ae4ec0",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 71,95 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:13:46Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil XL"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "271"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 40.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        31.95
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "267"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "579b0355428e74b950df8096f22f87d5404236a91b0f4eb9c2183ce2a6bc6ce9",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 79,95 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:14:36Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil XS"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "267"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 60.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        19.95
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "268"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "65747f3e3655eee1a6f5edada43ddf5d6d9c2dae29ce99b8c32bc90eb7b71bff",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 84,95 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:14:36Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil S"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "268"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 60.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        24.95
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=24",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "271"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "4b42ad919aecd00a0bf045520793f1d522370deac08e95a4cbf4f0adc540291c",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 90,45 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:14:37Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil XL"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "271"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 60.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        30.45
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
-      "tarif": "267"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "9fc439a740e8244529e292f89fe2cd08067359e58422a8110172c8bf4b12fe12",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 139,95 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:15:30Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil XS"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
-      "tarif": "267"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 120.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        19.95
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
-      "tarif": "268"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "279a8630d172ee6bfa9985990bfa0dd0234b84a96bd0a17f90482173c9d55299",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: monatlich 144,95 € (Gerät und Tarif zusammen) · Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:15:31Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "nachweise": {
-      "tarifname": "Mobil S"
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
-      "tarif": "268"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": 120.0,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        24,
-        24.95
-       ]
-      ],
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=271&financingType=rate&financingDuration=12",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
-      "tarif": "271"
-     },
-     "befunde": [
-      {
-       "feld": "rate",
-       "grund": "fehlt im Text, Antwort 120,00"
-      },
-      {
-       "feld": "tarifphasen",
-       "grund": "fehlt im Text, Antwort Monat 1–12: 25,95; Monat 13–24: 34,95"
-      }
-     ],
-     "beleg": {
-      "beleg_id": "ff8fae85d797f034891f0750862263092b768b3e4ed9eab4451e1efcaf766523",
-      "bildfolge": [
-       {
-        "schritt": "preis",
-        "text": "Im Bild: Zuzahlung 0,99 €"
-       }
-      ],
-      "bildfolge_fehlt": [
-       "geraet_speicher: Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl",
-       "tarif: Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen",
-       "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
-      ],
-      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:15:32Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": "fehlt im Text, Antwort 120,00",
-     "luecken": [
-      "ratenzahl",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "status": "befund",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
-      "tarif": "271"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": 0.99,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 231,
-    "beendet": 226,
+    "anfragen": 230,
+    "beendet": 227,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "collect.vodafone.de": 1,
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 4
+     "www.vodafone.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.5,
-    "takte_ms": 9750,
+    "sekunden": 12.3,
+    "takte_ms": 8500,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1102,12 +572,12 @@
    "struktur": {
     "anteil_felder": 0.14285714285714285,
     "anteil_knoepfe": 1.0,
-    "felder_gefunden": 18,
-    "felder_gesucht": 126,
-    "knoepfe_gefunden": 38,
-    "knoepfe_gesucht": 38
+    "felder_gefunden": 9,
+    "felder_gesucht": 63,
+    "knoepfe_gefunden": 20,
+    "knoepfe_gesucht": 20
    },
-   "verworfen": 30
+   "verworfen": 15
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
@@ -1125,7 +595,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "35a7d0e19be14cacf3f9255b1aacc80649a073622ef8770cb78f611594cc8110",
+      "beleg_id": "a66be7f89162bb05c424898d195467a92d627525d4eb2975cca64e108b888b78",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1138,7 +608,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:16:18Z"
+      "zeitpunkt": "2026-11-17T07:48:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1184,7 +654,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6debccc396d74d5820bfa9d50467a9945722951d15987ac53d00c1748307f7ff",
+      "beleg_id": "af821b395f2ecbfb601231abcbe3a96c5c08cfa32bfe4c5c52b5794359975487",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1197,7 +667,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:16:19Z"
+      "zeitpunkt": "2026-11-17T07:48:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1243,7 +713,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a8b03e253a2cacfc1b8cf373ce277a49f209cb721b7923f93e9472f8749564f6",
+      "beleg_id": "4f8fa367bd40f5a3226a6b8ddbce774b23f2193fb6a2b3ff99a438a36331bd9c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1256,7 +726,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:16:19Z"
+      "zeitpunkt": "2026-11-17T07:48:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1302,7 +772,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "be9d6a45526f1e82c8b83e54998ca799787be93fdcda8fcd54af3ba3c0c89870",
+      "beleg_id": "79680737b4a8d9feec8f7bf1fb3138c80fbdd3dc79acef395071bc930f6a512d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1315,7 +785,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:17:09Z"
+      "zeitpunkt": "2026-11-17T07:49:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1361,7 +831,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bb7c32b3caeeace5221f136dbe2dc27df9cbbdfe1b094e3e1c61e469f0dfb63b",
+      "beleg_id": "c5923944685c5bf27e0cba25880447f4bef0415c75f36a6221fa8cca5cca9c5a",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1374,7 +844,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:17:10Z"
+      "zeitpunkt": "2026-11-17T07:49:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1420,7 +890,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dafb85b041c25635f2cd59ba9c593ddb51d584144e877f491642ec5b7e21bbfb",
+      "beleg_id": "27e4bcb90c7295e942780a57b16531b52e4fd338452fc6ade746182e6f2b821d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1433,7 +903,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:17:11Z"
+      "zeitpunkt": "2026-11-17T07:49:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1479,7 +949,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cc306efaafcaae467e6a8ac26e1bb29138e012440500bb3fe38e767e706962f2",
+      "beleg_id": "56ff95fcce024a782bb20e4cf09ca1254b4709906ab0d07929b5d77ed72be3ac",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1492,7 +962,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:17:58Z"
+      "zeitpunkt": "2026-11-17T07:49:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1538,7 +1008,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "891284bfae223e6e3c8323021d79a63343896ee60f5890388d76b3f22fc13ed9",
+      "beleg_id": "5e30ed6680f9019c32cb40d18ff30cd95a9ef6892012b570b38800652494240b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1551,7 +1021,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:17:59Z"
+      "zeitpunkt": "2026-11-17T07:49:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1606,7 +1076,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "8aa640f5ff9e806b8a9a455f6c437eb72fb540716f1a45ace796be64fd22f41a",
+      "beleg_id": "117c65efcfa2d95b75e19e09c08b5dbf6e52d7c661f4be6bec7fd45033a4e874",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1619,7 +1089,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:18:00Z"
+      "zeitpunkt": "2026-11-17T07:49:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1656,7 +1126,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a5477bb0104c95ca97af73ddee74ac68f24d2905213ab0a2e708aa771bac81d8",
+      "beleg_id": "1d939effe825a69ebca64570e1c0eb69c75f44ee555437d2618a29de95b34f1c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1669,7 +1139,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:18:49Z"
+      "zeitpunkt": "2026-11-17T07:50:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1715,7 +1185,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5c62da5d4b501ca08c9aab24682f9e03e3419f9cc31850957350a09cd986bd2e",
+      "beleg_id": "adcfb586e66691abe2a2293786a3ca1253f5e356a6c484868ee1ab4b45d77b4f",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1728,7 +1198,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:18:50Z"
+      "zeitpunkt": "2026-11-17T07:50:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1774,7 +1244,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c7d7e4294a8047e756929a81d2aea29344da487d10157f8ab17655f006e818a7",
+      "beleg_id": "56c84b89e56c3d6993993a59666aa2bc15ac89c448281f7b6aa6a43ec3cae379",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1787,7 +1257,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:18:50Z"
+      "zeitpunkt": "2026-11-17T07:50:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1833,7 +1303,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "408e4e22d4009fcfe78650c6cadd42e21bd42f1c7c75628b6bfb443436381dc5",
+      "beleg_id": "9ee44ce8978e164d8918dbf17eaadbbc33ef76ef52576c4704c47b26099194be",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1846,7 +1316,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:19:44Z"
+      "zeitpunkt": "2026-11-17T07:51:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1892,7 +1362,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "eee759d2148c1ed9ac0966069581fbfc50b9581697725078665edb5d58b80340",
+      "beleg_id": "a56d103e9009b2df751c50b2abec6374cfac5bf0b628846477fcedc782eeace9",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1905,7 +1375,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:19:45Z"
+      "zeitpunkt": "2026-11-17T07:51:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1951,7 +1421,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "60d6778b6df5c694f37c5243665caa0607d6f23c0dd73e793db1d74bfc8fbcba",
+      "beleg_id": "3240730f2f63ded62582a8a7176cc50303a0fc75356280ea080e32cc544cea74",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -1964,7 +1434,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:19:45Z"
+      "zeitpunkt": "2026-11-17T07:51:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2010,7 +1480,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f113eea8e73605a09e2c178ed20f2498a88bb16c66ec8a555d8ae9224fc9ab23",
+      "beleg_id": "ad7e136c0cbcadb27b3f6637fa511c6c5415ec50e7bb9468f0321c342bafbb75",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2023,7 +1493,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:20:39Z"
+      "zeitpunkt": "2026-11-17T07:52:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2069,7 +1539,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "593ac90964477d582e3a4b11f404e6ef64a9ad4e24a3d88c2ac4715a3d7aeeac",
+      "beleg_id": "7f200e063e5606e43b91d2d8c7d6dbecd742889c3f423082f64c6d57a37501d9",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2082,7 +1552,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:20:40Z"
+      "zeitpunkt": "2026-11-17T07:52:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2137,7 +1607,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "883cd8e5528743262b980544c0931e136aadc363cf5db06252430b270fa52f8e",
+      "beleg_id": "44224063e6c22fdffd163ada134063b4be6f2634a98704eb1eb7c8e8d2fe27a4",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2150,7 +1620,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:20:41Z"
+      "zeitpunkt": "2026-11-17T07:52:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2186,11 +1656,13 @@
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "cdn.dimml.io": 1,
+     "collect.vodafone.de": 1,
      "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.9,
-    "takte_ms": 10600,
+    "sekunden": 12.6,
+    "takte_ms": 9550,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2217,17 +1689,15 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 116,
-    "beendet": 115,
+    "beendet": 117,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "collect.vodafone.de": 1,
-     "tags.vodafone.de": 1,
-     "www.vodafone.de": 1
+     "collect.vodafone.de": 1
     },
-    "ohne_antwort_ms": 300,
-    "sekunden": 10.5,
-    "takte_ms": 7650,
+    "ohne_antwort_ms": 0,
+    "sekunden": 9.7,
+    "takte_ms": 6850,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -2260,7 +1730,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5d6b5290c6e7c4913503469da19d247e92adb256a95ac3d1ad82bc66cb988d8a",
+      "beleg_id": "53d12bc9dc8db4952796c72be532a954430964f80ba876acfb3563a5a96cf6c0",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2273,7 +1743,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:21:57Z"
+      "zeitpunkt": "2026-11-17T07:53:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2319,7 +1789,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a898bcb82c5a6d6ca76ca5be6237cccb4a325c08a03fdba12acf54230993dea7",
+      "beleg_id": "a032de26f11a73ecce562ee0109b00ceeb55e1c8ad7f0618a0736ba7797e68e3",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2332,7 +1802,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:21:57Z"
+      "zeitpunkt": "2026-11-17T07:53:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2378,7 +1848,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ac38268f94eca5c62918ce16277a3123294d949ac49cceef3376996d41410112",
+      "beleg_id": "4f22bd15b216fcb1e6ac93e06b291963d4b3a1b5d7b6e42d03a5a846d582eccc",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2391,7 +1861,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:21:58Z"
+      "zeitpunkt": "2026-11-17T07:53:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2437,7 +1907,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "07d76d8e7188e6824ec5924f5cb04d0d6f6c29a4e1d05dc2fe887f7fd91731b8",
+      "beleg_id": "2f1d123808c99b5b3a4e840b3b92b5a3639db2e32624cb20e2f9e8d2df064492",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2450,7 +1920,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:22:47Z"
+      "zeitpunkt": "2026-11-17T07:54:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2496,7 +1966,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dcdcbbcf28ac2d748ccf2ab7bbc57562083a7cdac84b88f2044a8587487717fc",
+      "beleg_id": "8e75e4e300bad7d3e9aa0b88db54ed9da43ed34c0ea4b86597516ead672a85e8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2509,7 +1979,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:22:48Z"
+      "zeitpunkt": "2026-11-17T07:54:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2555,7 +2025,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "05a06cace5188cc640a01c6f4e8cfdfc3621ce5c90e3541b01da2848b058fb19",
+      "beleg_id": "3b19bd95ff34dee5068414245b96aa6e2e5be5558fc8a3ac50067d07993058fe",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2568,7 +2038,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:22:48Z"
+      "zeitpunkt": "2026-11-17T07:54:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2614,7 +2084,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e3e80b0dae63a151e1604a5c8c3ffabf8bc6a14a9c70f327592d8a0046809553",
+      "beleg_id": "b4b3a89f65f7fcb6815bc9c1872e7362daaa394d271477e1d78dc7d18750bcfa",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2627,7 +2097,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:23:35Z"
+      "zeitpunkt": "2026-11-17T07:55:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2673,7 +2143,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3409be4fec12be336d16e8122adae92cdb643bf3102e695da6d7ddca39e962f5",
+      "beleg_id": "dcece167dec19113912ed211e3bf64c471d9e5e16d0c9ff2e4a1564134310b7d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2686,7 +2156,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:23:36Z"
+      "zeitpunkt": "2026-11-17T07:55:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2741,7 +2211,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "bdeabdf95cc631249bd3c3b3eb3f9bbeab5dd106fb5a1183a7eb8d51d742d6d5",
+      "beleg_id": "ff5f975a2ccc0c93185f98c88a7fd2339ad0fa788804295cc79eed79e69c643f",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2754,7 +2224,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:23:37Z"
+      "zeitpunkt": "2026-11-17T07:55:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2785,14 +2255,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 209,
-    "beendet": 209,
+    "anfragen": 208,
+    "beendet": 207,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "cdn.dimml.io": 1,
+     "collect.vodafone.de": 1,
+     "tags.vodafone.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.2,
-    "takte_ms": 10500,
+    "sekunden": 12.5,
+    "takte_ms": 9100,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -2818,16 +2292,14 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 117,
+    "anfragen": 116,
     "beendet": 117,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "tags.vodafone.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 10.5,
-    "takte_ms": 7600,
+    "sekunden": 10.2,
+    "takte_ms": 7450,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -2860,7 +2332,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5c669aef3c975c9796f1664367e232ed9d6b3bb9245478d4d7ac208619d568f5",
+      "beleg_id": "14800595613fe7818ba001994770b6e3e6e4726decc929bea661f3a990647c27",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2873,7 +2345,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:24:50Z"
+      "zeitpunkt": "2026-11-17T07:56:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2919,7 +2391,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "32c9f1fb26303c172e983d2a6f37afe72601a1e3c34c1db7f938a9007f8ed1be",
+      "beleg_id": "6709b180705ecbe0411eaf3480807ae661930a758970085facb4ae4bb57c2bfe",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2932,7 +2404,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:24:50Z"
+      "zeitpunkt": "2026-11-17T07:56:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2978,7 +2450,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a579c4b7810ed1e95c251fdfb43def5608775d6194310a40164782a21447be8e",
+      "beleg_id": "13229eca0b8107ca7283397f2a53228f2fc255c86adf3a063f884032993453d7",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -2991,7 +2463,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:24:51Z"
+      "zeitpunkt": "2026-11-17T07:56:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3037,7 +2509,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "12857e6411914ac51f242b2eafbe7309f2aaf1a13bf9821295c916c3e248730f",
+      "beleg_id": "2858a057392aba548467dc12bcb7bafba25ca6aa33e9a4bd19db344d383197ee",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3050,7 +2522,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:25:39Z"
+      "zeitpunkt": "2026-11-17T07:57:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3096,7 +2568,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "16451083b7a509d8e22c22488ef880de962179adfe88c5d699e04f2b675e61f6",
+      "beleg_id": "f4a9ef80a0197a1e5a57edba8338daa933c4424bc335393cd2e0d8d22c99e595",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3109,7 +2581,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:25:40Z"
+      "zeitpunkt": "2026-11-17T07:57:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3155,7 +2627,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "561fb4d4867928f6cea4bde119b05b2683567cac3e77e069c0c5c632cccac89e",
+      "beleg_id": "274cd699e42ccdf5a1b436a6210da1e142b3fbf2f688646ee53ac97f00929dbd",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3168,7 +2640,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:25:41Z"
+      "zeitpunkt": "2026-11-17T07:57:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3214,7 +2686,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fc7e636fa7611c0456550e4896f36829f8bad4ce51985b869b9b41994f871937",
+      "beleg_id": "a92317c248489b96aaa650342383c82f939af62b927a1fb3c86a0da6c07a918f",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3227,7 +2699,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:26:30Z"
+      "zeitpunkt": "2026-11-17T07:57:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3273,7 +2745,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "242b9888f8ea95f40e5b87898efcbdd6d1ecec1ee260ff4dfa01b78ee7a89d77",
+      "beleg_id": "1e83e427305114483870855795fb39249dc76758e584eceff6eeb3f7ae03bf25",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3286,7 +2758,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:26:31Z"
+      "zeitpunkt": "2026-11-17T07:57:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3341,7 +2813,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "c08296d413eabbd9c8f3dfceb027e80e067844311da7c62d417bbb82c8ed7b44",
+      "beleg_id": "08f6d793733deb402226eabaadf7c0489c293a7acd32d16ccd5ab3f978cb1a26",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3354,7 +2826,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:26:32Z"
+      "zeitpunkt": "2026-11-17T07:57:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3385,16 +2857,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 238,
-    "beendet": 232,
+    "anfragen": 240,
+    "beendet": 239,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "tags.vodafone.de": 1,
-     "www.vodafone.de": 5
+     "cdn.dimml.io": 1,
+     "collect.vodafone.de": 1,
+     "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.3,
+    "sekunden": 13.5,
     "takte_ms": 9700,
     "wartet_auf": "load"
    },
@@ -3410,7 +2883,7 @@
     "knoepfe_gefunden": 20,
     "knoepfe_gesucht": 20
    },
-   "verworfen": 16
+   "verworfen": 15
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-17.html",
@@ -3428,7 +2901,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a75484ebd74a3e2400951b729b6c98fad0de52495800006dc64395b8125a7c08",
+      "beleg_id": "f7fb3049798f6dab76b49028a84d84d6eaad9c8490b720acd9c1dbc97ac4d1dd",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3441,7 +2914,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:27:16Z"
+      "zeitpunkt": "2026-11-17T07:58:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3487,7 +2960,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6feb995c91c96ed55f326176dd6d254f1abf55db4f1304804b74f28bb9c02fa5",
+      "beleg_id": "a5e7fee870cdc03032b024824d3d7f42cbed75cdbe00bd972be679114d1a6bbb",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3500,7 +2973,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:27:17Z"
+      "zeitpunkt": "2026-11-17T07:58:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3546,7 +3019,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2481eb71b10a74b901b83975bfb101781d70972587223ea5ac3b227bc5864599",
+      "beleg_id": "3ba1ad6956c5c7450cbef6f7a813f2afb0094ce781568bea9112fe4bf5405fbf",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3559,7 +3032,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:27:18Z"
+      "zeitpunkt": "2026-11-17T07:58:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3605,7 +3078,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bb417b5dd50890a3341fa1fe21f4f8208b1778553b3cc2e450af5ce718432d74",
+      "beleg_id": "9bb4df161089215a01bda072fdf5c3c204c600f5f8a1901aca89abdc607582c7",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3618,7 +3091,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:28:10Z"
+      "zeitpunkt": "2026-11-17T07:59:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3664,7 +3137,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f7df415c9806f890a37859310f38b5b742bc01908b592901b7248356f5ec062e",
+      "beleg_id": "b7d1ff8633d488cb9ebf312d1ca62ffbebe7c9fbd0939953042f48209350b84d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3677,7 +3150,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:28:11Z"
+      "zeitpunkt": "2026-11-17T07:59:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3723,7 +3196,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "081abac59747033f2c0cc0d23222eab5922fac238fa200c61a910a5f9dfa6078",
+      "beleg_id": "5b0aa7090d57290505bfdbf2d15575e3ccfe77f9f16c064019505ffda4d74251",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3736,7 +3209,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:28:11Z"
+      "zeitpunkt": "2026-11-17T07:59:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3782,7 +3255,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8fee9a415d5d0fc499ff5de18f9b557d766f707d833d920245326d7912256ca7",
+      "beleg_id": "93d908c6e6b9edda338aa52a09ff27b937c2c48530c24f8ae3bcd4822fe3e0e8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3795,7 +3268,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:29:04Z"
+      "zeitpunkt": "2026-11-17T08:00:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3841,7 +3314,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ad3ef8ad198eb9b9db31c7cd130a994df842d10c644c37b4b3e982b1bed5bae6",
+      "beleg_id": "4e6d1db2d0503a661a17be2d4f696801301cae05b2dbe00b9a7fe5a401af9d2d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3854,7 +3327,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:29:04Z"
+      "zeitpunkt": "2026-11-17T08:00:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3909,7 +3382,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "36bec808f491d6587d046e28a55a0ce12cf30d8ef8cd339ddee0a1a27424540c",
+      "beleg_id": "5182f3b557533c13437da11df670659e8dd323c714d36f0fe3f0bd5f54b20b96",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -3922,7 +3395,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:29:05Z"
+      "zeitpunkt": "2026-11-17T08:00:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3953,17 +3426,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 234,
-    "beendet": 232,
+    "anfragen": 239,
+    "beendet": 238,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "tags.vodafone.de": 1,
-     "www.vodafone.de": 1
+     "cdn.dimml.io": 1,
+     "collect.vodafone.de": 1,
+     "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 19.4,
-    "takte_ms": 15000,
+    "sekunden": 12.7,
+    "takte_ms": 8350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3996,7 +3470,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "29ae3f6520ab69de5b8d1520c28c55d3182ecb01bf01e3ac6a551ff910775fa7",
+      "beleg_id": "242fdcb5571b5cd580b77854d524cc7f5ad45b681b53eec9eb08930471c6dbbb",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4009,7 +3483,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:29:49Z"
+      "zeitpunkt": "2026-11-17T08:00:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4055,7 +3529,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9f7815108351aa1c142d59f1c021a7cde345e03bbd26eabc7b7d51c3ba402517",
+      "beleg_id": "e476b2be5aa11d3172c9ae592efe1653c86dfd8d56d31585b714305e001d70b8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4068,7 +3542,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:29:50Z"
+      "zeitpunkt": "2026-11-17T08:00:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4114,7 +3588,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7de2832f46125b5841355628aa2e1b3c6047f3faa561ab13d6e0d282449f35d5",
+      "beleg_id": "7ed63e6f156ed9d2e6ab4976778858ba5229d49d1937927e2a08564c8053e2a8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4127,7 +3601,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:29:51Z"
+      "zeitpunkt": "2026-11-17T08:00:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4173,7 +3647,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f5bdbabd1a3336913f47b65c53c1c0b670f4bc93b4eadb7daeba09fbb0572008",
+      "beleg_id": "3a5444e125e4ea88680f53c4484fb504ecb502d5529d9497da79c3082d6ec1ac",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4186,7 +3660,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:30:37Z"
+      "zeitpunkt": "2026-11-17T08:01:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4232,7 +3706,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d349dfdf1e963e3ab468660c3e49c76d350bd26cf4e3ee42c62d7775569e0936",
+      "beleg_id": "67f81111da37bb5034968a773099c3fe2065991b7bd9abd0c427ef88516c31c2",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4245,7 +3719,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:30:38Z"
+      "zeitpunkt": "2026-11-17T08:01:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4291,7 +3765,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "727b6576c6f34f3d2da506b2c489e490fb038899c9c0bbfd1dee731e205f7bd6",
+      "beleg_id": "4fd0db71dcbca411d8721408f709e4a97022f3b20dbdd894f7ca104181df2941",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4304,7 +3778,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:30:38Z"
+      "zeitpunkt": "2026-11-17T08:01:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4350,7 +3824,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0d3fbd7b103244d73ac43c05015988609e15a758f6975346a4499db7432222be",
+      "beleg_id": "0f4820aea21ff9ccad4189f0bdb073e12f21d33b7f74a8745be7fbb334c2295c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4363,7 +3837,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:31:28Z"
+      "zeitpunkt": "2026-11-17T08:02:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4409,7 +3883,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "75a119d8456164cc837c3fb675747dfafa2d9f11c55dee60b00252edada1beae",
+      "beleg_id": "0b26f7d537a9ae6285571420e114a7f5a8e845d2f2ccb915edfe6242351ef871",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4422,7 +3896,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:31:28Z"
+      "zeitpunkt": "2026-11-17T08:02:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4477,7 +3951,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "1399a5337723812c2cb7f915078a388f56fcb8e45feadba9e0e7335c96f9d35e",
+      "beleg_id": "9ea3b33469b08898cdf9fbc514d17821fe1a372bd6fedbb3a1a520ee1f4a06a6",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4490,7 +3964,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:31:29Z"
+      "zeitpunkt": "2026-11-17T08:02:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4527,7 +4001,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f11a572dbb2d78b860c30da7c14d5bf5ddd9d50e13ac0af9d2eb67e94779720c",
+      "beleg_id": "55c27809f0ce18604b7d3bcfcbb825e8a6f52911716916d56d1a67c6ee133ed5",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4540,7 +4014,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:32:17Z"
+      "zeitpunkt": "2026-11-17T08:03:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4586,7 +4060,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c4966ee6fb8c8efe120bec8ba72f7271583f454eb8f27b214c9bfeb4f699a091",
+      "beleg_id": "bc38b86f57ab767564942cbbb7f4dece9625253f49f8bfffc39fdb5f9811d8b0",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4599,7 +4073,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:32:18Z"
+      "zeitpunkt": "2026-11-17T08:03:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4645,7 +4119,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c778d2e37729bb5a478f23287040cde1116fec573d3cc6091e64e41d9209ad51",
+      "beleg_id": "529a6b8dc27c9cdadeba7478a9683e90276e08a29363bbed6296f62328ba8166",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4658,7 +4132,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:32:18Z"
+      "zeitpunkt": "2026-11-17T08:03:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4704,7 +4178,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8f451005b6fa30958eb03c38262da3ee59c7ee85b0392cca393d337de9c9d3ed",
+      "beleg_id": "2617a434061bb3cedb3e5f1c4b1830138742cdd56d6d5c734eb67d474ce95513",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4717,7 +4191,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:33:08Z"
+      "zeitpunkt": "2026-11-17T08:04:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4763,7 +4237,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "64a48e0670cb331b9168d614e09e40fc3d768be75edca027ace8128a8d4367fc",
+      "beleg_id": "27aab3532a08c0213c81b4c438f98d8f4bf8349074db0d74c3f65f53f242a071",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4776,7 +4250,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:33:09Z"
+      "zeitpunkt": "2026-11-17T08:04:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4822,7 +4296,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fcc01fd39f6accbe742a654976ed18a424369620ed22c563c40080d2de7e8e85",
+      "beleg_id": "3714148eafe1a3ca2911feaf84bdeac108002fa5e4352fec0135e52e3b71f1de",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4835,7 +4309,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:33:09Z"
+      "zeitpunkt": "2026-11-17T08:04:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4881,7 +4355,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ecf0327b885876db36045e186674f87cab64cf2c166538157aa3556e8043df98",
+      "beleg_id": "dc8d6bdcbf3cb9b90b60c6266612f560737c8f66bd5d69a103c295db23f9b157",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4894,7 +4368,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:34:02Z"
+      "zeitpunkt": "2026-11-17T08:04:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4940,7 +4414,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "055abb768c28d4a3054f7020857f1861917c9d58adbd425ae1df31cd3c03e515",
+      "beleg_id": "9defc0a6531ebd5be4b0ef6bd88ec7591786b3bc8e477e9cbdd6e04733c2fa8b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -4953,7 +4427,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:34:03Z"
+      "zeitpunkt": "2026-11-17T08:04:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5008,7 +4482,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "5ee4a56aa9797e7a4e3f0050547d89a80dc0f1cc8c019987bd6f4c23262dbef7",
+      "beleg_id": "65d3bcb2f23b85d9a0f71b39b1e8b68e44b0c46104d3bda55e86264880ae4e4f",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5021,7 +4495,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:34:04Z"
+      "zeitpunkt": "2026-11-17T08:04:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5052,17 +4526,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 231,
-    "beendet": 226,
+    "anfragen": 228,
+    "beendet": 222,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "collect.vodafone.de": 1,
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 4
+     "www.vodafone.de": 5
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.7,
-    "takte_ms": 11800,
+    "sekunden": 12.1,
+    "takte_ms": 8450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -5095,7 +4570,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d7b852f9eacb83489003a518e783dfebcb24481c9054fe93caf44c67955c3823",
+      "beleg_id": "eebe913f8c002b7617f0e982d57ebc4a866a7587a860d7e8ecb31a52d255f1c1",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5108,7 +4583,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:34:48Z"
+      "zeitpunkt": "2026-11-17T08:05:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5154,7 +4629,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e20dd2979267a29f98aae564204de9e432397c071a830d06cee883463f21c168",
+      "beleg_id": "e0698f4b31c41fa156400a3508ac32106511bdd19e73fd9a8b524539591d9c16",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5167,7 +4642,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:34:49Z"
+      "zeitpunkt": "2026-11-17T08:05:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5213,7 +4688,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c06e636c8634a2e2fbe090c3c71c46f84177fadc8099aad3af523eaf70e6348d",
+      "beleg_id": "bb53542e5a7d6551e161a5dfaf267459442a5b2db862615a1d036af94edcf5ba",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5226,7 +4701,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:34:50Z"
+      "zeitpunkt": "2026-11-17T08:05:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5272,7 +4747,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fdf994be852b6ade8c0efb34c32460f41193fbe275887b895c72431824ce6032",
+      "beleg_id": "00756b3f15153a8b5bf517249a3d1f975edc2f686f834b1f0626525f14092ce9",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5285,7 +4760,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:35:38Z"
+      "zeitpunkt": "2026-11-17T08:06:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5331,7 +4806,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "074f50bd00cf56a879912b3666a495f3fe57e72ceed62d7e554a5ae09b9779ac",
+      "beleg_id": "07aaf489ab52adf581f1e9e63f0999140595241dda753fa4e382e371d354e778",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5344,7 +4819,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:35:39Z"
+      "zeitpunkt": "2026-11-17T08:06:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5390,7 +4865,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "18c0294a24384e51b3c36fc60b4b7bb912a979a7ed5cdfd8a11852458b3d7189",
+      "beleg_id": "c92e828b5895a43666ef954ff38ad88896c15c836cbd86c5978675b4501e6822",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5403,7 +4878,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:35:40Z"
+      "zeitpunkt": "2026-11-17T08:06:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5449,7 +4924,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bbd8b99b4bde3260a4d6ed453a7b27b75553123c8a1ce482c761fcb5f47a1ab5",
+      "beleg_id": "3110a3fdbf21d76511e4ba94af35a73c0a0fb3a37483619fbec372abf383caa8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5462,7 +4937,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:36:27Z"
+      "zeitpunkt": "2026-11-17T08:07:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5508,7 +4983,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cc36811f93723ef2ea5398efa2ba57d9382a6c39573d635ad9046029f94db19e",
+      "beleg_id": "bf8a539625e3b9a6e01b0afa4b6762afb9084c74c7e8b5df23e95ea66930231a",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5521,7 +4996,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:36:27Z"
+      "zeitpunkt": "2026-11-17T08:07:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5576,7 +5051,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "8d410091ed01ee830b1ce6d2eedc4b81cd133869d1632f277ecd75b1771a948a",
+      "beleg_id": "b6cf336265888265d8b61a3811f363f4172f114094c3455491c5595c34da39b2",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5589,7 +5064,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:36:28Z"
+      "zeitpunkt": "2026-11-17T08:07:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5626,7 +5101,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7ec66da62183e734cf8cdeecdd6220f225d03356afef6f8e3e8f2f48865266ba",
+      "beleg_id": "96f6c19b7e98f3f5f95caaaf61b76a364929c4f0953b558d26f589f55dad1d63",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5639,7 +5114,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:37:16Z"
+      "zeitpunkt": "2026-11-17T08:07:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5685,7 +5160,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "45c90878796bed208573484d44994ded46ddb23f7bf53e5c64e1887c605b5f13",
+      "beleg_id": "8c65becb4d0dcd6cc11fabd9d9666ab8cb95bd7bcf972782d380ea0ad6047530",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5698,7 +5173,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:37:16Z"
+      "zeitpunkt": "2026-11-17T08:07:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5744,7 +5219,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e6881c415cde5364e6ed0a2e2d01a68c81cd7b01be6e1eada495c63d95137029",
+      "beleg_id": "304ad0242e17a85f9c172d0e0aeac6e2fbb182df09f18b07541926939336d412",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5757,7 +5232,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:37:17Z"
+      "zeitpunkt": "2026-11-17T08:07:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5803,7 +5278,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fdf8bd48fc237035b4256a6b3418552b63426781c37c5dcfddc2bfa4b8cc0a62",
+      "beleg_id": "fde1700bbc8509ee2d02fe444ccc03a4ca846af9efc309c8b198d0ef55c05c08",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5816,7 +5291,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:38:13Z"
+      "zeitpunkt": "2026-11-17T08:08:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5862,7 +5337,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fd8b183bfd9a7a799d5308902cebf4801c59d845b71caa9977cddeb96b5c5fd2",
+      "beleg_id": "24ba502066ba78a6dfeb9fb836616ebc43160e30d93a930e6cf1b29203db82e6",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5875,7 +5350,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:38:14Z"
+      "zeitpunkt": "2026-11-17T08:08:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5921,7 +5396,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2e0ffa15b54568ef998e963de9ede521abf5491eb85ab5db9d1db288e50efd39",
+      "beleg_id": "9895a374d035fe3f60814e6e358b4aa69d469d09170d7a612df24a4d0b06ae84",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5934,7 +5409,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:38:15Z"
+      "zeitpunkt": "2026-11-17T08:08:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5980,7 +5455,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "159c9b7fca0e452bcb6037875c89a66ad5ffcc816bc1036db62593870a5e8d47",
+      "beleg_id": "509a3cc2bcfaa74e177d7b87b3fd314ad114c18fcb0ca445683f44a65fc1bedd",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -5993,7 +5468,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:39:07Z"
+      "zeitpunkt": "2026-11-17T08:09:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6039,7 +5514,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "749a59beb4f031c34629e463564f08828fcb6298aa5a5568e102d65568a03852",
+      "beleg_id": "e0e53dc09c0a5c276afe7c4a71d88faae1458491b2ba25a58fd4fbe5e1706064",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6052,7 +5527,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:39:07Z"
+      "zeitpunkt": "2026-11-17T08:09:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6107,7 +5582,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "e96c144e19defa1e6d85c91f8f6fe5f3be6d960d4b14b75a50a8b0bce2390f15",
+      "beleg_id": "1931c68d03e030b050ecd031e55282ac04af12151d4afae4ecf5d46cb2dba78b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6120,7 +5595,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:39:08Z"
+      "zeitpunkt": "2026-11-17T08:09:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6152,17 +5627,17 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 151,
-    "beendet": 150,
+    "beendet": 145,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "cdn.dimml.io": 1,
      "collect.vodafone.de": 1,
-     "tags.vodafone.de": 1
+     "tags.vodafone.de": 1,
+     "www.vodafone.de": 5
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.2,
-    "takte_ms": 10450,
+    "sekunden": 13.9,
+    "takte_ms": 10350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -6195,7 +5670,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8d38b0a6e8396010d20f0944a901017956e62cb0118fce0003af5f47564a3f54",
+      "beleg_id": "6687ff3699b085cb2e437e44820a6b7917166e3d2f0f795237d4d06425a69a0a",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6208,7 +5683,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:39:54Z"
+      "zeitpunkt": "2026-11-17T08:10:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6254,7 +5729,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0a35f86e4882ec5dd0ca84ff2262acdee3cca0ce0a5e557cb7bb4325b739e903",
+      "beleg_id": "3cdf1f9fbe5a513cb1cffcf5aaafda4437d8bb6a747812d250d53b36eca14ebe",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6267,7 +5742,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:39:54Z"
+      "zeitpunkt": "2026-11-17T08:10:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6313,7 +5788,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3704eca8d474fa6cbfdd082cb65f9f231265444358b284204786428131ea2cd6",
+      "beleg_id": "5ec7ba0c6da4c656da59a8b5689822e097d40f3f8873ad2ea1deb173b776fbc7",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6326,7 +5801,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:39:55Z"
+      "zeitpunkt": "2026-11-17T08:10:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6372,7 +5847,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0115eff5c8c7cf3972520a8ffaf8ce6101281eec6637a58e9a501a0f7919bc4d",
+      "beleg_id": "7338fc971e00ddad85041d42944d225216e1bb2781047daffbd0a850eb0456e2",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6385,7 +5860,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:40:48Z"
+      "zeitpunkt": "2026-11-17T08:11:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6431,7 +5906,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a6906342f9f04ba551bac7d06ca2820b38a4abd39ede9a7ca3c52c21e28ddd9d",
+      "beleg_id": "1a23dd32b75898fd06cc3267b0ac2224d5a9d1185fe377d7a24469afe7a2a836",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6444,7 +5919,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:40:49Z"
+      "zeitpunkt": "2026-11-17T08:11:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6490,7 +5965,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fbf97642cb35744b7aff2774077bdb769cc684166cbce93e31bc230bfad5c36e",
+      "beleg_id": "cc90cf2e87091376b42dce678884770c9ec9784372884d2ad67012846764ca1a",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6503,7 +5978,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:40:50Z"
+      "zeitpunkt": "2026-11-17T08:11:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6549,7 +6024,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "74a086ae84bd692a682a94af3c96317054751ef5cfe54c31cef650c1cfc6a0be",
+      "beleg_id": "c33d9beb17b5e042af3ac1c6ddee5c99e5bd565508f4597224efc73e1267ab6d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6562,7 +6037,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:41:39Z"
+      "zeitpunkt": "2026-11-17T08:11:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6608,7 +6083,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fc0592b1326938cd322184b06a6cf89b3ab0b3f81eee6dc319d00aad521385c5",
+      "beleg_id": "f2997af5cd6acc33a8661cbeebeaa64cdb25dc697e244cca812c3ee77efe9d29",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6621,7 +6096,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:41:39Z"
+      "zeitpunkt": "2026-11-17T08:11:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6676,7 +6151,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "6d8d8e5539a05f4e10e3b53f26d03b230a473c6a483305577d69161ee0fbe802",
+      "beleg_id": "01891bb545f5cd1c1e3d8d90e7d9cca5ec93948feec9e4b214cafe0bfb61172b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6689,7 +6164,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:41:40Z"
+      "zeitpunkt": "2026-11-17T08:11:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6726,7 +6201,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1e8e67c1f57cf1b11b089c33a5a20648ac886f9b9000def3d7756c3c3c79bc22",
+      "beleg_id": "c435d83f86deb01acac98fc3aa74065ee33bc62374e34de8f0193ad977fb728a",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6739,7 +6214,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:42:35Z"
+      "zeitpunkt": "2026-11-17T08:12:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6785,7 +6260,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "94c447f3d3fcb5a1a7b47c6e77c21d2f0a973d30d4fa762baa8acf70f8791979",
+      "beleg_id": "9beb43a9a4a499bf18555fac4891f1ac9b5acc20141067865c1e1dfae179e067",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6798,7 +6273,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:42:36Z"
+      "zeitpunkt": "2026-11-17T08:12:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6844,7 +6319,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "64a23d0bcc5fdd2c240966c32f5a9f9d86f10fc7d8d9efe3db328ddbd4abf258",
+      "beleg_id": "750403b4c7288991344581fa40ce70208172fb0a1796889c1718d7d0a3733645",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6857,7 +6332,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:42:37Z"
+      "zeitpunkt": "2026-11-17T08:12:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6903,7 +6378,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "924fbf391cdae156688ac0d1cedf91250ed52866638548c9bcdc39763300eb4e",
+      "beleg_id": "4a29acd795b1044faf5ff394359ca6a6accea9fd309f460a1167e4aa5662639c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6916,7 +6391,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:43:31Z"
+      "zeitpunkt": "2026-11-17T08:13:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6962,7 +6437,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "53673ffa1b405ae6403b80706592437ae2857df0b1abc8fb6763920fb90c14ef",
+      "beleg_id": "9184da56e8dcc39769b6d04bfcd3bbb80c716db3b5bf0baddab38bd59023fa52",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -6975,7 +6450,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:43:32Z"
+      "zeitpunkt": "2026-11-17T08:13:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7021,7 +6496,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5fbe44ff2ad8f0c8cf4a2a2fe3739c47bcedf03920f35793739c43cd956440d2",
+      "beleg_id": "d41aee4e45af38676418bc690ca09679b2f96ebdd4e0518e828ee7fc80aa1e6b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7034,7 +6509,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:43:32Z"
+      "zeitpunkt": "2026-11-17T08:13:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7080,7 +6555,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8736788a653650b4e3f8116e0aeb9a7a81bb1db4d713a7ce8d97b045f7e5ce65",
+      "beleg_id": "a9752d316d17b39ea0d8911d3c1ee4f0f6fd2ef3c835b592db8386a31b9e696c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7093,7 +6568,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:44:22Z"
+      "zeitpunkt": "2026-11-17T08:14:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7139,7 +6614,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1ba8f55152eb5a5d0501eb30791b0bef742e43e9998003ec9b6a549297344cd3",
+      "beleg_id": "e46df659ac3c734badb517e8fbdd8a55e693bda9ce8574ea94e61b563e7f2303",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7152,7 +6627,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:44:23Z"
+      "zeitpunkt": "2026-11-17T08:14:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7207,7 +6682,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "60b39aeb4d7c54f07f1301134989da0da5bca1d8cdd3ae512725276894d3d33f",
+      "beleg_id": "8b58c6a2451bc8c743d03c212f2df1122dc971ae303145bdb2b725f014481bf6",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7220,7 +6695,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:44:24Z"
+      "zeitpunkt": "2026-11-17T08:14:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7257,7 +6732,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f9159f333788afa6fbf60e58f8e34dd6d810db27868dc5ace2354e802f481f25",
+      "beleg_id": "13fb2fe7c7a55b9b2b5531d74c405e410944dd82122532d8d25523db6ba4da12",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7270,7 +6745,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:45:13Z"
+      "zeitpunkt": "2026-11-17T08:15:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7316,7 +6791,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3a9a2864766d0417cef941395dc5c078e31b83b274ec645a29878950434cb7d6",
+      "beleg_id": "c25c3988ce768ce275fb1ca1fb471c89fc7e164156dd3e54e19633ef272d9a41",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7329,7 +6804,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:45:14Z"
+      "zeitpunkt": "2026-11-17T08:15:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7375,7 +6850,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5e60db0153dfe369f1bbcacc3f4a4af94cb1623cfe2b3699517dfcce53dd60d3",
+      "beleg_id": "7364b301df4c2f7f666d3fa14a08f061ff4e20860306ab52f02b826e523943d8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7388,7 +6863,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:45:15Z"
+      "zeitpunkt": "2026-11-17T08:15:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7434,7 +6909,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c3a80723340c7bebee6b90bb125958fbd1c1e14ee7dcdf0b50f923ee2e5e11e5",
+      "beleg_id": "7794b7c8db59e8b5d9f01e82902840f56c5db092021bf79fcb6dd6f67da9daf3",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7447,7 +6922,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:46:11Z"
+      "zeitpunkt": "2026-11-17T08:16:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7493,7 +6968,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "90d1ca2bf12c65c5cf8cbc636113bb1ad53069c0447ff129fd3a80a3af1d89c5",
+      "beleg_id": "e5f50e1bad9ffe597f8acda6dc1af9eb33ed11dd26ddf09bbd2d34b34233be16",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7506,7 +6981,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:46:12Z"
+      "zeitpunkt": "2026-11-17T08:16:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7552,7 +7027,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8be7a74c4dbb776e5fcbdb1d3b7d543fb2fec2bff774c6aac7a1052711c94ccb",
+      "beleg_id": "07bdf1e00da184a3a46f284624512226a54fa9b8060a8bdc9af2efa982838865",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7565,7 +7040,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:46:12Z"
+      "zeitpunkt": "2026-11-17T08:16:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7611,7 +7086,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1a9f3283751a2d20aed5367888a50b461dfccef987c2fcfcc51300bb4d1b91f4",
+      "beleg_id": "6b90f2dcb129b98cc0cf093f950a3b14de2e79d3314c3b571256871e473491a8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7624,7 +7099,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:47:03Z"
+      "zeitpunkt": "2026-11-17T08:16:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7670,7 +7145,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "916186e324054dd3f49f08731d9d5289bd7f5c7e127c3db21c389c2250d55159",
+      "beleg_id": "6a262d5d94a1f242a4a08c97cffadba0cf6eeeda824bd0ba65aeab547785a9b8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7683,7 +7158,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:47:04Z"
+      "zeitpunkt": "2026-11-17T08:16:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7738,7 +7213,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "b78bf71a534a4b144c5dccc456e216a879212eadf280c9a452bd796ad59d6275",
+      "beleg_id": "81a4159139a62bf4a76bef6c915a364cea2d3575e003fd309ecbce949596fcd8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7751,7 +7226,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:47:05Z"
+      "zeitpunkt": "2026-11-17T08:16:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7788,7 +7263,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1ba712d4290b7164873bae17f392a3a2b6f90c3e67537f93ff40c87e871baf80",
+      "beleg_id": "23a6b290d76b66c950a6019b676c752627e663fa65cf4848885aa4e8c0e3655e",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7801,7 +7276,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:47:55Z"
+      "zeitpunkt": "2026-11-17T08:17:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7847,7 +7322,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9b0923ab7bee66824e6db8023a0ba2b56f2c577fdc7238974d2f600f6b1b8dc3",
+      "beleg_id": "390f106475399aba90986eb5db6c40edeb30ad8b8947f7a578df624aca291d61",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7860,7 +7335,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:47:56Z"
+      "zeitpunkt": "2026-11-17T08:17:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7906,7 +7381,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "503366b75d062ff52012188498593e7ea3d2c1a628a3043b89b5a9c4301eafad",
+      "beleg_id": "2035cd9d8eae96e541971d76a3974ba25a36520cc5eb8feaff3c80405c4daec6",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7919,7 +7394,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:47:56Z"
+      "zeitpunkt": "2026-11-17T08:17:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7965,7 +7440,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "398589ceaf212061c5ea969d488b720f50a77384645a93ff27ed22a89ed8975a",
+      "beleg_id": "8427c24789dd737e7595604de890469b5643bc0d3cb744db86d1879151990aff",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -7978,7 +7453,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:48:47Z"
+      "zeitpunkt": "2026-11-17T08:18:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8024,7 +7499,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e3cc65757a2a12bfdf211ce81bb9d983b9e066d9243f02387a3e322748dd4957",
+      "beleg_id": "82bf6c1fb11ba43b289d1829b24533166b0896f199ada24a57b3088581994c36",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8037,7 +7512,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:48:48Z"
+      "zeitpunkt": "2026-11-17T08:18:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8083,7 +7558,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cac2e54851da9f923b748e3109200b2d76aaec451785a5987f3ff3b563275082",
+      "beleg_id": "6d450f3948f36ce0dea7fca5529a513c3f99bf5bbf417d344f562182fe749ad5",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8096,7 +7571,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:48:49Z"
+      "zeitpunkt": "2026-11-17T08:18:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8142,7 +7617,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b481f9f9b96856fe41279d11bfe70b375a46f5f4a6a884026fa16a521d219344",
+      "beleg_id": "4b3450889c4c74efab7f194cbf3bba18438eeef17517207f26ea0ffaf60a3318",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8155,7 +7630,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:49:41Z"
+      "zeitpunkt": "2026-11-17T08:19:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8201,7 +7676,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5c177c5b43b255aabd61fd11b1d47b4ba172f94b25017b9816eb711165bfbc8a",
+      "beleg_id": "6e48f1ad6838c8ff376e7f22908669c67d15218c0b75aa08f3b42b8c4075ab6b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8214,7 +7689,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:49:42Z"
+      "zeitpunkt": "2026-11-17T08:19:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8269,7 +7744,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "b968eaa359afa10f44062107c111e563a7f8eb31a57a836117514b23a4d6ed99",
+      "beleg_id": "fa118b1d81a3eabc2dab134476906547b6940fefd36e2934cdd66917ea0a0cdf",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8282,7 +7757,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:49:42Z"
+      "zeitpunkt": "2026-11-17T08:19:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8313,17 +7788,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 148,
-    "beendet": 147,
+    "anfragen": 150,
+    "beendet": 145,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "cdn.dimml.io": 1,
-     "tags.vodafone.de": 1
+     "collect.vodafone.de": 1,
+     "tags.vodafone.de": 1,
+     "www.vodafone.de": 4
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.3,
-    "takte_ms": 10700,
+    "sekunden": 12.4,
+    "takte_ms": 9000,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -8356,7 +7832,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "30d57dda0af9922e3f85af2a86bc65c12ba033f791e17b8f259cc2921681c855",
+      "beleg_id": "050a035429f40bb2979e42afb3ff4084056728ed20ebbbe0df5e29684d0fc022",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8369,7 +7845,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:50:27Z"
+      "zeitpunkt": "2026-11-17T08:20:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8415,7 +7891,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f987811d30694e559b954fc673ab4c44ae97a44af3c530f4bb6fe14179acbc50",
+      "beleg_id": "a36ad886e8ce6546fc4846e8df549476cfbc88967402afc22cb49871e0e336b5",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8428,7 +7904,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:50:28Z"
+      "zeitpunkt": "2026-11-17T08:20:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8474,7 +7950,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8deb818c257dc3e85788f99565279cd340bc05b5e23411735c402cdb1d372210",
+      "beleg_id": "960e7f882a739a6a695a894fcceda4a4b6839261908ca512c9ecff7b9ce51f6d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8487,7 +7963,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:50:29Z"
+      "zeitpunkt": "2026-11-17T08:20:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8533,7 +8009,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "01a8d229aba1147f64181c0fb0e6b7f560003e86615b6459f4bdc3163a823829",
+      "beleg_id": "2ac654f62ce4b37580cba1d3ce735b9e8fa4bcede490ccc40f3ead72b22b8b86",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8546,7 +8022,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:51:17Z"
+      "zeitpunkt": "2026-11-17T08:20:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8592,7 +8068,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2b70051f50e9e22e04f50331172d1e2094a9c46065a65076c5ccee5c04b6d38a",
+      "beleg_id": "a5de9cb407500b702b184c7149bb71cd05d4f36ddfe87d5ffb5abb6b9ab089fd",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8605,7 +8081,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:51:18Z"
+      "zeitpunkt": "2026-11-17T08:20:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8651,7 +8127,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cb77d3eaf1d823def7c64b3f68c24956a0b66d9c0a34e3a462de291468683e0e",
+      "beleg_id": "4770c91574ea64a206fbb8a694d7de353b1cbca2cd539e7c58f160fd6f56a7a2",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8664,7 +8140,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:51:19Z"
+      "zeitpunkt": "2026-11-17T08:20:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8710,7 +8186,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "08cfe37df946e9128d0ed3a6d2f361db5efdaebd0524759f86a521d8644f237f",
+      "beleg_id": "8c8306b913333fe6d2c9dcc7bcab5849f462bb29076abe6617509c14ac27b514",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8723,7 +8199,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:52:06Z"
+      "zeitpunkt": "2026-11-17T08:21:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8769,7 +8245,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f2c36ef0584268c497bec16141d47f2d34d1824201f7a71cbe6ef9761d496730",
+      "beleg_id": "9595fd0ebadd92fb294415971982fda76309deb2d5d7dd95532ff5e0ba66b2a5",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8782,7 +8258,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:52:07Z"
+      "zeitpunkt": "2026-11-17T08:21:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8837,7 +8313,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a76f14a29aa97a7f3312932739764623fb1d0787cdb181ac229df36357743dac",
+      "beleg_id": "dab4e872114182a4daf4454079a9856753c380b37ebab6a87aad6d00f145a131",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8850,7 +8326,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:52:08Z"
+      "zeitpunkt": "2026-11-17T08:21:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8887,7 +8363,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3292644f821f4420f5c3839743084b44833417f17d1ccaf8e9072cac65d6988e",
+      "beleg_id": "06b2ec67502c970e3d016f531ae69d1aa336ebe403e6ab9dc38f39b832b759bc",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8900,7 +8376,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:52:59Z"
+      "zeitpunkt": "2026-11-17T08:22:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8946,7 +8422,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "68018567fa9c4f5f0280bd073e8de9350cbd5432a624f791085bdecc188630ab",
+      "beleg_id": "1f02c0790040b79c5e19cf1c18e4db92ea5be823810d32c23c288289d19d5997",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -8959,7 +8435,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:53:00Z"
+      "zeitpunkt": "2026-11-17T08:22:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9005,7 +8481,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0b6972dbd041f602cf1d594f05be13853bbc8fac09f8733de59dd550a5a79338",
+      "beleg_id": "8be8270bf03cec49688ce64426cd539b31d6e666427f84a8c710d71b519f5a96",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9018,7 +8494,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:53:01Z"
+      "zeitpunkt": "2026-11-17T08:22:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9064,7 +8540,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2acb406dbf6c711bba00e1a5188c02fa4776979b360ea62c5d51300ee541775f",
+      "beleg_id": "a1497ec8ae820d7af56c20c76dfc2f907b800a363498b5b0869b51fb01e354b8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9077,7 +8553,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:53:51Z"
+      "zeitpunkt": "2026-11-17T08:23:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9123,7 +8599,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "11d4fb1e96609b310b4c0e88a27306fc9bd7297721543ded0f91e8d11a630b2d",
+      "beleg_id": "9d549e6f3197d87b179278c3552abdbf1f7308f6db0f66e202233db90cd1ce97",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9136,7 +8612,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:53:52Z"
+      "zeitpunkt": "2026-11-17T08:23:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9182,7 +8658,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a72adefc7647ad7ff5c3b3562b6db443498e1a1384a27cc30875ea6b9cbf16fd",
+      "beleg_id": "ab15b78d162abb814619baa9edca99701132c5dd5fa730b14b4284e6dc3765d8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9195,7 +8671,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:53:52Z"
+      "zeitpunkt": "2026-11-17T08:23:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9241,7 +8717,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "289d90c6695fd9a60e0f596d9f7d241ee247f7afdf72f09d9585767864f5faa4",
+      "beleg_id": "077ec0003d2292f08c4358caab99815684101d58aaa0d7a0596ba9f8385ab071",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9254,7 +8730,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:54:44Z"
+      "zeitpunkt": "2026-11-17T08:24:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9300,7 +8776,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6f233d2a7c9dd21e2b795ae739cd91eac916b51152105b4efe1c2d16ae7ea2a2",
+      "beleg_id": "9d40359fbe5351e8dad843fc5e99285a382959495fd0574842e26111c6a7285d",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9313,7 +8789,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:54:45Z"
+      "zeitpunkt": "2026-11-17T08:24:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9368,7 +8844,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a60d4f086a3e1b57af328750d672b9997230a967596d596167407d5a2d58b009",
+      "beleg_id": "ff05e2a2adec99a7b4f253c522b820489c556cd64cd52498a45cad58eb1ff258",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9381,7 +8857,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:54:45Z"
+      "zeitpunkt": "2026-11-17T08:24:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9418,7 +8894,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7a89b9e6da6007733eed44cceeed6b3fb20eab2abc533d87700ef88ecdd399d5",
+      "beleg_id": "4b4b2d25bee430aaa62b0d3f14137ca99e406d3d99477812e140055d03e96fdf",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9431,7 +8907,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:55:41Z"
+      "zeitpunkt": "2026-11-17T08:24:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9477,7 +8953,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0bc082e655c76f31332f482b179378a07c261aba2d70b0b975a784d99d436dc3",
+      "beleg_id": "2ee8de82ee813a354e91d4abe29b12090a52f4a4d0312436b7500701f14fd58b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9490,7 +8966,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:55:41Z"
+      "zeitpunkt": "2026-11-17T08:24:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9536,7 +9012,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "75df6650b80a254e406b64d9025fda2f81823d2d44e587bd39163fb688856ccc",
+      "beleg_id": "eec704cfd72998a8db12ee0dc6beb74708d18684e4014a034512d9563551dd61",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9549,7 +9025,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:55:42Z"
+      "zeitpunkt": "2026-11-17T08:24:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9595,7 +9071,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "af2f060490d49f482c0d7cf6453c75d80e35be0012427d1a6a508f146d6f721e",
+      "beleg_id": "dd8e74e91ec99ac0e44bcbc8bb730cdf6f4c696064bf09f33d9c96b9bdfef4ea",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9608,7 +9084,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:56:39Z"
+      "zeitpunkt": "2026-11-17T08:25:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9654,7 +9130,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9e28be45df32f6b3b893d3fbf20ccebd4bace55848e03cb35a20672279d3556a",
+      "beleg_id": "bbf9a9187be54b014caaaa3f14e4e402f7e337ac992f6795c584b2abc1d49a20",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9667,7 +9143,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:56:39Z"
+      "zeitpunkt": "2026-11-17T08:25:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9713,7 +9189,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "29b94a3c8d28e3c36bcc6f2e32e72f579026497e0f9bb17f766c6f904bc5a988",
+      "beleg_id": "6ae69f75511e4e398139ecf0d2735ae8cddb3ed2a00db6f25105502dbdd47930",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9726,7 +9202,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:56:40Z"
+      "zeitpunkt": "2026-11-17T08:25:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9772,7 +9248,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "911daef386e75a4613992a4a27cd6fe3e033c566fd2b2c9493f6c9b87d0ae121",
+      "beleg_id": "5816339eb67164eab797ba9cba74a5dc94487f16fd71d02f4e7ffcfbf2646453",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9785,7 +9261,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:57:33Z"
+      "zeitpunkt": "2026-11-17T08:26:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9831,7 +9307,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "88f79036ef1240445673bde993d368595046391d6effb46e33b2e6b665947d23",
+      "beleg_id": "a5a88b142d299b55f03670ee2474d9f15fb33b7d63f8c9d083291107415b0206",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9844,7 +9320,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:57:33Z"
+      "zeitpunkt": "2026-11-17T08:26:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9899,7 +9375,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "79370fc334760a866bbfc9dc80117e897c681045e6fc9fb5a24e16ebf72f313d",
+      "beleg_id": "049e4aba1ad96c57b025ec0015c477f58c9e4aab17fd694647fe9562fa05ec22",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9912,7 +9388,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:57:34Z"
+      "zeitpunkt": "2026-11-17T08:26:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9949,7 +9425,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "53da4f00e7f56af166b1273b4b659c48b6b1292a09bae0d22304495c1a097f45",
+      "beleg_id": "710fd6ca447948253596609fe0ff1bd240184604c523ac8724d94b41e0404cfa",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -9962,7 +9438,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:58:24Z"
+      "zeitpunkt": "2026-11-17T08:27:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10008,7 +9484,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c62fe82252d7e779cf3336d879cdff8ddeef3f6e4118f885537cc404c433d536",
+      "beleg_id": "2da6042d3eccd376b7e50d8cac4150f01676d1f70e497dc7fb9edb4e4f59ee2f",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10021,7 +9497,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:58:24Z"
+      "zeitpunkt": "2026-11-17T08:27:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10067,7 +9543,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2c8536858d2947c84890c74561d0000ffe941feec6604392c1f3525555855559",
+      "beleg_id": "2db337f875cdb3d0adaaf6b0bcc1fce40b8cd103326858fb36a60de0add4258c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10080,7 +9556,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:58:25Z"
+      "zeitpunkt": "2026-11-17T08:27:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10126,7 +9602,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "99335b288c0c74da08d0b05f9e32e82109862ffdec9a9464df7a758f5c239de7",
+      "beleg_id": "a2f773061d5bd04dc79559f3688dbd9991c6612a467bc7dea0bf73e8af7f2596",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10139,7 +9615,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:59:16Z"
+      "zeitpunkt": "2026-11-17T08:28:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10185,7 +9661,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f0930491880f6c3d610f9ef64a974cfa5cba77380876f3917a8afdcae5fe733f",
+      "beleg_id": "52898315337bbb60bea8428a8931ad70b286f2f1456da57822927e988d955364",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10198,7 +9674,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:59:16Z"
+      "zeitpunkt": "2026-11-17T08:28:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10244,7 +9720,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c7f77a56d110e0cb60558d77e01f038a76ec90fac5b0067fc38cbfcdea688ec5",
+      "beleg_id": "527dd73a8812030271c5b2f5a69e9dde12b05cb406146a52a44184c2fd738221",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10257,7 +9733,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T06:59:17Z"
+      "zeitpunkt": "2026-11-17T08:28:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10303,7 +9779,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "68d456a2e303bd4676a49786b9d75a1533a8c5c3a978f9c3304e49853b58d19b",
+      "beleg_id": "e536704af6822269663ccecd9e888bd1303cc3762aa542583a12fb2d1358b99c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10316,7 +9792,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:00:12Z"
+      "zeitpunkt": "2026-11-17T08:28:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10362,7 +9838,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cb5cce242bdcd43d61fc96b1933a21a998a19a122ad125d70f604e2c9b6e4cd2",
+      "beleg_id": "209a5e5494d5699e68fa8a21c198479c2244e8fbd1129c366595d66b4503cf06",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10375,7 +9851,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:00:12Z"
+      "zeitpunkt": "2026-11-17T08:28:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10430,7 +9906,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "8a28390bc01400b3c6280c575c8e3674bcabac27b644d5c12447f676efa7490a",
+      "beleg_id": "b3858ff209fa8834afe36e32c51ef0ed3c99dbbca1c0e1fc26fa3bb0f88bd784",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10443,7 +9919,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:00:13Z"
+      "zeitpunkt": "2026-11-17T08:28:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10474,8 +9950,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 147,
-    "beendet": 146,
+    "anfragen": 148,
+    "beendet": 147,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -10484,8 +9960,8 @@
      "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 16.0,
-    "takte_ms": 12300,
+    "sekunden": 14.3,
+    "takte_ms": 11050,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -10518,7 +9994,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2085c75dedb447d0d13f11ec9cc245b700d55895ae72256f2a2b1f97150b7b0f",
+      "beleg_id": "9b61dd1fab71dfae37ab6b86664238e73c6fbfa97eaa1182240616a34a03e3df",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10531,7 +10007,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:01:01Z"
+      "zeitpunkt": "2026-11-17T08:29:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10577,7 +10053,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dcd2165feb31f6c9b2d875bb6c832414d0dd7f79066ff5bf34d3475a9ad7b829",
+      "beleg_id": "f39e6070d2078b46efac675f6702684a6b76397fcf3b4fae32a6ce2430799fea",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10590,7 +10066,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:01:02Z"
+      "zeitpunkt": "2026-11-17T08:29:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10636,7 +10112,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bbeb66a11202622026ca16cabfe58a4ffa5bb9e0ea0d938c497ce98be70c59f8",
+      "beleg_id": "3a52ea3ce2a37d2ebbb9fb97a90cbe255ca68d483914c236abed3b10635282b9",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10649,7 +10125,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:01:03Z"
+      "zeitpunkt": "2026-11-17T08:29:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10695,7 +10171,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c9e020472951f69fcfb606cbf1859bcfbefe3ba87b55ac8339cf88daa4b9ba42",
+      "beleg_id": "0942b6baf08c85d5314efebda8e37d3be78c40be030f6ce18e825ac50fb9d61c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10708,7 +10184,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:01:49Z"
+      "zeitpunkt": "2026-11-17T08:30:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10754,7 +10230,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1a3276e9da9f55cc5389b85ddbf7c35e430ed3448ce7ac7fa2043ce390eb8ac8",
+      "beleg_id": "d9a3f3f60d4895d1920c018de330ee39790700c9ddb7ac19779918b046eb293a",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10767,7 +10243,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:01:49Z"
+      "zeitpunkt": "2026-11-17T08:30:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10813,7 +10289,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "054f1203c4ae57f3983168e4acd8963671a16b2de0ba7522e478cc025885ac5f",
+      "beleg_id": "7750caf09d613af9d7a29985cdd214d7f80e344cca9c08181a8d9b89fa919fa2",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10826,7 +10302,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:01:50Z"
+      "zeitpunkt": "2026-11-17T08:30:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10872,7 +10348,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4bf69444350e9446feb3fab37539fe803c88b9d8b37e6fd85b16f669939ca642",
+      "beleg_id": "da5fc8fc086182a1f85e4301e73b932e4980fc535c999be4717dc38035d76222",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10885,7 +10361,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:02:37Z"
+      "zeitpunkt": "2026-11-17T08:31:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10931,7 +10407,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a029bf933d3edc045e5f4496e3aadab603e497e64db642d31357cd29aca61342",
+      "beleg_id": "dbcda94dc5d352fc24db9006103f2427312339176f410865cfa6292c99421540",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -10944,7 +10420,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:02:38Z"
+      "zeitpunkt": "2026-11-17T08:31:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10999,7 +10475,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "1b18973f363300374f89fbc1c5bfa3a24e1da2e0db36c914cbb632351d8d3e16",
+      "beleg_id": "42746e707b5411db61cbc70d68c1deef651c9dcc1f1719e89f39641a98397d51",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11012,7 +10488,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:02:39Z"
+      "zeitpunkt": "2026-11-17T08:31:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11043,18 +10519,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 198,
-    "beendet": 197,
+    "anfragen": 199,
+    "beendet": 199,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "cdn.dimml.io": 1,
-     "collect.vodafone.de": 1,
-     "tags.vodafone.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 13.7,
-    "takte_ms": 10400,
+    "sekunden": 12.6,
+    "takte_ms": 9250,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -11087,7 +10559,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cb4773e2c6334caafac030832396182e71f95819f6acee9941f34be9290a61a9",
+      "beleg_id": "2bba0c9c5048ad04af50c7f04b0b1a2383efa073c2d1e64de75bb8b5c9735720",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11100,7 +10572,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:03:23Z"
+      "zeitpunkt": "2026-11-17T08:31:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11146,7 +10618,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8775eacb590568bb64f794808854b6d508d27be4b28f9a627f58fe0d8ef3510b",
+      "beleg_id": "dba8cb8551e1e7f0ad17ea671ffd8a5c122762a7c90c869c2f7f60b6bece64d5",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11159,7 +10631,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:03:24Z"
+      "zeitpunkt": "2026-11-17T08:31:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11205,7 +10677,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "60a45869de7867be2646d12f38d1332cee369add6dff331b551bd1ff19290ffd",
+      "beleg_id": "fa1c4f2a763aeac7e87ac7da9336a73f153178959bb4d452469b8eb37f520d20",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11218,7 +10690,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:03:24Z"
+      "zeitpunkt": "2026-11-17T08:31:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11264,7 +10736,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7b56eead2d0064c5aad4d1b4a6f5b88a4f989a93dd75fa8d43de51523f141c2b",
+      "beleg_id": "f141f07225896c31929b3888a210331854f745eb78628ea4d278d4d6722f0c9b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11277,7 +10749,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:04:12Z"
+      "zeitpunkt": "2026-11-17T08:32:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11323,7 +10795,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "31246863a3685d8dde36f41bf91e19ea608e59f054a868ececd7968c81790f72",
+      "beleg_id": "9ab592ecebcfe399658520980edd4d3f972ce2d6bbd81c216dabafea26797c67",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11336,7 +10808,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:04:13Z"
+      "zeitpunkt": "2026-11-17T08:32:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11382,7 +10854,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a566245719f2b560279c510fba8b3e7637b6941a1d19e9db73c76b8c40c0f3b5",
+      "beleg_id": "996c3aaff797a8bbd2b73b585b69ee2dfe0811211fca13aeb5f4daed23c88971",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11395,7 +10867,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:04:13Z"
+      "zeitpunkt": "2026-11-17T08:32:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11441,7 +10913,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a14b1389df4ac7d6455b8abefe54058753d2acd4db1ee9c8a4c27bf4e035176c",
+      "beleg_id": "96527b4adeb462ed6279f33e5125b9f514b177d3c776b874d06f5ddf4561746c",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11454,7 +10926,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:05:04Z"
+      "zeitpunkt": "2026-11-17T08:33:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11509,7 +10981,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "7640717bc6f485bc8c9cbc98d4b824560b9687fa02b2e38d2c16097f98d39630",
+      "beleg_id": "9d10191b2e88ef0993b163b0a4e45274bf9d74f49211ec704d4fa08ad45f1b49",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11522,7 +10994,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:05:05Z"
+      "zeitpunkt": "2026-11-17T08:33:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11568,7 +11040,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "656f4b30cbc46225cba8cc1241d0114d375aaf15271b9277b787624eb9d28fa1",
+      "beleg_id": "505cf137f6851a7d866ef2d8690f53451d108b509cc58f6ffcee89c73b8b4a5e",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11581,7 +11053,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:05:06Z"
+      "zeitpunkt": "2026-11-17T08:33:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11612,17 +11084,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 247,
-    "beendet": 246,
+    "anfragen": 253,
+    "beendet": 252,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "cdn.dimml.io": 1,
      "collect.vodafone.de": 1,
-     "www.vodafone.de": 1
+     "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 17.1,
-    "takte_ms": 13300,
+    "sekunden": 12.5,
+    "takte_ms": 9050,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -11655,7 +11128,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "62d26206e357a1e0ea7b1507243a489ed7b8ccc7b2ea0595a91e8c9f308dd4bf",
+      "beleg_id": "4471c74639f0b9debb08921e756a3a01547c7e4ebecbdeda698d4809e85d8bf8",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11668,7 +11141,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:05:53Z"
+      "zeitpunkt": "2026-11-17T08:34:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11714,7 +11187,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8baa726d4ac4b904cedee24d33deeb8b6306153f01064b0eb7a3ecbba85fc67f",
+      "beleg_id": "6f6e7da9bebc55d3db8032b749b83a5267dde9c4a98e66d63197d62ce2731b76",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11727,7 +11200,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:05:53Z"
+      "zeitpunkt": "2026-11-17T08:34:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11773,7 +11246,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "542704d6048f3baf0307e7ffb55c80393678146cbda53e227aeed81c603f1fb5",
+      "beleg_id": "b7440a55123a13101932074e95075d5866ed3a9179e83b2807521b3c96c67607",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11786,7 +11259,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:05:54Z"
+      "zeitpunkt": "2026-11-17T08:34:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11832,7 +11305,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b104728e5fcfb258807425a373cf88b46ab29bfadf402b4d14ad2419d374b124",
+      "beleg_id": "030d2561cf20893d7d68c436764ee082374378753f43c50f7d29389861be1605",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11845,7 +11318,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:06:44Z"
+      "zeitpunkt": "2026-11-17T08:34:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11891,7 +11364,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ef5858a25dd94d96bc8b0981c96727160c7aa200ff03335d2ddbba9a4770f414",
+      "beleg_id": "900a058290be23c8b7fcbd579b0f29f2eff0219f86dfd1228599258413d65b93",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11904,7 +11377,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:06:45Z"
+      "zeitpunkt": "2026-11-17T08:34:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11950,7 +11423,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "355c19a0ba94572879745becee38f491b9c75ffca37e79f95d037e2c2d4d2961",
+      "beleg_id": "d6f36f4159d67798eee0bea0e6e597d0c7cb3c50bee1a76e438593fb6b50c319",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -11963,7 +11436,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:06:45Z"
+      "zeitpunkt": "2026-11-17T08:34:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12009,7 +11482,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "18eb3d1bbed51d210d99728cb48fcea773932fdd4095bb4b7c09778b79c787b6",
+      "beleg_id": "e85303256b4ad68a5ecd54cdd7875b48705266840611f3b5f545f3ea51422044",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12022,7 +11495,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:07:33Z"
+      "zeitpunkt": "2026-11-17T08:35:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12077,7 +11550,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "e557cac6a980cc35ffae88f0a9edacbe106d244e38d0b224e723182e908bb6bd",
+      "beleg_id": "ff90e1e28f235b5606c8b333a0d165fc661effa3950f97f6caac0a46a9c3e303",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12090,7 +11563,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:07:34Z"
+      "zeitpunkt": "2026-11-17T08:35:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12136,7 +11609,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "81ba552114b173bf3038da2b628ea20d7a4e4f253306d6cd34da14d88d9d39d7",
+      "beleg_id": "5a5a8c327708b0bef42222e3651cb5004c86a5b9798c2b6b651f67a1d9aa6f55",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12149,7 +11622,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:07:35Z"
+      "zeitpunkt": "2026-11-17T08:35:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12186,7 +11659,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "91a471b0172072de68f221d7cdd80d36ee760fe94ffc7c524b89e3ba09786f4f",
+      "beleg_id": "a55403a002457f68e1baf2cf83f628bdd96e1e966b51f7985b539b75bb5f2908",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12199,7 +11672,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:08:26Z"
+      "zeitpunkt": "2026-11-17T08:36:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12245,7 +11718,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e540c93762de7c6656ce0b6bba7747c2bca3bbbbcab5cdc2838896316f88c53f",
+      "beleg_id": "e37451ccfe63e6ff635aaae55718610a6477d9ad68854737b73ee3e0e10273ff",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12258,7 +11731,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:08:27Z"
+      "zeitpunkt": "2026-11-17T08:36:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12304,7 +11777,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a264efa4d9e2f28188c31e6fd5d1dc90bdab8de2217fd0d55148a6c9b874659e",
+      "beleg_id": "c7cf538b45b3fb5a2c62d7967cb5931e02334612dc673b06e0f97015966adba3",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12317,7 +11790,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:08:28Z"
+      "zeitpunkt": "2026-11-17T08:36:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12363,7 +11836,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4785848a9c9018f619348146b2db608f5b253dbde863a9635dedf0164ee93401",
+      "beleg_id": "247ff1c95d1453c83251614da99e05e2b34e055b6d764b7aa825e55cd825efad",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12376,7 +11849,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:09:19Z"
+      "zeitpunkt": "2026-11-17T08:37:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12422,7 +11895,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f02b961d1de45e86eaf2690f974b96cd07d5563d1c5dfea541479e04d8c554dd",
+      "beleg_id": "ec2b3ff2665e04a19ffdacbd3c98b2c1685399cb4233723be03ad3945056a150",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12435,7 +11908,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:09:20Z"
+      "zeitpunkt": "2026-11-17T08:37:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12481,7 +11954,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cbcab3f0a617ee50fd16596148ad21166da984d05a02ca6587959cf5594bc508",
+      "beleg_id": "fff40ebfab9dd8de033467479a60a77403bbeb21baeb2424e0694c55bd963610",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12494,7 +11967,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:09:21Z"
+      "zeitpunkt": "2026-11-17T08:37:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12540,7 +12013,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1e2dfadf947fdbcdbdd6453a039dfa956577b630b5ab1962939ba16879391837",
+      "beleg_id": "0b37ec57e82508242f7cf2ac592b1964b498e678d47b567118caf232097fde72",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12553,7 +12026,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:10:16Z"
+      "zeitpunkt": "2026-11-17T08:38:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12608,7 +12081,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "10240b5d0b91e85646ded65da33886dfd678388fe0b4d83c327b1f207c4ffae7",
+      "beleg_id": "de12fdea422600c6e00e85473b5f02139e6039c46e0092dc109253a76d5bdcee",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12621,7 +12094,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:10:17Z"
+      "zeitpunkt": "2026-11-17T08:38:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12667,7 +12140,7 @@
       }
      ],
      "beleg": {
-      "beleg_id": "455cd5fe865acc6ac87fbb1e415715e69c79e69dd4f85e4a6242c1ee4b5881ae",
+      "beleg_id": "8efe8215c1cc6c3f8fea0204232abe840108fefc0c96ca879c4aed293f1287a1",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -12680,7 +12153,7 @@
        "laufzeit: Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"
       ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-16T07:10:17Z"
+      "zeitpunkt": "2026-11-17T08:38:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12711,17 +12184,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 200,
-    "beendet": 198,
+    "anfragen": 207,
+    "beendet": 202,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 1
+     "www.vodafone.de": 4
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.4,
-    "takte_ms": 11800,
+    "sekunden": 12.8,
+    "takte_ms": 9500,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -12745,5 +12218,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10259
+ "zeitbudget_sekunden": 10260
 }
