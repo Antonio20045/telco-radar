@@ -384,7 +384,13 @@ def test_s1_das_einzelbild_wird_mit_der_kennung_der_position_benannt():
 
 def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
     """Folge der Kennung K, die Zeile gehört zu einer anderen ``beleg_id``: kein Bild,
-    ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile)."""
+    ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile).
+
+    UI-D-1717 (Antonio, 17.11.2026): der Vermerk steht EINMAL für die ganze
+    Liste statt je Anbieter, und er nennt den technischen Grund nicht mehr -
+    der steht im Log von ``geraete_zeilenbelege`` und in ``zeilen_grund``.
+    Unverändert bleibt, worauf es hier ankommt: kein fremdes Bild, keine
+    Kennung im Text."""
     fremd_id = "9" * 64
     assert fremd_id[:16] != weg.beleg_id[:16]
     seite = _seite(tmp_path, weg.manifest, fremd_id)
@@ -392,11 +398,13 @@ def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
         li for li in seite.select(".gr-beleg-paar") if li["data-anbieter"] == "o2"
     )
     assert paar.select("img") == [] and paar.select(".gr-bildfolge") == []
-    keins = paar.select_one(".gr-beleg-keins")
+    assert paar.has_attr("hidden")
+    liste = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
+    keins = liste.select_one("li.gr-beleg-keins")
     assert "hidden" not in keins.attrs
-    text = keins.get_text(" ", strip=True)
-    assert "gehört zu einer anderen Messung" in text
-    assert weg.beleg_id[:16] not in text and fremd_id[:16] not in text, text
+    text = seite.get_text(" ", strip=True)
+    assert "Für diese Auswahl gibt es noch keinen Screenshot." in text
+    assert weg.beleg_id[:16] not in text and fremd_id[:16] not in text
     assert "Messung " + fremd_id[:4] not in text
 
 
@@ -659,7 +667,7 @@ def test_ein_geloeschtes_einzelbild_wird_zum_vermerk(weg, tmp_path, chromium):
 
     def erwartet(z, breite):
         assert z["bilder"] == 0 and z["direkt"] == [VERMERK], z
-        assert "Screenshot zu dieser Preiszeile" in z["summary"]
+        assert z["summary"].startswith("Beleg: Screenshot vom "), z["summary"]
 
     _pruefe_ladefehler(
         weg, tmp_path, chromium, manifest, ["__"], erwartet, (1440, 390), "einzel"

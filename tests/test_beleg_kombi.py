@@ -1,8 +1,9 @@
 """Der Beleg folgt der gewählten Kombination (Antonio, 08.11.2026).
 
 Gerät × Speicher × Tarifband × Laufzeit × Anbieter: die Seite zeigt nur ein Bild, dessen
-Preiszeile zur Wahl passt, wechselt es mit der Wahl und sagt ohne Bild „Für diese
-Kombination liegt noch kein Screenshot vor“, nie das Bild einer anderen Kombination.
+Preiszeile zur Wahl passt, wechselt es mit der Wahl und sagt ohne jedes Bild EINMAL
+„Für diese Auswahl gibt es noch keinen Screenshot“ (UI-D-1717, 17.11.2026 - vorher
+stand der Vermerk an jedem Anbieter), nie das Bild einer anderen Kombination.
 Ein Beleg mit ``bildfolge`` zeigt alle Bilder in Reihenfolge mit Schrittbeschriftung.
 Feste Daten, nie das heutige Datum (CLAUDE.md Regel 7). Die Seite wird mit
 ``render_site`` gebaut (Fixture von ``test_beleg_position``), die Wahl im echten
@@ -35,7 +36,7 @@ from telco_radar.beleg_regeln import folge_dateiname
 from telco_radar.report.html import render_site
 
 ID_O2_36 = "e" * 64
-KEINS = "Für diese Kombination liegt noch kein Screenshot vor."
+KEINS = "Für diese Auswahl gibt es noch keinen Screenshot."
 FOLGE = [
     ("geraet_speicher", "iPhone 17 Pro 256 GB gewählt"),
     ("tarif", "O2 Mobile Klein gewählt"),
@@ -159,23 +160,39 @@ def test_luecke_steht_an_der_stelle_ihres_schritts_mit_grund():
 
 
 def _sichtbar(s, anbieter: str) -> dict:
-    """Was der Leser unter dem Anbieter sieht: Zeilen mit Bild und Vermerke."""
+    """Was der Leser unter dem Anbieter sieht: Zeilen mit Bild und Zuordnung.
+
+    UI-D-1717: der Vermerk „kein Screenshot“ steht nicht mehr am Anbieter,
+    sondern EINMAL an der Liste (`_vermerke`); ein Anbieter ohne Bild zu dieser
+    Auswahl ist gar nicht mehr sichtbar."""
     return s.evaluate(
         """(anb) => {
           const li = [...document.querySelectorAll('#gr-bnd-gruppe .gr-beleg-paar')]
             .find(l => l.getAttribute('data-anbieter') === anb);
           const sicht = e => e.getBoundingClientRect().height > 0
             && !e.closest('[hidden]');
-          if (!li || !sicht(li)) return {anbieter: false};
+          if (!li || !sicht(li)) {
+            return {anbieter: false, zeilen: [], zu: [], bilder: 0};
+          }
           return {anbieter: true,
             zeilen: [...li.querySelectorAll('.gr-beleg-zeile')].filter(sicht)
               .map(z => z.querySelector('summary').textContent),
+            zu: [...li.querySelectorAll('.gr-beleg-zeile .gr-beleg-zu')]
+              .map(p => p.textContent),
             bilder: [...li.querySelectorAll('.gr-beleg-zeile img')]
-              .filter(i => sicht(i) || !i.closest('[hidden]')).length,
-            vermerke: [...li.querySelectorAll('.gr-beleg-keins')].filter(sicht)
-              .map(k => k.textContent.trim())};
+              .filter(i => sicht(i) || !i.closest('[hidden]')).length};
         }""",
         anbieter,
+    )
+
+
+def _vermerke(s) -> list:
+    """Der EINE Vermerk der Liste, sofern er wirklich sichtbar ist."""
+    return s.evaluate(
+        """() => [...document.querySelectorAll(
+            '#gr-bnd-gruppe .gr-beleg-paare .gr-beleg-keins')]
+          .filter(e => e.getBoundingClientRect().height > 0)
+          .map(e => e.textContent.trim())"""
     )
 
 
@@ -218,12 +235,14 @@ def test_der_beleg_wechselt_mit_der_laufzeit_und_zeigt_nie_ein_fremdes_bild(
                 s.goto(adresse, wait_until="domcontentloaded")
                 s.click("#gr-zr-laufzeiten button[data-lz='24']")
                 a = _sichtbar(s, "o2")
-                assert len(a["zeilen"]) == 1 and "24 Raten" in a["zeilen"][0], a
-                assert a["bilder"] == len(FOLGE) and a["vermerke"] == [], a
+                assert len(a["zeilen"]) == 1, a
+                assert a["zeilen"][0].startswith("Beleg: "), a
+                assert "24 Raten" in a["zu"][0], a
+                assert a["bilder"] == len(FOLGE) and _vermerke(s) == [], a
                 s.click("#gr-zr-laufzeiten button[data-lz='36']")
                 b = _sichtbar(s, "o2")
-                assert b["zeilen"] == [] and b["bilder"] == 0, b
-                assert b["vermerke"] == [KEINS], b
+                assert b["anbieter"] is False and b["bilder"] == 0, b
+                assert _vermerke(s) == [KEINS], b
                 assert _offene_bilder(s) == 0, breite
                 s.click("#gr-zr-laufzeiten button[data-lz='24']")
                 assert _sichtbar(s, "o2")["bilder"] == len(FOLGE)

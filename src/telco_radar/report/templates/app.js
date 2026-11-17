@@ -2921,9 +2921,14 @@ var TelcoFrage = (function () {
 
   /* Belege folgen der gewaehlten Kombination (Antonio, 08.11.2026): je Anbieter
      nur die Bilder, deren Preiszeile Band UND Laufzeit der Wahl traegt - dieselbe
-     Regel wie bei den Zeilen oben (leer = unter jeder Wahl). Kein Bild fuer genau
-     diese Kombination: der Vermerk, nie das Bild einer anderen. Hat der Anbieter
-     in der Wahl gar keine Zeile, tritt er zurueck (die Fehlliste nennt ihn). */
+     Regel wie bei den Zeilen oben (leer = unter jeder Wahl). Nie das Bild einer
+     anderen Kombination.
+
+     UI-D-1717 (Antonio, 17.11.2026): ein Anbieter ohne Bild zu dieser Auswahl
+     tritt ZURUECK, statt seinen eigenen Vermerk zu zeigen - acht Anbieter
+     ergaben acht Zeilen "liegt noch kein Screenshot vor" untereinander. Zeigt
+     die ganze Liste kein einziges Bild, sagt es EINE Zeile am Ende
+     (`.gr-beleg-keins`); dann tritt auch ihr Kopf zurueck. */
   function belegPasst(kombi, band, lz) {
     var t = kombi.split(':');
     var bandOk = !band || !t[0] || t[0] === band;
@@ -2931,36 +2936,28 @@ var TelcoFrage = (function () {
     return bandOk && lzOk;
   }
 
-  /* Hat der Anbieter in der Wahl eine Zeile? Bei gewaehltem Band zaehlt nur eine
-     Zeile, die dieses Band NENNT: eine Zeile ohne Tarifband steht zwar unter jeder
-     Wahl, macht aus einem Anbieter ohne Tarif in dieser Stufe aber keinen mit
-     „kein Screenshot“ (Live-Abnahme 08.11.2026, A3; die Tafel sagt dort
-     „Nur in anderen Bändern“). */
-  function belegHatZeile(kombi, band, lz) {
-    var t = kombi.split(':');
-    var bandOk = !band || t[0] === band;
-    var lzOk = lz === 'alle' || !t[1] || t[1] === lz;
-    return bandOk && lzOk;
-  }
-
   function stelleBelege(band, lz) {
     Array.prototype.forEach.call(
-      document.querySelectorAll('#gr-bnd-gruppe .gr-beleg-paar'),
-      function (li) {
-        var kombis = (li.getAttribute('data-kombis') || '').split(' ')
-          .filter(Boolean);
-        var hat = kombis.some(function (k) { return belegHatZeile(k, band, lz); });
-        var sichtbar = 0;
+      document.querySelectorAll('#gr-bnd-gruppe .gr-beleg-paare'),
+      function (liste) {
+        var gesamt = 0;
         Array.prototype.forEach.call(
-          li.querySelectorAll('.gr-beleg-zeile'), function (z) {
-            var passt = belegPasst(z.getAttribute('data-kombi') || ':',
-                                   band, lz);
-            z.hidden = !passt;
-            if (passt) sichtbar += 1;
+          liste.querySelectorAll('.gr-beleg-paar'), function (li) {
+            var sichtbar = 0;
+            Array.prototype.forEach.call(
+              li.querySelectorAll('.gr-beleg-zeile'), function (z) {
+                var passt = belegPasst(z.getAttribute('data-kombi') || ':',
+                                       band, lz);
+                z.hidden = !passt;
+                if (passt) sichtbar += 1;
+              });
+            li.hidden = sichtbar === 0;
+            gesamt += sichtbar;
           });
-        li.hidden = !hat && sichtbar === 0;
-        var keins = li.querySelector('.gr-beleg-keins');
-        if (keins) keins.hidden = sichtbar > 0;
+        var keins = liste.querySelector('.gr-beleg-keins');
+        if (keins) keins.hidden = gesamt > 0;
+        var kopf = liste.querySelector('.gr-beleg-kopf');
+        if (kopf) kopf.hidden = gesamt === 0;
       });
   }
 

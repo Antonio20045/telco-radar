@@ -20,10 +20,15 @@
    Tarifband x Laufzeit x Anbieter (Antonio, 08.11.2026). Je Anbieter stehen nur
    Bilder, deren Preiszeile Band und Laufzeit der Wahl traegt
    (`data-kombi`, wie `data-band`/`data-lz` der Zeilen; `app.js` blendet in
-   `stelleZeilen`). Ohne Bild fuer genau diese Kombination sagt die Zeile es
-   ("Fuer diese Kombination liegt noch kein Screenshot vor"); das Seitenbild des
-   Paares (Modell, Anbieter) zeigt EINE unbekannte Konfiguration und steht nirgends
-   mehr als Ersatz. Hat ein Beleg eine Bildfolge (`z.bildfolge`), stehen alle Bilder
+   `stelleZeilen`). UI-D-1717 (Antonio, 17.11.2026): ein Anbieter OHNE Bild zu
+   dieser Auswahl steht gar nicht mehr da - bis dahin stand der Vermerk an jedem
+   der acht Anbieter einzeln und die Stelle las sich als achtfaches
+   "liegt noch kein Screenshot vor". Hat KEIN Anbieter ein Bild, sagt es EINE
+   Zeile am Ende der Liste (`.gr-beleg-keins`, `role=status`). Der technische
+   Grund der Nichtzuordnung ("gleich teure Positionen", "keine Klick-Messung")
+   steht nicht mehr auf der Seite, sondern im Log (`geraete_zeilenbelege`); das
+   Seitenbild des Paares (Modell, Anbieter) zeigt EINE unbekannte Konfiguration
+   und steht nirgends als Ersatz. Hat ein Beleg eine Bildfolge (`z.bildfolge`), stehen alle Bilder
    in Reihenfolge mit Schrittbeschriftung; ein Schritt ohne veroeffentlichte Datei
    steht mit seinem Grund da ("Kein Bild: ...") und ohne `<img>`, die Zaehlung
    "Schritt i von N" umfasst Bilder und Luecken. `data-kombis` nennt alle Kombinationen
@@ -32,20 +37,21 @@
    Aufklappen (`data-src`); laedt ein Bild nicht (Datei geloescht), steht an seiner
    Stelle "Bild nicht mehr verfuegbar" und `.gr-folge-zahl` zaehlt neu. Die Zuordnung rechnet Python
    (`report/geraete_zeilenbelege.py`). #}
-{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}
-<ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Kombination">
-  <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifstufe, Laufzeit und Anbieter</li>{% for p in paare %}
-  <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ haendlername(p.anbieter) }}</b>{% for z in p.zeilenbilder %}
+{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}{% set mit_bild = paare | selectattr('zeilenbilder') | list | length %}
+<ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Auswahl">
+  <li class="gr-beleg-kopf"{% if not mit_bild %} hidden{% endif %}>Screenshots zu dieser Auswahl</li>{% for p in paare %}
+  <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"{% if not p.zeilenbilder %} hidden{% endif %}><b class="gr-beleg-anbieter">{{ haendlername(p.anbieter) }}</b>{% for z in p.zeilenbilder %}
     <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
-      <summary>{% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge (<span class="gr-folge-zahl">{% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}</span>){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
+      <summary>Beleg: {% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge (<span class="gr-folge-zahl">{% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}</span>){% else %}Screenshot{% endif %} vom {{ z.datum | date_de }}</summary>
+      <p class="gr-beleg-zu">Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</p>{% if z.bildfolge %}
       <ol class="gr-bildfolge">{% for f in z.bildfolge %}
         {% if not f.url %}<li class="gr-bildfolge-luecke"><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span><span class="gr-bildfolge-text">Kein Bild: {{ f.fehlt }}</span></li>{% else %}<li><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span>{% if f.text %}<span class="gr-bildfolge-text">{{ f.text }}</span>{% endif %}
           <img data-src="{{ f.url }}" alt="Screenshot {{ haendlername(p.anbieter) }}, {{ z.tarif }}, Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}, vom {{ z.datum | date_de }}" width="640" height="400"></li>{% endif %}{% endfor %}
       </ol>{% else %}
       <img data-src="{{ z.url }}" alt="Screenshot {{ haendlername(p.anbieter) }}, {{ z.tarif }}, vom {{ z.datum | date_de }}" width="640" height="400">{% endif %}
     </details></div>{% endfor %}
-    <span class="gr-beleg-keins" role="status"{% if p.zeilenbilder %} hidden{% endif %}>Für diese Kombination liegt noch kein Screenshot vor.{% if p.zeilen_grund %} ({{ p.zeilen_grund }}){% endif %}</span>
   </li>{% endfor %}
+  <li class="gr-beleg-keins" role="status"{% if mit_bild %} hidden{% endif %}>Für diese Auswahl gibt es noch keinen Screenshot.</li>
 </ul>{% endif %}{% endif %}{% endmacro %}
 
 {# UI-1717 Aufgabe 4: mobilcom-debitel.de leitet vollstaendig auf freenet.de -

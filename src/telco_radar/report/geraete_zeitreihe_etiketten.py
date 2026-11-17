@@ -1,4 +1,4 @@
-"""Namensetiketten am rechten Rand der Zeitreihe: Name, Zeitraum, Abrufdatum.
+"""Namensetiketten am rechten Rand der Zeitreihe: Name, Zeitraum, Endwert.
 
 Aus `geraete_zeitreihe` ausgelagert (Issue 125). Ein langer Name mit Netz
 („Saturn/MediaMarkt · Telekom-Netz“) steht zweizeilig und kleiner, schmal mit
@@ -6,13 +6,20 @@ breiterem Rand. Etiketten rücken nie näher als ihre eigene Höhe zusammen; rei
 das Bild dafür nicht, wird es höher (`mindesthoehe`). Etiketten rücken nach unten
 wie bisher (`_gestapelt`); erst wenn dabei eines unter die Linie des nächsten
 Anbieters oder aus dem Bild geriete, stehen sie zentriert (`_platziere`).
+
+UI-D-1717 (Antonio, 17.11.2026): der ENDWERT steht hier, unter seinem Namen, in
+der Farbe seiner Linie - nicht mehr frei im Bild. Im Bild stapelten sich die
+Beträge mehrerer Anbieter (1.694/1.516/1.487/1.368/1.352) zu einer Säule, die
+keiner Linie mehr zuzuordnen war. Das Abrufdatum ist dafür gefallen: es stand an
+jedem Etikett als dritte Zeile und sagte an sieben Linien siebenmal denselben
+Tag; den Tag jeder einzelnen Messung nennt der Tooltip am Punkt.
 """
 
 from __future__ import annotations
 
 from .anbieter_farben import stil_fuer
-from .geraete_rechenweg import _datum_kurz, _esc
-from .geraete_zeitreihe_legende import NAMEN_TRENNER, _mon_kurz, zweizeilig
+from .geraete_rechenweg import _esc
+from .geraete_zeitreihe_legende import NAMEN_TRENNER, _euro0, _mon_kurz, zweizeilig
 
 ENDLABEL_RAND = 6
 RAND_RECHTS = {True: 158, False: 96}
@@ -24,8 +31,9 @@ ZWEITE_ZEILE = {True: 14, False: 12}
 SCHRIFT_ZWEIZEILIG = {True: 13, False: 11}
 """Schrift (px) und Zeilenabstand eines zweizeiligen Namens; die übrigen 15 px."""
 ETIKETT_OBEN = 8
-ETIKETT_UNTEN = 21
-"""Ein Etikett reicht von ty - 8 (Oberkante Name) bis ty + 21 (Datum mit Unterlänge)."""
+ETIKETT_UNTEN = 24
+"""Ein Etikett reicht von ty - 8 (Oberkante Name) bis ty + 24 (Endwert, 13,5 px
+fett, mit Unterlänge)."""
 
 
 def rand_rechts(anbieter: list[str], breit: bool) -> int:
@@ -153,8 +161,13 @@ def namensetiketten(
     beleg_je: dict,
     mon_je: dict,
     mehrere: bool,
+    wert_je: dict | None = None,
 ) -> list[str]:
-    """Je Kurvenende (x, y, Anbieter), von oben nach unten sortiert, ein Etikett."""
+    """Je Kurvenende (x, y, Anbieter), von oben nach unten sortiert, ein Etikett.
+
+    `wert_je` ist der letzte gemessene Betrag je Anbieter - dieselbe Zahl, die
+    der letzte Punkt der Kurve trägt (nicht nachgerechnet). Ohne Angabe steht
+    unter dem Namen keine Zahl: auf dem schmalen Bild trägt sie die Legende."""
     folge = [a for _x, _y, a in enden]
     abstaende = _abstaende(folge, breit, mon_je, mehrere)
     ideal = [y for _x, y, _a in enden]
@@ -167,7 +180,7 @@ def namensetiketten(
     for a, ty in zip(folge, tys, strict=True):
         farbe = stil_fuer(a).farbe
         mon_text = _mon(a, mon_je, mehrere)
-        url, datum = beleg_je.get(a, ("", ""))
+        url, _datum = beleg_je.get(a, ("", ""))
         zeilen = (
             f" data-zeilen='2' style='font-size:{SCHRIFT_ZWEIZEILIG[breit]}px'"
             if zweizeilig(a)
@@ -193,10 +206,11 @@ def namensetiketten(
                 f"x='{lx:.1f}' y='{unter + 17:.1f}' "
                 f"text-anchor='end'>{_esc(mon_text)}</text>"
             )
-        if datum:
+        wert = (wert_je or {}).get(a)
+        if wert is not None:
             teile.append(
-                f"<text class='gr-zr-datum' x='{lx:.1f}' "
-                f"y='{unter + 17 + mon:.1f}' "
-                f"text-anchor='end'>{_datum_kurz(datum)}</text>"
+                f"<text class='gr-zr-wert gr-zr-endwert' x='{lx:.1f}' "
+                f"y='{unter + 18 + mon:.1f}' text-anchor='end' "
+                f"style='fill:{farbe}'>{_euro0(round(wert))}</text>"
             )
     return teile

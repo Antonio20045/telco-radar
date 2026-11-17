@@ -233,6 +233,11 @@ def quote(fuer: ZeilenbelegFuer, modelle: list[dict], bestand_ok: bool = True) -
 
     ``satz`` ist der fertige Text der Seite; ohne Zeile oder bei unlesbarem Bestand
     bleibt er leer (der Ausfall nennt es), statt „0 von N“ zu behaupten.
+
+    UI-D-1717 (Antonio, 17.11.2026): der Satz nennt nur noch die EINE Zahl. Die
+    Aufzählung je Anbieter („1&1 64 von 453 · congstar 0 von 866 · …“) stand als
+    siebengliedrige Zeile unter der Belegliste und war für den Leser kein Satz
+    mehr; ``je_anbieter`` trägt sie unverändert weiter.
     """
     je_anbieter: dict[str, list[int]] = {}
     for modell in modelle:
@@ -248,12 +253,8 @@ def quote(fuer: ZeilenbelegFuer, modelle: list[dict], bestand_ok: bool = True) -
     gesamt = sum(e["gesamt"] for e in liste)
     satz = ""
     if gesamt and bestand_ok:
-        teile = " · ".join(
-            f"{e['anbieter']} {_zahl(e['mit'])} von {_zahl(e['gesamt'])}" for e in liste
-        )
         satz = (
-            "Preiszeilen mit eigenem Screenshot, Zuordnung über die Messung "
-            f"(aus dem Bild allein nicht ablesbar): {teile}; "
-            f"zusammen {_zahl(mit)} von {_zahl(gesamt)}."
+            f"Mit eigenem Screenshot belegt: {_zahl(mit)} von "
+            f"{_zahl(gesamt)} Preiszeilen."
         )
     return {"mit": mit, "gesamt": gesamt, "je_anbieter": liste, "satz": satz}

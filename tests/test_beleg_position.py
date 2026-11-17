@@ -132,7 +132,12 @@ def _anzahl(lager: BeautifulSoup) -> dict[str, int]:
 
 def test_die_eindeutige_zeile_steht_im_paar_eintrag_mit_ihrem_bild(lager, seite):
     """Positiv: o2 hat einen Satz; jede o2-Zeile steht im sichtbaren Paar-Eintrag
-    mit Tarif, Raten und Preis, das Bild gehört genau zu ihr."""
+    mit Tarif, Raten und Preis, das Bild gehört genau zu ihr.
+
+    UI-D-1717 (Antonio, 17.11.2026): zugeklappt steht nur noch „Beleg:
+    Screenshot vom <Datum>“; Tarif, Raten und Preis nennt die Zuordnungszeile
+    im aufgeklappten Beleg, neben dem Bild - nicht mehr als Satzschlange im
+    Lesefluss."""
     n_o2 = _anzahl(lager)["o2"]
     assert n_o2, "Gegenprobe: die Fixture hat o2-Zeilen"
     zeilen = _paare(seite)["o2"].select(".gr-beleg-zeile details.gr-belege--zeile")
@@ -143,55 +148,62 @@ def test_die_eindeutige_zeile_steht_im_paar_eintrag_mit_ihrem_bild(lager, seite)
             in z.select_one("img[data-src]")["data-src"]
         )
         titel = _text(z.summary)
-        assert "O2 Mobile Klein" in titel
-        assert "24 Raten" in titel
-        assert "Zuordnung über die Messung" in titel
-        assert "€" in titel
+        assert titel.startswith("Beleg: Screenshot vom "), titel
+        assert "O2 Mobile Klein" not in titel
+        zu = _text(z.select_one(".gr-beleg-zu"))
+        assert "Zuordnung über die Messung" in zu
+        assert "O2 Mobile Klein" in zu
+        assert "24 Raten" in zu
+        assert "€" in zu
 
 
-def test_unklare_zuordnung_zeigt_kein_zeilenbild_sondern_den_grund(lager, seite):
+def test_unklare_zuordnung_zeigt_kein_zeilenbild(lager, seite):
     """Fail-closed: gleich teure Sätze (Telekom), neuerer Abruf als das Bild (congstar)
     und fehlende Klick-Messung (Vodafone) ergeben nie ein Bild an einer Zeile, obwohl
-    die Paare ein Seiten-Bild haben; der Paar-Eintrag nennt die Zahl und den Grund."""
+    die Paare ein Seiten-Bild haben.
+
+    UI-D-1717: der technische Grund steht nicht mehr auf der Seite (er stand an
+    jedem Anbieter einzeln und war Fachsprache); er bleibt im Log von
+    ``geraete_zeilenbelege`` und in ``zeilen_grund``. Auf der Seite tritt der
+    Anbieter ohne Bild ganz zurück - nur o2 steht hier."""
     paare = _paare(seite)
     n = _anzahl(lager)
-    gruende = {
-        "Telekom": schluessel.GRUND_GLEICHSTAND,
-        "congstar": schluessel.GRUND_BESTAND_NEUER,
-        "Vodafone": schluessel.GRUND_KEIN_KLICKSATZ,
-    }
-    for anbieter, grund in gruende.items():
+    text = seite.get_text(" ", strip=True)
+    for anbieter in ("Telekom", "congstar", "Vodafone"):
         assert n[anbieter], f"Gegenprobe: Zeilen für {anbieter}"
         li = paare[anbieter]
         assert li.select("details, img, .gr-beleg-zeile") == []
-        text = li.select_one(".gr-beleg-keins").get_text(strip=True)
-        assert text == (
-            f"Für diese Kombination liegt noch kein Screenshot vor. ({grund})"
-        )
+        assert li.has_attr("hidden"), anbieter
+    for grund in (
+        schluessel.GRUND_GLEICHSTAND,
+        schluessel.GRUND_BESTAND_NEUER,
+        schluessel.GRUND_KEIN_KLICKSATZ,
+    ):
+        assert grund not in text, grund
 
 
-def test_quote_nennt_je_anbieter_zeilen_nicht_paare(lager, seite):
-    """Die Seite zählt Zeilen je Anbieter, ehrlich auch bei 0, und sagt, dass die
-    Zuordnung über die Messung läuft und das Bild nur die Preisfelder zeigt."""
+def test_quote_nennt_eine_zahl_ohne_aufzaehlung(lager, seite):
+    """Die Seite zählt Zeilen mit eigenem Bild gegen alle Preiszeilen - EINE Zahl.
+
+    UI-D-1717: die Aufzählung je Anbieter („congstar 0 von N · o2 …“) ist von der
+    Seite genommen; ``quote()['je_anbieter']`` trägt sie unverändert weiter."""
     n = _anzahl(lager)
     satz = seite.select_one("#gr-zeilenquote").get_text(strip=True)
-    erwartet = (
-        "Preiszeilen mit eigenem Screenshot, Zuordnung über die Messung "
-        "(aus dem Bild allein nicht ablesbar): "
-        f"congstar 0 von {n['congstar']} · o2 {n['o2']} von {n['o2']} · "
-        f"Telekom 0 von {n['Telekom']} · Vodafone 0 von {n['Vodafone']}; "
-        f"zusammen {n['o2']} von {sum(n.values())}."
+    assert satz == (
+        f"Mit eigenem Screenshot belegt: {n['o2']} von {sum(n.values())} Preiszeilen."
     )
-    assert satz == erwartet
     assert "Paaren" not in satz
-    assert "Tarif und Laufzeit stimmen" not in satz
+    assert "congstar" not in satz
 
 
 def test_paar_nennt_seine_zeilen_mit_bild(lager, seite):
     n_o2 = _anzahl(lager)["o2"]
     o2 = _paare(seite)["o2"]
     assert len(o2.select(".gr-beleg-zeile")) == n_o2
-    assert o2.select_one(".gr-beleg-keins").has_attr("hidden")
+    assert not o2.has_attr("hidden")
+    liste = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
+    assert liste.select_one("li.gr-beleg-keins").has_attr("hidden")
+    assert not liste.select_one(".gr-beleg-kopf").has_attr("hidden")
 
 
 def test_fragment_traegt_keine_zeilenbilder_an_der_buendelliste(lager):
@@ -225,7 +237,7 @@ def _pruefe_breite(chromium, adresse: str, breite: int) -> list[str]:
         s.goto(adresse, wait_until="domcontentloaded")
         zeile = s.locator(f"{ZEILE} > summary").first
         assert zeile.is_visible(), breite
-        assert "Zuordnung über die Messung" in zeile.inner_text()
+        assert zeile.inner_text().startswith("Beleg: Screenshot vom ")
         zeile.click()
         s.wait_for_function(f"document.querySelector('{OFFEN}').hasAttribute('src')")
         assert s.locator(OFFEN).is_visible(), breite

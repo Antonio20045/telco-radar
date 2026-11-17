@@ -2,8 +2,12 @@
 
 Ein Bild gehört zum Paar (Modell, Anbieter), nicht zu einer Preiszeile; welchen Tarif es
 zeigt, ist maschinell nicht feststellbar. Darum zeigt die Seite es nie: ohne
-bestätigende Preiszeile steht je Anbieter der Vermerk „Für diese Kombination liegt noch
-kein Screenshot vor“, kein Bild, kein Link, keine Paar-Quote. Feste Daten, nie das
+bestätigende Preiszeile steht kein Bild, kein Link, keine Paar-Quote.
+
+UI-D-1717 (Antonio, 17.11.2026): der Vermerk steht EINMAL für die ganze Liste
+(„Für diese Auswahl gibt es noch keinen Screenshot.“), nicht mehr je Anbieter -
+bei acht Anbietern standen acht gleichlautende Zeilen untereinander. Ein
+Anbieter ohne Bild zu dieser Auswahl tritt ganz zurück. Feste Daten, nie das
 heutige Datum (CLAUDE.md Regel 7). Die Seite wird mit `render_site` gebaut (kleiner
 Bestand aus `test_geraete_buendel_kopf_zeitraum`), danach wird das DOM gelesen.
 """
@@ -64,7 +68,7 @@ def lager(site) -> BeautifulSoup:
 
 def test_paar_bild_steht_nie_als_beleg_auf_der_seite(seite):
     """Telekom und o2 haben ein Paar-Bild im Manifest, aber keinen Bildsatz: die Seite
-    zeigt kein Bild, nur den Vermerk je Anbieter (nichts Fremdes als Ersatz)."""
+    zeigt kein Bild, nur den einen Vermerk der Liste (nichts Fremdes als Ersatz)."""
     zone = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
     assert zone.select("img, details, a") == []
     assert "zeigt nicht jeden Tarif" not in seite.get_text(" ", strip=True)
@@ -74,20 +78,29 @@ def test_paar_bild_steht_nie_als_beleg_auf_der_seite(seite):
     assert sorted(namen) == sorted(MIT_BILD + OHNE_BILD)
 
 
-def test_jeder_anbieter_ohne_zeilenbild_bekommt_den_sichtbaren_vermerk(seite):
-    """ "Kein Preis" und "kein Bild" sind unterscheidbar, nichts erfunden."""
-    zeilen = seite.select("#gr-bnd-gruppe .gr-beleg-paare li.gr-beleg-paar")
+def test_ohne_ein_einziges_zeilenbild_steht_der_vermerk_genau_einmal(seite):
+    """UI-D-1717: EINE Zeile für die ganze Liste, kein Anbieter mit eigenem Vermerk.
+
+    Gegenprobe zum alten Stand: vier Anbieter stehen in der Liste (jeder mit
+    seinem Namen im DOM), aber keiner trägt einen eigenen „kein Screenshot“-Satz
+    und keiner ist sichtbar - sonst wären es wieder vier Zeilen."""
+    liste = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
+    zeilen = liste.select("li.gr-beleg-paar")
     je_anbieter = {
         z.select_one(".gr-beleg-anbieter").get_text(strip=True): z for z in zeilen
     }
     assert sorted(je_anbieter) == sorted(MIT_BILD + OHNE_BILD)
     for z in je_anbieter.values():
-        keins = z.select_one(".gr-beleg-keins")
-        assert keins.get_text(strip=True).startswith(
-            "Für diese Kombination liegt noch kein Screenshot vor."
-        )
-        assert not keins.has_attr("hidden")
+        assert z.select(".gr-beleg-keins") == []
+        assert z.has_attr("hidden"), "ein Anbieter ohne Bild steht noch da"
         assert z.select("details, img, a") == []
+    vermerke = liste.select("li.gr-beleg-keins")
+    assert len(vermerke) == 1
+    assert vermerke[0].get_text(strip=True) == (
+        "Für diese Auswahl gibt es noch keinen Screenshot."
+    )
+    assert not vermerke[0].has_attr("hidden")
+    assert liste.select_one(".gr-beleg-kopf").has_attr("hidden")
     assert "ohne Beleg" not in seite.get_text(" ", strip=True)
 
 
@@ -159,8 +172,8 @@ def test_manifest_json_der_fixture_ist_lesbar(site):
     assert len(json.loads(pfad.read_text(encoding="utf-8"))["belege"]) == 2
 
 
-def test_im_browser_steht_je_anbieter_der_vermerk_ohne_bild(site, chromium):
-    """Sichtbar gezählt wie ein Leser, 1440 und 390 px: Vermerke, kein Bild."""
+def test_im_browser_steht_der_vermerk_genau_einmal_ohne_bild(site, chromium):
+    """Sichtbar gezählt wie ein Leser, 1440 und 390 px: EIN Vermerk, kein Bild."""
     import functools
     import http.server
     import threading
@@ -177,12 +190,12 @@ def test_im_browser_steht_je_anbieter_der_vermerk_ohne_bild(site, chromium):
                 s = ctx.new_page()
                 url = f"http://127.0.0.1:{httpd.server_address[1]}/geraete.html"
                 s.goto(url, wait_until="domcontentloaded")
-                keins = s.locator(
-                    "#gr-bnd-gruppe .gr-beleg-paar:visible .gr-beleg-keins"
-                )
-                assert keins.count() >= 1, breite
-                for i in range(keins.count()):
-                    assert keins.nth(i).is_visible(), breite
+                keins = s.locator("#gr-bnd-gruppe .gr-beleg-keins")
+                assert keins.count() == 1, breite
+                assert keins.first.is_visible(), breite
+                assert (
+                    s.locator("#gr-bnd-gruppe .gr-beleg-paar:visible").count() == 0
+                ), breite
                 assert s.locator("#gr-bnd-gruppe .gr-beleg-paare img").count() == 0
                 assert s.evaluate("document.documentElement.scrollWidth") <= breite, (
                     breite

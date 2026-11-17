@@ -290,10 +290,17 @@ _FUENF_STRUKTUR = {
 Punkte und (Name, y) der Namensetiketten für `_serien(FUENF)`."""
 
 _FUENF_SHA = {
-    "breit": "7cd10fe1ead88a25537c4a5874b9d4c5e494f641c7707c20b5ac3f611f8685c8",
-    "schmal": "6de33c266dff7615a36866576b978ed1629290314159b67155c1415cf28a9e9d",
+    "breit": "624306d7fd6d1a9470391778ceb7696ef8fb4741782ef5261527a03a9c8df082",
+    "schmal": "e952a0bed933b50387ca909710802c3c877ebf11ec0492ee37b37a23466afb46",
     "legende": "b7e6341ef486fc5476865b487948598a92c918eab0ddbcb20c795619d3736ca4",
 }
+"""Nachgezogen am 17.11.2026 (UI-D-1717): der Endwert steht jetzt unter seinem
+Namen am rechten Rand statt frei im Bild, das Abrufdatum am Etikett ist
+gefallen. Die STRUKTUR (Zeichenreihenfolge und Etikettenhöhen,
+`test_gegenprobe_fuenf_ohne_haendler_struktur_unveraendert`) ist dabei
+unverändert geblieben - nur die Textknoten des Bildes sind andere; die Legende
+berührt der Umbau nicht und trägt ihre alte Prüfsumme weiter."""
+
 _PAAR_OHNE_STRUKTUR = {
     "svg_breit": (
         ["Vodafone", "o2", "1&1", "congstar"],
