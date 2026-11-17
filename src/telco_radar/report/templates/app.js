@@ -5546,7 +5546,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   if (!sec || !roh || !zeit) return;
   var D;
   try { D = JSON.parse(roh.textContent); } catch (e) { return; }
-  var MINUS = '−', NB = ' ';
+  var MINUS = '−', NB = ' ', KEIN_PREIS = 'kein Preis';
   var eigen = document.getElementById('hm-eigen');
   var von = document.getElementById('hm-von'), bis = document.getElementById('hm-bis');
   var einheit = document.getElementById('hm-einheit');
@@ -5596,33 +5596,72 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     });
     return n ? { m: s / n, n: n } : null;
   }
+  /* Die Punkte sitzen auf der FESTEN Achse aus D.achse (sie umfasst jeden
+     wählbaren Zeitraum): der Zeitraumwechsel verschiebt nur die Punkte, nie
+     das Raster. Gleiche Rechnung wie geraete_hersteller_punkte.x_fuer. */
+  function xFuer(wert, mass) {
+    var a = (wert - D.achse.von) / (D.achse.bis - D.achse.von);
+    return mass.x0 + Math.min(Math.max(a, 0), 1) * (mass.x1 - mass.x0);
+  }
+  function setzeTitel(g, text) {
+    var t = g.querySelector('title');
+    if (t) t.textContent = text;
+  }
+  function zeichneZeile(zeile, erg, mass) {
+    var h = zeile.getAttribute('data-hersteller');
+    var alle = zeile.classList.contains('gr-hm-zeile--alle');
+    var y = parseFloat(zeile.getAttribute('data-y')) || 0;
+    var da = [], fehlt = [];
+    [].forEach.call(zeile.querySelectorAll('.gr-pp-punkt'), function (p) {
+      var name = p.getAttribute('data-anbieter');
+      var j = D.w.indexOf(name);
+      var e = j < 0 ? null : mittel(erg.zeilen, alle ? null : h, j);
+      if (!e) {
+        p.setAttribute('hidden', 'hidden');
+        p.classList.remove('gr-pp-duenn');
+        setzeTitel(p, name + ': ' + KEIN_PREIS);
+        fehlt.push(name);
+        return;
+      }
+      p.removeAttribute('hidden');
+      p.classList.toggle('gr-pp-duenn', e.n < D.klein);
+      var x = xFuer(e.m, mass);
+      p.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
+      setzeTitel(p, name + ': ' + prozent(e.m) + ' · ' + richtung(e.m) + ' · ' + modelle(e.n));
+      da.push({ x: x, m: e.m });
+    });
+    da.sort(function (a, b) { return a.m - b.m; });
+    var spanne = zeile.querySelector('.gr-pp-spanne');
+    if (spanne) {
+      if (da.length > 1) {
+        spanne.removeAttribute('hidden');
+        spanne.setAttribute('x1', da[0].x.toFixed(1));
+        spanne.setAttribute('x2', da[da.length - 1].x.toFixed(1));
+        spanne.setAttribute('y1', y.toFixed(1));
+        spanne.setAttribute('y2', y.toFixed(1));
+      } else spanne.setAttribute('hidden', 'hidden');
+    }
+    var tief = zeile.querySelector('.gr-hm-tief');
+    var hoch = zeile.querySelector('.gr-hm-hoch');
+    if (tief) {
+      tief.textContent = da.length > 1 ? prozent(da[0].m) : '';
+      if (da.length > 1) tief.setAttribute('x', (da[0].x - 14).toFixed(1));
+      tief.setAttribute('y', (y + 4).toFixed(1));
+    }
+    if (hoch) {
+      hoch.textContent = da.length ? prozent(da[da.length - 1].m) : '';
+      if (da.length) hoch.setAttribute('x', (da[da.length - 1].x + 14).toFixed(1));
+      hoch.setAttribute('y', (y + 4).toFixed(1));
+    }
+    var luecke = zeile.querySelector('.gr-pp-fehlt');
+    if (luecke) luecke.textContent = fehlt.length ? fehlt.join(', ') + ': ' + KEIN_PREIS : '';
+  }
   function zeichne(erg) {
-    [].forEach.call(sec.querySelectorAll('.gr-hm-zeile'), function (zeile) {
-      var h = zeile.getAttribute('data-hersteller');
-      var alle = zeile.classList.contains('gr-hm-zeile--alle');
-      [].forEach.call(zeile.querySelectorAll('.gr-hm-zelle'), function (zelle) {
-        var j = D.w.indexOf(zelle.getAttribute('data-anbieter'));
-        var e = j < 0 ? null : mittel(erg.zeilen, alle ? null : h, j);
-        var zahl = zelle.querySelector('.gr-hm-zahl');
-        var balken = zelle.querySelector('.gr-hm-balken');
-        var rr = zelle.querySelector('.gr-hm-r'), mm = zelle.querySelector('.gr-hm-m');
-        zelle.classList.toggle('gr-hm-leer', !e);
-        zelle.classList.toggle('gr-hm-duenn', !!e && e.n < D.klein);
-        if (!e) {
-          zelle.removeAttribute('data-wert'); zelle.removeAttribute('data-n');
-          zahl.textContent = '–'; balken.hidden = true;
-          rr.textContent = ''; mm.textContent = 'kein Preis';
-          return;
-        }
-        var b = Math.min(Math.abs(e.m), D.skala) / D.skala * 50;
-        zelle.setAttribute('data-wert', e.m.toFixed(2));
-        zelle.setAttribute('data-n', String(e.n));
-        zahl.textContent = prozent(e.m);
-        balken.hidden = false;
-        balken.style.left = (e.m >= 0 ? 50 : 50 - b).toFixed(2) + '%';
-        balken.style.width = b.toFixed(2) + '%';
-        rr.textContent = richtung(e.m) + ' · ';
-        mm.textContent = modelle(e.n);
+    [].forEach.call(sec.querySelectorAll('.gr-pp-bild'), function (bild) {
+      var mass = D.masse[bild.getAttribute('data-mass')];
+      if (!mass) return;
+      [].forEach.call(bild.querySelectorAll('.gr-hm-zeile'), function (zeile) {
+        zeichneZeile(zeile, erg, mass);
       });
     });
   }

@@ -24,6 +24,33 @@ kommt die Anzeige mit Slug und Anschlusspreis DER PROBE in die Referenz.
 Eine gelesene Probe sperrt die Anzeige fuer den Lauf, ob sie haelt oder
 nicht; eine nicht gelesene (Abruffehler) nicht - sie darf an einem anderen
 Geraet wiederholt werden, bis `PROBEN_JE_ANZEIGE` Proben ungelesen blieben.
+
+DER BEFUND VOM 17.11.2026: DIE PROBE KAM NIE ZUM ZUG
+----------------------------------------------------
+Die Probe darf nur an einer Antwort ansetzen, deren eigener Tarif schon in
+der Referenz steht - und seit dem Abend des 13.11.2026 ist das genau die
+Haelfte des Katalogs, die nichts Neues kennt. o2 bietet die fuenf
+"Plus"-Tarife nur an einem Teil der Geraete an, und diese Geraete stehen im
+Katalog schon in einem "Plus"-Tarif. Gemessen am 17.11.2026 (Katalog mit
+Tarif, 70 Saetze): 8 Saetze stehen in "O2 Mobile on Demand M mit 50 GB+",
+ihre Produktseite bietet SIEBEN Tarife (Samsung Galaxy A27 5G, Xiaomi Redmi
+Note 17 5G, Apple iPhone 18 Pro Max - je sieben); die anderen 62 stehen in
+einem "Plus"-Tarif und bieten ZWOELF. Die Referenz entsteht am ersten
+Geraet, und `buendel_prioritaet.nach_prioritaet` stellt die Pflichtmodelle
+vorn - also das iPhone 18 Pro Max mit sieben.
+
+Folge in Lauf 44066902790 (17.11.2026): `referenz_tarife` 7,
+`referenz_widerspricht` 153 von 185 gemessenen Antworten, 192 abgeleitete
+Saetze; am 13.11.2026 morgens waren es mit `referenz_tarife` 12 noch 1864.
+83 Geraet-Tarif-Kombinationen vom 16.11. wurden am 17.11. nicht erneuert.
+
+Antwort: `_zweiter_durchlauf` - ein zweiter VOLLSTAENDIGER Tarifdurchlauf am
+ersten widersprechenden Geraet, hoechstens `DURCHLAEUFE_JE_LAUF` je Lauf. Er
+ergaenzt nur unbekannte Anzeigen und nur, wenn er die Referenz in allen
+gemeinsamen Anzeigen bestaetigt (`_bestaetigt`). Damit steht jeder Eintrag
+weiter auf einem vollstaendigen, in sich stimmigen Durchlauf EINES Geraets,
+und der Schutz des Befundes vom 07.10.2026 bleibt: ein Geraet mit eigener
+Aktion weicht im Anschlusspreis ab und sein ganzer Durchlauf faellt weg.
 """
 
 from __future__ import annotations
@@ -39,7 +66,12 @@ from .basis import _gleich
 log = logging.getLogger(__name__)
 
 PROBEN_JE_ANZEIGE = 2
+DURCHLAEUFE_JE_LAUF = 2
 REFERENZ_TARIFE = "referenz_tarife"
+DURCHLAUF_ABRUF = "referenz_durchlauf"
+DURCHLAUF_ERGAENZT = "referenz_durchlauf_ergaenzt"
+DURCHLAUF_VERWORFEN = "referenz_durchlauf_verworfen"
+DURCHLAUF_FRIST = "referenz_durchlauf_frist"
 PROBE_ABRUF = "referenz_probe"
 PROBE_ERGAENZT = "referenz_ergaenzt"
 PROBE_VERWORFEN = "probe_verworfen"
@@ -109,14 +141,13 @@ class Referenzstand:
         )
         self._weiter, self._z = weiter, z
         self._versucht = False
+        self._durchlaeufe = 0
         self._gesperrt: set = set()
         self._unlesbar_bei: defaultdict[str, set] = defaultdict(set)
 
-    def erster_durchlauf(self, start: dict) -> None:
-        """Einmal je Lauf: je verlinktem Tarif der Startantwort ein Abruf."""
-        if self._versucht or not self._weiter():
-            return
-        self._versucht = True
+    def _durchlauf(self, start: dict) -> dict | None:
+        """Je verlinktem Tarif dieser Startantwort ein Abruf, dann `tarife_aus`."""
+        self._durchlaeufe += 1
         durchlauf: list = [start]
         for option in (start.get("tariff") or {}).get("tariffOptions") or []:
             if option.get("selected") or not self._link(option):
@@ -125,7 +156,14 @@ class Referenzstand:
                 durchlauf.append(None)
                 break
             durchlauf.append(self._abruf(self._link(option)))
-        self.tarife = tarife_aus([self._messe(s) if s else None for s in durchlauf])
+        return tarife_aus([self._messe(s) if s else None for s in durchlauf])
+
+    def erster_durchlauf(self, start: dict) -> None:
+        """Einmal je Lauf: je verlinktem Tarif der Startantwort ein Abruf."""
+        if self._versucht or not self._weiter():
+            return
+        self._versucht = True
+        self.tarife = self._durchlauf(start)
         self._z[REFERENZ_TARIFE] = len(self.tarife or {})
         if self.tarife is None:
             log.warning(
@@ -134,15 +172,79 @@ class Referenzstand:
                 "gemessene Saetze"
             )
 
+    def _bestaetigt(self, neu: dict) -> bool:
+        """Der Durchlauf nennt in JEDER gemeinsamen Anzeige Slug und
+        Anschlusspreis der Referenz - und hat mindestens eine gemeinsame.
+
+        Das ist die Pruefung, die den Befund vom 07.10.2026 haelt: ein
+        Geraet mit eigener Aktion weicht in genau diesen Zahlen ab (am
+        29.09.2026 gemessen: 0,00 statt 39,99 EUR Anschlusspreis), und
+        dann faellt sein ganzer Durchlauf weg, statt fuer andere Geraete
+        etwas festzuschreiben.
+        """
+        gemeinsam = set(neu) & set(self.tarife or {})
+        return bool(gemeinsam) and all(
+            neu[a]["slug"] == (self.tarife or {})[a]["slug"]
+            and _gleich(neu[a]["anschluss"], (self.tarife or {})[a]["anschluss"])
+            for a in gemeinsam
+        )
+
+    def _zweiter_durchlauf(self, pv: dict) -> None:
+        """Ein weiterer vollstaendiger Tarifdurchlauf an einer Antwort, die
+        der Referenz widerspricht, weil sie ihren eigenen Tarif nicht kennt.
+
+        Der Befund vom 17.11.2026: o2 bietet die fuenf "Plus"-Tarife nur an
+        einem Teil der Geraete an, und GENAU diese Geraete stehen im Katalog
+        schon in einem "Plus"-Tarif. Die Referenz entsteht am ersten Geraet,
+        also an einem ohne "Plus" (sieben Tarife); `ergaenze` darf nur an
+        Antworten proben, deren eigener Tarif der Referenz bekannt ist - das
+        sind wieder die Geraete mit sieben Tarifen, die nichts Neues kennen.
+        Die Probe von 07.10.2026 kam damit nie zum Zug (Lauf 44066902790:
+        `referenz_tarife` 7, `referenz_widerspricht` 153 von 185, 192 statt
+        1864 abgeleitete Saetze).
+
+        Darum hier ein zweiter Durchlauf am ersten widersprechenden Geraet,
+        hoechstens `DURCHLAEUFE_JE_LAUF` je Lauf. Er ergaenzt nur Anzeigen,
+        die die Referenz nicht kennt, und nur wenn er sie in den gemeinsamen
+        bestaetigt (`_bestaetigt`) - jeder Eintrag steht damit weiter auf
+        einem vollstaendigen, in sich stimmigen Durchlauf EINES Geraets.
+        """
+        if self._durchlaeufe >= DURCHLAEUFE_JE_LAUF:
+            return
+        if not self._weiter():
+            _zaehle(self._z, DURCHLAUF_FRIST)
+            return
+        _zaehle(self._z, DURCHLAUF_ABRUF)
+        neu = self._durchlauf(pv)
+        if neu is None or not self._bestaetigt(neu):
+            _zaehle(self._z, DURCHLAUF_VERWORFEN)
+            log.info(
+                "o2-Vertiefung: der zweite Referenzdurchlauf bestaetigt die "
+                "Referenz nicht - sie bleibt bei %d Tarifen",
+                len(self.tarife or {}),
+            )
+            return
+        for anzeige, wert in neu.items():
+            if self.tarife is not None and anzeige not in self.tarife:
+                self.tarife[anzeige] = wert
+                _zaehle(self._z, DURCHLAUF_ERGAENZT)
+        self._z[REFERENZ_TARIFE] = len(self.tarife or {})
+
     def ergaenze(self, pv: dict, geraet: str) -> None:
         """Probt die Optionen dieser Antwort, die die Referenz nicht kennt.
 
         `geraet` ist die Adresse des Katalogbuendels; an ihm wird eine
-        ungelesene Probe nicht wiederholt.
+        ungelesene Probe nicht wiederholt. Kennt die Referenz den eigenen
+        Tarif dieser Antwort nicht, entscheidet ein zweiter vollstaendiger
+        Durchlauf (`_zweiter_durchlauf`), ob sie ueberhaupt proben darf.
         """
         g = self._messe(pv)
-        if self.tarife is None or g is None or not passt(self.tarife, g):
+        if self.tarife is None or g is None:
             return
+        if not passt(self.tarife, g):
+            self._zweiter_durchlauf(pv)
+            if not passt(self.tarife, g):
+                return
         optionen = [
             o
             for o in (pv.get("tariff") or {}).get("tariffOptions") or []

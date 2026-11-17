@@ -24,6 +24,7 @@ from bs4 import BeautifulSoup
 
 from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.report import geraete_hersteller as hm
+from telco_radar.report import geraete_hersteller_punkte as hp
 from telco_radar.report import geraete_hersteller_text as ht
 from telco_radar.report.html import render_site
 
@@ -288,7 +289,9 @@ def _rendern(welt: dict) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser")
 
 
-def test_vorlage_zeichnet_zellen_balken_und_zeitwahl():
+def test_vorlage_zeichnet_punkte_luecke_und_zeitwahl():
+    """Die Punktgrafik (Antonio, 17.11.2026): je Hersteller eine Zeile, je
+    Wettbewerber ein Punkt auf der Achse, die Lücke steht benannt darunter."""
     s = _rendern(_welt())
     assert s.select_one("section#hersteller h2").text == "Preisposition je Hersteller"
     assert [b["data-zeit"] for b in s.select("#hm-zeit button")] == [
@@ -298,17 +301,58 @@ def test_vorlage_zeichnet_zellen_balken_und_zeitwahl():
         "eigen",
     ]
     assert s.select_one("#hm-zeit").has_attr("hidden")
-    zeile = s.select_one('.gr-hm-zeile[data-hersteller="Apple"]')
-    zelle = zeile.select_one('.gr-hm-zelle[data-anbieter="Telekom"]')
-    assert zelle["data-wert"] == "-12.00" and zelle["data-n"] == "1"
-    assert "gr-hm-duenn" in zelle["class"]
-    assert zelle.select_one(".gr-hm-m").text == "nur 1 Modell"
-    leer = s.select_one('.gr-hm-zeile[data-hersteller="Samsung"] .gr-hm-leer')
-    assert leer.select_one(".gr-hm-zahl").text == "–"
-    assert leer.select_one(".gr-hm-balken").has_attr("hidden")
-    assert "data-wert" not in leer.attrs
-    assert s.select_one("#hm-einheit")["data-basis"].endswith(f"{LAUFZEIT} Monate")
+    assert s.select_one(".gr-pp-breit svg") and s.select_one(".gr-pp-schmal svg")
+    zeile = s.select_one('.gr-pp-breit .gr-hm-zeile[data-hersteller="Apple"]')
+    punkt = zeile.select_one('.gr-pp-punkt[data-anbieter="Telekom"]')
+    erwartet = f"Telekom: {ht.prozent_text(-12.0)} · günstiger · nur 1 Modell"
+    assert punkt.title.text == erwartet
+    assert "gr-pp-duenn" in punkt["class"]
+    assert not punkt.has_attr("hidden")
+    samsung = s.select_one('.gr-pp-breit .gr-hm-zeile[data-hersteller="Samsung"]')
+    leer = samsung.select(".gr-pp-punkt[hidden]")
+    assert leer, "ohne Preis bleibt der Punkt weg"
+    fehlt = samsung.select_one(".gr-pp-fehlt").text
+    for g in leer:
+        assert g["data-anbieter"] in fehlt
+        assert g.title.text.endswith("kein Preis")
+    assert fehlt.endswith("kein Preis")
+    assert "0" in [t.text for t in s.select(".gr-pp-tick--null")]
+    basis = s.select_one("#hm-einheit")["data-basis"]
+    assert basis.endswith(f"{LAUFZEIT}{ht.NBSP}Monate")
     assert s.select_one("#hm-daten").text.strip().startswith("{")
+
+
+def test_die_achse_umfasst_jeden_waehlbaren_zeitraum():
+    """Die Achse steht fest, damit der Zeitraumwechsel nur die Punkte
+    verschiebt. Dann muss sie jeden Wert tragen, den ein Zeitraum zeigen
+    kann - sonst klebte ein Punkt am Rand und logen die Zahlen am Bild."""
+    welt = _welt()
+    r = _rechne(welt)
+    d = hm.aufbereiten(welt["messungen"], welt["tco"], welt["katalog"], "2026-11-01")
+    ach = d["achse"]
+    zeitraeume = [r["aktuell"], *(r["pct"][t] for t in r["tage"])]
+    zeitraeume += [hm.zeitraum(r, f)[0] for f in hm.FENSTER]
+    zeitraeume.append(hm.mittel_ueber_tage(r, r["tage"][0], r["tage"][-1])[0])
+    werte = [
+        m
+        for zeilen in zeitraeume
+        for spalten in hm.zellen(r, zeilen).values()
+        for m, _ in spalten
+        if m is not None
+    ]
+    assert werte
+    assert all(ach["von"] <= m <= ach["bis"] for m in werte)
+
+
+def test_vorlage_nennt_vodafone_als_nulllinie_in_der_legende():
+    s = _rendern(_welt())
+    namen = [li.text.strip() for li in s.select(".gr-pp-legende li")]
+    assert namen[0].startswith("Vodafone") and "Nulllinie" in namen[0]
+    assert s.select_one(".gr-pp-legende--null .gr-pp-nullmarke") is not None
+    letzter = s.select(".gr-pp-legende li")[-1]
+    assert f"weniger als {hm.KLEIN} Modelle" in letzter.text
+    assert "gr-pp-duenn" in letzter.select_one("svg")["class"]
+    assert not any(c.startswith("gr-anb--") for c in letzter.get("class", []))
 
 
 def test_vorlage_benennt_ausfall_und_leerzustand():
@@ -386,34 +430,52 @@ def _lade(chromium, site: Path, welt: dict, breite: int = 1440):
 
 
 def _zellenwerte(seite) -> dict[str, tuple]:
-    return {
-        k: tuple(v)
-        for k, v in seite.evaluate(
-            """() => Object.fromEntries([...document.querySelectorAll('.gr-hm-zeile')]
-              .flatMap(z => [...z.querySelectorAll('.gr-hm-zelle')].map(c => [
-                z.dataset.hersteller + '|' + c.dataset.anbieter,
-                [c.dataset.wert ?? null, c.dataset.n ?? null,
-                 c.querySelector('.gr-hm-zahl').textContent,
-                 c.querySelector('.gr-hm-m').textContent]])))"""
-        ).items()
-    }
+    """Je (Hersteller, Anbieter): Lage des Punktes auf der Achse (None ohne
+    Preis) und sein Tooltip - mehr behauptet ein Punkt nicht."""
+    roh = seite.evaluate(
+        """() => Object.fromEntries(
+            [...document.querySelectorAll('.gr-pp-breit .gr-hm-zeile')]
+              .flatMap(z => [...z.querySelectorAll('.gr-pp-punkt')].map(p => [
+                z.dataset.hersteller + '|' + p.dataset.anbieter,
+                [p.hasAttribute('hidden') ? null
+                   : +p.getAttribute('transform').slice(10).split(' ')[0],
+                 p.querySelector('title').textContent]])))"""
+    )
+    return {k: (v[0], v[1]) for k, v in roh.items()}
 
 
-def _erwartet(r: dict, zeilen, spalten: list[str]) -> dict[str, tuple]:
+def _luecken(seite) -> dict[str, str]:
+    return seite.evaluate(
+        """() => Object.fromEntries(
+            [...document.querySelectorAll('.gr-pp-breit .gr-hm-zeile')]
+              .map(z => [z.dataset.hersteller,
+                         z.querySelector('.gr-pp-fehlt').textContent]))"""
+    )
+
+
+def _gleich(ist: dict, soll: dict) -> bool:
+    """Gleich heisst: gleicher Tooltip und die Lage auf 0,2 Einheiten genau
+    (Python und Browser runden die Koordinate je selbst)."""
+    if set(ist) != set(soll):
+        return False
+    for k, (x, titel) in soll.items():
+        ix, ititel = ist[k]
+        if ititel != titel or (x is None) != (ix is None):
+            return False
+        if x is not None and abs(ix - x) > 0.2:
+            return False
+    return True
+
+
+def _erwartet(r: dict, zeilen, spalten: list[str], ach: dict) -> dict[str, tuple]:
     aus = {}
     for h, zellen in hm.zellen(r, zeilen).items():
         for name, (m, n) in zip(hm.WETTBEWERBER, zellen, strict=True):
             if name not in spalten:
                 continue
-            if m is None:
-                aus[f"{h}|{name}"] = (None, None, "–", "kein Preis")
-            else:
-                aus[f"{h}|{name}"] = (
-                    f"{m:.2f}",
-                    str(n),
-                    hm.prozent_text(m),
-                    hm.modell_wort(n),
-                )
+            zelle = hm._zelle(name, m, n)
+            x = None if m is None else hp.x_fuer(m, ach, hp.BREIT)
+            aus[f"{h}|{name}"] = (x, hp.titel(zelle))
     return aus
 
 
@@ -428,7 +490,9 @@ def test_browser_rechnet_wie_die_python_referenz(chromium, _site, modus):
             seite.goto(f"{basis}/hm.html", wait_until="load")
             assert fehler == []
             assert not seite.is_hidden("#hm-zeit")
-            assert _zellenwerte(seite) == _erwartet(r, r["aktuell"], spalten)
+            assert _gleich(
+                _zellenwerte(seite), _erwartet(r, r["aktuell"], spalten, d["achse"])
+            )
             if modus == "eigen":
                 seite.click("button[data-zeit=eigen]")
                 seite.fill("#hm-von", "2026-10-31")
@@ -438,7 +502,9 @@ def test_browser_rechnet_wie_die_python_referenz(chromium, _site, modus):
             else:
                 seite.click(f"button[data-zeit='{modus}']")
                 zeilen, tage = hm.zeitraum(r, int(modus))
-            assert _zellenwerte(seite) == _erwartet(r, zeilen, spalten)
+            assert _gleich(
+                _zellenwerte(seite), _erwartet(r, zeilen, spalten, d["achse"])
+            )
             assert f"Mittel aus {tage} Messtagen" in seite.inner_text("#hm-einheit")
             pressed = seite.get_attribute(
                 f"button[data-zeit='{modus}']", "aria-pressed"
@@ -459,7 +525,11 @@ def test_browser_zeitraum_ohne_messtage_zeigt_luecken_statt_null(chromium, _site
             seite.fill("#hm-bis", "2026-01-02")
             seite.dispatch_event("#hm-bis", "change")
             werte = _zellenwerte(seite)
-            assert werte and all(v[0] is None and v[2] == "–" for v in werte.values())
+            assert werte and all(
+                x is None and t.endswith("kein Preis") for x, t in werte.values()
+            )
+            luecken = _luecken(seite)
+            assert luecken and all(t.endswith("kein Preis") for t in luecken.values())
             assert "Keine Messtage" in seite.inner_text("#hm-einheit")
             assert fehler == []
     finally:

@@ -1,7 +1,8 @@
-{# Preisposition je Hersteller (Antonio, 05.11.2026): die erste Übersichtsgrafik.
-   Daten und Text liefert geraete_hersteller.py; hier steht nur die Hülle. Der
-   Server zeichnet die Ansicht „aktuell“ (lesbar ohne JavaScript); die
-   Zeitraumwahl blendet app.js ein und rechnet aus dem JSON im Dokument. #}
+{# Preisposition je Hersteller: die Punktgrafik (Antonio, 17.11.2026 - der Typ,
+   den „Preisposition je Modell“ hatte). Daten, Achse und SVG liefert
+   geraete_hersteller.py / geraete_hersteller_punkte.py; hier steht nur die
+   Hülle. Der Server zeichnet die Ansicht „aktuell“ (lesbar ohne JavaScript);
+   die Zeitraumwahl blendet app.js ein und verschiebt nur die Punkte. #}
 {% set hm = geraete.hersteller %}
 <section class="gr-hm gx-art gx-art--tarif" id="hersteller" aria-labelledby="hm-titel"{% if hm and hm.json %} data-stand="{{ hm.stand }}"{% endif %}>
   <div class="gx-kopf"><h2 id="hm-titel">Preisposition je Hersteller</h2></div>
@@ -22,29 +23,16 @@
     <label>von <input type="date" id="hm-von" value="{{ hm.tage_von }}" min="{{ hm.tage_von }}" max="{{ hm.tage_bis }}"></label>
     <label>bis <input type="date" id="hm-bis" value="{{ hm.tage_bis }}" min="{{ hm.tage_von }}" max="{{ hm.tage_bis }}"></label>
   </div>
-  <p class="gr-pp-einheit" id="hm-einheit" data-basis="{{ hm.einheit }}" aria-live="polite">{{ hm.einheit }} · Stand {{ hm.stand[8:] }}.{{ hm.stand[5:7] }}.{{ hm.stand[:4] }}</p>
-  <div class="gr-hm-tafel" style="--hm-n:{{ hm.wettbewerber | length }}" role="group" aria-label="Abstand der Vodafone-Kosten zum Wettbewerber in Prozent je Hersteller">
-    <div class="gr-hm-achse">
-      <span></span>
-      {% for w in hm.wettbewerber %}
-      <span class="gr-hm-kopf gr-anb--{{ w.slug }}"><i class="gr-hm-punkt"></i>{{ w.legende }}</span>
-      {% endfor %}
-    </div>
-    <div class="gr-hm-richtung"><span>← Vodafone günstiger</span><span>Vodafone teurer →</span></div>
-    {% for z in hm.zeilen %}
-    <div class="gr-hm-zeile{{ ' gr-hm-zeile--alle' if z.gesamt }}" data-hersteller="{{ z.hersteller }}">
-      <div class="gr-hm-name">{{ z.name }}</div>
-      {% for c in z.zellen %}
-      <div class="gr-hm-zelle gr-anb--{{ c.slug }}{{ ' gr-hm-leer' if c.leer }}{{ ' gr-hm-duenn' if c.duenn }}" data-anbieter="{{ c.name }}"{% if not c.leer %} data-wert="{{ c.wert }}" data-n="{{ c.n }}"{% endif %}>
-        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>{{ c.name }}</span>
-        <span class="gr-hm-zahl">{{ c.text }}</span>
-        <span class="gr-hm-spur"><b class="gr-hm-balken"{% if c.leer %} hidden{% else %} style="left:{{ c.links }}%;width:{{ c.breite }}%"{% endif %}></b></span>
-        <span class="gr-hm-n"><span class="gr-hm-r">{{ c.richtung ~ ' · ' if not c.leer }}</span><span class="gr-hm-m">{{ c.n_text }}</span></span>
-      </div>
-      {% endfor %}
-    </div>
+  <ul class="gr-pp-legende">
+    {% for a in hm.legende %}
+    <li class="{{ 'gr-anb--' + a.slug if a.slug }}{{ ' gr-pp-legende--null' if a.null }}">
+      {% if a.null %}<i class="gr-pp-nullmarke" aria-hidden="true"></i>{% else %}<svg viewBox="-9 -9 18 18" aria-hidden="true" class="{{ 'gr-pp-duenn' if a.duenn }}">{{ a.marke | safe }}</svg>{% endif %}{{ a.name }}</li>
     {% endfor %}
-  </div>
+  </ul>
+  <p class="gr-pp-einheit" id="hm-einheit" data-basis="{{ hm.einheit }}" aria-live="polite">{{ hm.einheit }} · Stand {{ hm.stand[8:] }}.{{ hm.stand[5:7] }}.{{ hm.stand[:4] }}</p>
+  <div class="gr-hm-richtung"><span>{{ hm.links }}</span><span>{{ hm.rechts }}</span></div>
+  <div class="gr-pp-bild gr-pp-breit" data-mass="breit">{{ hm.svg_breit | safe }}</div>
+  <div class="gr-pp-bild gr-pp-schmal" data-mass="schmal">{{ hm.svg_schmal | safe }}</div>
   {% for o in hm.ohne_spalte %}
   <p class="gr-hm-ohne" data-anbieter="{{ o.name }}">{{ o.text }}</p>
   {% endfor %}
