@@ -12,7 +12,7 @@ KENNZAHL
   dieser Abstände über die aktuellen Modelle des Herstellers, die Vodafone
   UND der Wettbewerber mit einem echten Preis führen (je Modell vorher das
   Mittel über die Messtage des Zeitraums); die Zahl der Modelle steht dabei.
-  Fehlt ein Preis, fehlt die Zelle - nie ein Wert 0.
+  Fehlt ein Preis, fehlt der Punkt - nie ein Wert 0.
 
 ZEITRAUM
   aktuell    die Karten, die die Seite heute zeigt (`preise_je_anbieter`)
@@ -20,11 +20,11 @@ ZEITRAUM
   eigen      von/bis, vom Browser gerechnet
 
 Nichts wird fest verdrahtet: Modelle, Anbieter, Preise und Messtage kommen zur
-Bauzeit aus den Daten. Wenn ein Anbieter (o2: 24 Raten) neue Preise
-bekommt, füllen sich seine Zellen ohne Eingriff. Der Server rechnet und
-zeichnet die Ansicht „aktuell“ (ohne JavaScript lesbar); die Tageswerte
-liegen als JSON im Dokument, `app.js` schaltet den Zeitraum um. Ein Ausfall
-steht als `fehler` im Bild, nie als leeres Bild.
+Bauzeit aus den Daten. Der Server rechnet und zeichnet die Ansicht „aktuell“
+(ohne JavaScript lesbar); die Tageswerte liegen als JSON im Dokument, `app.js`
+schaltet den Zeitraum um. Ein Ausfall steht als `fehler` im Bild, nie als
+leeres Bild. Gezeichnet wird die Punktgrafik aus
+`geraete_hersteller_punkte` (Antonio, 17.11.2026).
 """
 
 from __future__ import annotations
@@ -39,6 +39,7 @@ from ..geraete_model import serie_aus_modell
 from ..tco_model import zeitraum_vergleichbar
 from . import geraete_notbremse, geraete_rechenweg, geraete_zeitreihe
 from .anbieter_farben import legendenname, slug_fuer
+from .geraete_hersteller_punkte import MASSE, achse, ergaenze, zelle_werte
 from .geraete_hersteller_text import (
     EIGEN,
     GLEICHAUF,
@@ -58,7 +59,6 @@ WETTBEWERBER = tuple(a for a in geraete_rechenweg.ANBIETER_FOLGE if a != EIGEN)
 HERSTELLER_VORAN = ("Apple", "Samsung", "Google")
 GESAMT = "Alle"
 FENSTER = (7, 30)
-SKALA = 40
 
 
 def abstand(vodafone: float, wettbewerber: float) -> float:
@@ -255,6 +255,24 @@ def zellen(rechnung: dict, werte: list[list]) -> dict[str, list]:
     }
 
 
+def achsenwerte(rechnung: dict) -> list[float]:
+    """Jeder Wert, den ein wählbarer Zeitraum zeigen kann (Begründung in
+    `geraete_hersteller_punkte`): „aktuell“, jeder Messtag, die festen
+    Fenster und der ganze Bereich."""
+    tage = rechnung["tage"]
+    quellen = [rechnung["aktuell"], *(rechnung["pct"][t] for t in tage)]
+    quellen += [zeitraum(rechnung, f)[0] for f in FENSTER]
+    if tage:
+        quellen.append(mittel_ueber_tage(rechnung, tage[0], tage[-1])[0])
+    return [
+        wert
+        for werte in quellen
+        for zeile in zellen(rechnung, werte).values()
+        for wert, _ in zeile
+        if wert is not None
+    ]
+
+
 def reihenfolge(rechnung: dict) -> list[str]:
     """Hersteller der Zeilen: die großen drei zuerst, dann nach Modellzahl."""
     zahl: dict[str, int] = {}
@@ -266,7 +284,7 @@ def reihenfolge(rechnung: dict) -> list[str]:
 
 
 def _zelle(w: str, mittel: float | None, n: int) -> dict:
-    """Eine Zelle fürs Template; ohne Preis: benannte Lücke, kein Wert."""
+    """Ein Punkt der Zeile; ohne Preis: benannte Lücke, kein Wert."""
     zelle = {"slug": slug_fuer(w), "name": w, "legende": legendenname(w)}
     if mittel is None:
         return {
@@ -277,7 +295,6 @@ def _zelle(w: str, mittel: float | None, n: int) -> dict:
             "n_text": "kein Preis",
             "n": 0,
         }
-    breite = min(abs(mittel), SKALA) / SKALA * 50
     return {
         **zelle,
         "leer": False,
@@ -287,8 +304,6 @@ def _zelle(w: str, mittel: float | None, n: int) -> dict:
         "text": prozent_text(mittel),
         "richtung": richtung(mittel),
         "n_text": modell_wort(n),
-        "links": f"{50 if mittel >= 0 else 50 - breite:.2f}",
-        "breite": f"{breite:.2f}",
     }
 
 
@@ -341,19 +356,23 @@ def aufbereiten(messungen: dict | None, tco: dict, katalog, heute: str) -> dict:
         - {m["hersteller"] for m in rechnung["modelle"]}
         - set(geraete_rechenweg.ANBIETER_FOLGE)
     )
+    ach = achse([*achsenwerte(rechnung), *zelle_werte(zeilen)])
+    if ach is None:
+        return {"fehler": "", "leer": True}
     daten = {
         "stand": rechnung["stand"],
+        "achse": {"von": ach["von"], "bis": ach["bis"]},
+        "masse": MASSE,
         "w": list(WETTBEWERBER),
         "h": [m["hersteller"] for m in rechnung["modelle"]],
         "tage": rechnung["tage"],
         "pct": [rechnung["pct"][t] for t in rechnung["tage"]],
         "aktuell": rechnung["aktuell"],
-        "skala": SKALA,
         "fenster": list(FENSTER),
         "gleichauf": GLEICHAUF,
         "klein": KLEIN,
     }
-    return {
+    teil = {
         "fehler": "",
         "leer": False,
         "stand": rechnung["stand"],
@@ -377,3 +396,4 @@ def aufbereiten(messungen: dict | None, tco: dict, katalog, heute: str) -> dict:
         "tage_von": rechnung["tage"][0] if rechnung["tage"] else "",
         "tage_bis": rechnung["tage"][-1] if rechnung["tage"] else "",
     }
+    return ergaenze(teil, ach)
