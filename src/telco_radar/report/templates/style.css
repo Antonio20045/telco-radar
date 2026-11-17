@@ -3932,6 +3932,11 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-legende .gr-zr-leg-ueberholt{white-space:normal;max-width:100%;
   min-width:0;line-height:1.3}
 .gr-zr-leg-ab{color:var(--ink-4);font-weight:600}
+.gr-zr-leg-so{flex-basis:100%;margin-top:2px}
+.gr-zr-leg-so>summary{font-family:var(--sans);font-size:11.5px;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);
+  cursor:pointer}
+.gr-zr-leg-so .gr-zr-leg-ueberholt{display:block;margin-top:4px}
 .gr-zr-bild{margin:2px 0 4px}
 /* SPEZIFITAET: die Umschalt-Regeln muessen DIESELBE Spezifitaet tragen wie
    die Basisform (0,1,1) - sonst schlaegt display:block der Basis das

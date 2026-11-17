@@ -22,14 +22,25 @@ from .geraete_rechenweg import _esc
 from .geraete_zeitreihe_legende import NAMEN_TRENNER, _euro0, _mon_kurz, zweizeilig
 
 ENDLABEL_RAND = 6
-RAND_RECHTS = {True: 158, False: 96}
+RAND_RECHTS = {True: 158, False: 78}
 RAND_RECHTS_ZWEIZEILIG = {True: 158, False: 120}
-"""Rechter Rand (breit/schmal); schmal trägt der Händlername 11 px erst ab 120."""
+"""Rechter Rand (breit/schmal); schmal trägt der Händlername 11 px erst ab 120.
+
+UI-D-1717 (Antonios Befund zu PR 148): auf 390 px nahm die Etikettenspalte
+mit 96 px rund ein Drittel der 358 px breiten Kurve ein, die Linien liefen
+auf einem Streifen von nur noch ~200 px zusammen. Der einzeilige Name trägt
+jetzt SCHRIFT_EINZEILIG_SCHMAL statt der 15-px-Breitschrift (`_name_html`),
+der Rand sinkt entsprechend mit; der zweizeilige Händlername (eigene Breite
+durch den Umbruch) bleibt unverändert."""
 ABSTAND = {True: 46, False: 44}
 ZEITRAUM_ZEILE = 13
 ZWEITE_ZEILE = {True: 14, False: 12}
 SCHRIFT_ZWEIZEILIG = {True: 13, False: 11}
 """Schrift (px) und Zeilenabstand eines zweizeiligen Namens; die übrigen 15 px."""
+SCHRIFT_EINZEILIG_SCHMAL = 12
+"""Schrift (px) eines einzeiligen Namens auf dem schmalen Bild (sonst 15 px);
+nicht kleiner - die 12-px-Mindestschrift lesender Beschriftung gilt auch
+hier (`test_keine_beschriftung_unter_zwoelf_pixeln`)."""
 ETIKETT_OBEN = 8
 ETIKETT_UNTEN = 24
 """Ein Etikett reicht von ty - 8 (Oberkante Name) bis ty + 24 (Endwert, 13,5 px
@@ -181,11 +192,12 @@ def namensetiketten(
         farbe = stil_fuer(a).farbe
         mon_text = _mon(a, mon_je, mehrere)
         url, _datum = beleg_je.get(a, ("", ""))
-        zeilen = (
-            f" data-zeilen='2' style='font-size:{SCHRIFT_ZWEIZEILIG[breit]}px'"
-            if zweizeilig(a)
-            else ""
-        )
+        if zweizeilig(a):
+            zeilen = f" data-zeilen='2' style='font-size:{SCHRIFT_ZWEIZEILIG[breit]}px'"
+        elif not breit:
+            zeilen = f" style='font-size:{SCHRIFT_EINZEILIG_SCHMAL}px'"
+        else:
+            zeilen = ""
         kopf = (
             f"<text class='gr-zr-name' x='{lx:.1f}' y='{ty + 4:.1f}' "
             f"text-anchor='end' fill='{farbe}'{zeilen}>"
