@@ -33,7 +33,7 @@ from html import escape
 
 from . import geraete_zeitreihe_geometrie
 from .anbieter_farben import slug_fuer, stil_fuer
-from .geraete_hersteller_text import EIGEN, NBSP, prozent_text
+from .geraete_hersteller_text import EIGEN, KLEIN, NBSP, prozent_text
 
 MAX_TICKS = 9
 TICK_SCHRITTE = (5, 10, 20, 25, 50, 100)
@@ -215,12 +215,14 @@ def richtungstext() -> tuple[str, str]:
 
 
 def legende(spalten: list[dict]) -> list[dict]:
-    """Legende: erst Vodafone als Nulllinie, dann die Wettbewerber mit Form."""
+    """Legende: erst Vodafone als Nulllinie, dann die Wettbewerber mit Form,
+    zuletzt der Hinweis auf blasse Punkte (kleine Stichprobe)."""
     aus = [
         {
             "name": f"{EIGEN} ={NBSP}Nulllinie",
             "slug": slug_fuer(EIGEN),
             "null": True,
+            "duenn": False,
             "marke": "",
         }
     ]
@@ -229,10 +231,20 @@ def legende(spalten: list[dict]) -> list[dict]:
             "name": w["legende"],
             "slug": w["slug"],
             "null": False,
+            "duenn": False,
             "marke": _marke(w["name"], 5.5),
         }
         for w in spalten
     ]
+    aus.append(
+        {
+            "name": f"weniger als {KLEIN} Modelle",
+            "slug": "",
+            "null": False,
+            "duenn": True,
+            "marke": "<circle cx='0' cy='0' r='5.5'/>",
+        }
+    )
     return aus
 
 

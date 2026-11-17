@@ -349,6 +349,10 @@ def test_vorlage_nennt_vodafone_als_nulllinie_in_der_legende():
     namen = [li.text.strip() for li in s.select(".gr-pp-legende li")]
     assert namen[0].startswith("Vodafone") and "Nulllinie" in namen[0]
     assert s.select_one(".gr-pp-legende--null .gr-pp-nullmarke") is not None
+    letzter = s.select(".gr-pp-legende li")[-1]
+    assert f"weniger als {hm.KLEIN} Modelle" in letzter.text
+    assert "gr-pp-duenn" in letzter.select_one("svg")["class"]
+    assert not any(c.startswith("gr-anb--") for c in letzter.get("class", []))
 
 
 def test_vorlage_benennt_ausfall_und_leerzustand():

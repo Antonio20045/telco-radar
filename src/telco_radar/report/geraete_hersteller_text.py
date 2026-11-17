@@ -72,9 +72,9 @@ def erklaerung(
         absaetze.append(f"Verglichene Tarife: {tarife_satz}.")
     absaetze.append(
         f"„Alle Hersteller“ ist das Mittel über alle Modelle, also nach Modellzahl "
-        f"gewichtet. Zellen mit weniger als {KLEIN} Modellen sind blasser und als "
-        f"kleine Stichprobe benannt; die Modellzahl steht in jeder Zelle, weil sie "
-        f"mit dem Zeitraum wechseln kann."
+        f"gewichtet. Die Modellzahl steht im Tooltip jedes Punkts, weil sie mit dem "
+        f"Zeitraum wechseln kann; Punkte mit weniger als {KLEIN} Modellen sind "
+        f"blasser und als kleine Stichprobe benannt."
     )
     if wettbewerber_ohne:
         namen = " und ".join(wettbewerber_ohne)

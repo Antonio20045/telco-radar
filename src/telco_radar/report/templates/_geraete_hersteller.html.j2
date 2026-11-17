@@ -25,8 +25,8 @@
   </div>
   <ul class="gr-pp-legende">
     {% for a in hm.legende %}
-    <li class="gr-anb--{{ a.slug }}{{ ' gr-pp-legende--null' if a.null }}">
-      {% if a.null %}<i class="gr-pp-nullmarke" aria-hidden="true"></i>{% else %}<svg viewBox="-9 -9 18 18" aria-hidden="true">{{ a.marke | safe }}</svg>{% endif %}{{ a.name }}</li>
+    <li class="{{ 'gr-anb--' + a.slug if a.slug }}{{ ' gr-pp-legende--null' if a.null }}">
+      {% if a.null %}<i class="gr-pp-nullmarke" aria-hidden="true"></i>{% else %}<svg viewBox="-9 -9 18 18" aria-hidden="true" class="{{ 'gr-pp-duenn' if a.duenn }}">{{ a.marke | safe }}</svg>{% endif %}{{ a.name }}</li>
     {% endfor %}
   </ul>
   <p class="gr-pp-einheit" id="hm-einheit" data-basis="{{ hm.einheit }}" aria-live="polite">{{ hm.einheit }} · Stand {{ hm.stand[8:] }}.{{ hm.stand[5:7] }}.{{ hm.stand[:4] }}</p>

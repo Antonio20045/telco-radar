@@ -124,6 +124,15 @@ def test_null_ist_die_vodafone_linie_und_traegt_eigene_teilstrichfarbe():
     assert hp.tick_text(0) == "0" and hp.tick_text(20) == hm.prozent_text(20)
 
 
+def test_legende_nennt_blasse_punkte_als_kleine_stichprobe():
+    spalten = [{"name": "Telekom", "slug": "telekom", "legende": "Telekom"}]
+    aus = hp.legende(spalten)
+    letzter = aus[-1]
+    assert letzter["duenn"] is True
+    assert f"weniger als {hm.KLEIN}" in letzter["name"]
+    assert all(not a["duenn"] for a in aus[:-1])
+
+
 def test_beide_breiten_zeichnen_dieselben_zeilen_an_eigener_stelle():
     ach = hp.achse([-20.0, 30.0])
     zeilen = [_zeile("Apple", {"Telekom": (-12.0, 4)})]
