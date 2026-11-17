@@ -48,7 +48,11 @@ def _karte(modell, anbieter: str, raten: int) -> dict:
 
 
 def _beschriftung(karte: dict) -> str:
-    """Die Zeilenbild-Beschriftung dieser Karte an der ECHTEN Vorlage."""
+    """Die Zeilenbild-Beschriftung dieser Karte an der ECHTEN Vorlage.
+
+    UI-D-1717 (Antonio, 17.11.2026): sie steht in der Zuordnungszeile
+    (`.gr-beleg-zu`) im aufgeklappten Beleg, neben dem Bild; zugeklappt sagt
+    die Zeile nur noch „Beleg: Screenshot vom <Datum>“."""
     zeile_modell = {"id": "m", "zeilen_band": [karte], "zeilen_ohne_band": []}
     paar = {"anbieter": karte["anbieter"], "beleg": None}
     paar |= geraete_zeilenbelege.ergaenze_paare(
@@ -61,11 +65,11 @@ def _beschriftung(karte: dict) -> str:
     html = env.from_string(
         '{% from "_geraete_buendel.html.j2" import belegpaare %}{{ belegpaare(m) }}'
     ).render(m=zeile_modell)
-    summary = BeautifulSoup(html, "html.parser").select_one(
-        "details.gr-belege--zeile summary"
+    zu = BeautifulSoup(html, "html.parser").select_one(
+        "details.gr-belege--zeile .gr-beleg-zu"
     )
-    assert summary is not None, html
-    return " ".join(summary.get_text().split())
+    assert zu is not None, html
+    return " ".join(zu.get_text().split())
 
 
 def _ratenwort_der_zeile(karte: dict) -> str:
