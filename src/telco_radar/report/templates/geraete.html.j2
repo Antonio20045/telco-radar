@@ -1122,6 +1122,12 @@
         data-datei-{{ lz }}="{{ e.datei }}"
         data-text-{{ lz }}="Kosten mit Tarif {{ lz }} Monate ({{ e.zeilen }})"{%
         endfor %}>{{ tco_text }}</a>
+      {% if geraete.export.tco_anbieter %}
+      <span class="gr-export-anbieter" title="Zeilen je Anbieter, davon mit Gesamtpreis (Kosten-Export)">{%
+        for a in geraete.export.tco_anbieter %}{{ a.anbieter }} {{ a.zeilen
+        }}/{{ a.mit_gesamtpreis }}{{ ' · ' if not loop.last }}{% endfor
+        %}</span>
+      {% endif %}
       <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
         >Radar ({{ geraete.export.radar.zeilen }})</a>
       {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -

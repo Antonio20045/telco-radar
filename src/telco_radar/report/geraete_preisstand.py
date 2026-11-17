@@ -130,6 +130,14 @@ def in_pruefung(karte: dict) -> bool:
     return bool(karte.get("quarantaene"))
 
 
+def pruefung_satz(karte: dict) -> str:
+    """Der Lückensatz einer Quarantäne-Karte: Grundsatz plus jede verletzte Regel
+    (``pruefgruende`` aus der Notbremse), damit die Zeile die Regel nennt, nicht
+    nur, dass eine verletzt ist."""
+    gruende = [f"{g}." for g in karte.get("pruefgruende") or []]
+    return " ".join([SATZ_PRUEFUNG, *gruende])
+
+
 def ist_bedingt(karte: dict) -> bool:
     """Setzt der Preis der Karte ein Zweitprodukt voraus? (``bedingter_tarif``.)"""
     return bool(karte.get("bedingter_tarif"))
@@ -168,7 +176,7 @@ def buendel_luecke(b, heute: str) -> str:
     if veraltet(frisch, flags["veraltet_pruefung"]):
         return grund(marke(b.abgerufen_am, heute, frisch), b.abgerufen_am)
     if in_pruefung(flags):
-        return SATZ_PRUEFUNG
+        return pruefung_satz(flags)
     return ""
 
 
@@ -196,7 +204,7 @@ def anzeige(karte: dict) -> dict:
             grund(karte.get("alt_marke") or "", karte.get("abgerufen_am") or ""),
         )
     elif in_pruefung(karte):
-        kurz_, satz = KURZ_PRUEFUNG, SATZ_PRUEFUNG
+        kurz_, satz = KURZ_PRUEFUNG, pruefung_satz(karte)
     else:
         return karte
     kopie = dict(karte)

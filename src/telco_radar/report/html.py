@@ -1691,7 +1691,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     )
 
     try:
-        from . import geraete_export as _geraete_export
+        from . import geraete_export_anbieter as _geraete_export
 
         geraete["export"] = _geraete_export.schreibe_exporte(
             site_dir,
@@ -1705,7 +1705,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         )
     except Exception as exc:  # noqa: BLE001
         log.error("Geraete-Export gescheitert: %s: %s", type(exc).__name__, exc)
-        from . import geraete_export as _geraete_export
+        from . import geraete_export_anbieter as _geraete_export
 
         geraete["export"] = _geraete_export.leer()
         radar_view["export"] = _geraete_export.leer()["radar"]
