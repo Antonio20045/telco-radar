@@ -1136,6 +1136,12 @@
         download>Katalog Kosten ({{ geraete.export.modell_tco.zeilen }})</a>
       {% endif %}
     </span>
+    {% if geraete.export.tco_anbieter %}
+    <p class="gr-export-anbieter">Anbieter-Zählung im Download: Zeilen /
+      davon mit Preis – {% for a in geraete.export.tco_anbieter %}{{
+      a.anbieter }} {{ a.zeilen }}/{{ a.mit_gesamtpreis }}{{ ' · ' if not
+      loop.last }}{% endfor %}</p>
+    {% endif %}
   </details>
 </section>
 {% endif %}

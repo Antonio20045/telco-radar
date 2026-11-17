@@ -102,7 +102,7 @@ def test_anzeige_laesst_die_karte_unveraendert_und_blankt_die_kopie():
     assert kopie["gesamt"] is None and kopie["delta"] is None
     assert kopie["belastbar"] is False
     assert kopie["luecke_kurz"] == geraete_preisstand.KURZ_PRUEFUNG
-    assert kopie["leer_grund"] == "Preis in Prüfung."
+    assert kopie["leer_grund"] == "Preis in Prüfung. Regel 5: Preis je Speicher."
 
 
 def _csv_zeilen(*buendel):
@@ -121,6 +121,6 @@ def test_export_nennt_den_hinweis_statt_der_zahl():
     gut = dataclasses.replace(_buendel("o2", 20.0), sku_id="h")
     zeilen = _csv_zeilen(gesperrt, gut)
     assert zeilen["g"]["Tarif/Monat EUR"] == "" and zeilen["g"][SPALTE_UEBER_24] == ""
-    assert zeilen["g"]["Lücke"] == "Preis in Prüfung."
+    assert zeilen["g"]["Lücke"] == "Preis in Prüfung. Regel 5: Preis je Speicher."
     assert zeilen["h"]["Tarif/Monat EUR"] == "20,00" and zeilen["h"][SPALTE_UEBER_24]
     assert zeilen["h"]["Lücke"] == ""
