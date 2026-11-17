@@ -86,8 +86,9 @@ def _paar(r: dict, name: str) -> dict:
     return next(p for p in r["paare"] if p["name"] == name)
 
 
-def _namen(gruppen: list[dict]) -> list[str]:
-    return [g["name"] for gr in gruppen for g in gr["geraete"]]
+def _namen(kacheln: list[dict]) -> list[str]:
+    """Die Modellnamen einer Kachelliste (flach, seit Paket C 17.11.2026)."""
+    return [g["name"] for g in kacheln]
 
 
 def test_belegt_nur_beim_wettbewerber_und_nur_bei_vodafone():
@@ -109,14 +110,14 @@ def test_belegt_nur_beim_wettbewerber_und_nur_bei_vodafone():
     assert _namen(p["nur_v"]) == [] and p["n_offen"] == 1
     p = _paar(_rechne(modelle, belege), "congstar")
     assert _namen(p["nur_v"]) == ["Galaxy S26"]
-    assert p["nur_v"][0]["geraete"][0]["beleg"]["url"].endswith("beleg.png")
+    assert p["nur_v"][0]["beleg"]["url"].endswith("beleg.png")
 
 
 def test_ohne_beleg_ist_es_eine_messluecke_nie_eine_portfolio_luecke():
     modelle = [_modell(S26, _karte("Telekom")), _modell(I18, _karte("Vodafone"))]
     p = _paar(_rechne(modelle), "Telekom")
     assert p["n_w"] == 0 and p["n_v"] == 0 and p["n_offen"] == 2
-    assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_OHNE
+    assert p["offen"][0]["geraete"][0]["grund"] == geraete_sortiment.GRUND_OHNE
     assert p["kopf"] == "0 Geräte nur bei Telekom, 0 nur bei Vodafone"
     assert p["kontext"] == (
         "Bisher belegt: 0 Geräte; 2 aktuelle Geräte sind noch nicht gemessen "
@@ -193,7 +194,7 @@ def test_alte_karte_widerlegt_keinen_beleg_und_wird_nicht_zur_luecke():
     assert p["nur_v"] and _namen(p["nur_v"]) == ["Galaxy S26"]
 
 
-def test_standard_ist_telekom_und_gruppen_haben_die_feste_reihenfolge():
+def test_standard_ist_telekom_und_kacheln_haben_die_feste_reihenfolge():
     s = _g("Nothing", "Phone 4", 4)
     katalog = Katalog(geraete=[S26, I18, s])
     modelle = [
@@ -563,7 +564,7 @@ def test_erfassung_aussage_zaehlt_als_belegte_portfolio_luecke():
     p = _paar(_rechne(modelle, erfassung_roh=erf), "congstar")
     assert _namen(p["nur_v"]) == [] and p["n_v"] == 0
     assert _namen(p["nur_w"]) == ["Galaxy S26"] and p["n_offen"] == 0
-    beleg = p["nur_w"][0]["geraete"][0]["beleg"]
+    beleg = p["nur_w"][0]["beleg"]
     assert beleg["grund"] == satz
     assert beleg["geprueft"] == "13.11.2026"
     assert "url" not in beleg and "bis" not in beleg
@@ -575,7 +576,7 @@ def test_erfassung_geht_einer_config_luecke_nie_vor(tmp_path):
     erf = _erfassung_roh(S26.device_id, Vodafone=satz)
     belege = _beleg(anbieter="Vodafone", modell=S26.device_id)
     p = _paar(_rechne(modelle, belege, erfassung_roh=erf), "congstar")
-    beleg = p["nur_w"][0]["geraete"][0]["beleg"]
+    beleg = p["nur_w"][0]["beleg"]
     assert beleg["url"].endswith("beleg.png")
 
 
@@ -588,7 +589,7 @@ def test_andere_erfassungsgruende_sind_keine_sortimentsaussage_und_zaehlen_nicht
     )
     p = _paar(_rechne(modelle, erfassung_roh=erf), "congstar")
     assert p["n_w"] == 0 and p["n_offen"] == 1
-    assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_OHNE
+    assert p["offen"][0]["geraete"][0]["grund"] == geraete_sortiment.GRUND_OHNE
 
 
 def test_veraltete_karte_mit_betrag_verdeckt_den_erfassungsbeleg_nicht():
@@ -613,7 +614,7 @@ def test_veraltete_karte_mit_betrag_verdeckt_den_erfassungsbeleg_nicht():
     p = _paar(_rechne(modelle, erfassung_roh=erf), "Telekom")
     assert p["n_w"] == 0 and p["n_offen"] == 0
     assert _namen(p["nur_v"]) == ["Galaxy S26"] and p["n_v"] == 1
-    beleg = p["nur_v"][0]["geraete"][0]["beleg"]
+    beleg = p["nur_v"][0]["beleg"]
     assert beleg["grund"] == satz
     assert beleg["geprueft"] == "13.11.2026"
 
@@ -631,7 +632,7 @@ def test_veraltete_karte_mit_betrag_und_anderer_erfassungsgrund_bleibt_messlueck
     )
     p = _paar(_rechne(modelle, erfassung_roh=erf), "Telekom")
     assert p["n_v"] == 0 and p["n_offen"] == 1
-    assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_OHNE
+    assert p["offen"][0]["geraete"][0]["grund"] == geraete_sortiment.GRUND_OHNE
 
 
 def _quarantaene_karte(anbieter: str, **besser) -> dict:
@@ -687,7 +688,9 @@ def test_erfassung_beleg_zeigt_auszug_nur_noch_im_tooltip_nicht_als_zeile():
     Gruppen-Überschrift ("Hat congstar, Vodafone nicht") dieselbe Aussage
     schon trägt. Jetzt steht ohne Link GAR KEINE Beleg-Zeile mehr - nur der
     Gerätename -, die ganze Auskunft (Kurzform, Auszug, Lesedatum) steht
-    vollständig im `title` der Zeile. Kein Text ist gefallen, nur umgezogen."""
+    vollständig im `title` der Zeile. Kein Text ist gefallen, nur umgezogen.
+    Seit Paket C (17.11.2026) ist die Zeile eine Kachel und nennt zusätzlich den
+    Hersteller."""
     satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
     modelle = [_modell(S26, _karte("congstar"))]
     erf = _erfassung_roh(S26.device_id, Vodafone=satz)
@@ -697,7 +700,7 @@ def test_erfassung_beleg_zeigt_auszug_nur_noch_im_tooltip_nicht_als_zeile():
     assert liste_w.select_one("a") is None
     assert liste_w.select_one(".gr-pf-beleg") is None
     zeile = liste_w.select_one("li")
-    assert zeile.get_text(" ", strip=True) == "Galaxy S26"
+    assert zeile.get_text(" ", strip=True) == "Samsung Galaxy S26"
     assert zeile["title"] == (
         f"bei Vodafone nicht im Angebot (Auszug: {satz} · gelesen 13.11.2026)"
     )

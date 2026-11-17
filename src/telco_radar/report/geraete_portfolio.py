@@ -25,6 +25,9 @@ Modelle der Herstellergrafik (`geraete_hersteller.aktuelle_geraete`). Alles
 kommt aus dem Seiten-Build (Bündel der Seite, `config/geraete_abdeckung.yaml`);
 es gibt keinen Abruf. Ein Ausfall steht als `fehler`, nie als leere Liste.
 
+DARSTELLUNG: Kacheln, Gruppen und Sätze baut
+`geraete_portfolio_anzeige.py`; dieses Modul teilt nur ein.
+
 ZWEITE BELEGQUELLE (P2, 13.11.2026): fehlt eine gültige Config-Lücke, zieht
 `erfassung_je` die `erfassung`-Sätze eines Modells heran (`klick_erfassung`,
 von `geraete_view` je Modell gesetzt) - nur Sätze der Form
@@ -39,18 +42,34 @@ from __future__ import annotations
 import logging
 import re
 from datetime import date
+from pathlib import Path
 
 from ..analyze import buendel_abdeckung
+from ..analyze.geraete_bilder import ORDNER as BILD_ORDNER
+from ..analyze.geraete_bilder import bilder_pfad, lade_bilder
 from ..analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT, TRENNER
 from . import geraete_hersteller
 from .anbieter_farben import legendenname, slug_fuer
-from .geraete_hersteller import HERSTELLER_VORAN, aktuelle_geraete
+from .geraete_hersteller import aktuelle_geraete
 from .geraete_hersteller_text import EIGEN
+from .geraete_portfolio_anzeige import (
+    KACHELN_SICHTBAR,
+    beleg_text,
+    fehlt_satz,
+    gruppiert,
+    in_pruefung_satz,
+    kacheln,
+    kontext,
+    kopfzeile,
+    rest,
+)
 from .geraete_rechenweg import ANBIETER_FOLGE
-from .geraete_sortiment import GRUND_OHNE, abdeckung_pfad, beleg_fuer
-from .geraete_sortiment import datum_de as _datum
+from .geraete_sortiment import abdeckung_pfad, beleg_fuer
 
 log = logging.getLogger(__name__)
+
+BILDER_ORDNER = Path(__file__).parent / "templates" / "static" / BILD_ORDNER
+"""Wo die Produktfotos im Repo liegen; von dort spiegelt `statik.kopiere()`."""
 
 _ERFASSUNG_MUSTER = re.compile(
     re.escape(SATZ_NICHT_IM_ANGEBOT)
@@ -61,13 +80,6 @@ _ERFASSUNG_MUSTER = re.compile(
 STANDARD = "Telekom"
 PREIS, ALT, IN_PRUEFUNG = "preis", "alt", "in_pruefung"
 _RANG = {PREIS: 2, IN_PRUEFUNG: 1, ALT: 0}
-FEHLT_SATZ = (
-    "{wer} führt es (Preis gemessen). Für {fehlt} liegt kein {beleg} vor{grund}."
-)
-IN_PRUEFUNG_SATZ = (
-    "{wer} führt es (Preis gemessen). {fehlt} führt es ebenfalls, der Preis "
-    "steht noch in Prüfung."
-)
 REGEL = (
     "Als Lücke zählt nur, was am Original belegt ist (Screenshot, geprüft und "
     "befristet); fehlt ein Preis ohne gültigen Beleg, ist das eine Messlücke und "
@@ -163,30 +175,6 @@ def erfassung_je(
     return aus
 
 
-def _beleg_text(b: dict) -> dict:
-    text = {"grund": b["grund"], "geprueft": _datum(b["geprueft"].isoformat())}
-    if b.get("beleg"):
-        text["url"] = b["beleg"]
-    if b.get("original"):
-        text["original"] = b["original"]
-    if b.get("bis"):
-        text["bis"] = _datum(b["bis"].isoformat())
-    return text
-
-
-def _gruppiert(zeilen: list[dict]) -> list[dict]:
-    """Nach Hersteller gruppieren: die großen drei zuerst, dann nach Zahl, Name."""
-    je: dict[str, list[dict]] = {}
-    for z in zeilen:
-        je.setdefault(z["hersteller"], []).append(z)
-    voran = [h for h in HERSTELLER_VORAN if h in je]
-    rest = sorted((h for h in je if h not in voran), key=lambda h: (-len(je[h]), h))
-    return [
-        {"hersteller": h, "geraete": sorted(je[h], key=lambda z: z["name"])}
-        for h in [*voran, *rest]
-    ]
-
-
 def wettbewerber_mit_daten(staende_je: dict, geraete: list) -> list[str]:
     """Anbieter außer Vodafone mit mindestens einem frischen Preis bei einem
     aktuellen Gerät: die festen Spalten zuerst, weitere nach Name."""
@@ -209,6 +197,7 @@ def _paar(
     belege: dict,
     erfassung_je_geraet: dict,
     heute: str,
+    bilder: dict[str, str],
 ) -> dict:
     nur_w: list[dict] = []
     nur_v: list[dict] = []
@@ -227,10 +216,15 @@ def _paar(
             erfasst = erfassung_je_geraet.get(g.device_id, {}).get(fehlt)
             if erfasst is not None:
                 beleg, grund = erfasst, ""
-        zeile = {"hersteller": g.hersteller, "name": g.modell}
+        zeile = {
+            "hersteller": g.hersteller,
+            "name": g.modell,
+            "device_id": g.device_id,
+            "bild": bilder.get(g.device_id),
+        }
         fuehrt = w if hat_w else EIGEN
         if beleg:
-            (nur_w if hat_w else nur_v).append({**zeile, "beleg": _beleg_text(beleg)})
+            (nur_w if hat_w else nur_v).append({**zeile, "beleg": beleg_text(beleg)})
         elif je.get(fehlt) == IN_PRUEFUNG:
             offen.append(
                 {
@@ -253,9 +247,11 @@ def _paar(
         "name": w,
         "slug": slug_fuer(w),
         "legende": legendenname(w),
-        "nur_w": _gruppiert(nur_w),
-        "nur_v": _gruppiert(nur_v),
-        "offen": _gruppiert(offen),
+        "nur_w": kacheln(nur_w),
+        "nur_v": kacheln(nur_v),
+        "mehr_w": rest(nur_w),
+        "mehr_v": rest(nur_v),
+        "offen": gruppiert(offen),
         "n_w": len(nur_w),
         "n_v": len(nur_v),
         "n_offen": len(offen),
@@ -264,46 +260,6 @@ def _paar(
         "kontext": kontext(len(nur_w) + len(nur_v), len(offen)),
         "offen_zeigen": not (nur_w or nur_v),
     }
-
-
-def _geraete(n: int) -> str:
-    return "1 Gerät" if n == 1 else f"{n} Geräte"
-
-
-def kopfzeile(w: str, n_w: int, n_v: int) -> str:
-    """Kopfzahlen je Paar: X nur beim Wettbewerber, Y nur bei Vodafone. Jede
-    dieser Zahlen steht in der Vorlage mit `kontext` direkt darunter."""
-    return f"{_geraete(n_w)} nur bei {legendenname(w)}, {n_v} nur bei Vodafone"
-
-
-def kontext(n_belegt: int, n_offen: int) -> str:
-    """Der Satz neben den Kopfzahlen: was die Null wirklich bedeutet."""
-    offen = (
-        "1 aktuelles Gerät ist noch nicht gemessen und wird"
-        if n_offen == 1
-        else f"{n_offen} aktuelle Geräte sind noch nicht gemessen und werden"
-    )
-    return f"Bisher belegt: {_geraete(n_belegt)}; {offen} nicht gezählt."
-
-
-def fehlt_satz(fuehrt: str, fehlt: str, grund: str) -> str:
-    """Zeile einer Messlücke: wer das Gerät nachweislich führt (gemessener Preis
-    im Bestand) und dass für den anderen Anbieter kein Beleg vorliegt."""
-    ohne = grund == GRUND_OHNE
-    return FEHLT_SATZ.format(
-        wer=legendenname(fuehrt),
-        fehlt=legendenname(fehlt),
-        beleg="Beleg" if ohne else "gültiger Beleg",
-        grund="" if ohne else f": {grund}",
-    )
-
-
-def in_pruefung_satz(fuehrt: str, fehlt: str) -> str:
-    """Zeile einer Quarantäne-Lücke (P3, 13.11.2026): `fehlt` führt das Gerät
-    nachweislich (eine Karte in Quarantäne ist kein fehlendes Gerät), nur der
-    Preis steht noch nicht fest - nie der Satz „liegt kein Beleg vor", der sich
-    wie „hat das Gerät nicht" liest."""
-    return IN_PRUEFUNG_SATZ.format(wer=legendenname(fuehrt), fehlt=legendenname(fehlt))
 
 
 def fehlende_anbieter(paare: list[dict]) -> str:
@@ -329,13 +285,14 @@ def berechne(
     belege: dict,
     heute: str,
     erfassung_roh: dict[str, str] | None = None,
+    bilder: dict[str, str] | None = None,
 ) -> dict:
     """Reine Rechnung: alle Paare gegen Vodafone."""
     geraete = aktuelle_geraete(katalog)
     je = staende(tco_modelle)
     erf = erfassung_je(tco_modelle, erfassung_roh)
     paare = [
-        _paar(w, geraete, je, belege, erf, heute)
+        _paar(w, geraete, je, belege, erf, heute, bilder or {})
         for w in wettbewerber_mit_daten(je, geraete)
     ]
     namen = [p["name"] for p in paare]
@@ -344,6 +301,7 @@ def berechne(
         "leer": not paare,
         "stand": heute,
         "paare": paare,
+        "grenze": KACHELN_SICHTBAR,
         "standard": STANDARD if STANDARD in namen else (namen[0] if namen else ""),
         "regel": REGEL,
         "fehlende": fehlende_anbieter(paare),
@@ -371,9 +329,15 @@ def ansicht(
     except (OSError, ValueError, KeyError, AttributeError) as exc:
         log.exception("Belegliste der Portfolio-Ansicht nicht lesbar")
         hinweis = f"Belegliste nicht lesbar ({type(exc).__name__}): keine Lücke belegt"
+    bilder = lade_bilder(bilder_pfad(state_dir), BILDER_ORDNER)
     try:
         ergebnis = berechne(
-            (tco or {}).get("modelle") or [], katalog, belege, heute, erfassung_roh
+            (tco or {}).get("modelle") or [],
+            katalog,
+            belege,
+            heute,
+            erfassung_roh,
+            bilder,
         )
     except (KeyError, TypeError, ValueError, AttributeError) as exc:
         log.exception("Portfolio-Ansicht nicht aufbereitbar")

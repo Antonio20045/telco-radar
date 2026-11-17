@@ -1,26 +1,46 @@
 {# Portfolio gegen Vodafone (Ziel 3): Daten und Texte liefert geraete_portfolio.py.
-   Ohne JavaScript stehen alle Paare untereinander; app.js zeigt nur das gewählte. #}
+   Ohne JavaScript stehen alle Paare untereinander; app.js zeigt nur das gewählte.
+   Die belegten Unterschiede stehen als Kachelraster (Paket C, 17.11.2026): je
+   Gerät eine Kachel mit Foto-Platz, Hersteller, Modellname und wenigen Worten.
+   Der Höhendeckel (`pf.grenze`) kommt aus dem Modul; was darüber liegt, steht in
+   einem zugeklappten `<details>` und braucht dafür kein JavaScript. #}
 {% set pf = geraete.hersteller.portfolio if geraete.hersteller else none %}
-{% macro gruppen(liste, mit_beleg) %}
+{% macro kachel(g) %}
+<li class="gr-pf-kachel{% if g.beleg and not g.beleg.url %} gr-pf-kachel--kurz{% endif %}"{% if g.beleg %} title="{{ g.beleg.titel }}"{% endif %}>
+  <span class="gr-pf-foto">
+    {% if g.bild %}<img src="{{ g.bild }}" alt="{{ g.hersteller }} {{ g.name }}" loading="lazy" decoding="async">
+    {% else %}<svg class="gr-pf-silhouette" viewBox="0 0 24 36" aria-hidden="true" focusable="false"><use href="#pf-geraet"></use></svg>{% endif %}
+  </span>
+  <span class="gr-pf-marke">{{ g.hersteller }}</span>
+  <span class="gr-pf-geraet">{{ g.name }}</span>
+  {# Ohne Screenshot keine Belegzeile: die Überschrift der Liste sagt es schon,
+     der Auszug steht im `title` der Kachel (RUHIGER-RUNDE2-1717 Aufgabe 5). #}
+  {% if g.beleg and g.beleg.url %}
+  <span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a> · {{ g.beleg.kurz }}</span>
+  {% endif %}
+</li>
+{% endmacro %}
+{% macro kacheln(liste, grenze, mehr) %}
+<ul class="gr-pf-kacheln">
+  {% for g in liste[:grenze] %}{{ kachel(g) }}{% endfor %}
+</ul>
+{% if mehr %}
+<details class="gr-pf-mehr">
+  <summary>{{ mehr }}</summary>
+  <ul class="gr-pf-kacheln">
+    {% for g in liste[grenze:] %}{{ kachel(g) }}{% endfor %}
+  </ul>
+</details>
+{% endif %}
+{% endmacro %}
+{% macro messluecken(liste) %}
   {% for gr in liste %}
   <div class="gr-pf-gruppe">
     <h5>{{ gr.hersteller }}</h5>
     <ul>
       {% for g in gr.geraete %}
-      {# RUHIGER-RUNDE2-1717 Aufgabe 5: der kurze Auszug ohne Link ("bei X
-         nicht im Angebot") stand noch als eigene Zeile je Gerät, obwohl
-         die Gruppen-Überschrift ("Hat {{ p.legende }}, Vodafone nicht")
-         dieselbe Aussage schon trägt. Ohne Link steht hier jetzt NUR der
-         Gerätename, der ganze Auszug (Kurzform + Grund + Lesedatum) steht
-         vollständig im `title` der Zeile. Mit Link (echter Beleg) bleibt
-         die Zeile wie zuvor - das sind Bedienelemente, kein Fülltext. #}
-      {% set kurz_titel = (g.beleg.grund.split(' (')[0] | replace('Bei ', 'bei ', 1) ~ ' (Auszug: ' ~ g.beleg.grund ~ ' · gelesen ' ~ g.beleg.geprueft ~ ')') if (mit_beleg and not g.beleg.url) else '' %}
-      <li{% if kurz_titel %} class="gr-pf-beleg--kurz" title="{{ kurz_titel }}"{% endif %}><span class="gr-pf-geraet">{{ g.name }}</span>
-        {% if mit_beleg %}
-        {% if g.beleg.url %}<span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>{{ g.beleg.grund }}<br>geprüft {{ g.beleg.geprueft }}{% if g.beleg.bis %}, gültig bis {{ g.beleg.bis }}{% endif %}</span>{% endif %}
-        {% else %}
+      <li><span class="gr-pf-geraet">{{ g.name }}</span>
         <span class="gr-pf-beleg">{{ g.satz }}</span>
-        {% endif %}
       </li>
       {% endfor %}
     </ul>
@@ -36,6 +56,7 @@
   {% elif pf.leer %}
   <p class="gx-leer">Kein Wettbewerber mit frischem Preis bei den aktuellen Modellen.</p>
   {% else %}
+  <svg class="gr-pf-sprite" width="0" height="0" aria-hidden="true" focusable="false"><symbol id="pf-geraet" viewBox="0 0 24 36"><rect x="1.5" y="1.5" width="21" height="33" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"></rect><rect x="9" y="4" width="6" height="1.4" rx=".7" fill="currentColor"></rect></symbol></svg>
   <p class="gr-pf-regel">{{ pf.regel }}</p>
   {% if pf.hinweis %}<p class="gr-pf-regel gr-pf-hinweis">{{ pf.hinweis }}</p>{% endif %}
   {% if pf.fehlende %}<p class="gr-pf-regel gr-pf-fehlende">{{ pf.fehlende }}</p>{% endif %}
@@ -51,16 +72,16 @@
     <div class="gr-pf-listen">
       <div class="gr-pf-liste gr-pf-liste--w">
         <h4>Hat {{ p.legende }}, Vodafone nicht</h4>
-        {% if p.nur_w %}{{ gruppen(p.nur_w, true) }}{% else %}<p class="gr-pf-leer">Keine belegte Lücke.</p>{% endif %}
+        {% if p.nur_w %}{{ kacheln(p.nur_w, pf.grenze, p.mehr_w) }}{% else %}<p class="gr-pf-leer">Keine belegte Lücke.</p>{% endif %}
       </div>
       <div class="gr-pf-liste gr-pf-liste--v">
         <h4>Hat Vodafone, {{ p.legende }} nicht</h4>
-        {% if p.nur_v %}{{ gruppen(p.nur_v, true) }}{% else %}<p class="gr-pf-leer">Keine belegte Lücke.</p>{% endif %}
+        {% if p.nur_v %}{{ kacheln(p.nur_v, pf.grenze, p.mehr_v) }}{% else %}<p class="gr-pf-leer">Keine belegte Lücke.</p>{% endif %}
       </div>
     </div>
     <details class="gr-pf-offen"{% if p.offen_zeigen %} open{% endif %}>
       <summary>Nicht gemessen (Messlücke, zählt nicht): {{ p.n_offen }}</summary>
-      {% if p.offen %}{{ gruppen(p.offen, false) }}{% else %}<p class="gr-pf-leer">Keine.</p>{% endif %}
+      {% if p.offen %}{{ messluecken(p.offen) }}{% else %}<p class="gr-pf-leer">Keine.</p>{% endif %}
     </details>
   </div>
   {% endfor %}
