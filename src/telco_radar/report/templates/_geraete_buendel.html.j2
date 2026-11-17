@@ -10,6 +10,13 @@
    weitere im EINEN Rechenweg-Aufklapper (A6: kein Datenverlust). O3 fügt
    NUR den numerischen Δ-Sortierschlüssel hinzu (`data-delta`, Punkt C).
 
+   UI-D-1717 Nachbesserung (Antonio, 17.11.2026): ein Bild, das keiner Zeile
+   zugeordnet werden kann (gleich teure Positionen, kein Klicksatz, ...), zeigt
+   trotzdem EINE Zeile mit dem Grund in Alltagsworten (`.gr-beleg-grund`,
+   `zeilen_grund` aus `geraete_zeilenbelege.grund_satz`); das ist ein anderer
+   Fall als "gar kein Bild vorhanden" (`.gr-beleg-keins`) und bleibt davon
+   unterscheidbar. Ein Anbieter ohne JEDES Bild tritt weiter zurück.
+
    A3 (STRATEGIE_GERAETE_V4, 20.09.2026): eine ALTE Zeile (Abruf älter
    als `geraete_tco_karten.ALT_AB_TAGEN`, gegen das Datum der Ausgabe)
    bleibt stehen, ausgegraut (`gr-bnd--alt`), mit Marke und Abrufdatum
@@ -37,10 +44,10 @@
    Aufklappen (`data-src`); laedt ein Bild nicht (Datei geloescht), steht an seiner
    Stelle "Bild nicht mehr verfuegbar" und `.gr-folge-zahl` zaehlt neu. Die Zuordnung rechnet Python
    (`report/geraete_zeilenbelege.py`). #}
-{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}{% set mit_bild = paare | selectattr('zeilenbilder') | list | length %}
+{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}{% set etwas_da = (paare | selectattr('zeilenbilder') | list | length) or (paare | selectattr('zeilen_grund') | list | length) %}
 <ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Auswahl">
-  <li class="gr-beleg-kopf"{% if not mit_bild %} hidden{% endif %}>Screenshots zu dieser Auswahl</li>{% for p in paare %}
-  <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"{% if not p.zeilenbilder %} hidden{% endif %}><b class="gr-beleg-anbieter">{{ haendlername(p.anbieter) }}</b>{% for z in p.zeilenbilder %}
+  <li class="gr-beleg-kopf"{% if not etwas_da %} hidden{% endif %}>Screenshots zu dieser Auswahl</li>{% for p in paare %}
+  <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"{% if not p.zeilenbilder and not p.zeilen_grund %} hidden{% endif %}><b class="gr-beleg-anbieter">{{ haendlername(p.anbieter) }}</b>{% for z in p.zeilenbilder %}
     <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
       <summary>Beleg: {% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge (<span class="gr-folge-zahl">{% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}</span>){% else %}Screenshot{% endif %} vom {{ z.datum | date_de }}</summary>
       <p class="gr-beleg-zu">Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</p>{% if z.bildfolge %}
@@ -49,9 +56,10 @@
           <img data-src="{{ f.url }}" alt="Screenshot {{ haendlername(p.anbieter) }}, {{ z.tarif }}, Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}, vom {{ z.datum | date_de }}" width="640" height="400"></li>{% endif %}{% endfor %}
       </ol>{% else %}
       <img data-src="{{ z.url }}" alt="Screenshot {{ haendlername(p.anbieter) }}, {{ z.tarif }}, vom {{ z.datum | date_de }}" width="640" height="400">{% endif %}
-    </details></div>{% endfor %}
+    </details></div>{% endfor %}{% if not p.zeilenbilder and p.zeilen_grund %}
+    <p class="gr-beleg-grund" role="status">{{ p.zeilen_grund }}</p>{% endif %}
   </li>{% endfor %}
-  <li class="gr-beleg-keins" role="status"{% if mit_bild %} hidden{% endif %}>Für diese Auswahl gibt es noch keinen Screenshot.</li>
+  <li class="gr-beleg-keins" role="status"{% if etwas_da %} hidden{% endif %}>Für diese Auswahl gibt es noch keinen Screenshot.</li>
 </ul>{% endif %}{% endif %}{% endmacro %}
 
 {# UI-1717 Aufgabe 4: mobilcom-debitel.de leitet vollstaendig auf freenet.de -

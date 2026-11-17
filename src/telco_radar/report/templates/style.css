@@ -2625,6 +2625,7 @@ b,strong{font-weight:700}
 .gr-beleg-anbieter{font-weight:600;color:var(--ink-2)}
 .gr-beleg-zeile{flex:1 1 0;min-width:min(100%,16em)}
 .gr-beleg-keins{color:var(--ink-3)}
+.gr-beleg-grund{margin:2px 0;color:var(--ink-3);font-size:12.5px;flex:1 1 100%}
 .gr-belege--zeile{margin:0}
 .gr-belege--zeile>summary{text-decoration:underline;text-underline-offset:2px;
   overflow-wrap:anywhere}

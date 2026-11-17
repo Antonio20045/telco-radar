@@ -4,12 +4,17 @@ Ein Bild gehört zum Paar (Modell, Anbieter), nicht zu einer Preiszeile; welchen
 zeigt, ist maschinell nicht feststellbar. Darum zeigt die Seite es nie: ohne
 bestätigende Preiszeile steht kein Bild, kein Link, keine Paar-Quote.
 
-UI-D-1717 (Antonio, 17.11.2026): der Vermerk steht EINMAL für die ganze Liste
-(„Für diese Auswahl gibt es noch keinen Screenshot.“), nicht mehr je Anbieter -
-bei acht Anbietern standen acht gleichlautende Zeilen untereinander. Ein
-Anbieter ohne Bild zu dieser Auswahl tritt ganz zurück. Feste Daten, nie das
-heutige Datum (CLAUDE.md Regel 7). Die Seite wird mit `render_site` gebaut (kleiner
-Bestand aus `test_geraete_buendel_kopf_zeitraum`), danach wird das DOM gelesen.
+UI-D-1717 (Antonio, 17.11.2026): ein Anbieter OHNE jedes Bild tritt ganz zurück;
+haben alle Anbieter kein Bild, sagt EINE Zeile „Für diese Auswahl gibt es noch
+keinen Screenshot.“ (statt acht gleichlautenden Zeilen je Anbieter).
+
+Nachbesserung (Prüferbefund PR #148, 17.11.2026): Telekom und o2 haben hier sehr
+wohl ein Bild (im Manifest), nur keinen Klick-Satz dazu - das ist ein anderer Fall
+als „kein Bild überhaupt“ (congstar, Vodafone) und zeigt darum seine eigene Zeile
+mit dem Grund in Alltagsworten (`.gr-beleg-grund`), statt identisch zum
+Nichts-vorhanden-Fall zu verschwinden. Feste Daten, nie das heutige Datum
+(CLAUDE.md Regel 7). Die Seite wird mit `render_site` gebaut (kleiner Bestand aus
+`test_geraete_buendel_kopf_zeitraum`), danach wird das DOM gelesen.
 """
 
 from __future__ import annotations
@@ -78,29 +83,34 @@ def test_paar_bild_steht_nie_als_beleg_auf_der_seite(seite):
     assert sorted(namen) == sorted(MIT_BILD + OHNE_BILD)
 
 
-def test_ohne_ein_einziges_zeilenbild_steht_der_vermerk_genau_einmal(seite):
-    """UI-D-1717: EINE Zeile für die ganze Liste, kein Anbieter mit eigenem Vermerk.
-
-    Gegenprobe zum alten Stand: vier Anbieter stehen in der Liste (jeder mit
-    seinem Namen im DOM), aber keiner trägt einen eigenen „kein Screenshot“-Satz
-    und keiner ist sichtbar - sonst wären es wieder vier Zeilen."""
+def test_mit_bild_ohne_klicksatz_zeigt_den_grund_ohne_bild_gar_nichts(seite):
+    """Telekom/o2 (Bild ohne Klick-Satz) zeigen GENAU EINE Grund-Zeile; congstar/
+    Vodafone (kein Bild überhaupt) treten ganz zurück - zwei verschiedene Fälle,
+    beide unterscheidbar (Prüferbefund PR #148: nicht mehr identisch darstellen)."""
     liste = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
     zeilen = liste.select("li.gr-beleg-paar")
     je_anbieter = {
         z.select_one(".gr-beleg-anbieter").get_text(strip=True): z for z in zeilen
     }
     assert sorted(je_anbieter) == sorted(MIT_BILD + OHNE_BILD)
-    for z in je_anbieter.values():
-        assert z.select(".gr-beleg-keins") == []
-        assert z.has_attr("hidden"), "ein Anbieter ohne Bild steht noch da"
+    for anbieter in MIT_BILD:
+        z = je_anbieter[anbieter]
+        assert not z.has_attr("hidden"), anbieter
+        assert z.select("details, img, a") == []
+        gruende = z.select(".gr-beleg-grund")
+        assert len(gruende) == 1, (anbieter, gruende)
+        assert gruende[0].get_text(strip=True) == (
+            "Für dieses Paar liegen keine Klick-Messungen vor."
+        )
+    for anbieter in OHNE_BILD:
+        z = je_anbieter[anbieter]
+        assert z.select(".gr-beleg-keins, .gr-beleg-grund") == []
+        assert z.has_attr("hidden"), f"{anbieter}: kein Bild überhaupt bleibt zurück"
         assert z.select("details, img, a") == []
     vermerke = liste.select("li.gr-beleg-keins")
     assert len(vermerke) == 1
-    assert vermerke[0].get_text(strip=True) == (
-        "Für diese Auswahl gibt es noch keinen Screenshot."
-    )
-    assert not vermerke[0].has_attr("hidden")
-    assert liste.select_one(".gr-beleg-kopf").has_attr("hidden")
+    assert vermerke[0].has_attr("hidden"), "Telekom/o2 zeigen ja schon ihren Grund"
+    assert not liste.select_one(".gr-beleg-kopf").has_attr("hidden")
     assert "ohne Beleg" not in seite.get_text(" ", strip=True)
 
 
@@ -172,8 +182,10 @@ def test_manifest_json_der_fixture_ist_lesbar(site):
     assert len(json.loads(pfad.read_text(encoding="utf-8"))["belege"]) == 2
 
 
-def test_im_browser_steht_der_vermerk_genau_einmal_ohne_bild(site, chromium):
-    """Sichtbar gezählt wie ein Leser, 1440 und 390 px: EIN Vermerk, kein Bild."""
+def test_im_browser_zeigt_den_grund_bei_bild_und_bleibt_still_ohne_bild(site, chromium):
+    """Sichtbar gezählt wie ein Leser, 1440 und 390 px: zwei Grund-Zeilen (Telekom,
+    o2), kein Bild, der globale Vermerk bleibt aus (die Grund-Zeilen sagen schon,
+    dass es Screenshots gibt)."""
     import functools
     import http.server
     import threading
@@ -192,9 +204,13 @@ def test_im_browser_steht_der_vermerk_genau_einmal_ohne_bild(site, chromium):
                 s.goto(url, wait_until="domcontentloaded")
                 keins = s.locator("#gr-bnd-gruppe .gr-beleg-keins")
                 assert keins.count() == 1, breite
-                assert keins.first.is_visible(), breite
+                assert not keins.first.is_visible(), breite
+                gruende = s.locator("#gr-bnd-gruppe .gr-beleg-grund")
+                assert gruende.count() == 2, breite
+                for i in range(gruende.count()):
+                    assert gruende.nth(i).is_visible(), breite
                 assert (
-                    s.locator("#gr-bnd-gruppe .gr-beleg-paar:visible").count() == 0
+                    s.locator("#gr-bnd-gruppe .gr-beleg-paar:visible").count() == 2
                 ), breite
                 assert s.locator("#gr-bnd-gruppe .gr-beleg-paare img").count() == 0
                 assert s.evaluate("document.documentElement.scrollWidth") <= breite, (

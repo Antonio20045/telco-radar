@@ -157,43 +157,51 @@ def test_die_eindeutige_zeile_steht_im_paar_eintrag_mit_ihrem_bild(lager, seite)
         assert "€" in zu
 
 
-def test_unklare_zuordnung_zeigt_kein_zeilenbild(lager, seite):
+def test_unklare_zuordnung_zeigt_genau_eine_grund_zeile(lager, seite):
     """Fail-closed: gleich teure Sätze (Telekom), neuerer Abruf als das Bild (congstar)
     und fehlende Klick-Messung (Vodafone) ergeben nie ein Bild an einer Zeile, obwohl
-    die Paare ein Seiten-Bild haben.
-
-    UI-D-1717: der technische Grund steht nicht mehr auf der Seite (er stand an
-    jedem Anbieter einzeln und war Fachsprache); er bleibt im Log von
-    ``geraete_zeilenbelege`` und in ``zeilen_grund``. Auf der Seite tritt der
-    Anbieter ohne Bild ganz zurück - nur o2 steht hier."""
+    die Paare ein Seiten-Bild haben; jeder dieser Anbieter zeigt trotzdem GENAU EINE
+    Zeile mit dem Grund in Alltagsworten (Prüferbefund PR #148: der Grund war
+    verschwunden, identisch zum Fall "kein Bild überhaupt"; beide bleiben
+    unterscheidbar)."""
     paare = _paare(seite)
     n = _anzahl(lager)
-    text = seite.get_text(" ", strip=True)
-    for anbieter in ("Telekom", "congstar", "Vodafone"):
+    erwartet = {
+        "Telekom": zeilen.grund_satz(schluessel.GRUND_GLEICHSTAND, HEUTE),
+        "congstar": zeilen.grund_satz(
+            schluessel.GRUND_BESTAND_NEUER, GESTERN.isoformat()
+        ),
+        "Vodafone": zeilen.grund_satz(schluessel.GRUND_KEIN_KLICKSATZ, ""),
+    }
+    for anbieter, satz in erwartet.items():
         assert n[anbieter], f"Gegenprobe: Zeilen für {anbieter}"
         li = paare[anbieter]
         assert li.select("details, img, .gr-beleg-zeile") == []
-        assert li.has_attr("hidden"), anbieter
-    for grund in (
-        schluessel.GRUND_GLEICHSTAND,
-        schluessel.GRUND_BESTAND_NEUER,
-        schluessel.GRUND_KEIN_KLICKSATZ,
-    ):
-        assert grund not in text, grund
+        assert not li.has_attr("hidden"), anbieter
+        gruende = li.select(".gr-beleg-grund")
+        assert len(gruende) == 1, (anbieter, gruende)
+        assert gruende[0].get_text(strip=True) == satz
+    keins = seite.select_one("#gr-bnd-gruppe .gr-beleg-keins")
+    assert keins.has_attr("hidden"), "o2 hat ein Bild: der globale Vermerk bleibt aus"
 
 
-def test_quote_nennt_eine_zahl_ohne_aufzaehlung(lager, seite):
-    """Die Seite zählt Zeilen mit eigenem Bild gegen alle Preiszeilen - EINE Zahl.
-
-    UI-D-1717: die Aufzählung je Anbieter („congstar 0 von N · o2 …“) ist von der
-    Seite genommen; ``quote()['je_anbieter']`` trägt sie unverändert weiter."""
+def test_quote_nennt_je_anbieter_zeilen_nicht_paare(lager, seite):
+    """Die Seite zählt Zeilen je Anbieter, ehrlich auch bei 0, und sagt, dass die
+    Zuordnung über die Messung läuft und das Bild nur die Preisfelder zeigt (harte
+    Regel 11: eine Aufschlüsselung je Anbieter deckt eine Erfassungslücke auf, eine
+    einzelne Gesamtzahl würde sie verstecken)."""
     n = _anzahl(lager)
     satz = seite.select_one("#gr-zeilenquote").get_text(strip=True)
-    assert satz == (
-        f"Mit eigenem Screenshot belegt: {n['o2']} von {sum(n.values())} Preiszeilen."
+    erwartet = (
+        "Preiszeilen mit eigenem Screenshot, Zuordnung über die Messung "
+        "(aus dem Bild allein nicht ablesbar): "
+        f"congstar 0 von {n['congstar']} · o2 {n['o2']} von {n['o2']} · "
+        f"Telekom 0 von {n['Telekom']} · Vodafone 0 von {n['Vodafone']}; "
+        f"zusammen {n['o2']} von {sum(n.values())}."
     )
+    assert satz == erwartet
     assert "Paaren" not in satz
-    assert "congstar" not in satz
+    assert "Tarif und Laufzeit stimmen" not in satz
 
 
 def test_paar_nennt_seine_zeilen_mit_bild(lager, seite):

@@ -24,21 +24,64 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
 
-from ..analyze.beleg_position import position_des_bildes
+from ..analyze.beleg_position import (
+    GRUND_BESTAND_NEUER,
+    GRUND_GLEICHSTAND,
+    GRUND_KEIN_KLICKSATZ,
+    GRUND_KEIN_SATZ_VOM_TAG,
+    GRUND_KEINE_KOSTEN,
+    position_des_bildes,
+)
 from ..analyze.geraete_pruefstatus import buendel_aus_satz
 from ..beleg_bildfolge import fremd_zur_kennung
 from ..beleg_regeln import KENNUNG_LAENGE, anbieter_schluessel
 from ..tarif_model import QUELLE_KLICK
 from .geraete_laufzeit import raten_laufzeit
 from .geraete_preisstand import anzeige as preis_anzeige
+from .geraete_sortiment import datum_de
 from .geraete_tco_karten import geraet_aus_sku, modell_schluessel
 
 log = logging.getLogger(__name__)
 
 GRUND_FREMD = "Bild gehört zu einer anderen Messung"
 GRUND_UNLESBAR = "Bildsatz unlesbar"
-"""Der Vermerk auf der Seite nennt keine Kennungen und keine Fehlertexte: die stehen im
-Log (``log.warning``), die Leser brauchen den Grund, nicht den Schlüssel."""
+"""Der technische Schlüssel steht nur im Log (``log.warning``); die Seite zeigt
+einen laienverständlichen Satz (``grund_satz``), nie Fachsprache oder Kennungen."""
+
+_GRUND_SAETZE: dict[str, str] = {
+    GRUND_KEIN_KLICKSATZ: "Für dieses Paar liegen keine Klick-Messungen vor.",
+    GRUND_BESTAND_NEUER: (
+        "Es gibt einen Screenshot vom {datum}, das Angebot hat sich seither geändert."
+    ),
+    GRUND_KEIN_SATZ_VOM_TAG: (
+        "Es gibt einen Screenshot vom {datum}, dazu fehlt eine Messung von diesem Tag."
+    ),
+    GRUND_KEINE_KOSTEN: (
+        "Es gibt einen Screenshot vom {datum}, die Kosten dazu fehlen."
+    ),
+    GRUND_GLEICHSTAND: (
+        "Es gibt einen Screenshot vom {datum}, er lässt sich keinem einzelnen "
+        "Tarif zuordnen."
+    ),
+    GRUND_FREMD: "Es gibt einen Screenshot, er gehört zu einer anderen Messung.",
+    GRUND_UNLESBAR: (
+        "Es gibt einen Screenshot, die Zuordnung ist derzeit nicht lesbar."
+    ),
+}
+_GRUND_UNBEKANNT = "Es gibt einen Screenshot, er lässt sich keiner Preiszeile zuordnen."
+
+
+def grund_satz(grund: str, datum: str | None) -> str:
+    """Der technische Grund (``GRUND_*``) als EIN laienverständlicher Satz.
+
+    Nennt das Datum des Bilds, wenn die Vorlage eines verlangt und ``datum``
+    bekannt ist; ein unbekannter Schlüssel fällt auf einen allgemeinen, aber
+    ehrlichen Satz zurück (nie eine leere Zeile, Clean Code 5)."""
+    vorlage = _GRUND_SAETZE.get(grund, _GRUND_UNBEKANNT)
+    if "{datum}" in vorlage and not datum:
+        return _GRUND_UNBEKANNT
+    return vorlage.format(datum=datum_de(datum)) if "{datum}" in vorlage else vorlage
+
 
 ZeilenbelegFuer = Callable[[dict], "dict | None"]
 
@@ -80,8 +123,9 @@ def baue_index(
     saetze: Iterable[dict[str, Any]],
     bilder_je_paar: dict[tuple[str, str], list[dict]],
     katalog: Any,
-) -> tuple[dict[str, Zeilenbeleg], dict[tuple[str, str], str]]:
-    """``beleg_id`` zu ``Zeilenbeleg``; je Paar der Grund, warum keine Zeile belegt ist.
+) -> tuple[dict[str, Zeilenbeleg], dict[tuple[str, str], tuple[str, str]]]:
+    """``beleg_id`` zu ``Zeilenbeleg``; je Paar Grund und Bilddatum, warum keine Zeile
+    belegt ist (``grund_satz`` übersetzt den Grund für die Seite).
 
     ``bilder_je_paar`` sind die angezeigten Bilder je (Gerät, Anbieter), neueste zuerst
     (``geraete_belege.sortiert_je_preis``); es zählt das neueste, wie beim Paar-Link.
@@ -99,26 +143,27 @@ def baue_index(
         )
         gruppen[schluessel].append(satz)
     index: dict[str, Zeilenbeleg] = {}
-    gruende: dict[tuple[str, str], str] = {}
+    gruende: dict[tuple[str, str], tuple[str, str]] = {}
     for schluessel, bilder in bilder_je_paar.items():
         if not bilder:
             continue
         bild = bilder[0]
         wahl = position_des_bildes(gruppen.get(schluessel, []), bild["datum"])
         if wahl.satz is None:
-            gruende[schluessel] = wahl.grund
+            log.info("Zeilenbeleg %s: %s", schluessel, wahl.grund)
+            gruende[schluessel] = (wahl.grund, bild["datum"])
             continue
         try:
             buendel = buendel_aus_satz(wahl.satz)
         except (TypeError, ValueError, KeyError) as fehler:
             log.warning("Zeilenbeleg %s: Bildsatz unlesbar: %s", schluessel, fehler)
-            gruende[schluessel] = GRUND_UNLESBAR
+            gruende[schluessel] = (GRUND_UNLESBAR, bild["datum"])
             continue
         folge = bild.get("bildfolge") or ()
         fremd = fremd_zur_kennung(bild["url"], folge, buendel.beleg_id[:KENNUNG_LAENGE])
         if fremd:
             log.warning("Zeilenbeleg %s: %s: %s", schluessel, GRUND_FREMD, fremd)
-            gruende[schluessel] = GRUND_FREMD
+            gruende[schluessel] = (GRUND_FREMD, bild["datum"])
             continue
         index[buendel.beleg_id] = Zeilenbeleg(
             geraet_id=schluessel[0],
@@ -176,7 +221,7 @@ def ergaenze_paare(
     paare: list[dict],
     modell: dict,
     fuer: ZeilenbelegFuer,
-    gruende: dict[tuple[str, str], str] | None = None,
+    gruende: dict[tuple[str, str], tuple[str, str]] | None = None,
 ) -> list[dict]:
     """Jedes Paar nennt seine Preiszeilen mit eigenem Bild (Gerät, Tarif, Raten, Preis).
 
@@ -184,8 +229,10 @@ def ergaenze_paare(
     ``zeilenbilder`` sind die belegten (je mit ``kombi``), ``kombis`` nennt alle
     Kombinationen (Band:Laufzeit) des Paares, damit die Seite bei der Wahl einer
     Kombination ohne Bild den Vermerk zeigt statt eines anderen Bildes; ohne eine
-    belegte Zeile nennt ``zeilen_grund`` (wenn bekannt), warum das Bild des Paares
-    keiner Zeile zugeordnet wird.
+    belegte Zeile nennt ``zeilen_grund`` (wenn bekannt) den laienverständlichen Satz,
+    warum das Bild des Paares keiner Zeile zugeordnet wird (``grund_satz``) - EINE
+    Zeile auf der Seite, verschieden von „kein Bild überhaupt“ (UI-D-1717,
+    17.11.2026, Antonios Befund: der Grund darf nicht verschwinden).
     """
     gesamt: dict[str, int] = defaultdict(int)
     kombis: dict[str, set[str]] = defaultdict(set)
@@ -210,7 +257,9 @@ def ergaenze_paare(
     ergebnis = []
     for paar in paare:
         schluessel = anbieter_schluessel(paar["anbieter"])
-        grund = (gruende or {}).get((modell.get("id", ""), schluessel), "")
+        grund, bild_datum = (gruende or {}).get(
+            (modell.get("id", ""), schluessel), ("", "")
+        )
         ergebnis.append(
             {
                 **paar,
@@ -218,7 +267,11 @@ def ergaenze_paare(
                 "zeilen_gesamt": gesamt[schluessel],
                 "zeilenbilder": bilder[schluessel],
                 "kombis": " ".join(sorted(kombis[schluessel])),
-                "zeilen_grund": "" if bilder[schluessel] else grund,
+                "zeilen_grund": (
+                    ""
+                    if bilder[schluessel] or not grund
+                    else grund_satz(grund, bild_datum)
+                ),
             }
         )
     return ergebnis
@@ -231,13 +284,12 @@ def _zahl(n: int) -> str:
 def quote(fuer: ZeilenbelegFuer, modelle: list[dict], bestand_ok: bool = True) -> dict:
     """Preiszeilen mit eigenem Bild, je Anbieter und zusammen.
 
-    ``satz`` ist der fertige Text der Seite; ohne Zeile oder bei unlesbarem Bestand
-    bleibt er leer (der Ausfall nennt es), statt „0 von N“ zu behaupten.
-
-    UI-D-1717 (Antonio, 17.11.2026): der Satz nennt nur noch die EINE Zahl. Die
-    Aufzählung je Anbieter („1&1 64 von 453 · congstar 0 von 866 · …“) stand als
-    siebengliedrige Zeile unter der Belegliste und war für den Leser kein Satz
-    mehr; ``je_anbieter`` trägt sie unverändert weiter.
+    ``satz`` ist der fertige Text der Seite, mit der Aufschlüsselung je Anbieter
+    (harte Regel 11: ein gleicher Wert bei allen Anbietern ist zuerst eine
+    Erfassungslücke, die ohne die Aufschlüsselung auf der Seite verschwände -
+    UI-D-1717, 17.11.2026, Rückbau der Abschwächung); ohne Zeile oder bei
+    unlesbarem Bestand bleibt er leer (der Ausfall nennt es), statt „0 von N“
+    zu behaupten.
     """
     je_anbieter: dict[str, list[int]] = {}
     for modell in modelle:
@@ -253,8 +305,12 @@ def quote(fuer: ZeilenbelegFuer, modelle: list[dict], bestand_ok: bool = True) -
     gesamt = sum(e["gesamt"] for e in liste)
     satz = ""
     if gesamt and bestand_ok:
+        teile = " · ".join(
+            f"{e['anbieter']} {_zahl(e['mit'])} von {_zahl(e['gesamt'])}" for e in liste
+        )
         satz = (
-            f"Mit eigenem Screenshot belegt: {_zahl(mit)} von "
-            f"{_zahl(gesamt)} Preiszeilen."
+            "Preiszeilen mit eigenem Screenshot, Zuordnung über die Messung "
+            f"(aus dem Bild allein nicht ablesbar): {teile}; "
+            f"zusammen {_zahl(mit)} von {_zahl(gesamt)}."
         )
     return {"mit": mit, "gesamt": gesamt, "je_anbieter": liste, "satz": satz}

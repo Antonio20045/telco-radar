@@ -384,13 +384,13 @@ def test_s1_das_einzelbild_wird_mit_der_kennung_der_position_benannt():
 
 def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
     """Folge der Kennung K, die Zeile gehört zu einer anderen ``beleg_id``: kein Bild,
-    ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile).
+    sondern GENAU EINE Zeile mit dem Grund in Alltagsworten (kein Bild unter der
+    falschen Zeile).
 
-    UI-D-1717 (Antonio, 17.11.2026): der Vermerk steht EINMAL für die ganze
-    Liste statt je Anbieter, und er nennt den technischen Grund nicht mehr -
-    der steht im Log von ``geraete_zeilenbelege`` und in ``zeilen_grund``.
-    Unverändert bleibt, worauf es hier ankommt: kein fremdes Bild, keine
-    Kennung im Text."""
+    Prüferbefund PR #148: eine frühere Fassung hatte diesen Grund von der Seite
+    genommen (nur noch im Log); das macht diesen Fall ununterscheidbar vom Fall
+    "kein Bild überhaupt" - das widerspricht Antonios Auftrag. Kennungen gehören
+    trotzdem nie in den Text (fail-closed bleibt stumm über die ``beleg_id``)."""
     fremd_id = "9" * 64
     assert fremd_id[:16] != weg.beleg_id[:16]
     seite = _seite(tmp_path, weg.manifest, fremd_id)
@@ -398,14 +398,17 @@ def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
         li for li in seite.select(".gr-beleg-paar") if li["data-anbieter"] == "o2"
     )
     assert paar.select("img") == [] and paar.select(".gr-bildfolge") == []
-    assert paar.has_attr("hidden")
+    assert not paar.has_attr("hidden")
+    gruende = paar.select(".gr-beleg-grund")
+    assert len(gruende) == 1, gruende
+    text = gruende[0].get_text(" ", strip=True)
+    assert text == pos.zeilen.grund_satz(pos.zeilen.GRUND_FREMD, "")
+    assert "gehört zu einer anderen Messung" in text
+    assert weg.beleg_id[:16] not in text and fremd_id[:16] not in text, text
+    assert "Messung " + fremd_id[:4] not in text
     liste = seite.select_one("#gr-bnd-gruppe .gr-beleg-paare")
     keins = liste.select_one("li.gr-beleg-keins")
-    assert "hidden" not in keins.attrs
-    text = seite.get_text(" ", strip=True)
-    assert "Für diese Auswahl gibt es noch keinen Screenshot." in text
-    assert weg.beleg_id[:16] not in text and fremd_id[:16] not in text
-    assert "Messung " + fremd_id[:4] not in text
+    assert "hidden" in keins.attrs, "der Anbieter hat ja einen Grund-Hinweis gezeigt"
 
 
 def _adr(name: str) -> str:

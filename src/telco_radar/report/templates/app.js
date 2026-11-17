@@ -2928,7 +2928,13 @@ var TelcoFrage = (function () {
      tritt ZURUECK, statt seinen eigenen Vermerk zu zeigen - acht Anbieter
      ergaben acht Zeilen "liegt noch kein Screenshot vor" untereinander. Zeigt
      die ganze Liste kein einziges Bild, sagt es EINE Zeile am Ende
-     (`.gr-beleg-keins`); dann tritt auch ihr Kopf zurueck. */
+     (`.gr-beleg-keins`); dann tritt auch ihr Kopf zurueck.
+
+     Nachbesserung (17.11.2026): ein Anbieter mit einem Bild, das sich keiner
+     Zeile zuordnen laesst, behaelt trotzdem EINE Zeile mit dem Grund
+     (`.gr-beleg-grund`, server-seitig gerendert, nicht vom Band/Laufzeit-Filter
+     abhaengig) - der tritt NICHT zurueck und zaehlt als "etwas da", damit der
+     globale Vermerk nicht faelschlich den einzigen Hinweis verdeckt. */
   function belegPasst(kombi, band, lz) {
     var t = kombi.split(':');
     var bandOk = !band || !t[0] || t[0] === band;
@@ -2951,8 +2957,9 @@ var TelcoFrage = (function () {
                 z.hidden = !passt;
                 if (passt) sichtbar += 1;
               });
-            li.hidden = sichtbar === 0;
-            gesamt += sichtbar;
+            var hatGrund = !!li.querySelector('.gr-beleg-grund');
+            li.hidden = sichtbar === 0 && !hatGrund;
+            gesamt += sichtbar + (hatGrund ? 1 : 0);
           });
         var keins = liste.querySelector('.gr-beleg-keins');
         if (keins) keins.hidden = gesamt > 0;
