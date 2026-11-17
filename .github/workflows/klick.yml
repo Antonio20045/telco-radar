@@ -47,6 +47,14 @@ name: Klick-Tageslauf
 # PARALLELLAUF: eigene concurrency-Gruppe `klick` ohne Abbruch (Regel 9).
 # Die Klick-Erkundung weicht diesem Lauf aus (klickparallel.WORKFLOWS).
 #
+# HEUTE-SPERRE (P1717, 17.11.2026): ein Mac-Cron startet diesen Lauf
+# frueh (00:00-02:00 UTC) per `workflow_dispatch`, weil GitHubs Schedule
+# 5-8 h verspaetet kommt. Kommt der verspaetete Schedule-Lauf trotzdem,
+# wuerde er alle Anbieterseiten ein zweites Mal besuchen. Der Schritt
+# `heute` in `plan` prueft darum bei `schedule`-Laeufen, ob fuer heute
+# schon ein anderer Klick-Lauf existiert, und ueberspringt dann `klick`,
+# `ablegen` und `belege`. `workflow_dispatch` laeuft immer.
+#
 # CRON HIER BEWUSST UNVERAENDERT (P1717): gemessen wurden ueber 30 Tage
 # Verzuege von 5h41 bis 7h38 fuer DIESEN Lauf und vergleichbare Verzuege fuer
 # geraete.yml (02:17, 09:47, 15:47) und radar.yml (11:00) - alle Minuten
@@ -59,6 +67,10 @@ name: Klick-Tageslauf
 # zweite Zufallsverzoegerung, auch wenn dieser Lauf selbst spaet startet.
 
 on:
+  # ZWEI WEGE zu diesem Lauf: ein Mac-Cron stoesst ihn frueh per
+  # `workflow_dispatch` an (00:00-02:00 UTC), der Schedule unten ist nur
+  # der Ruckfall, falls der Mac-Starter ausfaellt - daher die Heute-Sperre
+  # oben, die den spaeteren der beiden Anstoesse leer durchlaufen laesst.
   schedule:
     - cron: "5 0 * * *"
   workflow_dispatch:
@@ -75,8 +87,10 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
+      actions: read
     outputs:
       anbieter: ${{ steps.plan.outputs.anbieter }}
+      uebersprungen: ${{ steps.heute.outputs.uebersprungen }}
     steps:
       - uses: actions/checkout@v4
 
@@ -87,6 +101,30 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # Nur bei `schedule`: existiert fuer heute (UTC) schon ein anderer
+      # Klick-Lauf (laufend oder abgeschlossen, nicht abgebrochen)? Dann
+      # kam der Mac-Starter diesem verspaeteten Schedule-Termin schon
+      # zuvor - `klick`, `ablegen` und `belege` werden unten uebersprungen.
+      - name: Heute schon ein Klick-Lauf?
+        id: heute
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          heute=$(date -u +%Y-%m-%d)
+          anderer=$(gh run list --workflow klick.yml --limit 20 \
+            --json databaseId,createdAt,conclusion \
+            --jq ".[] | select(.databaseId != ${{ github.run_id }}) \
+              | select(.createdAt | startswith(\"$heute\")) \
+              | select(.conclusion != \"cancelled\")" | head -n1)
+          if [ -n "$anderer" ]; then
+            echo "Heute laeuft/lief schon ein anderer Klick-Lauf - dieser Schedule-Termin wird uebersprungen."
+            echo "uebersprungen=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Kein anderer Klick-Lauf heute - dieser Lauf macht weiter."
+            echo "uebersprungen=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # Jeder Anbieter mit Karte als JSON-Liste, ohne Netz.
       - name: Anbieter mit Klick-Karte
         id: plan
@@ -96,7 +134,7 @@ jobs:
 
   klick:
     needs: plan
-    if: needs.plan.outputs.anbieter != '[]'
+    if: needs.plan.outputs.anbieter != '[]' && needs.plan.outputs.uebersprungen != 'true'
     runs-on: ubuntu-latest
     # = --job-frist-sekunden 10800 unten = JOB_FRIST_S in klicktageslauf.py
     timeout-minutes: 180
@@ -160,7 +198,7 @@ jobs:
   ablegen:
     # Auch wenn ein Matrix-Job scheitert: die anderen Anbieter werden abgelegt.
     needs: [plan, klick]
-    if: ${{ always() && needs.plan.result == 'success' }}
+    if: ${{ always() && needs.plan.result == 'success' && needs.plan.outputs.uebersprungen != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -214,7 +252,7 @@ jobs:
   belege:
     # Auch wenn ein Matrix-Job scheitert: die anderen Anbieter werden abgelegt.
     needs: [plan, klick]
-    if: ${{ always() && needs.plan.result == 'success' }}
+    if: ${{ always() && needs.plan.result == 'success' && needs.plan.outputs.uebersprungen != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
