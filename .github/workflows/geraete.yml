@@ -58,16 +58,22 @@ on:
     # niemand fuer erledigt haelt: der Lauf crawlt nach dem Start noch
     # bis zu `--frist` Sekunden weiter, und medimax/ep kommen erst an
     # Position 4 und 5 der Anbieterreihenfolge. Verzug (340 min) plus
-    # Crawlfrist (25 min) sind 365 min - breiter als das Fenster selbst
-    # (360 min). Es gibt also KEINEN Cron-Wert, der allein garantiert,
-    # dass auch der letzte Abruf noch vor 08:00 liegt.
+    # Crawlfrist (seit 17.11.2026: 50 min statt 25 min, P1 o2-Budget)
+    # sind 390 min - breiter als das Fenster selbst (360 min), und zwar
+    # um 30 statt vorher um 5 Minuten. Es gibt also erst recht KEINEN
+    # Cron-Wert, der allein garantiert, dass auch der letzte Abruf noch
+    # vor 08:00 liegt - das galt schon vorher, kein Vorruecken des
+    # Cron-Termins aendert etwas an dieser Rechnung (der Verzug selbst
+    # ist die unsichere Groesse, nicht der Termin).
     #
     # Getragen wird die Zusage deshalb vom Code, nicht von diesem
     # Termin: die Fensterpruefung gilt je Abruf - in der Sammelphase
     # (`collect/geraete/__init__.py`, `Abrufschleuse`) ebenso wie in den
     # Nachbearbeitungs-Haken danach (`nachsammle_buendel`) -, und die
     # Sammelfrist wird gegen das Fensterende gedeckelt. Wer hier etwas
-    # verschiebt, prueft beides mit.
+    # verschiebt, prueft beides mit. Die laengere Crawlfrist verschiebt
+    # nur, WIE VIELE Tage medimax/ep real treffen - sicher bleibt es
+    # trotzdem, weil die Fensterpruefung jeden einzelnen Abruf deckelt.
     - cron: "17 2 * * *"
     # ERSATZTERMINE (29.09.2026). GitHub verspaetet geplante Laeufe nicht
     # nur, es laesst sie unter Last auch ganz ausfallen. Zwei weitere
@@ -82,7 +88,7 @@ on:
       frist:
         description: "Zeitbudget der Sammelphase in Sekunden"
         required: false
-        default: "1500"
+        default: "3000"
 
 permissions:
   contents: write
@@ -101,7 +107,7 @@ jobs:
     # Grosszuegig, weil die Bremse hier nicht die Rechenzeit ist, sondern die
     # Crawl-delay: zehn Sekunden je Abruf mal zwanzig Produktseiten sind
     # allein fuer einen Haendler mehr als drei Minuten.
-    timeout-minutes: 40
+    timeout-minutes: 70
     steps:
       - uses: actions/checkout@v4
         with:
@@ -141,7 +147,7 @@ jobs:
         run: |
           set -o pipefail
           python -m telco_radar.geraete_pipeline --root . \
-            --frist "${{ github.event.inputs.frist || 1500 }}" \
+            --frist "${{ github.event.inputs.frist || 3000 }}" \
             2>&1 | tee geraete.log
 
       - name: Upload log
