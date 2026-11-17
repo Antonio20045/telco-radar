@@ -12,6 +12,16 @@ on:
     # dahinter und halbiert die Laufkosten mit einer Zeile.
     # Taeglich seit 09.10.2026 (Pitch 4 "Meldungen kostenlos"): die KI laeuft
     # ueber kostenlose Modelle (llm_provider: frei), ein Lauf kostet nichts mehr.
+    #
+    # ZWEI WEGE zu diesem Lauf (P1717, 17.11.2026, gleiches Muster wie
+    # klick.yml/PR #145): ein Mac-Cron stoesst ihn frueh per
+    # `workflow_dispatch` an, weil GitHubs Schedule hier gemessen 5h41 bis
+    # 10h20 verspaetet kommt (Ausgabe vom 16.11. ging laut `gh run list`
+    # erst 20:51 UTC los) - bis dahin zeigt die Startseite tagsueber immer
+    # die Ausgabe des Vortags. Der Schedule unten ist nur der Ruckfall, falls
+    # der Mac-Starter ausfaellt; der Schritt `heute` prueft darum bei
+    # `schedule`-Laeufen, ob fuer heute schon ein anderer Radar-Lauf
+    # existiert, und ueberspringt dann Pipeline, Commit und Newsletter.
     - cron: "0 11 * * *" # taeglich 11:00 UTC
   workflow_dispatch:
     inputs:
@@ -31,6 +41,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: radar
@@ -106,6 +117,30 @@ jobs:
       - name: Install Playwright Chromium
         run: python -m playwright install --with-deps chromium
 
+      # Nur bei `schedule`: existiert fuer heute (UTC) schon ein anderer
+      # Radar-Lauf (laufend oder abgeschlossen, nicht abgebrochen)? Dann kam
+      # der Mac-Starter diesem verspaeteten Schedule-Termin schon zuvor -
+      # Pipeline, Commit, Deploy und Newsletter werden unten uebersprungen.
+      - name: Heute schon ein Radar-Lauf?
+        id: heute
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          heute=$(date -u +%Y-%m-%d)
+          anderer=$(gh run list --workflow radar.yml --limit 20 \
+            --json databaseId,createdAt,conclusion \
+            --jq ".[] | select(.databaseId != ${{ github.run_id }}) \
+              | select(.createdAt | startswith(\"$heute\")) \
+              | select(.conclusion != \"cancelled\")" | head -n1)
+          if [ -n "$anderer" ]; then
+            echo "Heute laeuft/lief schon ein anderer Radar-Lauf - dieser Schedule-Termin wird uebersprungen."
+            echo "uebersprungen=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Kein anderer Radar-Lauf heute - dieser Lauf macht weiter."
+            echo "uebersprungen=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Diagnose sources
         # Diagnostic-only dispatch: never touches the LLM, never commits, never
         # deploys. sources_only runs the health check + feed-rescue probe over
@@ -144,7 +179,7 @@ jobs:
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Check LLM secret presence
-        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
+        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' && steps.heute.outputs.uebersprungen != 'true' }}
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
@@ -158,7 +193,7 @@ jobs:
 
       - name: Run pipeline
         id: pipeline
-        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
+        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' && steps.heute.outputs.uebersprungen != 'true' }}
         env:
           # If MOONSHOT_API_KEY is set, the pipeline uses Moonshot/Kimi
           # (OpenAI-compatible) automatically; otherwise it falls back to Anthropic.
@@ -227,7 +262,7 @@ jobs:
 
       - name: Commit state, report and site
         id: commit
-        if: ${{ !cancelled() && (success() || steps.pipeline.outputs.render_ausfall == 'true') && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
+        if: ${{ !cancelled() && (success() || steps.pipeline.outputs.render_ausfall == 'true') && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' && steps.heute.outputs.uebersprungen != 'true' }}
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -276,7 +311,7 @@ jobs:
         #
         # Ziel ist das LEERE Inbox-Repo, nicht der Store - siehe
         # mail_repo/README.md.
-        if: ${{ success() && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
+        if: ${{ success() && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' && steps.heute.outputs.uebersprungen != 'true' }}
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.INBOX_DISPATCH_TOKEN }}
