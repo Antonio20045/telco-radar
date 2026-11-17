@@ -16,7 +16,7 @@
   {# Ohne Screenshot keine Belegzeile: die Überschrift der Liste sagt es schon,
      der Auszug steht im `title` der Kachel (RUHIGER-RUNDE2-1717 Aufgabe 5). #}
   {% if g.beleg and g.beleg.url %}
-  <span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a> · {{ g.beleg.kurz }}</span>
+  <span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Quelle</a>{% endif %} · {{ g.beleg.kurz }}</span>
   {% endif %}
 </li>
 {% endmacro %}
