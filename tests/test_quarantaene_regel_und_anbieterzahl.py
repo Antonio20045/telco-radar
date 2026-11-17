@@ -26,7 +26,12 @@ HEUTE = "2026-11-17"
 SKU = "pruefer-phone-256-schwarz"
 
 
-def _buendel(anbieter: str, sku: str = SKU, pruefung: str | None = None) -> Buendel:
+def _buendel(
+    anbieter: str,
+    sku: str = SKU,
+    pruefung: str | None = None,
+    laufzeit_monate: int = 24,
+) -> Buendel:
     return Buendel(
         sku_id=sku,
         anbieter=anbieter,
@@ -34,7 +39,7 @@ def _buendel(anbieter: str, sku: str = SKU, pruefung: str | None = None) -> Buen
         tarif_monatlich=30.0,
         geraet_zuzahlung=1.0,
         geraet_monatsrate=20.0,
-        laufzeit_monate=24,
+        laufzeit_monate=laufzeit_monate,
         anschlusspreis=39.99,
         quelle_url=f"https://example.org/{anbieter}/{sku}",
         abgerufen_am=HEUTE,
@@ -119,3 +124,35 @@ def test_export_zaehlt_zeilen_und_zeilen_mit_gesamtpreis_je_anbieter():
 def test_je_anbieter_ohne_zeilen_bleibt_leer():
     assert je_anbieter({}) == []
     assert je_anbieter({"buendel": []}) == []
+
+
+def test_je_anbieter_zaehlt_dieselbe_menge_wie_geraete_tco_24_csv():
+    """Befund PR #143 (Prüfung arbeit/pruefung-pr143-1717.md, Punkt 3): die
+    Anbieterzahl zählte über ALLE Laufzeiten, der Knopf daneben nur die
+    24-Monate-Ansicht (`geraete-tco-24.csv`). Zwei verschiedene Zahlen sahen
+    wie eine aus. Jetzt gehen beide über `export_je_laufzeit` auf dieselbe
+    Standard-Ansicht."""
+    import dataclasses
+
+    from telco_radar.report.geraete_laufzeit import (
+        LAUFZEIT_STANDARD,
+        export_je_laufzeit,
+    )
+
+    b_24 = dataclasses.replace(_buendel("Telekom", sku="a24", laufzeit_monate=24))
+    b_12 = dataclasses.replace(_buendel("Telekom", sku="a12", laufzeit_monate=12))
+    b_36 = dataclasses.replace(_buendel("Telekom", sku="a36", laufzeit_monate=36))
+    zeilen, _ = _csv_zeilen(b_24, b_12, b_36)
+
+    teil_24 = export_je_laufzeit(zeilen)[LAUFZEIT_STANDARD]
+    csv_text, _ = tco_csv(teil_24)
+    kopf, *rest = csv.reader(io.StringIO(csv_text), delimiter=";")
+    zeilen_in_csv_24 = sum(1 for r in rest if r[kopf.index("Anbieter")] == "Telekom")
+
+    je_ab = {e["anbieter"]: e for e in je_anbieter(zeilen)}
+    assert zeilen_in_csv_24 == 1
+    assert je_ab["Telekom"]["zeilen"] == zeilen_in_csv_24
+
+    gesamt_text, gesamt_zeilenzahl = tco_csv(zeilen)
+    assert gesamt_zeilenzahl == 3
+    assert je_ab["Telekom"]["zeilen"] != gesamt_zeilenzahl

@@ -2172,7 +2172,11 @@ b,strong{font-weight:700}
   display:inline-block}
 .gr-knopf:hover{color:var(--ink);border-color:var(--ink-3)}
 .gr-export-knoepfe{display:flex;gap:8px;flex-wrap:wrap}
-.gr-export-anbieter{font-size:11px;color:var(--ink-3);align-self:center}
+/* Eigene, umbrechende Zeile UNTER der Knopfreihe (nie Kind von
+   .gr-export-knoepfe) - sonst rollt sie am Telefon mit der Knopfreihe
+   aus dem Bild (overflow-x, siehe @media unten) und bleibt ungesehen. */
+.gr-export-anbieter{display:block;width:100%;margin-top:8px;
+  font-size:11px;color:var(--ink-3)}
 /* P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE EXPORT-FUSSZEILE - EINE
    Zeile am Seitenende der Geräteseite (.gr-export-fuss in geraete.html).
    Bis P4 standen die sechs Knöpfe in der Kopfzeile (O4 hatte sie dort

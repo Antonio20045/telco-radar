@@ -18,14 +18,21 @@ from __future__ import annotations
 from pathlib import Path
 
 from . import geraete_export
+from .geraete_laufzeit import LAUFZEIT_STANDARD, export_je_laufzeit
 
 
-def je_anbieter(zeilen: dict) -> list[dict]:
-    """Je Anbieter die Zeilenzahl des Bündel-Exports und, wie viele davon
+def je_anbieter(tco: dict) -> list[dict]:
+    """Je Anbieter die Zeilenzahl von `geraete-tco-24.csv` und, wie viele davon
     einen Gesamtpreis tragen (`tco24` gesetzt, wie `tco_csv` ihn in die
-    Spalte „Kosten über …“ schreibt)."""
+    Spalte „Kosten über …“ schreibt).
+
+    Dieselbe Menge wie der danebenstehende Knopf „Kosten mit Tarif 24
+    Monate“: beide gehen über `export_je_laufzeit` auf dieselbe
+    Standard-Ansicht (Clean Code 1, keine zweite Zählregel), samt der
+    SIM-only-Zeilen, die `tco_csv` dort mitschreibt."""
+    zeilen = export_je_laufzeit(tco or {}).get(LAUFZEIT_STANDARD, {})
     zaehler: dict[str, dict] = {}
-    for z in (zeilen or {}).get("buendel", []):
+    for z in [*zeilen.get("buendel", []), *zeilen.get("sim_only", [])]:
         anbieter = z.get("anbieter") or ""
         eintrag = zaehler.setdefault(
             anbieter, {"anbieter": anbieter, "zeilen": 0, "mit_gesamtpreis": 0}
