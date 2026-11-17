@@ -7,7 +7,7 @@ dass die neue Prüfung gegen die Pflichtliste misst.
 """
 
 import json
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
@@ -632,3 +632,47 @@ def test_echter_wegfall_bleibt_rot_trotz_farbwechsel():
     ]
     ergebnis = pruefe(_tco_telekom(), historie, _pflicht(anbieter=("Telekom",)))
     assert [b.art for b in ergebnis.befunde] == ["kombis_weg"]
+
+
+def _stock_eintrag(anbieter_slug, i, last_verified):
+    return {
+        "id": f"buendel--{anbieter_slug}--sku-{i}--t",
+        "anbieter": "A",
+        "sku_id": "apple-iphone-18-pro-256gb-polar",
+        "last_verified": last_verified,
+        "zustand": "neu",
+    }
+
+
+def test_frische_klick_messung_ohne_neuschreiben_bleibt_gruen():
+    """Gegenprobe zum Befund 17.11.2026 (Lauf 44129470685, o2): 83 von 452
+    Kombinationen fehlten im Messtag, weil die Klick-Vertiefung nicht jede
+    Kombination jeden Tag neu misst - der Bestandseintrag hielt weiter ein
+    `last_verified` innerhalb `FRISCHEGRENZE_TAGE`. Das ist kein Wegfall."""
+    verlust = KOMBI_VERLUST_MINDEST + 1
+    historie = _hist("a", 20, VORTAG) + _hist("a", 20 - verlust, TAG)
+    tco = {
+        "updated": TAG,
+        "buendel": [_buendel("A", "apple-iphone-18-pro-256gb-polar")]
+        + [_stock_eintrag("a", i, VORTAG) for i in range(20 - verlust, 20)],
+    }
+    ergebnis = pruefe(tco, historie, _pflicht(anbieter=("A",)))
+    assert ergebnis.befunde == []
+
+
+def test_echt_veraltete_klick_messung_bleibt_rot():
+    """Gegenprobe zur Gegenprobe: ist der Bestandseintrag selbst über
+    `FRISCHEGRENZE_TAGE` hinaus nicht mehr neu geschrieben worden, ist die
+    Kombination tatsächlich weg - die Frischegrenze darf einen echten
+    Verlust nicht verdecken."""
+    verlust = KOMBI_VERLUST_MINDEST + 1
+    historie = _hist("a", 20, VORTAG) + _hist("a", 20 - verlust, TAG)
+    alt_genug = (date.fromisoformat(TAG) - timedelta(days=30)).isoformat()
+    tco = {
+        "updated": TAG,
+        "buendel": [_buendel("A", "apple-iphone-18-pro-256gb-polar")]
+        + [_stock_eintrag("a", i, alt_genug) for i in range(20 - verlust, 20)],
+    }
+    ergebnis = pruefe(tco, historie, _pflicht(anbieter=("A",)))
+    assert [b.art for b in ergebnis.befunde] == ["kombis_weg"]
+    assert f"{verlust} von 20" in ergebnis.befunde[0].text

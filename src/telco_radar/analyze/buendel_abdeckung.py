@@ -17,7 +17,8 @@ Sechs Befundarten, jede für sich rot:
                         Händlerzeile) führt, fehlt unbelegt bei einem geprüften
 * ``kombis_weg``        gegenüber dem vorigen Messtag fehlen mehr als
                         `KOMBI_VERLUST_ANTEIL` der Kombinationen; verglichen wird
-                        das ANGEBOT ohne Farbe (`angebot_ohne_farbe`)
+                        das ANGEBOT ohne Farbe (`angebot_ohne_farbe`); ein noch
+                        frischer Bestandseintrag (`kombi_frische`) zählt nicht
 * ``preissprung``       die Leitzahl einer Kombination springt um mehr als
                         `PREISSPRUNG_ANTEIL` gegenüber dem vorigen Messtag; über
                         einen Bruch der Rechenweise (`rechenweise`) wird nicht
@@ -47,6 +48,7 @@ from .. import abdeckung_pflicht as pflichten
 from .. import rechenweise, tco_historie
 from ..geraete_model import normalisiere
 from .buendel_angebot import angebot_ohne_farbe, modell_und_speicher
+from .kombi_frische import frisch_im_bestand
 
 KOMBI_VERLUST_ANTEIL = 0.10
 KOMBI_VERLUST_MINDEST = 5
@@ -270,14 +272,19 @@ def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
                 )
             )
 
+    bestand = tco.get("buendel") or []
     _pruefe_speicherstufen(ergebnis, pflicht, belegt_speicher)
     _pruefe_luecken(ergebnis, pflicht)
-    _vergleiche_vortag(ergebnis, historie, pflicht["anbieter"], messtag)
+    _vergleiche_vortag(ergebnis, historie, bestand, pflicht["anbieter"], messtag)
     return ergebnis
 
 
 def _vergleiche_vortag(
-    ergebnis: Abdeckung, historie: list[dict], anbieter_liste: list[str], messtag: str
+    ergebnis: Abdeckung,
+    historie: list[dict],
+    bestand: list[dict],
+    anbieter_liste: list[str],
+    messtag: str,
 ) -> None:
     namen = {normalisiere(a): a for a in anbieter_liste}
     je_tag: dict = defaultdict(lambda: defaultdict(dict))
@@ -287,6 +294,7 @@ def _vergleiche_vortag(
             continue
         je_tag[anbieter][zeile.get("datum")][zeile["id"]] = zeile
 
+    frisch = frisch_im_bestand(bestand, messtag)
     vortage = set()
     for anbieter, tage in je_tag.items():
         if messtag not in tage:
@@ -297,7 +305,7 @@ def _vergleiche_vortag(
         vortag = frueher[-1]
         vortage.add(vortag)
         alt, neu = tage[vortag], tage[messtag]
-        noch_da = {angebot_ohne_farbe(bid) for bid in neu}
+        noch_da = {angebot_ohne_farbe(bid) for bid in neu} | frisch.get(anbieter, set())
         weg = sorted(bid for bid in alt if angebot_ohne_farbe(bid) not in noch_da)
         if len(weg) >= KOMBI_VERLUST_MINDEST and len(weg) > KOMBI_VERLUST_ANTEIL * len(
             alt
