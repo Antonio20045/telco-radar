@@ -195,9 +195,15 @@ def test_radar_nennt_den_grund_statt_kein_buendel(tmp_path):
 
 
 def test_gerenderte_seite_traegt_den_satz(tmp_path):
+    """UI-1717: der Satz steht in der Radar-TAFEL, die seitdem im
+    nachgeladenen Fragment ``data/geraete-radar.html`` liegt, nicht mehr
+    direkt in ``geraete.html``."""
     berichte = abbild(tmp_path)
     _mit_grund(tmp_path / "data" / "state")
-    render_site(tmp_path / "site", berichte, load_config(tmp_path))
-    seite = (tmp_path / "site" / "geraete.html").read_text(encoding="utf-8")
-    assert f'<span class="wr-grund">{SATZ}</span>' in seite
-    assert ALT not in seite
+    site = tmp_path / "site"
+    render_site(site, berichte, load_config(tmp_path))
+    seite = (site / "geraete.html").read_text(encoding="utf-8")
+    fragment = (site / "data" / "geraete-radar.html").read_text(encoding="utf-8")
+    inhalt = seite + fragment
+    assert f'<span class="wr-grund">{SATZ}</span>' in inhalt
+    assert ALT not in inhalt

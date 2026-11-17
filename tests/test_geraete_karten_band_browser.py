@@ -413,9 +413,9 @@ def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(fragment):
     Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
     wird das Fragment."""
     gruppe = fragment.select_one("#gr-ohneband")
-    assert gruppe is not None, "es gibt keine markierte Gruppe ohne Tarifband"
+    assert gruppe is not None, "es gibt keine markierte Gruppe ohne Tarifstufe"
     assert not gruppe.has_attr("hidden"), "die Gruppe ist versteckt"
-    assert "Ohne Tarifband" in _text(gruppe), _text(gruppe)
+    assert "Ohne Tarifstufe" in _text(gruppe), _text(gruppe)
     zeilen = gruppe.select(".gr-bnd")
     assert [z for z in zeilen if not z.has_attr("data-band")], (
         "keine Zeile ohne Band in der Gruppe"

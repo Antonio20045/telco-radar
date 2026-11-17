@@ -196,14 +196,28 @@ def _seite(tmp_path: pathlib.Path) -> dict[str, str]:
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return {
+    dateien = {
         name: (site / name).read_text(encoding="utf-8")
         for name in ("wettbewerbsradar.html", "geraete.html")
     }
+    dateien["geraete-radar.html"] = (site / "data" / "geraete-radar.html").read_text(
+        encoding="utf-8"
+    )
+    return dateien
 
 
 def _suppe(seiten: dict, name: str) -> BeautifulSoup:
-    return BeautifulSoup(seiten[name], "html.parser")
+    """UI-1717 Aufgabe 5: fuer geraete.html wird das nachgeladene
+    Radar-Fragment (app.js, data/geraete-radar.html) an derselben Stelle
+    (#gr-radar-inhalt) eingesetzt wie zur Laufzeit im Browser."""
+    suppe = BeautifulSoup(seiten[name], "html.parser")
+    if name != "geraete.html":
+        return suppe
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    assert inhalt is not None, "gr-radar-inhalt fehlt - Test prüft nichts"
+    for knoten in list(BeautifulSoup(seiten["geraete-radar.html"], "html.parser")):
+        inhalt.append(knoten)
+    return suppe
 
 
 def _text(el) -> str:

@@ -61,9 +61,17 @@ def _rendern(root: pathlib.Path) -> BeautifulSoup:
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return BeautifulSoup(
+    suppe = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    radar_fragment = site / "data" / "geraete-radar.html"
+    if inhalt is not None and radar_fragment.exists():
+        for knoten in list(
+            BeautifulSoup(radar_fragment.read_text(encoding="utf-8"), "html.parser")
+        ):
+            inhalt.append(knoten)
+    return suppe
 
 
 def _seite(tmp_path: pathlib.Path) -> BeautifulSoup:

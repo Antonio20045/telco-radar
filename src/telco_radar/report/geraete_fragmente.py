@@ -25,25 +25,37 @@ def _neu(ordner: Path) -> Path:
     return ordner
 
 
-def vorbereiten(site_dir: Path, env, geraete: dict) -> dict[Path, str]:
+def vorbereiten(
+    site_dir: Path, env, geraete: dict, radar: dict | None = None
+) -> dict[Path, str]:
     """Leert `data/zr/` und `data/bnd/`, gibt jede Fragmentdatei mit Inhalt zurück.
 
     Die Zeitfenster-Fragmente enthalten nur Grafiken (keine Rechenweg-Vorlagen, keine
     Bündel-Informationen); je ausgewähltem Modell genügt ein Abruf.
+
+    UI-1717 Aufgabe 5: der Radar-Reiter (`#tafel-radar`, heute ohne Navi-
+    Knopf, nur per Deep-Link erreichbar) stand bisher komplett im First
+    Paint von `geraete.html` (1,57 MB, nie gesehen ohne JS-Tab-Wechsel).
+    `data/geraete-radar.html` traegt denselben Inhalt, app.js laedt ihn
+    nur beim Wechsel auf diesen Reiter nach.
     """
-    tco = geraete.get("tco") or {}
-    if not tco.get("modelle"):
-        return {}
     daten = site_dir / "data"
     daten.mkdir(exist_ok=True)
+    dateien: dict[Path, str] = {}
+    if radar:
+        radar_vorlage = env.get_template("geraete_radar_fragment.html.j2")
+        dateien[daten / "geraete-radar.html"] = radar_vorlage.render(
+            prefix="", geraete=geraete, wr=radar
+        )
+    tco = geraete.get("tco") or {}
+    if not tco.get("modelle"):
+        return dateien
     zr = geraete.get("zeitreihe") or {}
     vorgabe = (zr.get("start") or {}).get("modell") or tco["modell_vorgabe"]
     bnd_vorlage = env.get_template("geraete_buendel_fragment.html.j2")
-    dateien = {
-        daten / "geraete-buendel.html": bnd_vorlage.render(
-            modelle=tco["modelle"], vorgabe=vorgabe
-        )
-    }
+    dateien[daten / "geraete-buendel.html"] = bnd_vorlage.render(
+        modelle=tco["modelle"], vorgabe=vorgabe
+    )
     bnd = _neu(daten / BND_ORDNER)
     for m in tco["modelle"]:
         dateien[bnd / f"{m['id']}.html"] = bnd_vorlage.render(

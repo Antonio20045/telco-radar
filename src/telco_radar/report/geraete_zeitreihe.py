@@ -79,7 +79,9 @@ from .geraete_zeitreihe_geometrie import (
     LUECKE_TAGE_SCHWELLE as LUECKE_TAGE_SCHWELLE,
 )
 from .geraete_zeitreihe_geometrie import _linien_laeufe as _linien_laeufe
+from .geraete_zeitreihe_geometrie import _luecken_satz as _luecken_satz
 from .geraete_zeitreihe_geometrie import _stufenpfad as _stufenpfad
+from .geraete_zeitreihe_geometrie import _tag_monat as _tag_monat
 from .geraete_zeitreihe_geometrie import (
     _x_marken,
     _xtick_x,
@@ -98,12 +100,6 @@ KOPF_FREIRAUM_BREIT, KOPF_FREIRAUM_SCHMAL = 18, 10
 MASSSTAB_FREIRAUM_ANTEIL, ACHSENBRUCH_ANTEIL = 0.12, 0.10
 TREFFERFLAECHE_RADIUS = 12
 AUTO_SICHTBAR_AB_MESTAGEN = 2
-
-
-def _tag_monat(iso: str) -> str:
-    """„12.9." - das X-Achsen-Format des Prototyps (echtes deutsches)."""
-    y, m, d = iso.split("-")
-    return f"{int(d)}.{int(m)}."
 
 
 def band_zeilen(modell: dict, laufzeit: int = LAUFZEIT_STANDARD) -> dict:
@@ -745,6 +741,7 @@ def _fenster_html(
         + breit
         + schmal
         + "</div>"
+        + _luecken_satz(serien)
     )
 
 

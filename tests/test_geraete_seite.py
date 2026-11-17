@@ -421,7 +421,20 @@ def _baue(tmp_path: Path, db=None, punkte=None, quellen=None):
 
 
 def _suppe(site: Path, name: str) -> BeautifulSoup:
-    return BeautifulSoup((site / name).read_text(encoding="utf-8"), "html.parser")
+    """UI-1717 Aufgabe 5: fuer geraete.html wird das nachgeladene
+    Radar-Fragment (app.js, data/geraete-radar.html) an derselben Stelle
+    (#gr-radar-inhalt) eingesetzt wie zur Laufzeit im Browser."""
+    suppe = BeautifulSoup((site / name).read_text(encoding="utf-8"), "html.parser")
+    if name != "geraete.html":
+        return suppe
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    radar_fragment = site / "data" / "geraete-radar.html"
+    if inhalt is not None and radar_fragment.exists():
+        for knoten in list(
+            BeautifulSoup(radar_fragment.read_text(encoding="utf-8"), "html.parser")
+        ):
+            inhalt.append(knoten)
+    return suppe
 
 
 def _radar(site: Path) -> BeautifulSoup:
@@ -1039,8 +1052,8 @@ def test_der_katalog_ist_eine_tabelle_auf_modellebene(tmp_path):
         "Spanne",
         "Kosten über 24 Monate",
         "Ø €/Monat",
-        "Δ zu Vodafone",
-        "Band",
+        "Unterschied zu Vodafone",
+        "Stufe",
     ], kopf
 
     zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")

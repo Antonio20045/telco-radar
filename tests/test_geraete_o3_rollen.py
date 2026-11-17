@@ -48,21 +48,29 @@ def site(tmp_path_factory) -> pathlib.Path:
 
 @pytest.fixture(scope="module")
 def geraete(site) -> BeautifulSoup:
-    return BeautifulSoup(
+    """UI-1717 Aufgabe 5: #gr-radar-inhalt steht im First Paint leer - app.js
+    holt sein Markup erst beim Sichtbarwerden aus data/geraete-radar.html;
+    die Fixture setzt denselben Inhalt ein, den der Browser einfügt."""
+    suppe = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    radar_fragment = site / "data" / "geraete-radar.html"
+    if inhalt is not None and radar_fragment.exists():
+        for knoten in list(
+            BeautifulSoup(radar_fragment.read_text(encoding="utf-8"), "html.parser")
+        ):
+            inhalt.append(knoten)
+    return suppe
 
 
 @pytest.fixture(scope="module")
-def radar(site) -> BeautifulSoup:
+def radar(geraete) -> BeautifulSoup:
     """Die Radar-TAFEL von geraete.html. Bis E3 Schritt 3 (17.09.2026) war
     der Radar eine eigene Seite (wettbewerbsradar.html); seitdem ist er der
     Reiter „Radar" der EINEN Geräteseite, und die Alt-URL ist eine
     Weiterleitung ohne Inhalt."""
-    suppe = BeautifulSoup(
-        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
-    )
-    tafel = suppe.select_one("#tafel-radar")
+    tafel = geraete.select_one("#tafel-radar")
     assert tafel is not None, "#tafel-radar fehlt - die Fixture prüft nichts"
     return BeautifulSoup(str(tafel), "html.parser")
 

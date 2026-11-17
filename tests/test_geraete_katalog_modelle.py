@@ -753,7 +753,7 @@ def test_modell_tco_csv_traegt_den_grund_statt_einer_luecke(tmp_path):
     pixel = next(z for z in zeilen[1:] if z[1] == "Pixel 11")
     assert apple[kopf.index("TCO ab EUR")] == "1000,00"
     assert apple[kopf.index("Abweichung zu Vodafone EUR")] == "-100,00"
-    assert apple[kopf.index("Tarifband")] == "XS"
+    assert apple[kopf.index("Tarifstufe")] == "XS"
     assert apple[kopf.index("Status")] == ""
     assert pixel[kopf.index("TCO ab EUR")] == ""
     assert pixel[kopf.index("Status")] == "kein Bündel gemessen"

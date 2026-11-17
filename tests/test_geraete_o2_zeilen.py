@@ -520,9 +520,9 @@ def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):
     assert s.select_one("#tafel-tco #gr-ohneband") is None
     tafel = _lager_ohne_band(tmp_path)
     gruppe = tafel.select_one("#gr-ohneband")
-    assert gruppe is not None, "die Gruppe 'Ohne Tarifband' fehlt"
+    assert gruppe is not None, "die Gruppe 'Ohne Tarifstufe' fehlt"
     ohueberschrift = _text(gruppe.find(["h3", "h4"]))
-    assert "Ohne Tarifband" in ohueberschrift
+    assert "Ohne Tarifstufe" in ohueberschrift
     zeilen = gruppe.select(".gr-bnd")
     assert len(zeilen) == 2, "o2 Unlimited und 1&1 stehen ohne Band"
     tarife = [_text(z.select_one(".gr-bnd-tarif")) for z in zeilen]

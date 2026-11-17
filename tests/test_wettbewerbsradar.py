@@ -827,10 +827,14 @@ def _seite(tmp_path: pathlib.Path) -> dict[str, str]:
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return {
+    dateien = {
         name: (site / name).read_text(encoding="utf-8")
         for name in ("geraete.html", "index.html", "wettbewerbsradar.html")
     }
+    dateien["geraete-radar.html"] = (site / "data" / "geraete-radar.html").read_text(
+        encoding="utf-8"
+    )
+    return dateien
 
 
 def _tafel(seiten: dict) -> str:
@@ -840,10 +844,18 @@ def _tafel(seiten: dict) -> str:
     EINEN Geräteseite; wettbewerbsradar.html ist eine Weiterleitung. Die
     Seiten-Tests laufen gegen die Tafel, nicht gegen die ganze 1,4-MB-
     Seite - sonst erfüllte irgendein anderer Reiter die Assertion
-    zufällig (CLAUDE.md §6: ein Test, der nichts trifft, ist grün)."""
+    zufällig (CLAUDE.md §6: ein Test, der nichts trifft, ist grün).
+
+    UI-1717 Aufgabe 5: `#gr-radar-inhalt` steht im First Paint leer - app.js
+    holt sein Markup erst beim Sichtbarwerden aus `data/geraete-radar.html`;
+    hier wird derselbe Inhalt an derselben Stelle eingesetzt."""
     suppe = BeautifulSoup(seiten["geraete.html"], "html.parser")
     tafel = suppe.select_one("#tafel-radar")
     assert tafel is not None, "#tafel-radar fehlt - Test prüft nichts"
+    inhalt = tafel.select_one("#gr-radar-inhalt")
+    assert inhalt is not None, "gr-radar-inhalt fehlt - Test prüft nichts"
+    for knoten in list(BeautifulSoup(seiten["geraete-radar.html"], "html.parser")):
+        inhalt.append(knoten)
     return tafel.decode_contents()
 
 

@@ -44,6 +44,8 @@ Ersten ist die interessante Richtung, nicht der umgekehrte).
 
 from __future__ import annotations
 
+import re
+
 from bestand_pfad import lese_wurzel
 
 from telco_radar.geraete_config import lade_katalog
@@ -673,11 +675,24 @@ def _buendel_welt(tmp_path):
 
 
 def _weltsite(root):
+    """UI-1717 Aufgabe 5: #gr-radar-inhalt steht im First Paint leer - app.js
+    holt sein Markup erst beim Sichtbarwerden aus data/geraete-radar.html;
+    hier wird derselbe Inhalt an derselben Stelle eingesetzt."""
     from telco_radar.report.html import render_site
 
     site = root / "site"
     render_site(site, root / "data" / "reports")
-    return (site / "geraete.html").read_text(encoding="utf-8")
+    html = (site / "geraete.html").read_text(encoding="utf-8")
+    radar_pfad = site / "data" / "geraete-radar.html"
+    if radar_pfad.exists() and "gr-radar-inhalt" in html:
+        radar_html = radar_pfad.read_text(encoding="utf-8")
+        html = re.sub(
+            r'(<div id="gr-radar-inhalt"[^>]*>)(</div>)',
+            lambda m: m.group(1) + radar_html + m.group(2),
+            html,
+            count=1,
+        )
+    return html
 
 
 def test_spaeterer_tag_liest_nur_lesbare_uhren():

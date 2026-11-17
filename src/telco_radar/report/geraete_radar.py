@@ -212,9 +212,9 @@ def _zeile_fuer_anbieter(
         vf_band = basis["band_label"]
         wb_band = _band_label(band)
         grund = (
-            f"Kein Tarifband, in dem beide dieses Gerät führen "
+            f"Keine Tarifstufe, in der beide dieses Gerät führen "
             f"(Vodafone: {vf_band}, {anbieter}: {wb_band}) – "
-            "nicht vergleichbar (Tarifband-Mismatch)."
+            "nicht vergleichbar (unterschiedliche Tarifstufe)."
         )
         return {
             "anbieter": anbieter,
@@ -475,7 +475,7 @@ def netzbetreiber_gruppen(
 
 
 _LUECKE_WORT = {
-    STATUS_BAND_MISMATCH: "kein gemeinsames Band",
+    STATUS_BAND_MISMATCH: "keine gemeinsame Tarifstufe",
     STATUS_KEIN_BUENDEL: "kein Bündel erhoben",
     STATUS_NICHT_VERGLEICHBAR: "nicht vergleichbar",
 }

@@ -218,12 +218,26 @@ def _seite(tmp_path: pathlib.Path, listungen: list) -> dict:
     return {"html": (site / "geraete.html").read_text(encoding="utf-8"), "site": site}
 
 
+def _suppe(seite: dict) -> BeautifulSoup:
+    """`seite["html"]` mit dem nachgeladenen Radar-Fragment zusammengesetzt
+    (UI-1717 Aufgabe 5: #gr-radar-inhalt steht im First Paint leer)."""
+    suppe = BeautifulSoup(seite["html"], "html.parser")
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    radar_fragment = seite["site"] / "data" / "geraete-radar.html"
+    if inhalt is not None and radar_fragment.exists():
+        for knoten in list(
+            BeautifulSoup(radar_fragment.read_text(encoding="utf-8"), "html.parser")
+        ):
+            inhalt.append(knoten)
+    return suppe
+
+
 @pytest.fixture(scope="module")
 def leer(tmp_path_factory) -> BeautifulSoup:
     """Der Ganz-Leer-Fall: kein Gerät, kein Bündel, kein Preis - die
     Seite muss BENANNT leer stehen, nicht still."""
     seite = _seite(tmp_path_factory.mktemp("leer-leer"), [])
-    return BeautifulSoup(seite["html"], "html.parser")
+    return _suppe(seite)
 
 
 @pytest.fixture(scope="module")
@@ -238,7 +252,7 @@ def ohne_alarm(tmp_path_factory) -> BeautifulSoup:
             _listung("Saturn", SKU, 709.90),
         ],
     )
-    return BeautifulSoup(seite["html"], "html.parser")
+    return _suppe(seite)
 
 
 def test_zeitreihe_ohne_buendel_nennt_den_leerzustand(ohne_alarm):

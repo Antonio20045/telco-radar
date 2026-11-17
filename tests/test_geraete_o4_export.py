@@ -101,23 +101,31 @@ def radar_csv(site) -> tuple[list[str], list[list[str]]]:
 
 @pytest.fixture(scope="module")
 def geraete(site) -> BeautifulSoup:
-    return BeautifulSoup(
+    """UI-1717 Aufgabe 5: #gr-radar-inhalt steht im First Paint leer - app.js
+    holt sein Markup erst beim Sichtbarwerden aus data/geraete-radar.html;
+    die Fixture setzt denselben Inhalt ein, den der Browser einfügt."""
+    suppe = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
+    inhalt = suppe.select_one("#gr-radar-inhalt")
+    radar_fragment = site / "data" / "geraete-radar.html"
+    if inhalt is not None and radar_fragment.exists():
+        for knoten in list(
+            BeautifulSoup(radar_fragment.read_text(encoding="utf-8"), "html.parser")
+        ):
+            inhalt.append(knoten)
+    return suppe
 
 
 @pytest.fixture(scope="module")
-def radar(site) -> BeautifulSoup:
+def radar(geraete) -> BeautifulSoup:
     """Die Radar-TAFEL von geraete.html - seit E3 Schritt 3 (17.09.2026)
     ist der Radar der Reiter „Radar" der EINEN Geräteseite; die Alt-URL
     wettbewerbsradar.html ist eine Weiterleitung ohne Inhalt. Der Export-
     Knopf des Radars steht in der FUSSZEILE der Seite (P4/D4, 18.09.2026:
     EINE Stelle für alle Reiter - bis dahin in der Kopfzeile, nie je
     Reiter, und auch die Fußzeile nie ZUSÄTZLICH in einer Tafel)."""
-    suppe = BeautifulSoup(
-        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
-    )
-    tafel = suppe.select_one("#tafel-radar")
+    tafel = geraete.select_one("#tafel-radar")
     assert tafel is not None, "#tafel-radar fehlt - die Fixture prüft nichts"
     return BeautifulSoup(str(tafel), "html.parser")
 
@@ -705,7 +713,7 @@ def test_die_export_links_stehen_in_der_fusszeile(geraete):
     )
 
 
-def test_der_radar_verlinkt_seinen_export_genau_einmal(geraete):
+def test_der_radar_verlinkt_seinen_export_genau_einmal(geraete, radar):
     """Seit E3 Schritt 3 gehört der Radar-Export zur EINEN Geräteseite -
     sein Knopf steht im Hero neben den drei anderen (bis dahin im Hero der
     Schwesterseite). Genau ein Mal, nie zusätzlich in einem Reiter."""
@@ -715,9 +723,7 @@ def test_der_radar_verlinkt_seinen_export_genau_einmal(geraete):
         if a.get("href") == "exporte/wettbewerbsradar.csv"
     ]
     assert links == ["exporte/wettbewerbsradar.csv"], links
-    radar_tafel = geraete.select_one("#tafel-radar")
-    assert radar_tafel is not None
-    assert not radar_tafel.select("a[href^='exporte/']"), (
+    assert not radar.select("a[href^='exporte/']"), (
         "der Radar-Export steht zusätzlich IN der Tafel (O4: eine Stelle)"
     )
 
