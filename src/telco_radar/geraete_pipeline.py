@@ -66,7 +66,7 @@ from .geraete_config import lade_farben, lade_katalog, lade_quellen
 log = logging.getLogger(__name__)
 
 FRIST_STANDARD = 900.0
-FRIST_TAGESLAUF = 1500.0
+FRIST_TAGESLAUF = 3000.0
 UNBEKANNTE_TITEL_MAX = 40
 
 
