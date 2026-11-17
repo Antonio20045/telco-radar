@@ -682,6 +682,12 @@ def test_quarantaene_satz_steht_als_messluecke_im_gerenderten_html():
 
 
 def test_erfassung_beleg_zeigt_auszug_nur_noch_im_tooltip_nicht_als_zeile():
+    """RUHIGER-RUNDE2-1717 Aufgabe 5: die Kurzform ("bei Vodafone nicht im
+    Angebot") stand noch als eigene Zeile je Gerät, obwohl die
+    Gruppen-Überschrift ("Hat congstar, Vodafone nicht") dieselbe Aussage
+    schon trägt. Jetzt steht ohne Link GAR KEINE Beleg-Zeile mehr - nur der
+    Gerätename -, die ganze Auskunft (Kurzform, Auszug, Lesedatum) steht
+    vollständig im `title` der Zeile. Kein Text ist gefallen, nur umgezogen."""
     satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter="Vodafone", datum="13.11.2026")
     modelle = [_modell(S26, _karte("congstar"))]
     erf = _erfassung_roh(S26.device_id, Vodafone=satz)
@@ -689,9 +695,11 @@ def test_erfassung_beleg_zeigt_auszug_nur_noch_im_tooltip_nicht_als_zeile():
     s = _rendern(a)
     liste_w = s.select_one('.gr-pf-paar[data-pf="congstar"] .gr-pf-liste--w')
     assert liste_w.select_one("a") is None
-    beleg = liste_w.select_one(".gr-pf-beleg")
-    assert "Auszug" not in beleg.text and "gelesen" not in beleg.text
-    assert beleg.text == "bei Vodafone nicht im Angebot"
-    assert beleg["title"] == f"Auszug: {satz} · gelesen 13.11.2026"
-    assert "<br>" not in str(beleg)
+    assert liste_w.select_one(".gr-pf-beleg") is None
+    zeile = liste_w.select_one("li")
+    assert zeile.get_text(" ", strip=True) == "Galaxy S26"
+    assert zeile["title"] == (
+        f"bei Vodafone nicht im Angebot (Auszug: {satz} · gelesen 13.11.2026)"
+    )
+    assert "<br>" not in str(zeile)
     assert "gültig bis" not in liste_w.text
