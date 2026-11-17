@@ -50,7 +50,7 @@ from . import geraete_notbremse as notbremse
 from . import geraete_zeitreihe_auswahl as zeitreihe_auswahl
 from . import geraete_zeitreihe_etiketten as etiketten
 from . import geraete_zeitreihe_uebertrag as uebertrag
-from .anbieter_farben import STRICHMUSTER, stil_fuer
+from .anbieter_farben import STRICHMUSTER, TARIFWELT_ANBIETER, stil_fuer
 from .geraete_antwort import _antwort_html as _antwort_html
 from .geraete_antwort import _leitzahl_html as _leitzahl_html
 from .geraete_antwort import _rechnung_html as _rechnung_html
@@ -88,7 +88,7 @@ from .geraete_zeitreihe_geometrie import (
     _y_schritt,
     form_pfad,
 )
-from .geraete_zeitreihe_legende import _euro0, ohne_alte, ueberholt_html, zweizeilig
+from .geraete_zeitreihe_legende import _euro0, ohne_alte, ueberholt_html
 from .geraete_zeitreihe_legende import legende_html as _legende_html
 
 log = logging.getLogger(__name__)
@@ -457,11 +457,11 @@ def _svg(
       mitten im Bild, ohne Farbe und ohne Zuordnung zu seiner Kurve. Auf dem
       schmalen Bild traegt die Zahl weiter die Legende (`wert_je` bleibt
       `None`) - eine Zahl steht je Ort genau einmal.
-    - Eine HANDELSREIHE („Saturn/MediaMarkt · o2-Netz“, erkannt an
-      `zweizeilig`) ist dasselbe Netz noch einmal, nur beim Haendler gekauft:
-      Linie, Punkte und Markerform treten mit `gr-zr--handel` zurueck (CSS),
-      damit die vier Netzlinien vorn liegen. Zurueckgenommen heisst nicht weg -
-      Reihe und Etikett bleiben vollstaendig.
+    - Eine HANDELSREIHE („Saturn/MediaMarkt · o2-Netz“, erkannt am stabilen
+      Namen aus `anbieter_farben.TARIFWELT_ANBIETER`, nicht am Trennzeichen
+      im Titeltext - Clean Code 2) ist dasselbe Netz, nur beim Haendler
+      gekauft: Linie, Punkte, Markerform treten mit `gr-zr--handel` zurueck
+      (CSS). Zurueckgenommen heisst nicht weg - Reihe/Etikett bleiben ganz.
     """
     anbieter = [a for a in ZEITREIHE_FOLGE if anbieter_serien.get(a)]
     if not anbieter:
@@ -561,7 +561,7 @@ def _svg(
         serie = anbieter_serien[a]
         stil = stil_fuer(a)
         farbe, marker_farbe = stil.farbe, stil.marker_farbe
-        handel = " gr-zr--handel" if zweizeilig(a) else ""
+        handel = " gr-zr--handel" if a in TARIFWELT_ANBIETER else ""
         if len(punkte) > 1:
             tage_a = [d for d, _p in serie]
             for lauf, ist_luecke in _linien_laeufe(punkte, tage_a):
