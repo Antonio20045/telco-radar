@@ -5820,15 +5820,21 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-kopf > span{color:var(--ink-3);font-size:15px}
 .gx-teuer-liste{list-style:none;margin:0;padding:0;counter-reset:none}
 .gx-teuer-liste li{border-bottom:1px solid var(--rule)}
-.gx-t{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name plus" "wer plus";column-gap:24px;row-gap:4px;
+/* RUHIGER-RUNDE2-1717 Aufgabe 1+3: die Haendler-/Preis-Unterzeile ist
+   gefallen (Haendlername steht jetzt inline im Namen, beide Betraege nur
+   noch im `title`) - darum nur noch EINE Grid-Zeile "name plus". */
+.gx-t{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name plus";column-gap:24px;align-items:baseline;
   padding:16px 4px;text-decoration:none;color:var(--ink);transition:background-color .25s,padding .25s}
 .gx-t:hover{background:var(--paper-2);padding-left:14px;padding-right:14px}
-.gx-t-name{grid-area:name;font:500 clamp(19px,1.8vw,24px)/1.2 var(--sans);letter-spacing:-.01em}
-.gx-t-wer{grid-area:wer;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--ink-3)}
-.gx-t-haendler{min-width:0}
-.gx-nw{white-space:nowrap}
-.gx-t-wer i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--anb,var(--ink-4));margin-right:7px;vertical-align:0}
-.gx-t-plus{grid-area:plus;align-self:center;font:500 clamp(32px,3.2vw,46px)/1 var(--sans);letter-spacing:-.03em;color:var(--red-text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.gx-t-name{grid-area:name;font:500 clamp(19px,1.8vw,24px)/1.2 var(--sans);letter-spacing:-.01em;min-width:0;overflow-wrap:anywhere}
+.gx-t-haendler{display:inline-block;min-width:0;margin-left:10px;font:500 13px/1.3 var(--sans);letter-spacing:0;color:var(--ink-3);vertical-align:middle}
+.gx-t-haendler i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--anb,var(--ink-4));margin-right:6px;vertical-align:0}
+/* Aufgabe 1: AA-Kontrast gegen Papier- und Weiss-Hintergrund (ueber 5:1)
+   bleibt mit --red-text erhalten; nur Groesse/Gewicht sinken auf das
+   Niveau einer gedaempften Nebenzahl (<=16px, Gewicht 500), kein
+   24-46px-Alarmton mehr - und ohne style-Attribut an der Vorlage (die
+   Vorrunde durfte style.css hier nicht aendern, dieser Auftrag darf). */
+.gx-t-plus{grid-area:plus;align-self:center;font:500 clamp(14px,1.1vw,16px)/1.2 var(--sans);letter-spacing:-.01em;color:var(--red-text);font-variant-numeric:tabular-nums;white-space:nowrap}
 .gx-mehr{margin:0}
 .gx-mehr summary{list-style:none;cursor:pointer;display:inline-flex;margin:18px 0 0;padding:11px 20px;border-radius:999px;border:1px solid var(--rule);background:var(--paper-2);font-weight:500}
 .gx-mehr summary::-webkit-details-marker{display:none}
@@ -5857,7 +5863,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
   .gx-modus button{height:44px;padding:0 18px;font-size:16px}
   .gx-t{column-gap:14px;padding:14px 2px}
   .gx-t-name{font-size:17px}
-  .gx-t-plus{font-size:30px}
+  .gx-t-haendler{display:block;margin-left:0;margin-top:2px}
 }
 @media (prefers-reduced-motion:reduce){
   .gx-held b,.gx-held b + span{animation:none}
@@ -6481,16 +6487,22 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-hm-leer .gr-hm-spur{opacity:.45}
 .gr-hm-duenn .gr-hm-zahl,.gr-hm-duenn .gr-hm-spur{opacity:.55}
 .gr-hm-ohne{margin:12px 0 0;font:500 13px var(--sans);color:var(--ink-3)}
-.gr-md{display:grid;grid-template-columns:repeat(auto-fill,minmax(358px,1fr));gap:6px 18px;
+/* RUHIGER-RUNDE2-1717 Aufgabe 2: die Spaltenbreite wuchs von 358px auf
+   460px, damit der gekuerzte Einzeiler ("Anbieter: gemessen TT.MM.JJJJ -
+   n von m Preisen") bei normaler Fensterbreite nicht umbricht und doch
+   zweizeilig wuerde. */
+.gr-md{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:6px 18px;
   list-style:none;margin:0 0 14px;padding:0;font:500 12.5px/1.3 var(--sans);color:var(--ink-2)}
-/* Je Anbieter zwei feste Zeilen: Satz mit Stand-Marke rechts, darunter der Anteil
-   kleiner. Der Text steht vollständig da; schmal (Telefon) steht eine Spalte. */
-.gr-md-z{min-width:0;overflow-wrap:anywhere;display:grid;
-  grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:baseline}
+/* RUHIGER-RUNDE2-1717 Aufgabe 2: EINE Zeile je Anbieter (Satz, gekuerzter
+   Anteil, Stand-Marke hintereinander) statt zwei fester Grid-Zeilen - die
+   Langform steht vollstaendig im title des Blocks. flex-wrap statt
+   grid-row:2: bei wenig Platz bricht die Zeile um, es entsteht nie eine
+   leere Zwangszeile. */
+.gr-md-z{min-width:0;overflow-wrap:anywhere;display:flex;flex-wrap:wrap;
+  column-gap:8px;row-gap:2px;align-items:baseline;cursor:help}
 .gr-md-z--alt{color:var(--ink-3)}
-.gr-md-anteil{grid-column:1/-1;grid-row:2;color:var(--ink-3);font-size:12px}
-.gr-md-z .gr-kk-marke{grid-column:2;grid-row:1;margin:0;padding:1px 4px;letter-spacing:0;
-  white-space:nowrap}
+.gr-md-anteil{color:var(--ink-3);font-size:12px}
+.gr-md-z .gr-kk-marke{margin:0;padding:1px 4px;letter-spacing:0;white-space:nowrap}
 @media (max-width:720px){
   .gr-md{grid-template-columns:minmax(0,1fr);gap:4px 0;margin-bottom:12px}
 }
