@@ -23627,12 +23627,12 @@
    "zustand": "refurbished",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--telekom--apple-iphone-14-128gb-ohne-farbe-refurbished--magentamobil-l--36m",
@@ -23739,12 +23739,12 @@
    "zustand": "refurbished",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--telekom--apple-iphone-14-128gb-ohne-farbe-refurbished--magentamobil-xl--36m",
@@ -37058,16 +37058,16 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 39.95,
    "quelle_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=81.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-   "abgerufen_am": "2026-11-16",
+   "abgerufen_am": "2026-11-17",
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
    "rabatte": [],
    "aktionen": [],
-   "last_verified": "2026-11-16",
+   "last_verified": "2026-11-17",
    "pruefung": "gueltig",
    "quelle_art": "klick",
-   "beleg_id": "75a1990a68f4303ae3c5f912b97c5ac5bff71786db540679cc95356239d8e0f3",
+   "beleg_id": "f8b6636ed7d6ba69172d452d188623c0dcb5983f476b2caa111d714f26b286ca",
    "beleg_status": "offen"
   },
   {
@@ -37671,13 +37671,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "0ef08a083226e4718fa147201d56e8d38621ed872a20a34393a81956fa6d7a67",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "0ef08a083226e4718fa147201d56e8d38621ed872a20a34393a81956fa6d7a67",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--telekom--fairphone-6-256gb-ohne-farbe--magentamobil-xs--12m",
@@ -40484,13 +40484,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "10b1f555f647bf8e8e832f599cd727933c0fb68ce2bf7170c6df14b81f4c83f5",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "10b1f555f647bf8e8e832f599cd727933c0fb68ce2bf7170c6df14b81f4c83f5",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--telekom--google-pixel-10a-128gb-ohne-farbe--magentamobil-m--12m",
@@ -65896,13 +65896,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "5152a77cbfcd9c3a482c8e5ca34446905aa33c8a6fd06d736acf283b4f97f4f1",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "5152a77cbfcd9c3a482c8e5ca34446905aa33c8a6fd06d736acf283b4f97f4f1",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--telekom--xiaomi-redmi-note-17-128gb-ohne-farbe--magentamobil-s--12m",
@@ -216538,13 +216538,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "c89fd68bcf00926093a21e9c9cef743b0ebf80b83f504f965330b501819b8f12",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "c89fd68bcf00926093a21e9c9cef743b0ebf80b83f504f965330b501819b8f12",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-l--36m",
@@ -216575,13 +216575,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "956fcb622627b63be33807dcd6bdaa0aa8e8246c05d2a9db871beabd28950acd",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "956fcb622627b63be33807dcd6bdaa0aa8e8246c05d2a9db871beabd28950acd",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-l-flex--24m",
@@ -216612,13 +216612,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "845f268c7681fff024b6a30df2e78c86933331e03db9a13cce63dd7f995828ef",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "845f268c7681fff024b6a30df2e78c86933331e03db9a13cce63dd7f995828ef",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-l-flex--36m",
@@ -216649,13 +216649,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "f1fd9681f91da6f0869afe66fb928f8e144988a45c7303cafbfa83cf3d4c0f8a",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "f1fd9681f91da6f0869afe66fb928f8e144988a45c7303cafbfa83cf3d4c0f8a",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-m--24m",
@@ -216686,13 +216686,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "1b033b344cd06e27f3b522cd98e3c6383aa7f70a6738b5d5c90c1febc63868ac",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "1b033b344cd06e27f3b522cd98e3c6383aa7f70a6738b5d5c90c1febc63868ac",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-m--36m",
@@ -216723,13 +216723,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "6405d87d2e9f38f58ef78eca67686a4d8981cd316ea93c62dee63cc8bcdbb3ed",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "6405d87d2e9f38f58ef78eca67686a4d8981cd316ea93c62dee63cc8bcdbb3ed",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-m-flex--24m",
@@ -216760,13 +216760,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "31f3415380cfd4689f005bea44116f2f1b7e4851088e8d15a33342a2f001fd3a",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "31f3415380cfd4689f005bea44116f2f1b7e4851088e8d15a33342a2f001fd3a",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-m-flex--36m",
@@ -216797,13 +216797,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "13aa4f08b2aa0c85559d0528345bb274fac32621a263d8ec6286a3bf1319d474",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "13aa4f08b2aa0c85559d0528345bb274fac32621a263d8ec6286a3bf1319d474",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-s--24m",
@@ -216834,13 +216834,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "9e135f40d76f0e1d75a1d5fb1c1bb983d60fd32dfc2d633a50cfe8a4bf9a6d01",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "9e135f40d76f0e1d75a1d5fb1c1bb983d60fd32dfc2d633a50cfe8a4bf9a6d01",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-s--36m",
@@ -216871,13 +216871,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "396655835995f97ee9ac3320ea9d529fb49cb32e023e52dddfac7e089da54000",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "396655835995f97ee9ac3320ea9d529fb49cb32e023e52dddfac7e089da54000",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-s-flex--24m",
@@ -216908,13 +216908,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "7bce6396559d9244ff3751496f2dda5c92cd316b95d0ed03f7025215314e48fb",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "7bce6396559d9244ff3751496f2dda5c92cd316b95d0ed03f7025215314e48fb",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-s-flex--36m",
@@ -216945,13 +216945,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "157486e3af1a8db7a53f193ea477a68725197bd5995be53a33e2489a10b3d678",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "157486e3af1a8db7a53f193ea477a68725197bd5995be53a33e2489a10b3d678",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-xs--24m",
@@ -216982,13 +216982,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "518ff30cabe6f58ec8299771216922f0a467a4ca0a4ecfe3ed77eb72521c544b",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "518ff30cabe6f58ec8299771216922f0a467a4ca0a4ecfe3ed77eb72521c544b",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-xs--36m",
@@ -217019,13 +217019,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "cc5d102a8b39567afa9b3ab17da373497e798b0117dd99de98ad5fd31c19f8b4",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "cc5d102a8b39567afa9b3ab17da373497e798b0117dd99de98ad5fd31c19f8b4",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-xs-flex--24m",
@@ -217056,13 +217056,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "69185702ffde214b1960560c03ff1d115f1ed132b99e59e1fdc0ba83e7327915",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "69185702ffde214b1960560c03ff1d115f1ed132b99e59e1fdc0ba83e7327915",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-128gb-ohne-farbe--allnet-flat-xs-flex--36m",
@@ -217093,13 +217093,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "ac890eebf8a4e91a35daffa6a96988f71cb4268885d12a570b63cacafea95031",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "ac890eebf8a4e91a35daffa6a96988f71cb4268885d12a570b63cacafea95031",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-fe-256gb-blueberry--allnet-flat-l--24m",
@@ -323512,13 +323512,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "dcb92bb983e461d88ae97a5b586bbd64475689a08a408cc3665688c6e1deda97",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "dcb92bb983e461d88ae97a5b586bbd64475689a08a408cc3665688c6e1deda97",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-s25-128gb-ohne-farbe--o2-mobile-unlimited-m-plus-mit-100-mbit-s--36m",
@@ -323549,13 +323549,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "52ec05ba361342fa78440ce98c85b032699874a0c7fa4a0e19a3ccd71f6bb5d6",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-11-17",
-   "pruefung": "quarantaene 5"
+   "pruefung": "quarantaene 5",
+   "quelle_art": "klick",
+   "beleg_id": "52ec05ba361342fa78440ce98c85b032699874a0c7fa4a0e19a3ccd71f6bb5d6",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-s25-128gb-ohne-farbe--o2-mobile-unlimited-s-special-mit-15-mbit-s--24m",
@@ -326130,13 +326130,13 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-grau-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-11-15",
+   "abgerufen_am": "2026-11-17",
    "zustand": "refurbished",
    "herleitung": "",
    "rechenweise": 1,
    "rabatte": [],
    "aktionen": [],
-   "last_verified": "2026-11-15",
+   "last_verified": "2026-11-17",
    "pruefung": "gueltig"
   },
   {
