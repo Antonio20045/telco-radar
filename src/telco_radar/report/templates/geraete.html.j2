@@ -148,20 +148,21 @@
    Abschnitte stehen seit O3 auf dem Wettbewerbs-Radar (Antonios
    Entscheidung, Strategie §5.2). #}
 {% macro teuerzeile(t, tarif) %}
+{# RUHIGER-RUNDE2-1717 Aufgabe 3: die Unterzeile mit Haendler UND beiden
+   Preisen (Angebot, Vodafone) ist GEFALLEN - der Haendlername steht jetzt
+   neben dem Geraetenamen in der Hauptzeile, die beiden Betraege (fuer den
+   Alarm selbst nicht neu, nur Beleg) stehen vollstaendig im `title`. Der
+   grosse rote Betrag hatte zuvor ein eigenes `style`-Attribut (Aufgabe 2
+   der Vorrunde) - das durfte `style.css` damals nicht aendern; dieser
+   Auftrag darf es, die Regel steht jetzt an der Klasse `.gx-t-plus`
+   selbst (<=16px, Gewicht <=500). #}
 <li class="gr-anb--{{ t.klasse }}">{% if tarif %}<a class="gr-sprung gx-t" href="?modell={{ t.id }}{% if t.band %}&amp;band={{ t.band }}{% endif %}#tafel-tco"
-  data-modell="{{ t.id }}"{% if t.band %} data-band="{{ t.band }}"{% endif %}>{% else %}<a class="gx-vsprung gx-t" href="?modell={{ t.id }}#tafel-verlauf"
-  data-geraet="{{ t.id }}">{% endif %}<span class="gx-t-name">{{ t.titel }}</span>
-  <span class="gx-t-wer"><span class="gx-t-haendler"><i aria-hidden="true"></i>{{ haendlername(t.anbieter) }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %}</span>
-  <span class="gx-nw">{{ t.preis | euro }}</span>
-  <span class="gx-nw">Vodafone {{ t.vodafone | euro }}</span></span>
-  {# UI-1717 Aufgabe 2: ein riesiger roter Betrag an JEDER Zeile dieser
-     Liste wirkte wie ein Alarm-Dauerton (bis zu 46px, fast doppelt so
-     gross wie der Geraetename daneben). Die Farbe bleibt (echte
-     Abweichung ueber der Schwelle), die Groesse sinkt auf die des Namens
-     - als `style`-Attribut, weil `style.css` fuer diesen Auftrag nur die
-     Kopfleiste (Aufgabe 3) aendern darf; so bleibt es auch am Telefon
-     wirksam, wo dieselbe Klasse sonst auf 30px zurueckspringt. #}
-  <span class="gx-t-plus" style="font:600 clamp(19px,1.8vw,24px)/1.2 var(--sans);letter-spacing:-.01em">+{{ t.abstand | round | int }}&nbsp;€</span></a></li>
+  data-modell="{{ t.id }}"{% if t.band %} data-band="{{ t.band }}"{% endif %}
+  title="{{ haendlername(t.anbieter) }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %}: {{ t.preis | euro }} · Vodafone: {{ t.vodafone | euro }}">{% else %}<a class="gx-vsprung gx-t" href="?modell={{ t.id }}#tafel-verlauf"
+  data-geraet="{{ t.id }}"
+  title="{{ haendlername(t.anbieter) }}: {{ t.preis | euro }} · Vodafone: {{ t.vodafone | euro }}">{% endif %}<span class="gx-t-name">{{ t.titel }}
+  <span class="gx-t-haendler"><i aria-hidden="true"></i>{{ haendlername(t.anbieter) }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %}</span></span>
+  <span class="gx-t-plus">+{{ t.abstand | round | int }}&nbsp;€</span></a></li>
 {% endmacro %}
 {% macro teuerliste(zeilen, tarif) %}
 {% if zeilen %}
@@ -802,7 +803,9 @@
          durchgereicht). Eine feste 24 in der Vorlage konnte gegen den
          Inhalt der Spalte laufen - genau das war der Befund: 16 Zeilen
          trugen eine 36-Monats-Summe unter diesem Kopf. #}
-      <th scope="col" class="num gr-sp--tco"><button type="button"
+      {# RUHIGER-RUNDE2-1717 Aufgabe 4: das Messdatum der Spalte steht hier
+         EINMAL im `title` des Spaltenkopfs statt in jeder Zeile einzeln. #}
+      <th scope="col" class="num gr-sp--tco"{% if geraete.messdatum.juengster %} title="zuletzt gemessen am {{ geraete.messdatum.juengster | date_de }}"{% endif %}><button type="button"
         class="gr-sort" data-sort="tco" data-art="zahl">{{ spalten.tco }}</button></th>
       <th scope="col" class="num gr-sp--tco"><button type="button"
         class="gr-sort" data-sort="monat" data-art="zahl">{{ spalten.monat }}</button></th>
@@ -912,7 +915,22 @@
                vergleichbar ist. Ein Modell ohne Bündel trägt "–" hier,
                weil seine TCO-Zelle den Grund schon nennt ("kein Bündel
                gemessen"). #}
-        <td class="num gr-sp--tco" data-k="{{ spalten.tco }}">
+        {# RUHIGER-RUNDE2-1717 Aufgabe 4: das Abrufdatum (und die Stand-
+           Marke) stehen nicht mehr sichtbar in jeder Zeile - dieselbe Zahl
+           stand hier acht- bis zehnfach identisch ("17. November 2026").
+           Beide bleiben vollständig im `title` dieser Zelle; einmal fürs
+           ganze Regal steht das Messdatum im `title` des Spaltenkopfs
+           (Methodik-Umzug-Konvention, siehe `_geraete_methodik_umzug`-
+           Tests). Haendler und Tarif bleiben sichtbar - das sind zwei
+           verschiedene Aussagen (woher der Preis, aus welchem Tarif),
+           keine Wiederholung derselben Zahl. #}
+        {%- set tco_titel = [] -%}
+        {%- if m.tco_beleg and m.tco_beleg.abgerufen_am -%}
+          {%- set _ = tco_titel.append('gemessen am ' ~ (m.tco_beleg.abgerufen_am | date_de)) -%}
+          {%- set sv = stand_vom(m.tco_beleg.abgerufen_am, geraete.messdatum.juengster) -%}
+          {%- if sv -%}{%- set _ = tco_titel.append(sv) -%}{%- endif -%}
+        {%- endif -%}
+        <td class="num gr-sp--tco" data-k="{{ spalten.tco }}"{% if tco_titel %} title="{{ tco_titel | join(', ') }}"{% endif %}>
           {%- if m.tco_ab is not none %}
           <span class="gr-k-ab">ab {{ m.tco_ab | euro }}</span>
           {% if m.tco_beleg and m.tco_beleg.quelle_url %}<a
@@ -921,8 +939,6 @@
             {{ haendlername(m.tco_anbieter) }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
           {% else %}<span class="gr-a-klein">bei {{ haendlername(m.tco_anbieter) }}</span>{% endif %}
           {% if m.tco_band_label %}<span class="gr-a-klein gr-k-tarif">Tarif {{ m.tco_band_label }}</span>{% endif %}
-          {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
-            class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% set sv = stand_vom(m.tco_beleg.abgerufen_am, geraete.messdatum.juengster) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}{% endif %}
           {%- else %}<span class="gr-a-klein">{{ m.tco_leer }}</span>{%- endif %}</td>
         <td class="num gr-sp--tco" data-k="{{ spalten.monat }}">{% if m.tco_monat is not none %}{{
           m.tco_monat | euro }}{% else %}–{% endif %}</td>

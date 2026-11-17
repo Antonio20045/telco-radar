@@ -7,9 +7,17 @@
     <h5>{{ gr.hersteller }}</h5>
     <ul>
       {% for g in gr.geraete %}
-      <li><span class="gr-pf-geraet">{{ g.name }}</span>
+      {# RUHIGER-RUNDE2-1717 Aufgabe 5: der kurze Auszug ohne Link ("bei X
+         nicht im Angebot") stand noch als eigene Zeile je Gerät, obwohl
+         die Gruppen-Überschrift ("Hat {{ p.legende }}, Vodafone nicht")
+         dieselbe Aussage schon trägt. Ohne Link steht hier jetzt NUR der
+         Gerätename, der ganze Auszug (Kurzform + Grund + Lesedatum) steht
+         vollständig im `title` der Zeile. Mit Link (echter Beleg) bleibt
+         die Zeile wie zuvor - das sind Bedienelemente, kein Fülltext. #}
+      {% set kurz_titel = (g.beleg.grund.split(' (')[0] | replace('Bei ', 'bei ', 1) ~ ' (Auszug: ' ~ g.beleg.grund ~ ' · gelesen ' ~ g.beleg.geprueft ~ ')') if (mit_beleg and not g.beleg.url) else '' %}
+      <li{% if kurz_titel %} class="gr-pf-beleg--kurz" title="{{ kurz_titel }}"{% endif %}><span class="gr-pf-geraet">{{ g.name }}</span>
         {% if mit_beleg %}
-        {% if g.beleg.url %}<span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>{{ g.beleg.grund }}<br>geprüft {{ g.beleg.geprueft }}{% if g.beleg.bis %}, gültig bis {{ g.beleg.bis }}{% endif %}</span>{% else %}<span class="gr-pf-beleg gr-pf-beleg--kurz" title="Auszug: {{ g.beleg.grund }} · gelesen {{ g.beleg.geprueft }}">{{ g.beleg.grund.split(' (')[0] | replace('Bei ', 'bei ', 1) }}</span>{% endif %}
+        {% if g.beleg.url %}<span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>{{ g.beleg.grund }}<br>geprüft {{ g.beleg.geprueft }}{% if g.beleg.bis %}, gültig bis {{ g.beleg.bis }}{% endif %}</span>{% endif %}
         {% else %}
         <span class="gr-pf-beleg">{{ g.satz }}</span>
         {% endif %}

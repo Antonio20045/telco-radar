@@ -185,19 +185,36 @@ def _liste(site):
     }
 
 
+def _titel(site):
+    """RUHIGER-RUNDE2-1717 Aufgabe 2: der Block steht seither einzeilig, die
+    Langform mit dem vollen Anteil-Satz steht vollständig im `title`."""
+    suppe = BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
+    return {
+        li["data-anbieter"]: li.get("title", "") for li in suppe.select("#messdatum li")
+    }
+
+
 def test_die_seite_nennt_aus_dem_bestand_vodafone_0811_und_telekom_0711(tmp_path):
     """Ohne die Korrektur rot: die Zukunftssperre nahm `geraete.stand` (07.11., Datum
     des jüngsten Tagesberichts) und verwarf alle Messungen vom 08.11.; Vodafone stand
-    dann als „Messdatum unbekannt“, die Telekom-Lücke blieb unsichtbar."""
+    dann als „Messdatum unbekannt“, die Telekom-Lücke blieb unsichtbar.
+
+    RUHIGER-RUNDE2-1717 Aufgabe 2: die sichtbare Zeile trägt seither die Kurzform
+    ("1 von 1 Preisen"), die Langform steht vollständig im `title` - keine
+    Information ist gefallen, nur umgezogen."""
     site = _baue_wie_live(tmp_path)
     _, je = _liste(site)
+    titel = _titel(site)
     assert je["Vodafone"].startswith("Vodafone: zuletzt gemessen am 08.11.2026"), je
     assert je["o2"].startswith("o2: zuletzt gemessen am 08.11.2026"), je
     assert je["congstar"].startswith("congstar: zuletzt gemessen am 08.11.2026"), je
     assert je["Telekom"].startswith("Telekom: zuletzt gemessen am 07.11.2026"), je
     assert je["Telekom"].endswith("Stand vom 07.11."), je
     assert "Stand vom" not in je["Vodafone"] + je["o2"] + je["congstar"]
-    assert "1 von 1 gezeigten Preisen von diesem Tag" in je["Telekom"]
+    assert "1 von 1 Preisen" in je["Telekom"]
+    assert "1 von 1 gezeigten Preisen von diesem Tag" in titel["Telekom"]
     assert je["1&1"] == "1&1: Messdatum unbekannt"
 
 
