@@ -1,0 +1,26 @@
+# =============================================================================
+# TELCO RADAR - Produktfotos je Gerät (Portfolio-Vergleich der Geräteseite)
+# =============================================================================
+# Hand-gepflegt. Hier steht je Gerät, WELCHE Bilddatei die Kachel im Portfolio-
+# Vergleich zeigt. Ohne Eintrag zeigt die Kachel eine ruhige Geräte-Silhouette;
+# das ist der heutige Normalzustand und kein Fehler.
+#
+# REGELN
+#   - Die Bilddatei liegt im Repo unter
+#     src/telco_radar/report/templates/static/geraete/<datei>.
+#     Sie wird bei jedem Rendern nach site/static/geraete/ gespiegelt.
+#   - Keine fremden Händlerbilder einbinden und nichts von fremden Servern
+#     nachladen (CLAUDE.md: keine CDNs, keine Rechtsfragen nebenbei). Ein Foto
+#     kommt erst hier hinein, wenn seine Herkunft und Lizenz geklärt sind.
+#   - `quelle` und `lizenz` sind Pflichtangaben für die Nachvollziehbarkeit;
+#     gelesen wird zum Rendern nur `datei`.
+#   - Schlüssel ist die `device_id` aus dem Katalog (hersteller-modell,
+#     kleingeschrieben, Bindestriche), z. B. apple-iphone-18-pro.
+#
+# BEISPIEL (auskommentiert, damit nichts auf ein fehlendes Bild zeigt)
+# bilder:
+#   apple-iphone-18-pro:
+#     datei: apple-iphone-18-pro.jpg
+#     quelle: Apple Presseportal, 09.09.2026
+#     lizenz: Pressebild, redaktionelle Nutzung
+bilder: {}
