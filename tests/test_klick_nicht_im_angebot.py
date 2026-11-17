@@ -140,14 +140,19 @@ def test_gegenprobe_veraltete_datei_kein_satz(katalog):
 
 
 def test_gerenderte_seite_zeigt_den_satz_in_der_telekom_zeile(tmp_path, katalog):
+    """UI-1717: der Satz steht in der Radar-TAFEL, die seitdem im
+    nachgeladenen Fragment ``data/geraete-radar.html`` liegt, nicht mehr
+    direkt in ``geraete.html``."""
     berichte = abbild(tmp_path)
     pfad = tmp_path / "data" / "state" / "geraete_tco.json"
     daten = json.loads(pfad.read_text(encoding="utf-8"))
     daten["erfassung"] = _erfassung(_datei(), katalog)
     pfad.write_text(json.dumps(daten, ensure_ascii=False), encoding="utf-8")
-    render_site(tmp_path / "site", berichte, load_config(tmp_path))
-    seite = (tmp_path / "site" / "geraete.html").read_text(encoding="utf-8")
-    assert f'<span class="wr-grund">{SATZ}</span>' in seite
+    site = tmp_path / "site"
+    render_site(site, berichte, load_config(tmp_path))
+    seite = (site / "geraete.html").read_text(encoding="utf-8")
+    fragment = (site / "data" / "geraete-radar.html").read_text(encoding="utf-8")
+    assert f'<span class="wr-grund">{SATZ}</span>' in seite + fragment
 
 
 def test_unbekannter_erneuerter_titel_haelt_den_satz_nicht_auf(katalog):
