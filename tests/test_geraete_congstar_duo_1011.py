@@ -54,7 +54,7 @@ def test_geraeteseite_verweist_im_portfolio_auf_den_kategorie_screenshot(belege)
     a = pf.berechne(modelle, katalog, belege, HEUTE)
     p = tp._paar(a, "congstar")
     assert (p["n_v"], p["n_offen"]) == (1, 0)
-    text = p["nur_v"][0]["geraete"][0]["beleg"]
+    text = p["nur_v"][0]["beleg"]
     assert text["original"] == KATEGORIE
     assert "congstar-duo-1011" in text["url"] and text["url"].endswith(".png")
     s = tp._rendern({**a, "hinweis": ""})
