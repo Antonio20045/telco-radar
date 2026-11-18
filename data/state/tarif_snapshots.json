@@ -52,7 +52,7 @@
    "|5gb",
    "|5€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -81,7 +81,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -114,7 +114,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -145,7 +145,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -175,7 +175,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -202,12 +202,13 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
    "allnet flat|100gb",
    "allnet flat|15gb",
+   "allnet flat|200gb",
    "allnet flat|50gb",
    "beträgt die laufzeit bis|24monate",
    "dir tarife mit mindestens|40gb",
@@ -228,14 +229,14 @@
    "|38%",
    "|39.99€",
    "|44.99€",
-   "|46.99€",
+   "|54.99€",
    "|56%",
    "|57%",
    "|60%",
-   "|68%",
+   "|64%",
    "|99€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -259,7 +260,7 @@
    "|71%",
    "|99€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -276,7 +277,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -501,7 +502,7 @@
    "|96€",
    "|999.99€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -518,7 +519,7 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  },
  "https://www.telekom.de/mobilfunk/tarife": {
   "werte": [
@@ -527,23 +528,24 @@
    "ca.|1mb",
    "ca.|3mb",
    "ca.|50mb",
+   "für|39.95€",
    "gb statt|20gb",
    "gb statt|30gb",
-   "gesamtpreis|69.90€",
    "höhe von bis zu|240€",
+   "inkl.|240€",
    "instagram ca.|330mb",
    "pluskarte zum beispiel bei|34.95€",
    "schonen die umwelt mit|24monate",
    "statt|100gb",
    "statt|50gb",
    "tarif mit bis zu|50gb",
+   "unlimited statt|50gb",
    "|10gb",
    "|19.95€",
    "|1gb",
    "|25gb",
    "|29.95€",
    "|2gb",
-   "|34.95€",
    "|39.95€",
    "|49.95€",
    "|4gb",
@@ -555,6 +557,6 @@
    "|84.95€",
    "|90gb"
   ],
-  "stand": "2026-11-17"
+  "stand": "2026-11-18"
  }
 }
