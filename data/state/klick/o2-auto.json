@@ -1,7 +1,7 @@
 {
  "anbieter": "o2-auto",
- "datum": "2026-11-17",
- "dauer_sekunden": 2929.0,
+ "datum": "2026-11-18",
+ "dauer_sekunden": 2950.7,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -10,582 +10,6 @@
  "lesefrist_tage": 1,
  "name": "o2",
  "seiten": [
-  {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-   "geraet": "samsung-galaxy-s25-ultra",
-   "gescheitert": 0,
-   "grund": null,
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1zLXNwZWNpYWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "4cf71cb06a15152791b9da0a768d29457cab53b310d08ac8cb439d337923e448",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 59,98 € inkl. 6,99 € Versand; davon Gerät 13,00 € · monatlich 45,99 € (Gerät und Tarif zusammen) · Monatsrate 26,00 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:11:13Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": 39.99,
-      "anzahlung": 13.0,
-      "rate": 26.0,
-      "ratenzahl": 36,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        19.99
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1zLXNwZWNpYWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "8d230e41298b205f02583ca80a8ada39941fb395d127291e2b269b690fb6e1b1",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 47,98 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 59,49 € (Gerät und Tarif zusammen) · Monatsrate 39,50 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:11:15Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": 39.99,
-      "anzahlung": 1.0,
-      "rate": 39.5,
-      "ratenzahl": 24,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        19.99
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "4ee9119aba6562910d96afd58a091dd6c5c7c3ff5a8bcc4765aefc2f8cc83c1e",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile L Plus mit 150 GB+"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 19,99 € inkl. 6,99 € Versand; davon Gerät 13,00 € · monatlich 45,99 € (Gerät und Tarif zusammen) · Monatsrate 26,00 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:11:18Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": 0.0,
-      "anzahlung": 13.0,
-      "rate": 26.0,
-      "ratenzahl": 36,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        19.99
-       ]
-      ],
-      "volumen_gb": 150.0
-     }
-    },
-    {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "5c316f87b6ab97d719770cf9aa998e6465d67f31fc59124013e0bebd30afba81",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile L Plus mit 150 GB+"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 59,49 € (Gerät und Tarif zusammen) · Monatsrate 39,50 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:11:21Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": 0.0,
-      "anzahlung": 1.0,
-      "rate": 39.5,
-      "ratenzahl": 24,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        19.99
-       ]
-      ],
-      "volumen_gb": 150.0
-     }
-    },
-    {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLW9uLWRlbWFuZC1tLXBsdXMtb25saW5lLWh3djtwYWNrcz11bXRzLW9wdGlvbg==",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "50a98d9fa2cf6e2e3857c1865d7a315db1a4f863aee35cf1128923d2ef2a7ada",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile on Demand M Plus mit 50 GB+"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 19,99 € inkl. 6,99 € Versand; davon Gerät 13,00 € · monatlich 40,99 € (Gerät und Tarif zusammen) · Monatsrate 26,00 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:11:25Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": 0.0,
-      "anzahlung": 13.0,
-      "rate": 26.0,
-      "ratenzahl": 36,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        14.99
-       ]
-      ],
-      "volumen_gb": 50.0
-     }
-    },
-    {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLW9uLWRlbWFuZC1tLXBsdXMtb25saW5lLWh3djtwYWNrcz11bXRzLW9wdGlvbg==",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "bb7d4e1e47be437b312a92335f38c2e4402201a2346175bce15c478a1c6da9d7",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile on Demand M Plus mit 50 GB+"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 54,49 € (Gerät und Tarif zusammen) · Monatsrate 39,50 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:11:27Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": 0.0,
-      "anzahlung": 1.0,
-      "rate": 39.5,
-      "ratenzahl": 24,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        14.99
-       ]
-      ],
-      "volumen_gb": 50.0
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 136,
-    "beendet": 134,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 2
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 13.1,
-    "takte_ms": 6800,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 512,
-   "sperre": null,
-   "status": "gelesen",
-   "stoerung": null,
-   "struktur": {
-    "anteil_felder": 1.0,
-    "anteil_knoepfe": 1.0,
-    "felder_gefunden": 42,
-    "felder_gesucht": 42,
-    "knoepfe_gefunden": 51,
-    "knoepfe_gesucht": 51
-   },
-   "verworfen": 4
-  },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
    "geraet": "samsung-galaxy-s25-ultra",
@@ -718,7 +142,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0c4ecfb96582f0b12e6eaa39e12ee481d2ed82e85eabb8432a22c234e1431e69",
+      "beleg_id": "dedb5a15e1d9d68ac9a2cbda6e67d2209b98249916b021afed4ab1c7bfeb7aeb",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -739,7 +163,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:12:59Z"
+      "zeitpunkt": "2026-11-18T00:03:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -779,7 +203,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c42300eec60301a29b9c94ceb5174c1f723b4d9aee28f8e3fdf7719935322931",
+      "beleg_id": "321aa7af6a97b340ffa34cd38e71312aaf5f7b2dac29418286816b58ec267fed",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -800,7 +224,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:13:01Z"
+      "zeitpunkt": "2026-11-18T00:04:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -840,7 +264,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "16771309c81734791c6a2ea3566effa9693f3572c65d3157f2dcd8c504fdeb89",
+      "beleg_id": "502d09599b2f36c258817a1820e413e50182659d35a0a2de1a87350bb8a1c817",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -861,7 +285,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:13:04Z"
+      "zeitpunkt": "2026-11-18T00:04:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -901,7 +325,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b5c762fce962ecbb7691df419086858bedc178cd58b98dfad5d42cc600d66480",
+      "beleg_id": "c30f3308ba200fda239730953b7868109fdbd1a2a4fece1ed2cb338007ff0dbe",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -922,7 +346,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:13:05Z"
+      "zeitpunkt": "2026-11-18T00:04:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -962,7 +386,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b86c5ba7262e774f00fa226285166b68eefb719b383806cca03a43bc9f6492af",
+      "beleg_id": "6ae3fa41794c907ab96b2c6c1d364a3ad45b1aa6027de7e5e90d3af01da72004",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -983,7 +407,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:13:08Z"
+      "zeitpunkt": "2026-11-18T00:04:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1023,7 +447,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1c72392f062284746fa14232c0579877fb83181c13c4ff8d28976249b60ec72d",
+      "beleg_id": "09e2483257f8b3e3a49c62dc1dc6635b88a7f7d0757c7e8fbeb999406686ed11",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1044,7 +468,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:13:10Z"
+      "zeitpunkt": "2026-11-18T00:04:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1136,16 +560,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 140,
-    "beendet": 140,
+    "anfragen": 139,
+    "beendet": 136,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "api-v4.trbo.com": 1
+     "library.telefonica.de": 4
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 11.1,
-    "takte_ms": 7050,
+    "sekunden": 16.7,
+    "takte_ms": 9700,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1157,6 +581,528 @@
     "anteil_knoepfe": 1.0,
     "felder_gefunden": 42,
     "felder_gesucht": 42,
+    "knoepfe_gefunden": 51,
+    "knoepfe_gesucht": 51
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1zLXNwZWNpYWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "af41bf44485131adc59eed07b609f3d741dcd7b56ecbcb82639a1e16081dee3d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 59,98 € inkl. 6,99 € Versand; davon Gerät 13,00 € · monatlich 45,99 € (Gerät und Tarif zusammen) · Monatsrate 26,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-18T00:05:47Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": 39.99,
+      "anzahlung": 13.0,
+      "rate": 26.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1zLXNwZWNpYWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "132fe9f8d8b43cb7cc460c341ad9b9f2231c44d609c97f7421824c1cfb869276",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 47,98 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 59,49 € (Gerät und Tarif zusammen) · Monatsrate 39,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-18T00:05:50Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": 39.99,
+      "anzahlung": 1.0,
+      "rate": 39.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "739380b875dc715710c1d082d6b605e84112c4255625d9b4d33ba9590d193572",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile L Plus mit 150 GB+"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 19,99 € inkl. 6,99 € Versand; davon Gerät 13,00 € · monatlich 45,99 € (Gerät und Tarif zusammen) · Monatsrate 26,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-18T00:05:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 13.0,
+      "rate": 26.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": 150.0
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9fb08322e50c3b55507b904568c464bf1b963eb36c425774a289961c6e2b437a",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile L Plus mit 150 GB+"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 59,49 € (Gerät und Tarif zusammen) · Monatsrate 39,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-18T00:05:56Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 39.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": 150.0
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [
+      {
+       "feld": "variante.laufzeit",
+       "grund": "Seite zeigt 24 statt 36"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt 24 statt 36",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [
+      {
+       "feld": "antwort",
+       "grund": "keine Antwort mitgeschnitten"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "keine Antwort mitgeschnitten",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 136,
+    "beendet": 131,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 5
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 12.8,
+    "takte_ms": 8650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 49,
+    "felder_gesucht": 49,
     "knoepfe_gefunden": 51,
     "knoepfe_gesucht": 51
    },
@@ -1352,7 +1298,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ddd82ea72c9509de66fdd736f968e8a151dacc6de37adc69e0718344ae084eb4",
+      "beleg_id": "7f7d124dec1b121229daf8ae6c26ffdd991a73a56ea119e2e3b111e7075b2790",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1373,7 +1319,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:14:44Z"
+      "zeitpunkt": "2026-11-18T00:07:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1413,7 +1359,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "678b68ca0de9362d34fe3b807a48c0123dcfe70c38d63233f297067bfa4beef6",
+      "beleg_id": "3bfaceb0b99afc79c02c6fd7f75283fba40b41f6af50b28c77b990349c2cecfa",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1434,7 +1380,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:14:47Z"
+      "zeitpunkt": "2026-11-18T00:08:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1503,7 +1449,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5ddac6fc34ece1d235301b5ea809abe26ced1cd5ea35f31e44bac31b22b67a9d",
+      "beleg_id": "5d578d04b6f756bd897c5a4f1b97ad45da7c3631ea0df70f7d561ef3a9c20260",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1524,7 +1470,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:14:54Z"
+      "zeitpunkt": "2026-11-18T00:08:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1564,7 +1510,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ab7edbdab2dc7a9e033494c105f4660eb317486101c4dc7e7156c9f44ab8e0ce",
+      "beleg_id": "f48cb83fdca632ff5eaedc9cc31c7e1c608538b0a98b7c77513e58ad4516b4e6",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1585,7 +1531,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:14:58Z"
+      "zeitpunkt": "2026-11-18T00:08:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1654,7 +1600,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5e36ea5913d9a717f5f4f3b5817c751125b32495d50789d675f8b0e184f28d8c",
+      "beleg_id": "4bbc369817caf55239e841844ed483fd6110f0d98fab8b4291a52fa4bfef0e0f",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1675,7 +1621,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:15:12Z"
+      "zeitpunkt": "2026-11-18T00:08:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1831,7 +1777,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1195778ff692720d44f536572148ebd8b76eb16209d12faffb6ad3b0c72187c7",
+      "beleg_id": "a41d023214e4cf0d7a7f098a9c009f84e82d4cb32187fea30356370fbeb938e7",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1852,7 +1798,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:15:15Z"
+      "zeitpunkt": "2026-11-18T00:08:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1950,7 +1896,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4a67a2de34353bdb59f32be1fb371529b88558aa6c06a9fa34bbfbc8cd30f7a6",
+      "beleg_id": "0780301b4703084309fdf10ea1df7e9d4a193a1b78f86c942d30ed8777996415",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1971,7 +1917,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:15:23Z"
+      "zeitpunkt": "2026-11-18T00:08:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2156,7 +2102,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a726817fcfe0fb0043283784fc03ca880aa00b0f28c868a11a86784ef28d9b9c",
+      "beleg_id": "010bab72a773784ce2e3f3136fe7817cf1bf9595d9733144be3d0cbec8deb7b1",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2177,7 +2123,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:15:26Z"
+      "zeitpunkt": "2026-11-18T00:08:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4908,16 +4854,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 145,
-    "beendet": 145,
+    "anfragen": 135,
+    "beendet": 135,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 10.6,
-    "takte_ms": 6800,
+    "offen": {},
+    "ohne_antwort_ms": 50,
+    "sekunden": 17.3,
+    "takte_ms": 10600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -5646,7 +5590,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "318f5660b03f4be98f6023953e1bd349b615f26dd22f0d4a1c0bc3c7e017ef58",
+      "beleg_id": "4096529a08cbdc81cacdd22b63c8e17ef4fa7fde33671b526cf1399589c8a57c",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -5667,7 +5611,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:29:08Z"
+      "zeitpunkt": "2026-11-18T00:22:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5707,7 +5651,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fd1c87b70d2dd90034e043de73d018e7c2bc3b48ae595667995a64e285be72a3",
+      "beleg_id": "59ea2ede3d71c3a918e745a7c646306206d13c42e3d7322d9cfe62e76bdeed42",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -5728,7 +5672,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:29:12Z"
+      "zeitpunkt": "2026-11-18T00:22:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5797,7 +5741,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "17c1bec59c757313aab8d51a8ca36c70b5dcc43403a520dc61db04ba269682ef",
+      "beleg_id": "632764b0ed6ff945c955a76b4dcbd33d4232e94e9644767df19ad508f4ee1509",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -5818,7 +5762,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:29:19Z"
+      "zeitpunkt": "2026-11-18T00:22:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5858,7 +5802,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "828a63152e9a43b85109633bd71ca741952c12f571c4cd9696cf519060b219f5",
+      "beleg_id": "b66de7bd8db5c79ccca56115153f4a7f020cee5b52a6de45a63482a3d4838c16",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -5879,7 +5823,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:29:23Z"
+      "zeitpunkt": "2026-11-18T00:22:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5948,7 +5892,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1b4f0c1a23c1b65609795244b13b4e9b89a149f056c0bbaa420089714a42e459",
+      "beleg_id": "5b2c3f6b69021f62d9d1acaeab64df771727d1df03f1a9923e97506f0d713224",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -5969,7 +5913,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:29:28Z"
+      "zeitpunkt": "2026-11-18T00:22:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6299,7 +6243,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e659ca78b0f4a1c222a224e0651c429cbc4de9d63958f8d5ecfa565eb3e8b1e2",
+      "beleg_id": "dfd93fb1431116d2a9a0b734095a86dec431160e92cb1961687750468bb8cd9f",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -6320,7 +6264,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:29:32Z"
+      "zeitpunkt": "2026-11-18T00:22:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6418,7 +6362,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0af21891be760a02035cdfe99cc9faa60965c7ebca2f41b89c2a2174ec43cdcb",
+      "beleg_id": "1c77cec720e89e2760aadbf861f86815c37e22217127ee51e963fe953fd46fbd",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -6439,7 +6383,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:29:39Z"
+      "zeitpunkt": "2026-11-18T00:22:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6790,37 +6734,64 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTUxMmdiLW5hY2h0aGltbWVsLTI0eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1zLW9ubGluZS1od3YtMjRtLTA1LTAwO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "O2 Mobile S mit 15 GB+"
      },
-     "befunde": [
-      {
-       "feld": "variante.laufzeit",
-       "grund": "Seite zeigt 36 statt 24"
-      }
-     ],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ef351302dd1e890a891a2549659a67ab7dae8b41b5614e686736441c21d1301c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile S mit 15 GB+"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 47,98 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 130,49 € (Gerät und Tarif zusammen) · Monatsrate 115,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-18T00:22:55Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Seite zeigt 36 statt 24",
+     "grund": null,
      "luecken": [],
-     "status": "befund",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "O2 Mobile S mit 15 GB+"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 39.99,
+      "anzahlung": 1.0,
+      "rate": 115.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": 15.0
      }
     },
     {
@@ -8653,17 +8624,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 144,
-    "beendet": 139,
+    "anfragen": 146,
+    "beendet": 142,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 6,
-     "www.o2online.de": 1
+     "library.telefonica.de": 4
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.0,
-    "takte_ms": 6850,
+    "sekunden": 15.1,
+    "takte_ms": 9750,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -9914,7 +9884,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bc2dc9f562a6b30ca8eef3006e3f2a4a8dcfdc8ba1e7e7cff25b9116086e15e7",
+      "beleg_id": "c208d337839ae65e74c3dfc1ef2de02cc887672b2c05568ffa0e60bcc27f72af",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -9935,7 +9905,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:43:35Z"
+      "zeitpunkt": "2026-11-18T00:36:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9975,7 +9945,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e1999cc5e5b01f3c3c4ad5a7e6848d95ea91ca8ea2248fe67b15d6bd42d2b891",
+      "beleg_id": "814f254518a04cc08c15ab9b50215bf4ed0980d393c62035d9df6bd809452efd",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -9996,7 +9966,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:43:39Z"
+      "zeitpunkt": "2026-11-18T00:36:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10065,7 +10035,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "99ae200ec168a2626bc47fbdbe52e6c99ebdcec52e3023def325b2f51657932a",
+      "beleg_id": "ddbfa5f5adcef92bb598063903977423ae74ee3931b35376f479a5a05abac39f",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -10086,7 +10056,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:43:45Z"
+      "zeitpunkt": "2026-11-18T00:36:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10126,7 +10096,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "53c62748bc3733347d17f38ab89f1b28a390b14a80c94491f4b6149db3b2ca39",
+      "beleg_id": "9b356bb50f5f6bf72e4f6476142c8dad745e99fec220eb9c67318e3b8bd10c06",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -10147,7 +10117,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:43:49Z"
+      "zeitpunkt": "2026-11-18T00:36:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10216,7 +10186,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "58027a539a827a196c1ac8a7faa71fcdfd456f87e145977b5e8afeea74b11171",
+      "beleg_id": "8cf68a62077da36d990ce98fecb6683c3bef58575e87ee6c7d14d6a579418e8d",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -10237,7 +10207,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:43:55Z"
+      "zeitpunkt": "2026-11-18T00:36:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10741,7 +10711,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "34cff3dd20a6eefbee4fa6663b63bd85abfd5b3cc691545b2b93da8deb3efca9",
+      "beleg_id": "aa2c78118d702abb2ee8fa865278180db932bfcccfe9c6d8bb29587083311d80",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -10762,7 +10732,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:44:00Z"
+      "zeitpunkt": "2026-11-18T00:37:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10860,7 +10830,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0c49960b8e4af75fa5b480c20e98cb693707109fbf1a70b7dd2a620809e13def",
+      "beleg_id": "9acb7b56cc619101dec439faa4250e2769c36d1503fc15221a7e28d3a1549e81",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -10881,7 +10851,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:44:09Z"
+      "zeitpunkt": "2026-11-18T00:37:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11414,7 +11384,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "798b865f272b312ecf562f5e6a76633e867d4d976810341fe6cbbd9860f67232",
+      "beleg_id": "1b435f67e5bd303bddec3f6115b54d0393ae5406042553108d5fb48bb418bb97",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -11435,7 +11405,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:44:13Z"
+      "zeitpunkt": "2026-11-18T00:37:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12435,8 +12405,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.4,
-    "takte_ms": 6200,
+    "sekunden": 14.9,
+    "takte_ms": 8850,
     "wartet_auf": "load"
    },
    "speicher_gb": 1024,
@@ -14209,7 +14179,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "27361acfc2bcd8e8282f9d68df0e56d525221aceab609f64c10bf5529a1a8749",
+      "beleg_id": "ed50ab16747271a9dab3540e5fe753d093610c27683d8af0c0bcfb5cfa79d9a9",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -14230,7 +14200,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:57:51Z"
+      "zeitpunkt": "2026-11-18T00:50:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14270,7 +14240,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "440f576aea21cf6f673476e7006946bb4bbd5925c66cc351e2e19b332f827b9f",
+      "beleg_id": "5043096762497d8f70f0faee7615862b5595da24ce0ed0c74b50b807b1b6cc88",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -14291,7 +14261,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:57:55Z"
+      "zeitpunkt": "2026-11-18T00:50:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14360,7 +14330,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "14ac4cb9a189658135b51a79cf564326db2ef5cd5d1e2e31fc8b7ca68301526a",
+      "beleg_id": "54e099a1d8c996b7d8598fe313e0850c12c875d5d4ebed57b082a6c7c4cd318e",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -14381,7 +14351,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:58:01Z"
+      "zeitpunkt": "2026-11-18T00:51:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14421,7 +14391,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f79f4f3884c053396d779cb231ee997fc9115b51963e9d8506675c6f1e83722d",
+      "beleg_id": "895096b2a9bbba5309ba2e06ec115a5a0b631e668feb5b7b2405275268139996",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -14442,7 +14412,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:58:06Z"
+      "zeitpunkt": "2026-11-18T00:51:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14511,7 +14481,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3d116d6a76598c5b620a9c3a2afedf8be2dc86d45f2e293ee3adee05e40ccbd5",
+      "beleg_id": "a73f7614f22f13a388dd67adc7ba74d53316b02af3b3fd7c8d17970df8680466",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -14532,7 +14502,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:58:12Z"
+      "zeitpunkt": "2026-11-18T00:51:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15210,7 +15180,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "844f3cfc270c13f94f236bdc583366d363abae44e0be333a630044868027a8a5",
+      "beleg_id": "3e63ffac8dc8ffba892e3ae5cac1c13d46c9a0674bfc0cd8f45eb08317ee1400",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -15231,7 +15201,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:58:17Z"
+      "zeitpunkt": "2026-11-18T00:51:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15329,7 +15299,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2558b852a24ade8044c7a67eeec51d00f9e08f778fd1affbaab278d62083558f",
+      "beleg_id": "9a131ba6e75fb841c7870c034a64c9dcdf4be94c3085bd295f7b46b07f7d7dd0",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -15350,7 +15320,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:58:23Z"
+      "zeitpunkt": "2026-11-18T00:51:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16057,7 +16027,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dee032269e4b61ee9e5ee74fce3a1aef4b44c2b726022f830288e43ecacf64b9",
+      "beleg_id": "49abcaa15d33de58818d6f85e41a0c250335bd348fb102dadf6ada7b681575ea",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -16078,7 +16048,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-17T08:58:27Z"
+      "zeitpunkt": "2026-11-18T00:51:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16200,13 +16170,15 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 146,
-    "beendet": 146,
+    "beendet": 142,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "library.telefonica.de": 5
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 11.9,
-    "takte_ms": 7600,
+    "sekunden": 15.0,
+    "takte_ms": 10200,
     "wartet_auf": "load"
    },
    "speicher_gb": 2048,
@@ -16227,5 +16199,5 @@
  "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10261
+ "zeitbudget_sekunden": 10254
 }
