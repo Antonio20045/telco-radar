@@ -1,6 +1,36 @@
 {
- "stand": "2026-11-17",
+ "stand": "2026-11-18",
  "videos": [
+  {
+   "id": "hnpNRoKdneo",
+   "titel": "How to Connect Claude to Blender",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 333,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "hnpNRoKdneo.jpg"
+  },
+  {
+   "id": "JVHkb8PTMvc",
+   "titel": "OpenAI GPT-6.2 Astra is Here - It's Not What You Think",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 898,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "JVHkb8PTMvc.jpg"
+  },
+  {
+   "id": "2pdF52EVlbM",
+   "titel": "An underrated way to use ChatGPT: Life admin",
+   "kanal": "OpenAI",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 34,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "2pdF52EVlbM.jpg"
+  },
   {
    "id": "xkeXefmxArU",
    "titel": "Making marketing feel local across 40 markets | Revolut’s Kim Maniovich",
@@ -42,6 +72,16 @@
    "bild": "qbsb9DpdZ6s.jpg"
   },
   {
+   "id": "pmOJIq7Ah00",
+   "titel": "Introducing ChatGPT for Sales",
+   "kanal": "OpenAI",
+   "datum": "2026-11-17",
+   "dauer_sekunden": 51,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "pmOJIq7Ah00.jpg"
+  },
+  {
    "id": "gl2U4fGTr6g",
    "titel": "OpenAI's New Breakthrough Is... Utter Chaos",
    "kanal": "Two Minute Papers",
@@ -80,6 +120,26 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "R_sl8zEp9ng.jpg"
+  },
+  {
+   "id": "LxKNPrXBuyU",
+   "titel": "ChatGPT 6.2 Astra is \"A Mess\"",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-17",
+   "dauer_sekunden": 87,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "LxKNPrXBuyU.jpg"
+  },
+  {
+   "id": "K81vU-gykmQ",
+   "titel": "RSI is here?! GPT 6.2 is “high” on recursive self-improvement",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-17",
+   "dauer_sekunden": 1630,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "K81vU-gykmQ.jpg"
   },
   {
    "id": "IFEd7SNqNPk",
@@ -240,153 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "1X4rF_o60mY.jpg"
-  },
-  {
-   "id": "_l6gzItCF80",
-   "titel": "Claude Fable 5.2: DAS kann es wirklich! + Die Folgen des NVIDIA-Dramas | KI-NEWS",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-15",
-   "dauer_sekunden": 2282,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "_l6gzItCF80.jpg"
-  },
-  {
-   "id": "X3r-mZtPfP8",
-   "titel": "The Self-Driving Car With Balls",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-15",
-   "dauer_sekunden": 60,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "X3r-mZtPfP8.jpg"
-  },
-  {
-   "id": "K6ffYKrlPdU",
-   "titel": "AI Model Debugging: Find the First Divergence Across AI Accelerators",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-15",
-   "dauer_sekunden": 870,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "K6ffYKrlPdU.jpg"
-  },
-  {
-   "id": "7-Tj5qaOUbc",
-   "titel": "Build your own open-source Grok Bot, here’s how",
-   "kanal": "David Ondrej",
-   "datum": "2026-11-15",
-   "dauer_sekunden": 3415,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "7-Tj5qaOUbc.jpg"
-  },
-  {
-   "id": "x7iwI6WfWS0",
-   "titel": "AI Can Do Everything…Except This",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-11-14",
-   "dauer_sekunden": 363,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "x7iwI6WfWS0.jpg"
-  },
-  {
-   "id": "sZg4uJnU9rU",
-   "titel": "Security's New Reality Check",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-14",
-   "dauer_sekunden": 41,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "sZg4uJnU9rU.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-17",
-   "abgerufen": "2026-11-17"
+   "versucht": "2026-11-18",
+   "abgerufen": "2026-11-18"
   }
  },
  "error": null
