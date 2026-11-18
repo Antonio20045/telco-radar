@@ -2,6 +2,26 @@
  "stand": "2026-11-18",
  "videos": [
   {
+   "id": "w9VqhLZhRks",
+   "titel": "Preparing for Service Outages",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 27,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "w9VqhLZhRks.jpg"
+  },
+  {
+   "id": "pVc6KkjeCfU",
+   "titel": "Behind the scenes with Genie 4",
+   "kanal": "Google DeepMind",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 154,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "pVc6KkjeCfU.jpg"
+  },
+  {
    "id": "hnpNRoKdneo",
    "titel": "How to Connect Claude to Blender",
    "kanal": "Kevin Stratvert",
@@ -10,6 +30,46 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "hnpNRoKdneo.jpg"
+  },
+  {
+   "id": "hT0qW_DRFLw",
+   "titel": "The Reason No One Can Catch NVIDIA",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 98,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "hT0qW_DRFLw.jpg"
+  },
+  {
+   "id": "b5ZSPULTrz8",
+   "titel": "Build apps by describing what you want | Copilot Code",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 465,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "b5ZSPULTrz8.jpg"
+  },
+  {
+   "id": "TrXieGlY85Y",
+   "titel": "KI-Update kompakt: Destillation, Anthropics Börsengang, OpenAI-Klage, IdeaLens",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 1115,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "TrXieGlY85Y.jpg"
+  },
+  {
+   "id": "KtV_f3chj9A",
+   "titel": "Introducing Autopilot, your personal and proactive agent",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 576,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "KtV_f3chj9A.jpg"
   },
   {
    "id": "JVHkb8PTMvc",
@@ -22,6 +82,26 @@
    "bild": "JVHkb8PTMvc.jpg"
   },
   {
+   "id": "EDp4IoAUsXY",
+   "titel": "Project Genie: Create and explore interactive worlds with Genie 4",
+   "kanal": "Google DeepMind",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 92,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "EDp4IoAUsXY.jpg"
+  },
+  {
+   "id": "Bn8DhYpy-qI",
+   "titel": "Grok Build leaks apps and Outlook goes dark worldwide",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 1572,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Bn8DhYpy-qI.jpg"
+  },
+  {
    "id": "2pdF52EVlbM",
    "titel": "An underrated way to use ChatGPT: Life admin",
    "kanal": "OpenAI",
@@ -30,6 +110,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "2pdF52EVlbM.jpg"
+  },
+  {
+   "id": "2nAFAIXdXew",
+   "titel": "KI-Update kompakt: Destillation, Anthropics Börsengang, OpenAI-Klage, IdeaLens",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-18",
+   "dauer_sekunden": 1190,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "2nAFAIXdXew.jpg"
   },
   {
    "id": "xkeXefmxArU",
@@ -63,7 +153,7 @@
   },
   {
    "id": "qbsb9DpdZ6s",
-   "titel": "How to compress text to 1 bit per character | Compression is Intelligence Part 3",
+   "titel": "How to compress text to 1 bit per character | Information theory, part 3",
    "kanal": "3Blue1Brown",
    "datum": "2026-11-17",
    "dauer_sekunden": 2245,
@@ -210,96 +300,6 @@
    "stufe": "Fortgeschritten",
    "sprache": "en",
    "bild": "0IZcjWtWmDA.jpg"
-  },
-  {
-   "id": "vVVdxMwPBuA",
-   "titel": "How Check Point speeds up vulnerability research with Daybreak | OpenAI for Cybersecurity",
-   "kanal": "OpenAI",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 65,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "vVVdxMwPBuA.jpg"
-  },
-  {
-   "id": "soNLXvgUqNY",
-   "titel": "La Cousinade",
-   "kanal": "OpenAI",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 30,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "soNLXvgUqNY.jpg"
-  },
-  {
-   "id": "kGtpPvAb7q0",
-   "titel": "KI-Update kompakt: Nvidia-Drama, Berufseinstieg, Siri AI, Home Assistant mit KI",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 1091,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "kGtpPvAb7q0.jpg"
-  },
-  {
-   "id": "iv32wI3MBpw",
-   "titel": "Software Supply Chain Security: What AI Coding Changes",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 579,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "iv32wI3MBpw.jpg"
-  },
-  {
-   "id": "btjS7OaffpM",
-   "titel": "This had never been done before!",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 78,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "btjS7OaffpM.jpg"
-  },
-  {
-   "id": "Zbv70lLBHgo",
-   "titel": "How Check Point speeds up vulnerability research with Daybreak | OpenAI for Cybersecurity",
-   "kanal": "OpenAI",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 23,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Zbv70lLBHgo.jpg"
-  },
-  {
-   "id": "MZrItvHnTGU",
-   "titel": "KI-Update kompakt: Nvidia-Drama, Berufseinstieg, Siri AI, Home Assistant mit KI",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 1058,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "MZrItvHnTGU.jpg"
-  },
-  {
-   "id": "ETw45WHQ6Z4",
-   "titel": "3D Printing Entire Buildings is So Wild To Me",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 66,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "ETw45WHQ6Z4.jpg"
-  },
-  {
-   "id": "1X4rF_o60mY",
-   "titel": "Tatort: ChatGPT",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-16",
-   "dauer_sekunden": 81,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "1X4rF_o60mY.jpg"
   }
  ],
  "kanaele": {
