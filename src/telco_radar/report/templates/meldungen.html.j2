@@ -73,7 +73,10 @@
       <header class="mg-kopf wa-text">
         {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
         <h1 class="mg-titel">Meldungen</h1>
-        {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
+        {# data-ausgabe-heute: app.js ersetzt das Datum durch den heutigen Tag
+           in Duesseldorf statt dem Tag des letzten radar.yml-Laufs. Ohne
+           JavaScript steht weiterhin das Datum der zuletzt gebauten Ausgabe. #}
+        {% if date_de %}<p class="mg-datum" data-ausgabe-heute>Ausgabe vom {{ date_de }}</p>{% endif %}
       </header>
     </div>
   </div>

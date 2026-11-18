@@ -85,6 +85,19 @@
     }
   }
 
+  /* DATUM DER KOPFBAENDER (Antonio, 18.11.2026): Meldungen und KI zeigen im
+     Kopfband "Ausgabe vom ..." - das soll wie auf der Startseite den
+     heutigen Tag in Duesseldorf zeigen, nicht den Tag des letzten
+     radar.yml-Laufs. Ohne JavaScript steht weiterhin das Datum der zuletzt
+     gebauten Ausgabe da. */
+  var ausgabeHeute = document.querySelectorAll('[data-ausgabe-heute]');
+  if (ausgabeHeute.length && window.Intl) {
+    var vollHeute = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+    for (var k = 0; k < ausgabeHeute.length; k++) {
+      ausgabeHeute[k].textContent = ausgabeHeute[k].textContent.replace(/Ausgabe vom .+$/, 'Ausgabe vom ' + vollHeute);
+    }
+  }
+
   /* Die Lage am Campus aus Zeitpunkt und Wetter: Sonnenhoehe, welche Platte
      wie stark, Laub der Jahreszeit und wie viele Bueros Licht haben. */
   var CAMPUS_LEBEN = (function () {
