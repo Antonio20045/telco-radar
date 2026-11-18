@@ -32,6 +32,20 @@
   /* DIE BUEHNE: genau EIN Bild laden - das der Tageszeit. */
   var buehne = document.querySelector('.buehne');
   if (buehne) {
+    /* DATUM DER AUSGABE (Antonio, 18.11.2026): nur auf der Startseite
+       (data-ausgabe-aktuell) zeigen Titel, aria-label und das grosse Datum
+       den heutigen Tag in Duesseldorf - nicht den Tag des letzten
+       radar.yml-Laufs. Ohne JavaScript steht weiterhin das Datum der
+       zuletzt gebauten Ausgabe da. Archivseiten bleiben unberuehrt. */
+    if (buehne.hasAttribute('data-ausgabe-aktuell') && window.Intl) {
+      var heute = new Date();
+      var voll = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', day: 'numeric', month: 'long', year: 'numeric' }).format(heute);
+      var kurz = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', day: 'numeric', month: 'long' }).format(heute);
+      document.title = document.title.replace(/Ausgabe vom .+$/, 'Ausgabe vom ' + voll);
+      buehne.setAttribute('aria-label', 'Ausgabe vom ' + voll);
+      var ausgabeDatum = buehne.querySelector('.buehne-datum');
+      if (ausgabeDatum) ausgabeDatum.textContent = kurz;
+    }
     var gruss = buehne.querySelector('[data-gruss]');
     var GRUSS = { morgen: 'Guten Morgen', tag: 'Guten Tag', abend: 'Guten Abend', nacht: 'Guten Abend' };
     if (gruss && gruss.textContent.trim() === 'Ausgabe') gruss.textContent = GRUSS[stunde];
@@ -68,6 +82,19 @@
       new IntersectionObserver(function (e) {
         buehne.classList.toggle('verdeckt', !e[0].isIntersecting);
       }).observe(buehne);
+    }
+  }
+
+  /* DATUM DER KOPFBAENDER (Antonio, 18.11.2026): Meldungen und KI zeigen im
+     Kopfband "Ausgabe vom ..." - das soll wie auf der Startseite den
+     heutigen Tag in Duesseldorf zeigen, nicht den Tag des letzten
+     radar.yml-Laufs. Ohne JavaScript steht weiterhin das Datum der zuletzt
+     gebauten Ausgabe da. */
+  var ausgabeHeute = document.querySelectorAll('[data-ausgabe-heute]');
+  if (ausgabeHeute.length && window.Intl) {
+    var vollHeute = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+    for (var k = 0; k < ausgabeHeute.length; k++) {
+      ausgabeHeute[k].textContent = ausgabeHeute[k].textContent.replace(/Ausgabe vom .+$/, 'Ausgabe vom ' + vollHeute);
     }
   }
 

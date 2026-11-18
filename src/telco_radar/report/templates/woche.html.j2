@@ -28,7 +28,11 @@
    Zwischentitel und ohne Kino-Animation (Antonio, 11.10.2026). #}
 {# campus-wartet steht schon im HTML: bis app.js laeuft, ist die Buehne dunkel
    statt hellblau (Antonio, 14.10.2026). #}
-<section class="buehne{% if 'campus-turm' in bilder %} campus-wartet film-dunkel{% endif %}" aria-label="Ausgabe vom {{ date_de }}">
+{# data-ausgabe-aktuell markiert nur die Startseite (is_latest): app.js setzt
+   dort Titel, aria-label und Datum auf das heutige Datum in Duesseldorf, statt
+   auf den Tag des letzten radar.yml-Laufs (Antonio, 18.11.2026). Archivseiten
+   zeigen weiterhin ihr festes Datum. #}
+<section class="buehne{% if 'campus-turm' in bilder %} campus-wartet film-dunkel{% endif %}"{% if is_latest %} data-ausgabe-aktuell{% endif %} aria-label="Ausgabe vom {{ date_de }}">
   {# app.js malt im Canvas den Campus aus sieben Fotoplatten (static/campus/)
      nach Uhrzeit, Wetter und Jahreszeit; das Foto der blauen Stunde steht nur
      ohne JavaScript oder WebGL 2. #}
