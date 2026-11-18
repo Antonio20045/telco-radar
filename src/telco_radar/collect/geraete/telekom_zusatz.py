@@ -14,6 +14,14 @@ Fail-closed: eine abweichende Schlussrate, ein Tarif, dessen `id` nicht zur
 angefragten `tariffId` passt, oder eine Antwort ohne `__INITIAL_STATE__`
 liefern `None` - die Zelle bleibt eine benannte Luecke, nie ein geratener
 Preis (Entscheidung Antonio, 11.08.2026).
+
+Eine Antwort ohne `__INITIAL_STATE__` ist die Challenge-Signatur (`telekom.
+zustand` setzt `GeraeteAbrufFehler.schutz`, CLAUDE.md §6 unlesbar, 2xx ohne
+lesbaren Inhalt). Trifft sie, bricht `vertiefe_buendel` den Rest dieses
+Aufrufs sofort ab (gleiches `tariffId`, alle noch fehlenden Geraete und
+Varianten) statt sie einzeln gegen denselben blockierten Pfad zu versuchen
+(Hoeflichkeits-/Ressourcenregel, CLAUDE.md §4: eine Challenge-Seite liefert
+still null Links). Der naechste Tageslauf prueft erneut.
 """
 
 from __future__ import annotations
@@ -186,6 +194,8 @@ def _hole_zusatz_satz(
         satz = lies_zusatz_variante(text, url, tarif_id, produkt_slug, variante_slug)
     except GeraeteAbrufFehler as exc:
         z["unlesbar"] = z.get("unlesbar", 0) + 1
+        if exc.schutz:
+            z["schutz"] = True
         log.info("Telekom-Zusatz: %s unlesbar (%s)", url, exc)
         return None
     if satz is None:
@@ -228,7 +238,10 @@ def vertiefe_buendel(
     werden, steht dort, nicht hier. Fuer jede konfigurierte Variante, deren
     Speichergroesse unter diesem Tarif (`rohsaetze[0]["tarif_slug"]`) schon
     im Bestseller-Karussell steht, wird NICHTS abgerufen - genau so viele
-    Seitenaufrufe wie fehlende Zellen, nie mehr (HAUSREGEL)."""
+    Seitenaufrufe wie fehlende Zellen, nie mehr (HAUSREGEL). Erkennt ein
+    Abruf die Challenge-Signatur (`z["schutz"]`, Modulkopf), bricht der Rest
+    dieses Aufrufs sofort ab - dann sind es WENIGER Seitenaufrufe als
+    fehlende Zellen, nie mehr."""
     z = zaehler if zaehler is not None else {}
     weiter = weiter or (lambda: True)
     konfiguriert = [g for g in zusatz or [] if isinstance(g, dict)]
@@ -246,10 +259,14 @@ def vertiefe_buendel(
         produkt_slug = str(geraet.get("produkt_slug") or "").strip()
         if not name or not marke or not produkt_slug:
             continue
+        if z.get("schutz"):
+            return out
         schon_da = vorhandene_speicher.get(name, set())
         for variante_slug, _speicher_gb in _fehlende_varianten(geraet, schon_da):
             if not weiter():
                 z["frist"] = z.get("frist", 0) + 1
+                return out
+            if z.get("schutz"):
                 return out
             url = (
                 f"https://www.telekom.de/shop/geraet/{marke}/{produkt_slug}/"

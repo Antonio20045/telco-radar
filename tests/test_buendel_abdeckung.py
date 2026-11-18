@@ -242,9 +242,11 @@ def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
     Gerät fehlt in der Geräteliste (kein „nicht mehr“: seit wann ist nicht belegt).
     08.11.2026: dieselbe Übersicht führt auch das 17 Pro Max nicht mehr (Lauf
     42356867331, 07.11., war deshalb rot) und Apple iPhone Duo kam dazu
-    (Soft-404, ebenfalls nicht in der Geräteliste). Alle drei Lücken stehen
-    mit Grund in der echten Config, und nur diese drei: kein ganzer
-    Anbieter, kein anderes Modell."""
+    (Soft-404, ebenfalls nicht in der Geräteliste). 18.11.2026: die Sitemap
+    führt auch kein Xiaomi 17 (Basis-Modell, nur Ultra/17T/17T Pro/18 Pro/
+    18 Pro Max/Redmi-Varianten) - eine Sortimentslücke, kein Matching-Fehler.
+    Alle vier Lücken stehen mit Grund in der echten Config, und nur diese
+    vier: kein ganzer Anbieter, kein anderes Modell."""
     pflicht = lade_pflicht(ECHTE_CONFIG)
     assert "apple-iphone-17-pro" in pflicht["modelle"]
     assert "apple-iphone-17-pro-max" in pflicht["modelle"]
@@ -260,10 +262,14 @@ def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
         "nicht in der Geräteliste"
         in pflicht["luecken"][("congstar", "apple-iphone-duo")]
     )
+    assert (
+        "nicht im Sortiment" in pflicht["luecken"][("congstar", "xiaomi-17")]
+    )
     assert sorted(k for k in pflicht["luecken"] if k[0] == "congstar") == [
         ("congstar", "apple-iphone-17-pro"),
         ("congstar", "apple-iphone-17-pro-max"),
         ("congstar", "apple-iphone-duo"),
+        ("congstar", "xiaomi-17"),
     ]
 
 
