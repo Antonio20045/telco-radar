@@ -252,3 +252,36 @@ def test_vertiefe_nicht_eindeutige_antwort_bleibt_luecke():
 
     out = vertiefe_buendel(hole, _katalog_ohne_duo(_XS), zusatz=_ZUSATZ_KONFIG)
     assert out == []
+
+
+_ZUSATZ_KONFIG_ZWEI_GERAETE = [
+    _ZUSATZ_KONFIG[0],
+    {
+        "marke": "samsung",
+        "produkt_slug": "samsung-galaxy-s26",
+        "produkt_name": "Samsung Galaxy S26",
+        "varianten": [
+            {"variante_slug": "schwarz-512-gb", "speicher_gb": 512},
+        ],
+    },
+]
+
+
+def test_vertiefe_bricht_bei_challenge_signatur_den_rest_ab():
+    """Antwortet die erste fehlende Zelle mit der Challenge-Signatur (2xx
+    ohne `__INITIAL_STATE__`, `telekom.zustand` setzt `schutz=True`), ruft
+    `vertiefe_buendel` die restlichen fehlenden Zellen desselben Aufrufs
+    NICHT mehr ab - drei fehlende Zellen (zwei Varianten vom iPhone Duo,
+    eine vom Galaxy S26), aber nur EIN Abruf, der Rest bleibt eine
+    unversuchte Luecke statt gegen denselben blockierten Pfad zu hämmern."""
+    abgerufen: list[str] = []
+
+    def hole(url: str) -> str:
+        abgerufen.append(url)
+        return "<html>Challenge</html>"
+
+    out = vertiefe_buendel(
+        hole, _katalog_ohne_duo(_XS), zusatz=_ZUSATZ_KONFIG_ZWEI_GERAETE
+    )
+    assert out == []
+    assert len(abgerufen) == 1

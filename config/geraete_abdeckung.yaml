@@ -586,3 +586,26 @@ belegte_luecken:
     original: https://tarife.mediamarkt.de/sitemap.xml
     geprueft: "2026-11-13"
     bis: "2026-11-27"
+  # congstar: Xiaomi 17 (Basis-Modell) ist nicht in der Geräteliste. Die
+  # Portfolio-Ansicht der Geräteseite zeigte das als offene Messlücke, obwohl
+  # bereits am 18.11.2026 nachgewiesen war, dass congstar das Gerät nicht
+  # führt. Belegt (18.11.2026, ein GET auf die öffentliche Sitemap, ehrliche
+  # Kennung, robots.txt von congstar.de erlaubt Sitemaps ausdrücklich, kein
+  # Login/Checkout/Suche-Pfad, Rohdaten gesichert unter
+  # docs/belege/congstar-xiaomi17-1118/sitemap-devices-2026-11-18.txt, 581
+  # Zeilen): die Sitemap listet bei Xiaomi nur Leica Leitz Phone powered by
+  # Xiaomi, Xiaomi 17 Ultra, 17T, 17T Pro, 18 Pro, 18 Pro Max und vier Redmi-
+  # Modelle - kein "xiaomi-17/" (Basis). Kein Screenshot, weil kein Geräte-
+  # oder Klick-Lauf gestartet wurde (dieselbe Lesart wie bei den MediaMarkt-
+  # Sitemap-Belegen oben: Sitemap-Textabzug statt Screenshot). Der Tageslauf
+  # liest die Sitemap weiter; kommt das Gerät zurück, warnt der Wächter
+  # "überholt".
+  - anbieter: congstar
+    modelle:
+      - xiaomi-17
+    grund: Gerät ist bei congstar nicht im Sortiment (Sitemap https://www.congstar.de/sitemap/devices.xml geprüft 18.11.2026, führt kein Xiaomi 17 Basis-Modell)
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-xiaomi17-1118/sitemap-devices-2026-11-18.txt
+    original: https://www.congstar.de/sitemap/devices.xml
+    geprueft: "2026-11-18"
+    bis: "2026-12-02"

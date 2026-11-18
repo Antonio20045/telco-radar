@@ -297,7 +297,8 @@ def zustand(html: str) -> dict:
     if not treffer:
         raise GeraeteAbrufFehler(
             "Telekom-Kategorieseite ohne window.__INITIAL_STATE__ "
-            f"({len(html or '')} Bytes) - Challenge oder neues Format"
+            f"({len(html or '')} Bytes) - Challenge oder neues Format",
+            schutz=True,
         )
     try:
         daten, _ = json.JSONDecoder().raw_decode(html, treffer.end())
