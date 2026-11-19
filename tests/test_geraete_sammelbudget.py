@@ -126,6 +126,18 @@ def test_die_ausgelieferte_konfiguration_nennt_o2_bedarf():
     assert sammelbedarf(o2) > (len(o2.crawled_einstiege) + o2.max_produkte) * 2
 
 
+def test_die_ausgelieferte_konfiguration_nennt_congstar_bedarf():
+    """BEFUND 18./19.11.2026 (arbeit/ursache-je-anbieter-1818.md): die
+    Schätzung aus ``max_produkte`` × ``rate_limit_sekunden`` lag praktisch auf
+    ``MINDEST_JE_ANBIETER`` - zu knapp fuer die reale Seitenzahl, deshalb
+    blieben Messungen älter als ``ALT_AB_TAGEN``."""
+    quellen = lade_quellen(_WURZEL)
+    congstar = next(a for a in quellen.anbieter if a.name == "congstar")
+
+    assert congstar.sammelbedarf_sekunden is not None
+    assert sammelbedarf(congstar) > MINDEST_JE_ANBIETER
+
+
 def test_die_ausgelieferten_anteile_bleiben_im_budget():
     """Gegenprobe an der echten Anbieterliste: kein Anteil über dem Budget,
     die Summe genau das Budget - sonst verspräche der Lauf Zeit, die der Job

@@ -602,7 +602,6 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
         name = str(eintrag.get("name") or "").strip()
         if not name:
             continue
-
         formen = _preisformen(eintrag.get("price") or {})
         if not formen:
             log.info(
