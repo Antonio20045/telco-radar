@@ -135,7 +135,8 @@ def test_die_seite_schreibt_das_wort_in_die_delta_zelle(tmp_path):
 
 def test_die_katalogzahl_traegt_ihr_wort_und_die_kostenzelle_ihren_tarif(tmp_path):
     """Die nackte Zahl neben „Alle Geräte“ heißt „Modelle“ und ist die Zahl der
-    Tabellenzeilen; der „ab“-Betrag nennt den Tarif, aus dem er stammt."""
+    Tabellenzeilen; der „ab“-Betrag nennt den Tarif, aus dem er stammt (als
+    Tooltip der Preiszelle, die Zeile selbst bleibt ruhig)."""
     site = baue_site(tmp_path)
     suppe = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
@@ -146,9 +147,10 @@ def test_die_katalogzahl_traegt_ihr_wort_und_die_kostenzelle_ihren_tarif(tmp_pat
     mit_kosten = [z for z in zeilen if z.select_one(".gr-k-ab")]
     assert mit_kosten
     for z in mit_kosten:
-        kosten = z.select("td.gr-sp--tco")[0].get_text(" ", strip=True)
+        zelle = z.select("td.gr-sp--tco")[0]
+        titel = zelle.get("title") or ""
         band = z.select("td.gr-sp--tco")[3].get_text(strip=True)
-        assert f"Tarif {band}" in kosten, kosten
+        assert f"Tarif {band}" in titel, titel
 
 
 def _zeile_mit_vodafone_vorn(o2_betrag, o2_prozent):
