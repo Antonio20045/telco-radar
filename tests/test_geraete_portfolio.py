@@ -520,12 +520,12 @@ def test_echter_congstar_beleg_belegt_die_geraeteliste_nicht_nur_nicht_verfuegba
     b = belege[("congstar", "apple-iphone-17-pro")]
     assert "nicht in der Geräteliste" in b["grund"]
     assert "verfügbar" not in b["grund"]
-    gueltig, _ = pf.beleg_fuer(belege, "congstar", "apple-iphone-17-pro", "2026-11-10")
+    gueltig, _ = pf.beleg_fuer(belege, "congstar", "apple-iphone-17-pro", "2026-11-19")
     assert gueltig is not None
-    ordner = wurzel / "docs" / "belege" / "congstar-17pro-0511"
+    ordner = wurzel / "docs" / "belege" / "congstar-17pro-1911"
     assert (ordner / "3-apple-uebersicht-ganz.png").is_file()
     assert b["beleg"].endswith(
-        "/docs/belege/congstar-17pro-0511/3-apple-uebersicht-ganz.png"
+        "/docs/belege/congstar-17pro-1911/3-apple-uebersicht-ganz.png"
     )
     for datei in ("4-apple-uebersicht-links.txt", "5-congstar-sitemap-devices.xml"):
         assert (ordner / datei).is_file()

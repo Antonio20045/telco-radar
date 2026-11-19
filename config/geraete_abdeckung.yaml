@@ -115,15 +115,24 @@ belegte_luecken:
   # trägt („nicht im Sortiment“, „Seite entfernt“, „nicht in der Geräteliste“).
   # Der Tageslauf liest die Seite weiter und meldet sie als „Gerät nicht mehr
   # angeboten“; kommt sie zurück, entsteht wieder ein Bündel.
+  # congstar: iPhone 17 Pro weiterhin nicht in der Geräteliste (Nachprüfung
+  # 19.11.2026, Frist aus dem Eintrag vom 05.11.2026 lief heute ab). Belegt
+  # (docs/belege/congstar-17pro-1911/, Playwright, ehrliche Kennung
+  # TelcoRadar/1.0, robots.txt beachtet, nichts im Warenkorb): die Einzelseite
+  # /geraete/apple/apple-iphone-17-pro/ leitet per 307 auf die Apple-Übersicht
+  # um (Screenshot 1). Die Übersicht (Screenshot 2+3, Linkliste 4, 29 Links)
+  # führt nur noch 16, 17, 17e, 18 Pro, 18 Pro Max, Air und Refurbished-Modelle
+  # - kein 17 Pro. Die Sitemap /sitemap/devices.xml (5) bestätigt das (die
+  # beiden Treffer auf "17-pro" sind Xiaomi Redmi Note 17 Pro/Pro Max).
   - anbieter: congstar
     modelle:
       - apple-iphone-17-pro
-    grund: Gerät ist nicht in der Geräteliste (Apple-Übersicht) und nicht in der Sitemap; die Seite leitet auf die Übersicht um
+    grund: Gerät ist weiterhin nicht in der Geräteliste (Apple-Übersicht) und nicht in der Sitemap; die Seite leitet auf die Übersicht um
     art: nicht_im_portfolio
-    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-17pro-0511/3-apple-uebersicht-ganz.png
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-17pro-1911/3-apple-uebersicht-ganz.png
     original: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/
-    geprueft: "2026-11-05"
-    bis: "2026-11-19"
+    geprueft: "2026-11-19"
+    bis: "2026-12-03"
   # congstar: iPhone 17 Pro Max ist nicht mehr in der Geräteliste. Lauf
   # 42356867331 (07.11.2026, 08:46 UTC) war deshalb rot: "congstar, 1
   # Pflichtmodell ohne Bündel und ohne belegte Lücke: apple-iphone-17-pro-max".
@@ -211,6 +220,27 @@ belegte_luecken:
     original: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
     geprueft: "2026-11-08"
     bis: "2026-11-22"
+  # o2: Sortimentsänderung beim Galaxy S26 Ultra (Auftrag A-HJ9UAE, 19.11.2026,
+  # Hintergrund arbeit/ursache-waechter-2026-11-19.md). Katalog und
+  # Speicher-Wähler führen das Modell seit heute nur noch in 256 GB; 512 GB
+  # (gestern noch da) und 1024 GB sind beide weg - belegt mit echtem Browser
+  # (Playwright, Standard-UA, kein Warenkorb): der Wähler der
+  # 256gb-black-bw-Produktseite hat genau eine Stufe (Screenshot 1), die Adresse
+  # der 512-GB-Variante (…-512gb-cobalt-violet-details) ergibt 404 (Screenshot
+  # 2). Die alte 1024gb-Zeile oben (08.11.2026) bleibt bis zu ihrem Ablauf
+  # stehen, deckt aber dieselbe Stufe zusätzlich ab.
+  - anbieter: o2
+    modelle:
+      - samsung-galaxy-s26-ultra
+    speicher:
+      - 512gb
+      - 1024gb
+    grund: Speicherstufen bei o2 nicht im Sortiment (geprüft 19.11.2026) - der Speicher-Wähler der Produktseite hat genau eine Stufe, 256 GB; die 512-GB-Adresse ergibt 404
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-1911/1-speicherwaehler-nur256gb.png
+    original: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-19"
+    bis: "2026-12-03"
   - anbieter: o2
     modelle:
       - google-pixel-11
