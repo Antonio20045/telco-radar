@@ -996,6 +996,24 @@ anbieter:
     sammelrang: 4
     methode: congstar_next
     aktiv: true
+    # BEFUND 18./19.11.2026 (arbeit/ursache-je-anbieter-1818.md, congstar):
+    # ohne diese Angabe schaetzte die Aufteilung aus `max_produkte` (60) und
+    # `rate_limit_sekunden` (2 s) einen Bedarf von 122 s - das liegt praktisch
+    # auf `MINDEST_JE_ANBIETER` (120 s) und deckt den echten Bedarf nur an
+    # guten Naechten. Die Geraete-Sitemap (sitemap/devices.xml) fuehrt real
+    # 43-44 Produktseiten nach dem Smartwatch-/Tablet-Ausschluss
+    # (ohne_pfadmuster, Lauf 44223298480 vom 18.11.: "21 Adressen
+    # ausgeschlossen"); derselbe Lauf holte davon 42 Seiten in 118,8 s -
+    # 2,8 s je Seite, nicht die 2 s der `rate_limit_sekunden` (Next.js-Flight-
+    # Payload ist gross, die Downloadzeit zaehlt mit). Bei 121 s Zuteilung
+    # bleibt praktisch keine Luft fuer eine langsamere Nacht oder ein
+    # zusaetzliches Geraet - genau das haelt die Messung vom 13.11. laenger
+    # als `ALT_AB_TAGEN=3` alt. Angesetzt: 44 Seiten x 2,8 s plus Sitemap/
+    # robots.txt (rund 10 s) = 153 s, aufgerundet auf 180 s Luft. Das
+    # Budget bleibt insgesamt 3000 s (`geraete.yml`, Fix #139); die
+    # Aufteilung (`sammelbudget.sammelanteile`) gibt congstar dadurch rund
+    # 155-160 s statt 121 s - mehr als die gemessenen 118,8 s brauchen.
+    sammelbedarf_sekunden: 180
     # `grund` ist gestrichen (B3, 08.09.2026): das Feld beantwortet "warum
     # NICHT aktiv", und congstar laeuft seit dem 04.09.2026 nachtlich mit
     # Listungen. Die Messhistorie der Aktivierung (fuenf Nachtlaeufe bis zum
