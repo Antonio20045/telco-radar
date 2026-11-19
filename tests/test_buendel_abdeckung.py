@@ -262,9 +262,7 @@ def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
         "nicht in der Geräteliste"
         in pflicht["luecken"][("congstar", "apple-iphone-duo")]
     )
-    assert (
-        "nicht im Sortiment" in pflicht["luecken"][("congstar", "xiaomi-17")]
-    )
+    assert "nicht im Sortiment" in pflicht["luecken"][("congstar", "xiaomi-17")]
     assert sorted(k for k in pflicht["luecken"] if k[0] == "congstar") == [
         ("congstar", "apple-iphone-17-pro"),
         ("congstar", "apple-iphone-17-pro-max"),
