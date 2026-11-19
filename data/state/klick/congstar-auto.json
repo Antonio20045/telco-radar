@@ -1,41 +1,578 @@
 {
  "anbieter": "congstar-auto",
- "datum": "2026-11-18",
- "dauer_sekunden": 0.6,
+ "datum": "2026-11-19",
+ "dauer_sekunden": 48.6,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+ "grund": null,
  "karte": "congstar.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gelesen",
  "lesefrist_tage": 1,
  "name": "congstar",
  "seiten": [
   {
    "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details,/geraete/samsung/?redirectFrom=device-details",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 67,
+    "beendet": 68,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 8.0,
+    "takte_ms": 3500,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "leer",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 2
   },
   {
-   "adresse": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+   "adresse": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6057e05f8224ee49ac8772d2b8234ddd028b8abd555aa20ee1fa4b9f6664f65d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 64,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 49,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=501",
+      "zeitpunkt": "2026-11-19T07:35:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 49.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9b1437e36ad6c9519a38cb1ca0d10bae2b35e97ad9b3ebbcb9291530ee20c6ec",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 88,50 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 73,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=500",
+      "zeitpunkt": "2026-11-19T07:35:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 73.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a5506f1627bb0fb47c4cf66ac69d2e160f2c32d975761247bf8e6ca3eb33d287",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 67,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 47,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=501",
+      "zeitpunkt": "2026-11-19T07:35:51Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 47.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5c03800bc1c552686c0799773c941c2c6eac454d083201aa5e4d600c73b59680",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 90,50 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 70,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=500",
+      "zeitpunkt": "2026-11-19T07:35:53Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 70.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f6c0c62a84343b78d011bff14f70c1afe4cb7396d14de45df143518a24e316d3",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 69,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 44,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=501",
+      "zeitpunkt": "2026-11-19T07:35:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 44.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 250.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d0ba63409d86ef57a7d2cdcb96a3ee4707fe35e7182b785151bfa699d303145f",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 91,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 66,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=500",
+      "zeitpunkt": "2026-11-19T07:35:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 66.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 250.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "72fa4c9cdd279a122fd7c54467d245315240a6bac7c8136e6541f5a21bb0014a",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 73,00 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 43,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=501",
+      "zeitpunkt": "2026-11-19T07:35:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 43.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 300.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "656242477d0d7bce7ef4295a8aad0240222f6cf6628119115055e6f63a146eb9",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: Allnet Flat L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 119,00 € · monatlich 94,50 € (Gerät und Tarif zusammen) · Zuzahlung 119,00 € · Monatsrate 64,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=500",
+      "zeitpunkt": "2026-11-19T07:35:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 119.0,
+      "rate": 64.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 300.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 80,
+    "beendet": 77,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "images.congstar.de": 10,
+     "www.congstar.de": 4
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 5.1,
+    "takte_ms": 3600,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 56,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 51,
+    "knoepfe_gesucht": 51
+   },
+   "verworfen": 2
   }
  ],
  "ueberfaellig": [
-  "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/",
-  "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?paymentVariantBenefits=&planId=545&installmentPlanId=500"
+  "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/"
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10261
+ "zeitbudget_sekunden": 10225
 }
