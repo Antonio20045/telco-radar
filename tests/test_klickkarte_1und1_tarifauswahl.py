@@ -343,3 +343,16 @@ def test_fixture_traegt_keine_kennung_des_warenkorbs():
     roh = TARIFAUSWAHL.read_text(encoding="utf-8")
     assert not re.search(r"traceId=|JSESSIONID|cart[-_]?id", roh, re.I)
     assert html_modul.unescape(roh).count('"hardwareSelectedTermMonths":24') == 10
+
+
+def test_einmalzahlung_geraet_bleibt_benannte_luecke(karte, tarifauswahl):
+    """Die Tarifauswahl nennt bei „Fix“ keine einmalige Gerätezahlung: keine Zeile
+    „Einmalige Gesamtkosten“ (die Preisleiste zeigt sie nur bei „Sofort“), im JSON
+    ``oneTimeCosts: []``. Gemessen ist damit keine Zahl; die Zuzahlung bleibt ``None``
+    (nie 0) und die Kombination nennt die Lücke ``einmalzahlung``."""
+    assert "einmalig" not in tarifauswahl.select_one("#pso").get_text(" ").lower()
+    assert {len(h["oneTimeCosts"]) for h in _hinweise(karte, tarifauswahl)} == {0}
+    katalog = lade_katalog(lese_wurzel())
+    (satz,) = ausbeute(_daten(TARIFE[0], NAMEN[0], NAMEN[0]), katalog).rohsaetze
+
+    assert (satz["geraet_zuzahlung"], satz["einmalzahlung"]) == (None, None)
