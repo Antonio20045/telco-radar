@@ -32,7 +32,7 @@ import pathlib
 from bestand_pfad import ZUSTAND
 
 from telco_radar.report import geraete_tco_karten as karten
-from telco_radar.tco_model import TCO_HORIZONT, Buendel, tco_24
+from telco_radar.tco_model import TCO_HORIZONT, Buendel, kosten_ueber
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
@@ -87,8 +87,8 @@ def test_keine_leitzahl_unter_dem_eigenen_barpreis():
         b.tarif_phasen = karten.phasen_fuer_buendel(
             tarife.get(b.tarif_id) or {}, b.tarif_monatlich
         )
-        kennzahl = tco_24(b)
-        if not kennzahl.belastbar or kennzahl.gesamt is None:
+        kennzahl = kosten_ueber(b)
+        if kennzahl.gesamt is None:
             continue
         barpreis = bar.get((b.anbieter, b.sku_id))
         if barpreis is None:
@@ -158,8 +158,8 @@ def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
         tarife.get(b.tarif_id) or {}, b.tarif_monatlich
     )
     assert b.tarif_phasen == [], "der Widerspruch wurde nicht erkannt"
-    kennzahl = tco_24(b)
-    assert kennzahl.bestandteile["Tarif über 24 Monate"] == 766.8
+    kennzahl = kosten_ueber(b)
+    assert kennzahl.posten["Tarif über 24 Monate"] == 766.8
     assert kennzahl.gesamt == 2297.79
     assert kennzahl.gesamt != 2249.79
 
@@ -195,7 +195,7 @@ def test_kein_tarifposten_wider_die_gemessene_monatsrate():
         tarifposten = next(
             (
                 v
-                for n, v in tco_24(b).bestandteile.items()
+                for n, v in kosten_ueber(b).posten.items()
                 if n.startswith("Tarif über")
             ),
             None,
@@ -247,6 +247,6 @@ def test_der_pflichtfall_steht_wirklich_im_bestand():
         laufzeit_monate=satz.get("laufzeit_monate", 24),
         anschlusspreis=satz.get("anschlusspreis"),
     )
-    kennzahl = tco_24(b)
+    kennzahl = kosten_ueber(b)
     assert kennzahl.gesamt == 1459.0
     assert kennzahl.gesamt != 1093.0

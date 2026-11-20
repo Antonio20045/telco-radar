@@ -18,13 +18,12 @@ from pathlib import Path
 from typing import Any
 
 from ..tco_kosten import kosten_ueber
-from ..tco_model import TCO_HORIZONT
 from .geraete_pruefstatus import buendel_aus_satz
 
 
 def gesamt_kosten(satz: dict[str, Any]) -> float | None:
-    """Die Gesamtkosten eines Bestands- oder Rohsatzes über ``TCO_HORIZONT`` Monate."""
-    return kosten_ueber(buendel_aus_satz(satz), TCO_HORIZONT).gesamt
+    """Die Gesamtkosten eines Bestands- oder Rohsatzes, dieselbe Zahl wie die Seite."""
+    return kosten_ueber(buendel_aus_satz(satz)).gesamt
 
 
 GRUND_KEIN_KLICKSATZ = "keine Klick-Messung dieses Paares im Bestand"

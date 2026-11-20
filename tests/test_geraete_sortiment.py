@@ -22,6 +22,7 @@ from telco_radar.report import geraete_preisstand, geraete_sortiment, geraete_tc
 from telco_radar.report.geraete_export import (
     SPALTE_UEBER_24,
     SPALTE_UEBER_LAUFZEIT,
+    leitzahl_aus_zeile,
     tco_csv,
 )
 from telco_radar.tco_model import Buendel
@@ -99,7 +100,7 @@ def test_beide_varianten_erscheinen_bei_1und1_als_luecke_ohne_preis(
     satz = _satz(sku, abgerufen_am=abgerufen_am)
     if sku == SKU_16E:
         assert geraete_preisstand.buendel_luecke(_buendel(satz), HEUTE) == ""
-        assert _export(satz)[SPALTE_UEBER_24] != ""
+        assert leitzahl_aus_zeile(_export(satz)) != ""
     (markiert,) = geraete_sortiment.markiere_mit([satz], belege, HEUTE)
     assert markiert is not satz and satz["pruefung"] == "gueltig"
     b = _buendel(markiert)
@@ -108,7 +109,7 @@ def test_beide_varianten_erscheinen_bei_1und1_als_luecke_ohne_preis(
     assert SATZ in zeile["Lücke"]
     assert zeile["Status"] == "nicht im Sortiment"
     for spalte in (
-        "Zuzahlung EUR",
+        "Gerät einmalig EUR",
         "Bündel/Monat EUR",
         "Anschlusspreis EUR",
         SPALTE_UEBER_24,

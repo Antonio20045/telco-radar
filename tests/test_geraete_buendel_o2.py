@@ -39,7 +39,12 @@ from telco_radar.collect.geraete import GeraeteAbrufFehler
 from telco_radar.collect.geraete.o2 import lies_buendel
 from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tarif_model import NUR_MIT_GERAET
-from telco_radar.tco_model import LAUFZEIT_LUECKE, POSTEN_LAUFZEIT, TCO_HORIZONT, tco_24
+from telco_radar.tco_model import (
+    LAUFZEIT_LUECKE,
+    POSTEN_LAUFZEIT,
+    TCO_HORIZONT,
+    kosten_ueber,
+)
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _DATEI = "o2_katalog_buendel.json.gz"
@@ -355,13 +360,12 @@ def test_die_rechenprobe_der_tco_am_echten_satz():
     """
     buendel = aus_rohsaetzen([_rohsatz()], _bestand(), "2026-09-04").buendel[0]
     assert buendel.tarif_monatlich == pytest.approx(14.99, abs=0.005)
-    tco = tco_24(buendel)
-    assert tco.belastbar
+    tco = kosten_ueber(buendel)
     assert tco.gesamt == pytest.approx(
         1.0 + TCO_HORIZONT * 14.99 + 36 * 34.0 + 39.99, abs=0.005
     )
     assert tco.gesamt == pytest.approx(1624.75, abs=0.005)
-    assert tco.restbetrag == pytest.approx(408.0, abs=0.005)
+    assert tco.posten["Geräteraten über 36 Monate"] == pytest.approx(36 * 34.0)
 
 
 def test_kein_rabatt_wird_aus_der_simonly_kachel_gebaut():
@@ -381,7 +385,6 @@ def test_kein_rabatt_wird_aus_der_simonly_kachel_gebaut():
     assert _bestand().je_id["o2:o2-mobile-on-demand-m"]["grundgebuehr"] == 19.99
     assert buendel.tarif_monatlich == pytest.approx(14.99, abs=0.005)
     assert buendel.rabatte == []
-    assert tco_24(buendel).rabatte_offen == 0.0
 
     ohne_beleg = aus_rohsaetzen(
         [_rohsatz(tarif_rabatt_beleg=False)], _bestand(), "2026-09-04"
@@ -414,12 +417,11 @@ def test_ein_rohsatz_ohne_laufzeit_verschmilzt_nicht_mit_dem_24er_angebot():
     assert ohne.id != echt.id
     assert ohne.id.endswith("--" + LAUFZEIT_LUECKE)
     assert echt.id.endswith("--24m")
-    tco = tco_24(ohne)
+    tco = kosten_ueber(ohne)
     assert POSTEN_LAUFZEIT in tco.luecken
-    assert not tco.belastbar
-    assert tco.restbetrag is None
-    assert all("Geräteraten" not in name for name in tco.bestandteile)
-    assert tco_24(echt).belastbar
+    assert tco.gesamt is None
+    assert all("Geräteraten" not in name for name in tco.posten)
+    assert kosten_ueber(echt).gesamt is not None
 
 
 def test_der_ganze_weg_an_der_echten_antwort():
@@ -434,5 +436,5 @@ def test_der_ganze_weg_an_der_echten_antwort():
     assert {b.tarif_id for b in bilanz.buendel if "Plus" not in b.tarif_name} == {
         "o2:o2-mobile-on-demand-m"
     }
-    assert all(tco_24(b).belastbar for b in bilanz.buendel)
+    assert all(kosten_ueber(b).gesamt is not None for b in bilanz.buendel)
     assert {b.laufzeit_monate for b in bilanz.buendel} == {36}

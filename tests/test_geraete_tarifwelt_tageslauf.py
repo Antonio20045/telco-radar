@@ -21,7 +21,7 @@ from telco_radar.collect.geraete.basis import GeraeteAbrufFehler
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_tco_band as bandmod
 from telco_radar.report import geraete_tco_karten as karten
-from telco_radar.tco_model import tco_24
+from telco_radar.tco_model import kosten_ueber
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 KATALOG = lade_katalog(lese_wurzel())
@@ -147,7 +147,7 @@ def test_buendel_der_tarifwelt_stehen_im_band_der_karten():
         if b.sku_id.startswith("apple-iphone-17-256"):
             assert any(
                 k["anbieter"] == b.anbieter
-                and abs(k["gesamt"] - tco_24(b).gesamt) < 0.005
+                and abs(k["gesamt"] - kosten_ueber(b).gesamt) < 0.005
                 for ks in (je_band[band_je_tarif[b.tarif_id]][b.anbieter],)
                 for k in ks
             )

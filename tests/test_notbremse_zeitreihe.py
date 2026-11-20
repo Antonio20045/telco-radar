@@ -229,16 +229,17 @@ def _panels(fragment: BeautifulSoup) -> list[tuple[str, BeautifulSoup]]:
     ]
 
 
-def test_panel_von_eins_und_eins_traegt_nie_36_monate(gerendert):
-    """1&1 trägt den Tarif bis Monat 36 und wird nur über 24 Monate verglichen
-    (Antonio, 10.10.2026): kein Rechenweg-Panel von 1&1 über 36 Monate."""
+def test_panel_von_eins_und_eins_nennt_nie_geraeteraten(gerendert):
+    """1&1 nennt einen Betrag für Tarif und Gerät: sein Rechenweg-Panel trägt den
+    Zeitraum seiner Laufzeit, nie „Geräteraten“ (seit 20.11.2026 alle Beträge)."""
     _, fragment = gerendert
     etiketten: dict[str, set] = {"1&1": set(), "o2": set()}
     for anbieter, inhalt in _panels(fragment):
         etikett = inhalt.select_one(".gr-zr-plabel")
         if anbieter in etiketten and etikett is not None:
             etiketten[anbieter].add(etikett.get_text(strip=True))
-    assert "Kosten über 36 Monate" not in etiketten["1&1"], etiketten["1&1"]
+    assert etiketten["1&1"], "die Fixture muss 1&1-Panels liefern"
+    assert not any("Geräteraten" in e for e in etiketten["1&1"]), etiketten["1&1"]
     assert "Kosten über 24 Tarifmonate und 36 Geräteraten" in etiketten["o2"], (
         "Gegenprobe: o2 mit 36 Raten"
     )

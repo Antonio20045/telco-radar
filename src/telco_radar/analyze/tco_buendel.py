@@ -13,7 +13,7 @@ Dieses Modul stellt die Verbindung her und ist damit das Gegenstueck zu
 (SIM-only je Anbieter und Tarif), hier wird aus Geraetenutzlast plus
 Tarifbestand das BUENDEL. Beide schreiben in dieselbe Datei, beide laufen
 im naechtlichen Geraetelauf, und beide rechnen keine Kennzahl aus - die
-rechnet `tco_model.tco_24()`, jedes Mal neu.
+rechnet `tco_kosten.kosten_ueber()`, jedes Mal neu.
 
 DIE EINE REGEL
 --------------
@@ -78,9 +78,7 @@ kann - und zugleich die echte Luecke `POSTEN_RABATTE` ("kein Bonus
 erfasst") zudecken.
 
 Was der SIM-only-Preis desselben Tarifs leistet, leistet er anderswo: als
-MASSSTAB in `analyze/tarif_referenzen.py` und als Geraeteanteil in
-`tco_model.geraeteanteil()` - dort steht die Differenz als Differenz und
-nicht als Abzug.
+MASSSTAB in `analyze/tarif_referenzen.py` - als eigene Zeile, nie als Abzug.
 
 Dasselbe gilt fuer die 1&1-Aufspaltung (`collect/geraete/einsundeins.py`,
 "Hardware-Rate 45,00 plus Tarif 14,99 waere 59,99, das Buendel kostet aber
