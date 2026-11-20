@@ -41,26 +41,6 @@
  "scripts/llm_probe4.py": {
   "TID251": 1
  },
- "scripts/lokallauf_congstar.py": {
-  "I001": 1,
-  "UP017": 1
- },
- "scripts/lokallauf_einsundeins.py": {
-  "I001": 1,
-  "UP017": 1
- },
- "scripts/lokallauf_einsundeins_simonly.py": {
-  "I001": 1,
-  "UP017": 1
- },
- "scripts/lokallauf_saturn.py": {
-  "I001": 1,
-  "UP017": 1
- },
- "scripts/lokallauf_telekom.py": {
-  "I001": 1,
-  "UP017": 3
- },
  "scripts/migriere_seen_store.py": {
   "E501": 1
  },
@@ -115,14 +95,6 @@
   "BLE001": 2,
   "E501": 1,
   "S112": 1
- },
- "scripts/spike_saturn_geraetepreis.py": {
-  "BLE001": 2,
-  "C901": 1,
-  "E501": 5,
-  "S112": 1,
-  "TID251": 3,
-  "UP017": 4
  },
  "scripts/validate_sources.py": {
   "F401": 1
@@ -264,9 +236,6 @@
   "I001": 1,
   "UP045": 6
  },
- "src/telco_radar/collect/geraete/einsundeins.py": {
-  "C901": 1
- },
  "src/telco_radar/collect/geraete/o2.py": {
   "C901": 1,
   "I001": 1,
@@ -388,7 +357,7 @@
   "I001": 1,
   "UP017": 1,
   "UP035": 1,
-  "UP045": 5
+  "UP045": 4
  },
  "src/telco_radar/models.py": {
   "D102": 3,
@@ -674,7 +643,7 @@
   "E741": 1
  },
  "tests/test_geraete_adapter_telekom_1und1.py": {
-  "E741": 5
+  "E741": 2
  },
  "tests/test_geraete_aktionen.py": {
   "I001": 1
