@@ -18,7 +18,8 @@ Gefundene Wertfelder zählt der Strukturwächter, ebenso jede angezeigte Option,
 das Muster der Karte nicht passt (``unlesbar``); deren Kombination heißt
 ``nicht_erfasst``. Mit ``weiter`` (``klickweiter``) liest ``vorlesung`` Seitenwerte,
 zweite Lesung und Markierung auf der Startseite vor dem Weiter-Klick; ``lies`` nimmt
-sie mit und liest auf der Folgeseite nur die Kachel an ``stelle``. Nennt die zweite
+sie mit und liest auf der Folgeseite nur die Kachel an ``stelle`` (und eine
+``kachel``-Quelle in ihr, 1&1). Nennt die zweite
 Lesung für die Kacheldimension eine andere Option, ist die Kachel selbst die Quelle
 (``klickkachel``). Mit ``weiter.klicken`` liest ``folgelesung`` nach jedem Klick auf
 der Folgeseite die zweite Lesung neu, mit den Seitenwerten der Startseite.
@@ -193,6 +194,9 @@ class Leser(Bildleser):
         if vorab is None:
             vorab = self.vorlesung(ziel, unberuehrt, markiert=False)
         seitenwerte, zweite = vorab.seitenwerte, vorab.zweite
+        if any(q.kachel is not None for q in self.karte.lesequellen):
+            platz = {**seitenwerte, **ziel, PLATZHALTER_MODELL: self.modell}
+            zweite = self.quellen.lies(0, False, platz, kachel=bereich)
         self.belegteile = Belegteile(zweite.kopie, zweite.json_pfade)
         url = None if zweite.kopie is None else zweite.kopie.url
         in_antwort = zweite.lesung.werte if zweite.lesung is not None else None

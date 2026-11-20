@@ -282,9 +282,6 @@ FEHLERFAELLE = [
     pytest.param("o2_katalog", "lies", "{}", id="o2"),
     pytest.param("telekom_kategorie", "lies", "<html></html>", id="telekom"),
     pytest.param("congstar_next", "lies", "<html></html>", id="congstar"),
-    pytest.param(
-        "einsundeins_buendel", "lies_buendel", "<html></html>", id="einsundeins"
-    ),
     pytest.param("saturn_brand", "lies", "<html></html>", id="saturn"),
 ]
 
@@ -294,6 +291,18 @@ def test_jeder_adapter_wirft_dieselbe_klasse(ohne_netz, methode, lesart, text):
     lesen = getattr(geraete.ADAPTER[methode], lesart)
     with pytest.raises(geraete.GeraeteAbrufFehler) as fehler:
         lesen(text, "https://beispiel.invalid/")
+    assert type(fehler.value) is geraete.GeraeteAbrufFehler
+    assert fehler.value.status is None
+
+
+def test_einsundeins_testleser_wirft_dieselbe_klasse(ohne_netz):
+    """Seit 20.11.2026 ohne Bündelhaken in der Registry; der Leser selbst wirft
+    weiter dieselbe Klasse."""
+    from telco_radar.collect.geraete import einsundeins
+
+    assert geraete.ADAPTER["einsundeins_buendel"].lies_buendel is None
+    with pytest.raises(geraete.GeraeteAbrufFehler) as fehler:
+        einsundeins.lies_buendel("<html></html>", "https://beispiel.invalid/")
     assert type(fehler.value) is geraete.GeraeteAbrufFehler
     assert fehler.value.status is None
 

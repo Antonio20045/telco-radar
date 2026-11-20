@@ -1,4 +1,4 @@
-"""Produktseiten aus den Kacheln der zuletzt gelesenen Übersichten (Telekom).
+"""Produktseiten aus den Kacheln der zuletzt gelesenen Übersichten (Telekom, 1&1).
 
 Die Telekom-Produktseiten standen von Hand in ``config/klick_tageslauf.yaml``, je
 Gerät mit einer festen Farbe in der Adresse. Ein Gerät, das die Telekom nur noch in
@@ -25,11 +25,18 @@ den Kanarienwert schreibt die Kachel (``_modellname``). Eine nicht gelesene Übe
 liefert ihre Seiten aus dem Vorrat: den Kacheln, die sie zuletzt ganz gelesen hatte
 (``fuehre_vorrat`` in der Ablage, ``kachelvorrat`` mit Lesedatum), höchstens
 ``VORRAT_HOECHSTALTER_TAGE`` alt. Jede nicht ganz gelesene Übersicht steht mit Grund in
-``Kachelseiten.luecken``; sie ist nicht „leer“ und verschwindet nie still.
+``Kachelseiten.luecken``; sie ist nicht „leer“ und verschwindet nie still. Ohne jede
+Kachel (erster Lauf nach der Umstellung, Vorrat zu alt) gelten die Produktseiten, die
+die Datei selbst besucht hat (``_seiten_des_laufs``), ebenfalls als benannte Lücke.
 
 ``verteile`` legt die Seiten reihum auf die Einträge einer Gruppe (je ein Matrix-Job);
 sortiert nach Gerät und Tarif, damit Seiten eines Geräts nicht im selben Job
 hintereinander stehen. Rein, ohne Netz.
+
+1&1 (seit 20.11.2026): die Geräteübersicht ``/smartphones`` liefert je Kachel den
+Produktlink ``https://mobile.1und1.de/<gerät>`` ohne Tarif (``klickraster.ART_LISTE``);
+die Produktseite liest jeden Tarif selbst (Tarifauswahl im Bestellweg), also eine
+Seite je Produkt.
 """
 
 from __future__ import annotations
@@ -52,6 +59,8 @@ log = logging.getLogger(__name__)
 T = TypeVar("T")
 
 PRODUKTPFAD = "/shop/geraet/"
+EINSUNDEINS_HOST = "mobile.1und1.de"
+_EINSUNDEINS_PFAD = re.compile(r"/[a-z0-9]+(?:-[a-z0-9]+)*")
 TARIF_PARAMETER = "tariffId"
 ZUSTAND_UNBEKANNT = "unbekannt"
 VORRAT = "kachelvorrat"
@@ -110,7 +119,26 @@ def seiten_aus_kacheln(daten: dict, katalog: Katalog) -> Kachelseiten:
     ergebnis.seiten = [
         je_seite[s] for s in sorted(je_seite, key=lambda s: (je_seite[s]["geraet"], s))
     ]
+    if not ergebnis.seiten:
+        ergebnis.seiten = _seiten_des_laufs(daten, katalog, ergebnis.luecken)
     return ergebnis
+
+
+def _seiten_des_laufs(daten: dict, katalog: Katalog, luecken: list[str]) -> list[dict]:
+    """Rückfall ohne jede Kachel (erster Lauf nach der Umstellung, Übersicht und
+    Vorrat fehlen): die Produktseiten, die die Datei selbst besucht hat, Adresse und
+    Gerät wörtlich; die Lücke nennt es."""
+    seiten = []
+    for seite in daten.get("seiten") or []:
+        adresse, geraet = str(seite.get("adresse") or ""), seite.get("geraet")
+        if _produkt_und_tarif(adresse) is None or katalog.nach_id(str(geraet)) is None:
+            continue
+        gb = seite.get("speicher_gb")
+        seiten.append({"geraet": geraet, "speicher_gb": gb, "url": adresse})
+    if seiten:
+        tag = _tag(daten.get("datum"))
+        luecken.append(f"keine Kachel, {len(seiten)} Seiten des Laufs vom {tag}")
+    return seiten
 
 
 def fuehre_vorrat(neu: dict, alt: dict | None) -> dict:
@@ -208,12 +236,8 @@ def _kacheln(uebersicht: dict) -> list[dict]:
 def _seite(satz: dict, katalog: Katalog) -> dict | None:
     titel = " ".join(str(satz.get("titel") or "").split())
     adresse = str(satz.get("url") or "")
-    teile = urlsplit(adresse)
-    if not teile.path.startswith(PRODUKTPFAD):
-        return None
-    tarif = (parse_qs(teile.query).get(TARIF_PARAMETER) or [""])[0].strip()
-    produkt = teile.path.removeprefix(PRODUKTPFAD).split("/")
-    if not tarif or len(produkt) < 2:
+    schluessel = _produkt_und_tarif(adresse)
+    if schluessel is None:
         return None
     geraet = erkenne_geraet(titel, katalog)
     zustand = zustand_aus_titel(titel)
@@ -228,9 +252,26 @@ def _seite(satz: dict, katalog: Katalog) -> dict | None:
         "url": adresse,
         "modell": _modellname(name, geraet.hersteller, geraet.modell),
         "zustand": zustand,
-        "_produkt": "/".join(produkt[:2]),
-        "_tarif": tarif,
+        "_produkt": schluessel[0],
+        "_tarif": schluessel[1],
     }
+
+
+def _produkt_und_tarif(adresse: str) -> tuple[str, str] | None:
+    """Produkt und Tarif einer Kacheladresse: Telekom ``/shop/geraet/<marke>/<gerät>/…
+    ?tariffId=…``, 1&1 ``https://mobile.1und1.de/<gerät>`` (Tarif leer); sonst
+    ``None``."""
+    teile = urlsplit(adresse)
+    if teile.path.startswith(PRODUKTPFAD):
+        tarif = (parse_qs(teile.query).get(TARIF_PARAMETER) or [""])[0].strip()
+        produkt = teile.path.removeprefix(PRODUKTPFAD).split("/")
+        if not tarif or len(produkt) < 2:
+            return None
+        return "/".join(produkt[:2]), tarif
+    einzeln = _EINSUNDEINS_PFAD.fullmatch(teile.path)
+    if teile.netloc == EINSUNDEINS_HOST and einzeln and not teile.query:
+        return teile.path.strip("/"), ""
+    return None
 
 
 def _modellname(name: str, hersteller: str, modell: str) -> str:
