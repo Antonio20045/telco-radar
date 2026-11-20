@@ -276,6 +276,7 @@ def _listensaetze(
     """Die Sätze aus den Datenantworten; die Zahlen dazu gehen in die Diagnose."""
     lesung = liste.liste.saetze(liste.nutzlasten, text, adresse)
     liste.diagnose.update(lesung.zahlen())
+    liste.diagnose["kacheln"] = lesung.kacheln
     if not lesung.saetze:
         lauf.status = LAUF_LEER
         lauf.grund = f"{GRUND_LEER} ({lesung.mit_rueckgabedeal} mit Rückgabedeal)"

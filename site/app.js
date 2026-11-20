@@ -2821,7 +2821,7 @@ var TelcoFrage = (function () {
      Zeile stillschweigend mitsortieren ODER sie aus der Liste nehmen
      (Meldungen werden nie gekappt).
      Deshalb sortiert der TCO-Rang jetzt ZWEISTUFIG: erst der Zeitraum
-     (`data-leitzahl-monate`, aus `Tco.leitzahl_monate` - gelesen, nicht
+     (`data-leitzahl-monate`, aus `Kosten.monate` - gelesen, nicht
      gerechnet), dann der Betrag INNERHALB dieses Zeitraums. Die
      Zeitraeume selbst stehen immer aufsteigend (kuerzerer zuerst) und
      drehen mit der Richtung NICHT mit: der Zeitraum ist kein Wert, der

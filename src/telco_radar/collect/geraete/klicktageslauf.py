@@ -296,7 +296,7 @@ def fahre(
         nie = bool(gelesen) and ohne_geheimnisse(seite.adresse) not in gelesen
         gang.nach(lauf.status, lauf.stoerung, lauf.grund, nie)
     status, grund = laufstatus(
-        seiten + [s for u in uebersichten for s in _als_seiten(u)]
+        seiten + [s for u in uebersichten for s in _als_seiten(u)], ziel.seitengrund
     )
     heute_gelesen = {s["adresse"] for s in ganz_gelesen(seiten)}
     faellig = ueberfaellig(ziel.seiten, gelesen, heute_gelesen, heute)
@@ -316,6 +316,7 @@ def fahre(
         "seiten": seiten,
         "uebersichten": uebersichten,
         "ueberfaellig": faellig,
+        "seitengrund": ziel.seitengrund,
     }
     log.info(
         "Klick-Tageslauf %s: %s %s, %d Seiten, %d überfällig",
