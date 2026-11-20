@@ -14,7 +14,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 wg = importlib.import_module("waechter_gegenprobe")
-wv = importlib.import_module("waechter_vertraege")
+wb = importlib.import_module("waechter_belegvertraege")
 
 SKRIPT = "JOB_MINUTEN = 60\nPUFFER_S = 600\nJOB_FRIST_S = JOB_MINUTEN * 60 - PUFFER_S\n"
 GERAETE = "name: Geraete- und Preisradar\non: {workflow_dispatch: {}}\njobs: {}\n"
@@ -76,5 +76,18 @@ def test_jede_bruchstelle_meldet_sich(tmp_path, alt, neu, meldung):
     assert len(meldungen) == 1 and meldung in meldungen[0]
 
 
-def test_regel_steht_in_der_leiter():
-    assert wg.gegenprobe_haelt_zeit_und_grenzen in wv.REGELN
+def test_regel_laeuft_mit_den_belegvertraegen(tmp_path):
+    wurzel = _baum(
+        tmp_path, BEISPIEL.replace("timeout-minutes: 60", "timeout-minutes: 9")
+    )
+    for leer in (wb.BELEG_MANIFEST, wb.BELEG_SKRIPT, wb.BELEG_ABLAGE):
+        (wurzel / leer).parent.mkdir(parents=True, exist_ok=True)
+        (wurzel / leer).write_text("", encoding="utf-8")
+    meldungen = wb.belegbilder_halten_commit_und_zeit_frei(wurzel)
+    assert any("timeout-minutes 9" in m for m in meldungen)
+
+
+def test_ohne_geraete_workflow_entfaellt_nur_der_ausloeser(tmp_path):
+    wurzel = _baum(tmp_path)
+    (wurzel / wg.GERAETE).unlink()
+    assert wg.gegenprobe_haelt_zeit_und_grenzen(wurzel) == []

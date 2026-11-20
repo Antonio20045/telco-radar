@@ -63,8 +63,15 @@ def _hat_funktion(pfad: Path, name: str) -> bool:
 
 def belegbilder_halten_commit_und_zeit_frei(wurzel: Path) -> list[str]:
     """Das Manifest-Skript bricht vor dem Schritt-Timeout selbst ab; der Belegjob
-    lässt nach der wirksamen Frist einen letzten Aufruf plus Puffer."""
-    return [*_manifest_frist(wurzel), *_belegjob_frist(wurzel)]
+    lässt nach der wirksamen Frist einen letzten Aufruf plus Puffer; die Gegenprobe
+    hält Zeit und Grenzen (``waechter_gegenprobe``)."""
+    from waechter_gegenprobe import gegenprobe_haelt_zeit_und_grenzen
+
+    return [
+        *_manifest_frist(wurzel),
+        *_belegjob_frist(wurzel),
+        *gegenprobe_haelt_zeit_und_grenzen(wurzel),
+    ]
 
 
 def _manifest_frist(wurzel: Path) -> list[str]:
