@@ -974,6 +974,11 @@ anbieter:
       - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
         label: Tarifdetails Unlimited XL
         kind: klick
+      # Geräteübersicht (kind klick): nur der Klick-Tageslauf liest sie, je Kachel der
+      # Produktlink als Seite des Klick-Laufs (seit 20.11.2026).
+      - url: https://mobile.1und1.de/smartphones
+        label: Smartphone-Übersicht
+        kind: klick
 
   # ===================================================== DISCOUNT & ZWEITMARKEN
 

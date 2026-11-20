@@ -155,21 +155,23 @@ def test_bereit_wartet_beim_raster_auf_kacheln():
     bereit = LESARTEN["1&1"].bereit
 
     assert bereit is not None
-    assert "form.hardware-box" in bereit and "/smartphones-" in bereit
+    assert "form.hardware-box" in bereit and "'/smartphones'" in bereit
     assert "complete" in bereit
 
 
-def test_tagesdatei_und_quellen_nennen_nur_noch_die_details():
+def test_tagesdatei_und_quellen_nennen_details_und_geraeteuebersicht():
     """Seit 20.11.2026 liest jede Produktseite alle Tarife selbst (Tarifauswahl); die
     Raster lesen sich nicht mehr und stehen weder in der Tagesdatei noch in den
-    Quellen. Der Gerätelauf hat für 1&1 keinen Einstieg mehr."""
+    Quellen, dafür die Geräteübersicht (Seitenquelle). Der Gerätelauf hat für 1&1
+    keinen Einstieg mehr."""
     wurzel = lese_wurzel()
     ziele = lade_ziele(wurzel, TAGESDATEI, hoechste=None)
     (einsundeins,) = [z for z in ziele if z.schluessel == "1und1"]
     anbieter = lade_quellen(wurzel).nach_name("1&1")
     klick = [e.url for e in anbieter.klick_einstiege if e.kind == "klick"]
 
-    assert einsundeins.uebersichten == DETAILS
-    assert tuple(klick) == DETAILS
+    uebersicht = ("https://mobile.1und1.de/smartphones",)
+    assert einsundeins.uebersichten == DETAILS + uebersicht
+    assert tuple(klick) == DETAILS + uebersicht
     assert not set(RASTER) & {*einsundeins.uebersichten, *klick}
     assert [e.kind for e in anbieter.einstiege] == []

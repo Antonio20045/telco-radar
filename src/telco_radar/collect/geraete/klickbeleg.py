@@ -314,7 +314,8 @@ def pfadtext(pfad: str | Wertpfad | Phasenpfad) -> str:
     if isinstance(pfad, Phasenpfad):
         return f"{pfad.liste}[*].{{{pfad.von},{pfad.bis},{pfad.betrag}}}"
     if isinstance(pfad, Wertpfad):
-        return " + ".join((pfad.pfad, *pfad.summe))
+        teile = " + ".join((pfad.pfad, *pfad.summe))
+        return teile + ("" if not pfad.abzug else " − " + " × ".join(pfad.abzug))
     return pfad
 
 

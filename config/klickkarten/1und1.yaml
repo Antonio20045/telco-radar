@@ -125,12 +125,35 @@ zusammenfassung:
             #pso [data-pso-main-monthly-section]
             > .price-summary-overlay__item:first-child .price-summary-overlay__item-price
           muster: '(\d+,(?:\d{2}|–))\s*€/Mon'
+    # Dieselbe Rechnung aus dem Text der Preisleiste (aufgeklappt sichtbar: „Ratenzahlung
+    # Hardware: 24 Monate | Gesamtpreis Hardware: 1.392,– €“, zugeklappt im DOM).
+    einmalzahlung:
+      selektor: >-
+        #pso [data-pso-main-monthly-section]
+        > .price-summary-overlay__item:first-child .price-summary-overlay__item-description
+      muster: 'Gesamtpreis Hardware:\s*(\d[\d.]*,(?:\d{2}|–))\s*€'
+      abzug:
+        - selektor: >-
+            #pso [data-pso-main-monthly-section]
+            > .price-summary-overlay__item:first-child .price-summary-overlay__item-description
+          muster: 'Ratenzahlung Hardware:\s*(\d+)\s*Monate'
+        - selektor: >-
+            #pso [data-pso-main-monthly-section]
+            > .price-summary-overlay__item:first-child .price-summary-overlay__item-price
+          muster: '(\d+,(?:\d{2}|–))\s*€/Mon'
 
 antwort:
   kachel: 'input[name="tariff-plan"]'
   attribut: data-tariff-price-hint
   pfade:
     buendelbetrag: {pfad: hardwarePricePerMonth, summe: [tariffPricePerMonth]}
+    # Einmalige Gerätezahlung = genannter Gerätegesamtpreis − Raten × Geräterate
+    # (Entscheidung 20.11.2026: Differenz zweier genannter Zahlen; 0 heißt gemessen
+    # null, negativ oder fehlend ist eine Lücke). Der Gesamtpreis selbst als Nachweis.
+    einmalzahlung:
+      pfad: hardwareTotalPrice
+      abzug: [hardwareSelectedTermMonths, hardwarePricePerMonth]
+    geraetegesamtpreis: hardwareTotalPrice
     tarifname: tariffName
   variante:
     laufzeit: hardwareSelectedTermMonths

@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickantwort import abzug
 from .klickecho import feldwert
 from .klickkartentypen import BUENDELFELDER, PHASENFELD
 from .klicklauf import LAUF_GESTOERT
@@ -98,8 +99,11 @@ class Textleser:
         fundorte: dict[str, tuple[str, str]] = {}
         for feld, muster in self.karte.textlesung.muster.items():
             funde = [self._fund(feld, m, text) for m in (muster, *muster.summe)]
-            werte_je_teil = [w for w, _ in funde]
-            gemustert[feld] = werte_je_teil[0] if not muster.summe else summe(funde)
+            gemustert[feld] = funde[0][0] if not muster.summe else summe(funde)
+            if muster.abzug:
+                weg = [self._fund(feld, m, text) for m in muster.abzug]
+                gemustert[feld] = abzug(gemustert[feld], weg[0][0], weg[1][0])
+                funde += weg
             if gemustert[feld] is not None:
                 orte = [o for _, o in funde if o is not None]
                 fundorte[feld] = (

@@ -25,7 +25,7 @@ WERTFELDER = (
     "volumen_gb",
 )
 BUENDELFELDER = ("buendelbetrag", "einmalzahlung")
-NACHWEISFELDER = ("ratenplan", "tarifname")
+NACHWEISFELDER = ("ratenplan", "tarifname", "geraetegesamtpreis")
 SUMMENFELD = BUENDELFELDER[0]
 """Wortlaute nur aus der Antwort, kein Wertfeld: weder Echo noch Lesefeld noch Beleg.
 ``ratenplan`` ist der Satz, der den Tarifpreis an die Ratenlaufzeit bindet (o2)."""
@@ -161,13 +161,14 @@ class Textmuster:
     Ohne ``selektor`` im Text der Zusammenfassung, sonst im Text des ersten Treffers,
     mit ``attribut`` in dessen Attribut (congstar „Mindestlaufzeit von 0 Monaten“ am
     Input, das Label „Ohne Laufzeit“ nennt keine Zahl). ``summe``: weitere Muster, deren
-    Werte dazukommen (1&1: Tarifpreis der Kachel plus Geräterate der Preisleiste).
+    Werte dazukommen; ``abzug``: zwei Muster, deren Produkt abgeht (1&1, Preisleiste).
     """
 
     muster: re.Pattern[str]
     selektor: str | None = None
     attribut: str | None = None
     summe: tuple[Textmuster, ...] = ()
+    abzug: tuple[Textmuster, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -202,13 +203,15 @@ class Wertpfad:
     """Ein Pfad (oder Parametername) mit Muster und Einheit.
 
     ``muster`` nimmt aus dem Wert als Text die erste Gruppe; ``einheit`` rechnet um
-    (``cent`` in Euro, ``mb`` in GB zu 1024 MB); ``summe``: Pfade weiterer Beträge.
+    (``cent`` in Euro, ``mb`` in GB); ``summe``: Pfade weiterer Beträge, ``abzug``: zwei
+    Pfade, deren Produkt abgeht.
     """
 
     pfad: str
     muster: re.Pattern[str] | None = None
     einheit: str | None = None
     summe: tuple[str, ...] = ()
+    abzug: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

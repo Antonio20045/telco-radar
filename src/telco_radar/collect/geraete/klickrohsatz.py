@@ -79,7 +79,7 @@ from .klicklauf import (
     NICHT_ERFASST,
 )
 from .klickpfad import ohne_markup
-from .klickraster import ART_RASTER, raster_roh
+from .klickraster import ART_LISTE, ART_RASTER, raster_roh
 from .klickratenplan import RatenplanRegelFehlt, buendelphasen
 
 log = logging.getLogger(__name__)
@@ -185,7 +185,7 @@ def _nimm_uebersicht(
     ergebnis: Klickausbeute, uebersicht: dict, daten: dict, katalog: Katalog
 ) -> bool:
     """Rohsätze und angebotene Geräte einer gelesenen Übersicht; wahr, wenn jeder
-    Gerätetitel im Katalog steht. Rastersätze zählen nur als angeboten."""
+    Gerätetitel im Katalog steht. Raster- und Listensätze zählen nur als angeboten."""
     erkannt = True
     for roh in uebersicht.get("saetze") or []:
         if roh.get("art") == ART_ANSCHLUSS:
@@ -195,7 +195,7 @@ def _nimm_uebersicht(
         neuware = zustand_aus_titel(titel) == ZUSTAND_NEU
         erkannt = erkannt and (geraet is not None or not neuware)
         ergebnis.angeboten.update([geraet.device_id] if geraet else [])
-        if roh.get("art") != ART_RASTER:
+        if roh.get("art") not in (ART_RASTER, ART_LISTE):
             _nimm(ergebnis, uebersicht_rohsatz(roh, uebersicht, daten, katalog))
     return erkannt
 

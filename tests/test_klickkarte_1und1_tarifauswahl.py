@@ -181,7 +181,8 @@ def test_antwort_je_kachel_buendel_aus_geraeterate_und_tarifpreis(karte, tarifau
     assert [x.buendel.buendelbetrag for x in lesungen] == list(BUENDEL_512_24)
     assert [x.nachweise["tarifname"] for x in lesungen] == list(NAMEN)
     assert {x.variante["laufzeit"] for x in lesungen} == {24}
-    assert {x.buendel.einmalzahlung for x in lesungen} == {None}
+    assert {x.buendel.einmalzahlung for x in lesungen} == {0.0}
+    assert {x.nachweise["geraetegesamtpreis"] for x in lesungen} == {"1392.0"}
 
 
 def test_gegenprobe_ohne_tarifpreis_kein_buendel(karte, tarifauswahl):
@@ -281,9 +282,15 @@ def test_quellenleser_liest_die_kachel_und_ohne_kachel_nichts(karte, seite):
     ohne = leser.lies(0, False, platz)
 
     assert gelesen.lesung.buendel.buendelbetrag == 93.99
-    assert gelesen.lesung.nachweise == {"tarifname": "1&1 Unlimited XL"}
+    assert gelesen.lesung.nachweise == {
+        "tarifname": "1&1 Unlimited XL",
+        "geraetegesamtpreis": "1392.0",
+    }
     assert gelesen.json_pfade == {
-        "buendelbetrag": "hardwarePricePerMonth + tariffPricePerMonth"
+        "buendelbetrag": "hardwarePricePerMonth + tariffPricePerMonth",
+        "einmalzahlung": (
+            "hardwareTotalPrice − hardwareSelectedTermMonths × hardwarePricePerMonth"
+        ),
     }
     (koerper,) = json.loads(gelesen.kopie.koerper).values()
     assert koerper["hardwarePricePerMonth"] == 58.0
@@ -345,14 +352,83 @@ def test_fixture_traegt_keine_kennung_des_warenkorbs():
     assert html_modul.unescape(roh).count('"hardwareSelectedTermMonths":24') == 10
 
 
-def test_einmalzahlung_geraet_bleibt_benannte_luecke(karte, tarifauswahl):
-    """Die Tarifauswahl nennt bei „Fix“ keine einmalige Gerätezahlung: keine Zeile
-    „Einmalige Gesamtkosten“ (die Preisleiste zeigt sie nur bei „Sofort“), im JSON
-    ``oneTimeCosts: []``. Gemessen ist damit keine Zahl; die Zuzahlung bleibt ``None``
-    (nie 0) und die Kombination nennt die Lücke ``einmalzahlung``."""
-    assert "einmalig" not in tarifauswahl.select_one("#pso").get_text(" ").lower()
-    assert {len(h["oneTimeCosts"]) for h in _hinweise(karte, tarifauswahl)} == {0}
-    katalog = lade_katalog(lese_wurzel())
-    (satz,) = ausbeute(_daten(TARIFE[0], NAMEN[0], NAMEN[0]), katalog).rohsaetze
+GERAETEPREIS = {
+    "einsundeins_tarifauswahl_pixel11_20261120.html": (34.0, 24, 816.0),
+    "einsundeins_tarifauswahl_s26ultra_20261120.html": (33.0, 36, 1188.0),
+}
 
-    assert (satz["geraet_zuzahlung"], satz["einmalzahlung"]) == (None, None)
+
+@pytest.fixture(params=sorted(GERAETEPREIS))
+def geraeteseite(request, chromium):
+    seite = chromium.new_page(viewport={"width": 1440, "height": 1000})
+    seite.set_content((FIX / request.param).read_text(encoding="utf-8"))
+    yield request.param, seite
+    seite.close()
+
+
+def test_einmalzahlung_gesamtpreis_minus_raten_aus_text_und_antwort(
+    karte, geraeteseite
+):
+    """Entscheidung 20.11.2026: Einmalzahlung = genannter „Gesamtpreis Hardware“ minus
+    Raten × Geräterate. Pixel 11 (24 × 34,– = 816,– €) und Galaxy S26 Ultra (36 × 33,–
+    = 1.188,– €): gemessen 0, im Text der Preisleiste wie im JSON jeder Kachel."""
+    name, seite = geraeteseite
+    rate, raten, gesamt = GERAETEPREIS[name]
+    leser = Textleser(seite, karte, 2_000)
+    kacheln = seite.locator(karte.textlesung.selektoren[0])
+    _, buendel, orte = leser.textwerte(leser.zusammenfassung(kacheln.first))
+    dom = BeautifulSoup((FIX / name).read_text(encoding="utf-8"), "html.parser")
+    lesungen = [lies_antwort(h, karte.antwort) for h in _hinweise(karte, dom)]
+
+    assert raten * rate == gesamt
+    assert buendel.einmalzahlung == 0.0
+    assert "Gesamtpreis Hardware:" in orte["einmalzahlung"][1]
+    assert len(lesungen) == 7
+    assert {x.buendel.einmalzahlung for x in lesungen} == {0.0}
+    assert {x.nachweise["geraetegesamtpreis"] for x in lesungen} == {str(gesamt)}
+
+
+@pytest.mark.parametrize(
+    ("gesamt", "erwartet"),
+    [
+        pytest.param("900,–", 84.0, id="genannte-zuzahlung"),
+        pytest.param("800,–", None, id="negativ-ist-luecke"),
+    ],
+)
+def test_gegenprobe_zuzahlung_und_negative_differenz(karte, chromium, gesamt, erwartet):
+    seite = chromium.new_page()
+    try:
+        roh = (FIX / sorted(GERAETEPREIS)[0]).read_text(encoding="utf-8")
+        neu = roh.replace(
+            "Gesamtpreis Hardware: 816,–", f"Gesamtpreis Hardware: {gesamt}"
+        )
+        assert neu != roh
+        seite.set_content(neu)
+        leser = Textleser(seite, karte, 500)
+        kachel = seite.locator(karte.textlesung.selektoren[0]).first
+        _, buendel, _ = leser.textwerte(leser.zusammenfassung(kachel))
+    finally:
+        seite.close()
+    assert buendel.einmalzahlung == erwartet
+
+
+def test_gegenprobe_ohne_gesamtpreis_keine_einmalzahlung(karte, tarifauswahl):
+    hinweis = _hinweise(karte, tarifauswahl)[0]
+    del hinweis["hardwareTotalPrice"]
+    lesung = lies_antwort(hinweis, karte.antwort)
+
+    assert lesung.buendel.einmalzahlung is None
+    assert "geraetegesamtpreis" not in lesung.nachweise
+
+
+def test_einmalzahlung_null_wird_zuzahlung_null():
+    """Gemessen 0 ist die Zuzahlung 0,0 (nie ``None``), damit die Gesamtkosten (#175)
+    rechnen; ohne Messung bleibt sie ``None``."""
+    katalog = lade_katalog(lese_wurzel())
+    daten = _daten(TARIFE[0], NAMEN[0], NAMEN[0])
+    ohne = ausbeute(daten, katalog).rohsaetze[0]
+    daten["seiten"][0]["kombinationen"][0]["buendel"]["einmalzahlung"] = 0.0
+    (satz,) = ausbeute(daten, katalog).rohsaetze
+
+    assert (satz["geraet_zuzahlung"], satz["einmalzahlung"]) == (0.0, 0.0)
+    assert ohne["geraet_zuzahlung"] is None

@@ -311,7 +311,8 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
     for stelle, antwort in enumerate(quellen):
         ort = f"antwort.{stelle}.pfade" if liste else "antwort.pfade"
         pruefe_felder(leser, antwort.pfade, ort, ein_vertrag, summe)
-    weiter = leser.weiter(roh_weiter, knoepfe, textlesung)
+    eigene = any(q.kachel for q in quellen)
+    weiter = leser.weiter(roh_weiter, knoepfe, textlesung, eigene)
     if any(q.kachel for q in quellen) and (weiter is None or weiter.kacheln is None):
         raise leser.fehler("antwort.kachel", GRUND_KACHELQUELLE)
     return Klickkarte(

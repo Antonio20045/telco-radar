@@ -66,10 +66,11 @@ QUELLENTEILE = (
     "parameter",
     "platzhalter",
 )
-WERTPFADTEILE = ("pfad", "muster", "einheit", "summe")
+WERTPFADTEILE = ("pfad", "muster", "einheit", "summe", "abzug")
 PARAMETERTEILE = ("name", "muster")
 SEITENTEILE = ("selektor", "attribut", "parameter", "muster")
-MUSTERTEILE = ("muster", "selektor", "attribut", "summe")
+MUSTERTEILE = ("muster", "selektor", "attribut", "summe", "abzug")
+GRUND_ZWEI_FAKTOREN = "abzug braucht genau zwei Teile"
 GRUND_NUR_KACHEL = "nur mit kachel"
 GRUND_PFAD = "kein gültiger Pfad"
 GRUND_GLOBAL = "kein Bezeichner einer globalen Variable"
@@ -165,12 +166,18 @@ def _textmuster(leser: Kartenleser, daten: Mapping, feld: str, ort: str) -> Text
     attribut = leser.wahlweise_text(teile, "attribut", stelle)
     if attribut is not None and selektor is None:
         raise leser.fehler(stelle, GRUND_ATTRIBUT_OHNE_SELEKTOR)
-    summe: tuple[Textmuster, ...] = ()
-    if teile.get("summe") is not None:
-        liste = {str(n): e for n, e in enumerate(leser.liste(teile["summe"], stelle))}
-        summe = tuple(_textmuster(leser, liste, n, f"{stelle}.summe") for n in liste)
+    teile_je = {}
+    for art in ("summe", "abzug"):
+        roh = teile.get(art)
+        eintraege = [] if roh is None else leser.liste(roh, stelle)
+        liste = {str(n): e for n, e in enumerate(eintraege)}
+        teile_je[art] = tuple(
+            _textmuster(leser, liste, n, f"{stelle}.{art}") for n in liste
+        )
+    if teile_je["abzug"] and len(teile_je["abzug"]) != 2:
+        raise leser.fehler(f"{stelle}.abzug", GRUND_ZWEI_FAKTOREN)
     muster = leser.muster(teile, "muster", stelle)
-    return Textmuster(muster, selektor, attribut, summe)
+    return Textmuster(muster, selektor, attribut, teile_je["summe"], teile_je["abzug"])
 
 
 def texte(
@@ -355,13 +362,15 @@ def _wertpfad(
     if einheit is not None and einheit not in EINHEITEN:
         raise leser.fehler(f"{stelle}.einheit", f"{GRUND_EINHEIT} {einheit}")
     muster = leser.wahlweise_muster(eintrag, "muster", stelle)
-    summe: tuple[str, ...] = ()
-    if eintrag.get("summe") is not None:
-        liste = leser.liste(eintrag["summe"], f"{stelle}.summe")
-        summe = tuple(leser.text({"0": e}, "0", f"{stelle}.summe") for e in liste)
-        for teil in summe:
-            _pruefe_pfad(leser, teil, f"{stelle}.summe", namen)
-    return Wertpfad(pfad=pfad, muster=muster, einheit=einheit, summe=summe)
+    je: dict[str, tuple[str, ...]] = {}
+    for art in ("summe", "abzug"):
+        liste = [] if eintrag.get(art) is None else leser.liste(eintrag[art], stelle)
+        je[art] = tuple(leser.text({"0": e}, "0", f"{stelle}.{art}") for e in liste)
+        for teil in je[art]:
+            _pruefe_pfad(leser, teil, f"{stelle}.{art}", namen)
+    if je["abzug"] and len(je["abzug"]) != 2:
+        raise leser.fehler(f"{stelle}.abzug", GRUND_ZWEI_FAKTOREN)
+    return Wertpfad(pfad, muster, einheit, je["summe"], je["abzug"])
 
 
 def _pruefe_pfad(leser: Kartenleser, pfad: str, ort: str, namen: set[str]) -> None:
