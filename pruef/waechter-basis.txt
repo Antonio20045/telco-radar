@@ -22,10 +22,6 @@ scripts/llm_probe2.py noqa:BLE001 2
 scripts/llm_probe3.py noqa:BLE001 1
 scripts/llm_probe4.py noqa:BLE001 1
 scripts/llm_probe4.py noqa:E402 1
-scripts/lokallauf_congstar.py noqa:BLE001 1
-scripts/lokallauf_einsundeins.py noqa:BLE001 1
-scripts/lokallauf_einsundeins_simonly.py noqa:BLE001 1
-scripts/lokallauf_telekom.py noqa:BLE001 1
 scripts/miss_artikelabruf.py noqa:BLE001 2
 scripts/miss_artikelabruf.py noqa:E402 6
 scripts/miss_sammelphase.py noqa:E402 2
@@ -45,7 +41,6 @@ scripts/quellen_zaehlen.py noqa:E402 1
 scripts/rescue_sources.py noqa:E402 4
 scripts/sniff_xhr.py noqa:BLE001 2
 scripts/sniff_xhr.py noqa:E402 2
-scripts/spike_saturn_geraetepreis.py noqa:BLE001 5
 scripts/validate_promo_sources.py noqa:BLE001 1
 scripts/validate_promo_sources.py noqa:E402 3
 scripts/validate_sources.py noqa:BLE001 1

@@ -2,8 +2,7 @@
 Markenseite.
 
 Bauanleitung: `outputs/saturn-spike-2026-09-05.md` (Spike, kein
-Produktionscode) und `scripts/spike_saturn_geraetepreis.py` (der
-funktionierende Prototyp). Dieser Adapter ist die Produktivfassung.
+Produktionscode). Dieser Adapter ist die Produktivfassung.
 
 JEDE GZIP-FIXTURE IST EIN GESPEICHERTER ECHTER ABRUF vom 05.09.2026 (siehe
 `tests/fixtures/geraete/_herkunft.json` fuer URL, Status und SHA-256) - kein

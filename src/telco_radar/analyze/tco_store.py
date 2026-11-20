@@ -343,22 +343,11 @@ class TcoDB:
             self._historie_pendente[(bid, today)] = self._historie_zeile(satz, today)
         return neu, gesehen
 
-    def setze_referenzen(
-        self, referenzen, today: str, anbieter: set | None = None
-    ) -> int:
+    def setze_referenzen(self, referenzen, today: str) -> int:
         """SIM-only-Referenzen aufnehmen oder auffrischen. Gibt die Zahl der
-        neu aufgenommenen zurueck.
-
-        `anbieter` (Optional, Menge von Anbieternamen wie im Tarifbestand)
-        grenzt den Schreibzug ein: Referenzen ANDERER Anbieter werden weder
-        aufgenommen noch veraendert. Der Default `None` bedeutet alle -
-        das Verhalten des naechtlichen Gesamtlaufs, der den Massstab als
-        EIN Ganzes neu ableitet.
-        """
+        neu aufgenommenen zurueck."""
         neu = 0
         for satz in referenzen:
-            if anbieter is not None and satz.anbieter not in anbieter:
-                continue
             if not isinstance(satz, SimOnlyReferenz):
                 raise TypeError(f"keine SimOnlyReferenz: {type(satz).__name__}")
             rid = satz.id
@@ -377,9 +366,7 @@ class TcoDB:
             eintrag["last_verified"] = today
         return neu
 
-    def ersetze_referenzen(
-        self, referenzen, today: str, anbieter: set | None = None
-    ) -> tuple[int, int]:
+    def ersetze_referenzen(self, referenzen, today: str) -> tuple[int, int]:
         """Den Referenzbestand VOLLSTAENDIG neu setzen. Gibt (neu, entfernt).
 
         Warum hier ersetzt und sonst nirgends in diesem Projekt gelöscht
@@ -400,23 +387,10 @@ class TcoDB:
         der den SIM-only-Preis von der Anbieterseite liest), gehoert an
         diese Stelle eine Herkunft und kein pauschales Ersetzen mehr.
         Heute gibt es genau eine Quelle.
-
-        `anbieter` schraenkt die Ersetzung auf die genannten Anbieter ein
-        (Lokallauf eines EINZELNEN Anbieters, siehe run_geraete_stage):
-        Fremde Bestandssaetze werden weder aufgefrischt noch datiert noch
-        als veraltet entfernt - ein Lauf, der einen Anbieter misst, hat
-        ueber die anderen nichts auszusagen. Das ist KEIN Widerspruch zum
-        Ersetzen: innerhalb des Scopes gilt weiterhin die volle Semantik,
-        inklusive Wegnehmen umbenannter Tarife.
         """
-        neu = self.setze_referenzen(referenzen, today, anbieter=anbieter)
+        neu = self.setze_referenzen(referenzen, today)
         gewuenscht = {satz.id for satz in referenzen}
-        veraltet = [
-            rid
-            for rid, eintrag in self._referenzen.items()
-            if rid not in gewuenscht
-            and (anbieter is None or eintrag.get("anbieter") in anbieter)
-        ]
+        veraltet = [rid for rid in self._referenzen if rid not in gewuenscht]
         for rid in veraltet:
             del self._referenzen[rid]
         return neu, len(veraltet)

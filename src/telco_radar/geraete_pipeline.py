@@ -259,21 +259,11 @@ def run_geraete_stage(
     jetzt: Optional[datetime] = None,
     frist_sekunden: Optional[float] = FRIST_STANDARD,
     hole: Optional[Callable] = None,
-    referenz_anbieter: Optional[set] = None,
     klick: Path | None = None,
     klick_nachholen: Nachholen | None = None,
 ) -> dict:
     """Sammeln, aufnehmen, altern, speichern. Gibt die Bilanz zurueck.
 
-    `referenz_anbieter` grenzt die SIM-only-Referenzstufe ein (Menge von
-    Anbieternamen wie im Tarifbestand). Der naechtliche Gesamtlauf ruft
-    OHNE den Parameter und erneuert den Massstab fuer alle Anbieter wie
-    bisher. Ein Lokallauf EINES Anbieters (scripts/lokallauf_*.py) uebergibt
-    seinen Namen - dann wird auch die 1&1-SIM-only-Messung (S-5) nur
-    ausgefuehrt, wenn 1&1 selbst im Scope liegt, und der Store traegt
-    heutige Daten NUR an die Referenzen dieses Anbieters ein. Der Lauf
-    vom 15.09.2026 hat ohne diesen Scope 35 Fremd-Referenzen neu datiert
-    und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
     `klick` ist der Ordner der Klick-Ergebnisse (`analyze.klick_zusammenfuehrung`),
     ohne Angabe aus TELCO_KLICK_ERGEBNISSE, sonst `data/state/klick`; `klick_nachholen`
     holt dort vor dem Merge den Stand von origin, wenn er nicht vom Messtag ist.
@@ -391,11 +381,9 @@ def run_geraete_stage(
                 tarife,
             )
         else:
-            simonly_refs, simonly_protokoll = [], {}
-            if referenz_anbieter is None or SIMONLY_ANBIETER in referenz_anbieter:
-                simonly_refs, simonly_protokoll = abgesichert(
-                    lambda: sammle_simonly(hole, heute, uhr), _ohne_simonly
-                )
+            simonly_refs, simonly_protokoll = abgesichert(
+                lambda: sammle_simonly(hole, heute, uhr), _ohne_simonly
+            )
             if simonly_refs:
                 gemessen = {r.tarif_name for r in simonly_refs}
                 zurueckgefallen = sum(
@@ -417,9 +405,7 @@ def run_geraete_stage(
                     f", {zurueckgefallen} nur im Bestand" if zurueckgefallen else "",
                 )
             tco = TcoDB(zustand / "geraete_tco.json")
-            _, entfernt = tco.ersetze_referenzen(
-                referenzen, heute, anbieter=referenz_anbieter
-            )
+            _, entfernt = tco.ersetze_referenzen(referenzen, heute)
             if entfernt:
                 log.info(
                     "Tarif-Referenzen: %d nicht mehr im Tarifbestand - entfernt",

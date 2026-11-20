@@ -241,7 +241,7 @@ anbieter:
       dagegen eine tote, im Sitemap-Index nicht mehr gefuehrte Adresse
       (HTTP 200, aber 0 Artikel) und wird NICHT verwendet.
       GRENZE, gemessen im Produktivlauf mit der ehrlichen Kennung
-      (05.09.2026, R2, scripts/lokallauf_saturn.py): NUR 6 der 17
+      (05.09.2026, R2, Lokallauf): NUR 6 der 17
       Markenseiten liefern Saturn-eigene Listungen (iPhone
       16/16e/17/17 Pro/Air/17e, 22 Listungen). Die uebrigen ELF liefern
       strukturell einwandfrei, aber

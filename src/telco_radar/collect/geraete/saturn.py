@@ -1,9 +1,9 @@
 """Saturn: der Preis in zwei unabhaengigen, serverseitig gerenderten
 Fundstellen derselben Markenseite - ld+json UND dem Apollo-Cache.
 
-Bauanleitung: `outputs/saturn-spike-2026-09-05.md` (Spike vom 05.09.2026,
-`scripts/spike_saturn_geraetepreis.py`). Dieser Adapter ist die
-Produktivfassung des dort gemessenen Struktur-Funds, kein neuer Fund.
+Bauanleitung: `outputs/saturn-spike-2026-09-05.md` (Spike vom 05.09.2026).
+Dieser Adapter ist die Produktivfassung des dort gemessenen Struktur-Funds,
+kein neuer Fund.
 
 WO DIE ZAHL STEHT
 ------------------
