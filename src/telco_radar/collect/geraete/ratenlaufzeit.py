@@ -47,6 +47,18 @@ _EURO_RE = re.compile(r"\d{1,3}(?:\.\d{3})*,\d{2}")
 _TAG_RE = re.compile(r"<[^>]+>")
 
 
+def ratenzahl_im_knopf(option: dict) -> int | None:
+    """Die Ratenzahl eines o2-Zahlungsknopfs ("36 Monate"); `None` fuer "Einmalzahlung
+    Geraet" (`rateplanOption: false`). Am 20.11.2026 galten diesem Knopf 62 von 254
+    o2-Abrufen, rund 1.450 von 2.094 s, ohne einen Satz (Befund in
+    tests/test_geraete_o2_einmalzahlung.py). `o2` waehlt damit Abrufe und Messung.
+    0 Raten ist ebenfalls kein Ratenkauf und gibt `None`."""
+    m = re.search(r"(\d+)", str((option or {}).get("displayValue") or ""))
+    if not m or option.get("rateplanOption") is False or int(m[1]) == 0:
+        return None
+    return int(m[1])
+
+
 def ganze_ratenlaufzeit(beleg: str | None, laufzeit, betrag) -> list[dict]:
     """Der Tarifpreis als eine Phase von Monat 1 bis `laufzeit` - nur mit Beleg."""
     if beleg is None or laufzeit is None or betrag is None:

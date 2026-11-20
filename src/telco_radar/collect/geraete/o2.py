@@ -82,7 +82,7 @@ from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
 from .o2_referenz import Referenzstand, belegadresse, modellname, passt, tarife_aus
-from .ratenlaufzeit import katalog_mit_phasen, o2_phasen
+from .ratenlaufzeit import katalog_mit_phasen, o2_phasen, ratenzahl_im_knopf
 from ...geraete_model import probe_geht_auf
 
 log = logging.getLogger(__name__)
@@ -451,11 +451,9 @@ def _gemessen(pv: dict) -> Optional[dict]:
     if option is None or zahlung is None:
         return None
     angebot = str(hw.get("offerName") or "").strip()
-    m_raten = _RATEN_RE.search(angebot)
-    m_knopf = _DAUER_RE.search(str(zahlung.get("displayValue") or ""))
-    if not (m_raten and m_knopf) or m_raten.group("raten") != m_knopf.group(1):
+    m_raten, raten = _RATEN_RE.search(angebot), ratenzahl_im_knopf(zahlung)
+    if raten is None or not m_raten or int(m_raten.group("raten")) != raten:
         return None
-    raten = m_knopf.group(1)
     zeilen = _zusammenfassung(pv)
     rate = zeilen.get(f"Gerät mtl. ({raten} Raten):")
     tarif_zeilen = [v for k, v in zeilen.items() if k.startswith("Tarif mtl.")]
@@ -470,7 +468,7 @@ def _gemessen(pv: dict) -> Optional[dict]:
     werte = (pv.get("ecommerceProductValue") or {}).get("attributes") or {}
     return {
         "angebot": angebot,
-        "laufzeit": int(m_knopf.group(1)),
+        "laufzeit": raten,
         "rate": rate,
         "tarif_rate": tarif_rate,
         "anzahlung": anzahlung,
@@ -611,9 +609,11 @@ def _hole_seite(hole, url: str, z: dict) -> Optional[dict]:
 
 
 def _folgeseiten(hole, weiter, z: dict, seite: dict, art: str) -> list:
-    """(Antwort, Adresse) je nicht gewählter Option ``art`` der Seite."""
+    """(Antwort, Adresse) je nicht gewählter Option ``art`` mit Ratenzahl."""
     optionen = (seite.get("hardware") or {}).get(art) or []
-    links = [_link(o) for o in optionen if not o.get("selected") and _link(o)]
+    nur_raten = art == "paymentOptions"
+    bar = [o for o in optionen if not nur_raten or ratenzahl_im_knopf(o) is not None]
+    links = [_link(o) for o in bar if not o.get("selected") and _link(o)]
     paare = ((_hole_seite(hole, u, z), u) for u in links if weiter())
     return [(pv, u) for pv, u in paare if pv is not None]
 
