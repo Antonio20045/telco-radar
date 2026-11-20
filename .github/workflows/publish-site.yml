@@ -7,6 +7,11 @@ on:
       - 'src/telco_radar/report/**'
       - 'tests/test_geraete_zeitfenster.py'
       - '.github/workflows/publish-site.yml'
+  # Nach der Gegenprobe neu bauen, damit die Belege das Ergebnis noch am
+  # selben Tag zeigen.
+  workflow_run:
+    workflows: ["Gegenprobe Gerätepreise"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
