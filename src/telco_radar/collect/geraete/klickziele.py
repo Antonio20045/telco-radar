@@ -21,12 +21,18 @@ werden kann.
 Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
 (``klicktageslauf``); ``geplante_anbieter`` nennt, wer darin eine Karte unter
 ``KARTEN`` hat und darum jeden Tag ein Ergebnis liefern soll.
+
+Statt ``seiten`` darf ein Eintrag ``seiten_aus_uebersicht: <schluessel>`` tragen: seine
+Seiten kommen dann aus den Kacheln der Übersichten in der Ergebnisdatei dieses
+Schlüssels (``klickliste_kacheln``), reihum verteilt auf alle Einträge mit derselben
+Quelle. Ohne gelesene Kachel bleibt die Seitenliste leer und ``seitengrund`` nennt den
+Grund; dann leitet ``klickliste_auto`` die Seiten dieses Anbieters ab, sonst nicht.
 """
 
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -35,6 +41,7 @@ import yaml
 from ...geraete_config import lade_katalog, lade_quellen
 from ...geraete_model import Katalog
 from .klickliste_auto import KlicklisteAutoFehler, leite_ab
+from .klickliste_kacheln import KachelquelleFehler, lies_kachelseiten, verteile
 from .robots import host_von
 
 DATEI = Path("config") / "klick_erkundung.yaml"
@@ -47,6 +54,8 @@ log = logging.getLogger(__name__)
 SCHEMA = "https"
 LOKALE_HOSTS = frozenset({"127.0.0.1", "localhost"})
 WEITER_FELDER = frozenset({"selektor", "text", "proben"})
+AUS_UEBERSICHT = "seiten_aus_uebersicht"
+ZUSTAND_NEU = "neu"
 
 
 class ErkundungszielFehler(ValueError):
@@ -69,6 +78,8 @@ class Seitenziel:
 
     ``modell`` ist der Name für ``{modell}`` im Kanarienwert: das Feld ``modell`` der
     Seite (wie die Anbieterseite das Gerät nennt), sonst der Modellname aus dem Katalog.
+    ``zustand`` ist der Zustand des Geräts auf der Seite (``refurbished`` bei
+    „Erneuert“), Vorgabe ``neu``.
     """
 
     geraet: str
@@ -76,6 +87,7 @@ class Seitenziel:
     adresse: str
     weiter: Weiter | None = None
     modell: str | None = None
+    zustand: str = ZUSTAND_NEU
 
 
 @dataclass(frozen=True)
@@ -90,6 +102,8 @@ class Erkundungsziel:
     seitenabstand_sekunden: float = 0.0
     uebersichten: tuple[str, ...] = ()
     karte: str | None = None
+    seitenquelle: str | None = None
+    seitengrund: str | None = None
 
     @property
     def kartenschluessel(self) -> str:
@@ -128,8 +142,14 @@ def lade_ziele(
         anbieter = quellen.nach_name(name)
         if anbieter is None:
             raise ErkundungszielFehler(f"{ort}: {name!r} fehlt in geraete_quellen.yaml")
-        roh_seiten = eintrag.get("seiten")
-        if not isinstance(roh_seiten, list) or not roh_seiten:
+        quelle = None
+        if AUS_UEBERSICHT in eintrag:
+            quelle = _text(eintrag, AUS_UEBERSICHT, ort)
+        roh = eintrag.get("seiten")
+        if quelle is not None and roh is not None:
+            raise ErkundungszielFehler(f"{ort}: seiten und {AUS_UEBERSICHT} zugleich")
+        roh_seiten: list = roh if isinstance(roh, list) else []
+        if quelle is None and not roh_seiten:
             raise ErkundungszielFehler(f"{ort}: keine Seiten")
         if hoechste is not None and len(roh_seiten) > hoechste:
             grund = f"{len(roh_seiten)} Seiten, höchstens {hoechste}"
@@ -150,14 +170,51 @@ def lade_ziele(
                     eintrag, ort, [*anbieter.einstiege, *anbieter.klick_einstiege]
                 ),
                 karte=_text(eintrag, "karte", ort) if "karte" in eintrag else None,
+                seitenquelle=quelle,
             )
         )
+    ziele = _mit_kachelseiten(root, ziele, katalog, quellen)
     if auto:
         ziele.extend(_auto_ziele(root, ziele, katalog, quellen))
     schluessel_alle = [z.schluessel for z in ziele]
     doppelt = {s for s in schluessel_alle if schluessel_alle.count(s) > 1}
     if doppelt:
         raise ErkundungszielFehler(f"{datei}: Schlüssel doppelt: {sorted(doppelt)}")
+    return ziele
+
+
+def _mit_kachelseiten(
+    root: Path, ziele: list[Erkundungsziel], katalog: Katalog, quellen
+) -> list[Erkundungsziel]:
+    """Die Ziele mit ``seitenquelle`` bekommen die Seiten aus den Kacheln ihrer
+    Quelle, reihum in der Reihenfolge der Datei. Eine Seite, die ``_seite`` nicht
+    besteht, entfällt mit Protokoll."""
+    gruppen: dict[str, list[int]] = {}
+    for stelle, ziel in enumerate(ziele):
+        if ziel.seitenquelle is not None:
+            gruppen.setdefault(ziel.seitenquelle, []).append(stelle)
+    for quelle, stellen in gruppen.items():
+        try:
+            kacheln = lies_kachelseiten(root, quelle, katalog)
+        except KachelquelleFehler as fehler:
+            grund = f"Seiten aus der Übersicht: {fehler}"
+            raise ErkundungszielFehler(grund) from fehler
+        for luecke in kacheln.luecken:
+            log.warning("Seiten aus der Übersicht %s: %s", quelle, luecke)
+        basis = quellen.nach_name(ziele[stellen[0]].name).basis_url
+        seiten: list[Seitenziel] = []
+        for roh in kacheln.seiten:
+            try:
+                seiten.append(_seite(roh, f"Kachel {quelle}", katalog, basis))
+            except ErkundungszielFehler as fehler:
+                log.warning("Seiten aus der Übersicht: Seite entfällt: %s", fehler)
+        leer: str | None = None
+        if not seiten:
+            luecken = "; ".join(kacheln.luecken) or "keine Kachel mit Produktlink"
+            leer = f"keine Seite aus der Übersicht {quelle}: {luecken}"
+        teile = verteile(seiten, len(stellen))
+        for stelle, teil in zip(stellen, teile, strict=True):
+            ziele[stelle] = replace(ziele[stelle], seiten=tuple(teil), seitengrund=leer)
     return ziele
 
 
@@ -168,12 +225,15 @@ def _auto_ziele(
     Eintrags dieses Anbieters. Eine abgeleitete Seite, die die Prüfung von ``_seite``
     nicht besteht, entfällt mit Protokoll; sie hält die Handliste nicht an."""
     vorhanden = {(z.name, s.geraet) for z in ziele for s in z.seiten}
+    aus_kacheln = {z.name for z in ziele if z.seitenquelle is not None and z.seiten}
     try:
         abgeleitet = leite_ab(root, katalog, vorhanden)
     except KlicklisteAutoFehler as fehler:
         raise ErkundungszielFehler(f"Klickliste aus dem Katalog: {fehler}") from fehler
     je_anbieter: dict[str, list[Seitenziel]] = {}
     for seite in abgeleitet:
+        if seite.anbieter in aus_kacheln:
+            continue
         anbieter = quellen.nach_name(seite.anbieter)
         if anbieter is None:
             log.warning(
@@ -249,7 +309,8 @@ def _seite(roh: object, ort: str, katalog: Katalog, basis_url: str) -> Seitenzie
         raise ErkundungszielFehler(f"{ort}: {grund}")
     weiter = _weiter(roh.get("weiter"), ort)
     modell = _text(roh, "modell", ort) if "modell" in roh else geraet.modell
-    return Seitenziel(geraet_id, speicher, adresse, weiter, modell)
+    zustand = _text(roh, "zustand", ort) if "zustand" in roh else ZUSTAND_NEU
+    return Seitenziel(geraet_id, speicher, adresse, weiter, modell, zustand)
 
 
 def _weiter(roh: object, ort: str) -> Weiter | None:

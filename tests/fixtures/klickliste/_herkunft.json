@@ -1,5 +1,5 @@
 {
- "zweck": "Echter Auszug aus data/state/geraete_tco.json (Telekom, iPhone Duo, 36 Monate) fuer tests/test_klickliste_auto_tarif.py",
+ "zweck": "Echte Auszüge aus dem Bestand und aus Klick-Ergebnisdateien für tests/test_klickliste_auto_tarif.py und tests/test_klickliste_kacheln.py",
  "eintraege": [
   {
    "datei": "telekom_duo_bestand_0911.json",
@@ -7,6 +7,13 @@
    "commit": "8cdd36df",
    "filter": "nur Telekom, sku_id beginnt mit apple-iphone-duo, laufzeit_monate 36, fuenf Felder",
    "sha256_roh": "7fed08bd8805092def061ee7be495499f45b675c1f5d81d1a10ca67eff062d8d"
+  },
+  {
+   "datei": "telekom_uebersichten_20261120.json",
+   "quelle": "data/state/klick/telekom.json @ origin/main 82f01eca (Klick-Tageslauf 20.11.2026, alle fünf Übersichten MagentaMobil M, XS, S, L, XL)",
+   "commit": "82f01eca",
+   "filter": "Felder datum, name, uebersichten[].adresse/status/grund und je Satz nur titel, speicher_gb, url (ohne Preise)",
+   "sha256_roh": "3db56b23924604b80dd74d2684ad9d52a0fa0212c0019334b4e8c45afc6cc965"
   }
  ]
 }
