@@ -36,6 +36,10 @@ ZEITZONE = ZoneInfo("Europe/Berlin")
 SATZ_OHNE_GEGENPROBE = "Noch nicht gegengeprüft"
 SATZ_OHNE_BILD = "Kein Screenshot zu diesem Preis"
 SATZ_OHNE_RECHENWEG = "Kein vollständiger Rechenweg"
+SATZ_ZEIT_ABSTAND = "Preis kann sich zwischen Messung und Gegenprobe geändert haben"
+SATZ_ZEIT_UNBEKANNT = (
+    "Zeit der Messung nicht gespeichert; der Preis kann sich seither geändert haben"
+)
 STATUS_WORT = {
     gp.BESTAETIGT: "bestätigt",
     gp.TEILWEISE: "teilweise bestätigt",
@@ -185,10 +189,24 @@ def hinweise(e: gp.Ergebnis, buendel_id: str, abgerufen_am: str) -> list[str]:
         name = farbe(e.buendel_id)
         bekannt = name and name != "ohne farbe"
         out.append(f"andere Farbe ({name})" if bekannt else "andere Farbvariante")
+    if e.status == gp.ABWEICHEND:
+        abstand = gp.abstand_stunden(e.gemessen_um, e.geprueft_um)
+        if abstand is None:
+            out.append(SATZ_ZEIT_UNBEKANNT)
+        elif abstand > gp.ABSTAND_STUNDEN:
+            out.append(SATZ_ZEIT_ABSTAND)
     if abgerufen_am and e.datum != abgerufen_am:
         gelesen = datum_de(abgerufen_am)
         out.append(f"Prüfung vom {datum_de(e.datum)}, Preis gelesen am {gelesen}")
     return out
+
+
+def _zeitpunkt(iso: str | None) -> str:
+    """„20.11.2026, 03:48 Uhr“ (Berlin) aus einem ISO-Zeitpunkt; sonst leer."""
+    if not uhrzeit(iso):
+        return ""
+    zeit = datetime.fromisoformat(iso or "").astimezone(ZEITZONE)
+    return f"{zeit:%d.%m.%Y, %H:%M} Uhr"
 
 
 def gegenprobe_anzeige(
@@ -205,6 +223,7 @@ def gegenprobe_anzeige(
         "wort": STATUS_WORT[e.status],
         "datum": datum_de(e.datum),
         "uhrzeit": uhrzeit(e.geprueft_um),
+        "messung": _zeitpunkt(e.gemessen_um),
         "grund": e.grund or "",
         "abweichungen": [_abweichung(a) for a in e.abweichungen],
         "nicht_gelesen": [

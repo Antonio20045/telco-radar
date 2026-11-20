@@ -381,3 +381,37 @@ def test_belege_folgen_der_gewaehlten_laufzeit(site, chromium, breite):
     for v in (v24, v36):
         assert v["kopf"] and v["fehler"] == [] and v["breit"] <= breite
         assert v["offen"] == "true" and v["inhalt"]
+
+
+def test_zurueckgenommene_aenderung_heisst_nur_in_einem_lauf(tmp_path):
+    _bestand(tmp_path)
+    _historie(
+        tmp_path,
+        {
+            "2026-09-09": [_zeile(O2, "2026-09-09", 18.0)],
+            VORTAG: [_zeile(O2, VORTAG, 20.0)],
+            TAG: [_zeile(O2, TAG, 18.0)],
+        },
+    )
+    tage = {
+        t["datum"]: t
+        for t in pa.aufbereiten(tmp_path, {}, Gegenproben(), lambda k: None)
+    }
+    assert tage[VORTAG]["aenderungen"][0]["nur_ein_lauf"] is True
+    assert tage[TAG]["aenderungen"][0]["nur_ein_lauf"] is False
+    zeilen = list(csv.reader(io.StringIO(pa.csv_text(tage[VORTAG])), delimiter=";"))
+    assert zeilen[1][-1] == "ja"
+
+
+def test_bleibende_aenderung_ist_kein_einzelner_lauf(tmp_path):
+    _bestand(tmp_path)
+    _historie(
+        tmp_path,
+        {
+            "2026-09-09": [_zeile(O2, "2026-09-09", 18.0)],
+            VORTAG: [_zeile(O2, VORTAG, 20.0)],
+            TAG: [_zeile(O2, TAG, 20.0)],
+        },
+    )
+    tage = pa.aufbereiten(tmp_path, {}, Gegenproben(), lambda k: None)
+    assert [a["nur_ein_lauf"] for t in tage for a in t["aenderungen"]] == [False]

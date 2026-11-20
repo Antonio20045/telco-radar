@@ -277,3 +277,34 @@ def test_kaputte_tagesdatei_ist_ein_ausfall(tmp_path):
     ausfaelle = pb.installiere(env, tmp_path, {"fuer": lambda k: None})
     assert [a.teil for a in ausfaelle] == [pb.TEIL]
     assert env.globals["preisbeleg"]({"gesamt": 1.0})["gegenprobe"] is None
+
+
+def _abweichend(**anders):
+    return _ergebnis(
+        status=gp.ABWEICHEND,
+        abweichungen=[
+            {"feld": "geraet_monatsrate", "gespeichert": 5.0, "gelesen": 9.5}
+        ],
+        **anders,
+    )
+
+
+def test_messung_und_gegenprobe_stehen_mit_zeit_nebeneinander():
+    e = _abweichend(gemessen_um="2026-11-20T02:48+00:00")
+    anzeige = pb.gegenprobe_anzeige(e)
+    assert anzeige["messung"] == "20.11.2026, 03:48 Uhr"
+    assert anzeige["uhrzeit"] == "18:34 Uhr"
+
+
+def test_grosser_zeitabstand_wird_an_der_abweichung_genannt():
+    weit = pb.gegenprobe_anzeige(_abweichend(gemessen_um="2026-11-20T02:48+00:00"))
+    assert pb.SATZ_ZEIT_ABSTAND in weit["hinweise"]
+    nah = pb.gegenprobe_anzeige(_abweichend(gemessen_um="2026-11-20T16:00+00:00"))
+    assert pb.SATZ_ZEIT_ABSTAND not in nah["hinweise"]
+    assert nah["wort"] == "abweichend"
+
+
+def test_unbekannte_messzeit_wird_an_der_abweichung_genannt():
+    anzeige = pb.gegenprobe_anzeige(_abweichend())
+    assert pb.SATZ_ZEIT_UNBEKANNT in anzeige["hinweise"]
+    assert pb.gegenprobe_anzeige(_ergebnis())["hinweise"] == []

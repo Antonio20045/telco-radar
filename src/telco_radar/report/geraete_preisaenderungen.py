@@ -36,6 +36,8 @@ log = logging.getLogger(__name__)
 
 SEITE = "geraete-preisaenderungen.html"
 ORDNER = "preisaenderungen"
+NUR_EIN_LAUF = "nur in einem Lauf gesehen"
+"""Marke einer Änderung, die die nächste Messung zurücknimmt (A → B → A)."""
 ZEILEN_JE_TAG = 200
 """So viele Änderungen eines Tages stehen mit Beleg auf seiner Seite (die größten);
 alle stehen mit denselben Angaben im Export des Tages."""
@@ -59,6 +61,7 @@ CSV_SPALTEN = (
     "Screenshot",
     "Änderung EUR",
     "Geänderte Posten",
+    "Nur in einem Lauf",
 )
 HISTORIE = "geraete_tco_historie.jsonl"
 BESTAND = "geraete_tco.json"
@@ -142,10 +145,18 @@ def aufbereiten(
     bestand = {b["id"]: b for b in lies_buendel(state_dir / BESTAND) if b.get("id")}
     zuletzt: dict = {}
     tage: list[dict] = []
+    offen: dict[str, tuple[dict, dict]] = {}
+    """Je Bündel die letzte Änderung (Eintrag, Messung davor), bis die nächste Messung
+    zeigt, ob sie blieb oder zurückging (``NUR_EIN_LAUF``)."""
     for tag, saetze in tco_historie.tage(state_dir / HISTORIE):
         gemessen = gp.gemessen(saetze, tag)
-        aenderungen = [
-            _aenderung(
+        for bid, satz in gemessen.items():
+            if bid in offen:
+                eintrag, davor = offen.pop(bid)
+                eintrag["nur_ein_lauf"] = not gp.geaendert(satz, davor)
+        aenderungen = []
+        for satz, vorher in gp.aenderungen(gemessen, zuletzt):
+            eintrag = _aenderung(
                 dict(satz),
                 dict(vorher),
                 bestand,
@@ -154,8 +165,8 @@ def aufbereiten(
                 gegenproben,
                 zeilenbild,
             )
-            for satz, vorher in gp.aenderungen(gemessen, zuletzt)
-        ]
+            offen[satz["id"]] = (eintrag, dict(vorher))
+            aenderungen.append(eintrag)
         zuletzt.update(gemessen)
         if aenderungen:
             aenderungen.sort(key=lambda a: -abs(a["delta"] or 0.0))
@@ -203,6 +214,7 @@ def _aenderung(satz, vorher, bestand, karten, tarife, gegenproben, zeilenbild) -
         "neu": neu,
         "delta": delta,
         "posten": _posten(vorher, satz),
+        "nur_ein_lauf": False,
     }
 
 
@@ -257,6 +269,7 @@ def csv_text(tag: dict) -> str:
         zeile += [
             "" if a["delta"] is None else f"{a['delta']:.2f}",
             " · ".join(a["posten"]),
+            "ja" if a["nur_ein_lauf"] else "",
         ]
         schreiber.writerow(zeile)
     return puffer.getvalue()
@@ -302,6 +315,7 @@ def seiten(env, geraete: dict, site_dir: Path) -> dict[Path, str]:
             tag=tag,
             zeilen=tag["aenderungen"][:ZEILEN_JE_TAG],
             zeilen_je_tag=ZEILEN_JE_TAG,
+            nur_ein_lauf=NUR_EIN_LAUF,
         )
         dateien[ordner / f"{tag['datum']}.csv"] = csv_text(tag)
     return dateien
