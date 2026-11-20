@@ -384,7 +384,7 @@ def lies_buendel(text: str, url: str = "", proben: dict | None = None) -> list[d
     tarifdetails = _tarifdetails_url(text, url)
     hw_id = _hw_id(text)
     vorauswahl = variante(text).get("size") or ""
-    angezeigt = _angezeigter_preis(text, hw_id)
+    angezeigt_html = _angezeigter_preis(text, hw_id)
     out: list[dict] = []
     gesehen: dict[int, tuple[str, float]] = {}
     for schluessel, eintrag in karte.items():
@@ -429,6 +429,7 @@ def lies_buendel(text: str, url: str = "", proben: dict | None = None) -> list[d
                 gb,
             )
         vorausgewaehlt = str(gb) == vorauswahl
+        angezeigt = angezeigt_html if angezeigt_html is not None else betrag
         out.append(
             {
                 "hw_id": hw_id,
@@ -638,7 +639,11 @@ def _cent(euro: str, cent: str) -> int:
 
 
 def _angezeigter_preis(text: str, hw_id: str) -> float | None:
-    """Der Monatspreis, den die Geraeteseite serverseitig anzeigt."""
+    """Der Monatspreis, den die Geraeteseite im `hwd-monthly-price`-Block
+    serverseitig anzeigt (VOR K1, mit `id="<hw_id>--price__digits"` im
+    Markup). `None`, wenn der Block fehlt (K1-Markup ab 20.11.2026 traegt
+    ihn nicht mehr) - der Aufrufer faellt dann auf die Preiskarte zurueck,
+    statt eine falsche Zahl anzunehmen."""
     if not hw_id:
         return None
     kopf = re.escape(hw_id)
