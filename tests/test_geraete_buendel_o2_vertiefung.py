@@ -94,14 +94,19 @@ def test_abrufe_je_geraet_und_nur_verlinkte_adressen(mitschnitt):
 
 
 def test_jeder_satz_traegt_seine_posten(mitschnitt):
+    """Den Anschlusspreis misst nur der gewählte Tarif; abgeleitete nennt der
+    Mitschnitt (29.09.2026, Fußnoten ohne Betrag) nicht (``o2_anschluss``)."""
     for s in _vertieft(mitschnitt):
         for feld in (
             "tarif_monatlich",
             "geraet_monatsrate",
             "geraet_zuzahlung",
-            "anschlusspreis",
         ):
             assert isinstance(s[feld], float), (feld, s)
+        if "herleitung" in s:
+            assert s["anschlusspreis"] is None, s
+        else:
+            assert isinstance(s["anschlusspreis"], float), s
         assert s["tarif_name"] and s["tarif_slug"]
         assert s["url"].startswith("https://www.o2online.de/e-shop/")
 
@@ -120,7 +125,8 @@ def _satz(saetze, speicher, laufzeit, slug):
 def test_iphone_17_pro_256_zwei_tarife_gegen_die_seite(mitschnitt):
     """Die Referenzantworten sind die Seiten genau dieser Kombination: ihre
     Preiszusammenfassung nennt Geraet mtl. 36,50, Tarif mtl. 39,99 (Unlimited
-    L) bzw. 14,99 (Mobile S), Anzahlung 1,00, Anschluss 0,00 / 39,99."""
+    L) bzw. 14,99 (Mobile S), Anzahlung 1,00, Anschluss 0,00 / 39,99. Beide Sätze
+    sind abgeleitet; den Anschlusspreis nennt ihre Antwort nicht (``o2_anschluss``)."""
     saetze = _vertieft(mitschnitt)
     ul = _satz(saetze, 256, 36, "o2-mobile-unlimited-l")
     assert (
@@ -128,9 +134,11 @@ def test_iphone_17_pro_256_zwei_tarife_gegen_die_seite(mitschnitt):
         ul["tarif_monatlich"],
         ul["geraet_zuzahlung"],
         ul["anschlusspreis"],
-    ) == (36.5, 39.99, 1.0, 0.0)
+    ) == (36.5, 39.99, 1.0, None), "abgeleitet: Anschlusspreis ist eine Lücke"
     s = _satz(saetze, 256, 36, "o2-mobile-s")
-    assert (s["tarif_monatlich"], s["anschlusspreis"]) == (14.99, 39.99)
+    assert (s["tarif_monatlich"], s["anschlusspreis"]) == (14.99, None), (
+        "abgeleitet: die Antwort nennt den berechneten Anschlusspreis nicht"
+    )
     s24 = _satz(saetze, 256, 24, "o2-mobile-unlimited-m-plus")
     assert (
         s24["geraet_monatsrate"],
@@ -178,10 +186,12 @@ def test_abgeleiteter_tarifbetrag_trifft_die_messung(xiaomi):
                     "tarif_monatlich",
                     "geraet_monatsrate",
                     "geraet_zuzahlung",
-                    "anschlusspreis",
                     "tarif_name",
                 ):
                     assert s[feld] == g[feld], (laufzeit, s["tarif_slug"], feld)
+                assert s["anschlusspreis"] in (None, g["anschlusspreis"]), (
+                    "Lücke statt Referenzwert, nie ein anderer Betrag"
+                )
         assert verglichen > 80
     rabatt = [
         s

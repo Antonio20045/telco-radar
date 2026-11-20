@@ -1184,6 +1184,16 @@
       "gzip": true,
       "bytes_roh": 185757,
       "sha256_roh": "30d273256800da5782db4836380d1f78b8523a95670a4189a97fd6286a24c083"
+    },
+    {
+      "datei": "o2_iphone14_erneuert_tarifoptionen_20261120.json.gz",
+      "url": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Echter Abruf 2026-11-20T19:10Z, HTTP 200, Absender TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber), robots.txt (User-agent: *) sperrt /e-shop/ nicht. Vollantwort 850920 B (sha256 0b3140a34b6b8148b32bec0492555cb92d781902c29fa069018bcae6a8eacded). GEKUERZT auf die pdp:PageValue-Felder, die o2.saetze_aus_konfiguration liest (priceSummary, hardware.offerName/paymentOptions/contents.selectedHardwareRateDurationModal, tariff.tariffDurationOptions, tariffOptions mit displayValue/selected/selectCall/monthlyCharges/blauFootnotes, ecommerceProductValue.attributes.dimension59); Werte und Texte unveraendert.",
+      "gzip": true,
+      "bytes_roh": 48415,
+      "sha256_roh": "8487d9c7a51d3fd5518df73992bbf0cd6338cd235a0cdcfd4e7bb5d75f0ac4ed"
     }
   ]
 }

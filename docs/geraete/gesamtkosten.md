@@ -93,3 +93,8 @@ Der Export nennt die Spalte deshalb „Gerät einmalig EUR“, nicht „Anzahlun
 - Die SIM-only-Referenz zeigt ohne belegten Anschlusspreis keine Zahl mehr statt eines
   Teilbetrags.
 - Unbelegter Versand ist eine Lücke statt 0 € (betrifft heute keinen Anbieter).
+- o2: Ein abgeleiteter Tarif (`tarifsumme_minus_geraeterate`) nimmt den Anschlusspreis
+  nicht mehr vom Referenzgerät, sondern aus seiner eigenen Tarifoption
+  (`o2_anschluss`): Listenpreis 0 € in der Fußnote zählt 0 €, ein höherer oder keiner
+  ist die Lücke „Anschlusspreis“ (Gegenprobe 20.11.2026: iPhone 14 erneuert, S Special
+  Plus, gespeichert 39,99 €, Seite 0,00 €).
