@@ -2506,9 +2506,18 @@ b,strong{font-weight:700}
   .gr-katalog-mod>tbody>tr.gr-a-zeile>td .gr-a-klein{display:inline}
   /* RUHIG-RUNDE3-1119: am Telefon bleibt die Karte bei Gerät, bestem
      Preis, Händler und Unterschied - Ø/Monat und Stufe/Tarif stehen im
-     title der Preis-Zelle, keine eigene Kartenzeile mehr. */
+     title der Preis-Zelle, keine eigene Kartenzeile mehr.
+     RUHIG-RUNDE3-1119-R4 (20.11.2026): in der TCO-Ansicht (Standard beim
+     Laden, Klasse `gr-katalog--tco`) gewann bisher die spezifischere
+     Block-Regel oben (0-4-3 gegen 0-3-3 dieser Regel), die zwei Zeilen
+     blieben sichtbar. Die zweite Zeile je Eigenschaft gilt nur fuer die
+     TCO-Klasse und ist dadurch selbst spezifischer (0-5-3), unabhaengig
+     von der Reihenfolge im Blatt - kein `!important` noetig. */
   .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k="Ø €/Monat"],
-  .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k="Stufe"]{display:none}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k="Stufe"],
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td[data-k="Ø €/Monat"]:not(.gr-sp--barpreis),
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td[data-k="Stufe"]:not(.gr-sp--barpreis){
+    display:none}
   /* Die Leitzahl der Karte ist ihre groesste Schrift, nicht das Δ. */
   .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-k-ab{font-size:18px}
   .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-a-prozent{font-size:15px}
