@@ -119,15 +119,15 @@ def _zeile_mit(text: str, muster: re.Pattern) -> str:
 def _name_und_art(text: str, t: Tarif) -> None:
     """Der Produktname steht als eigene Zeile, meist mit der Art in Klammern.
 
-    Die Klammer kann die Abrechnungsform mitfuehren: congstar schreibt
-    "Allnet Flat L (Postpaid Mobilfunk)". Ohne sie im Muster fiel der Name
-    in den Rueckfallzweig und trug den Klammerzusatz mit - auf der Seite
-    stand dann "Allnet Flat XL mit Upgrade-Versprechen (Postpaid" samt
-    offener Klammer, weil die Zeile im PDF umbricht. Die Art blieb dabei
-    leer, und ein Tarif ohne Art faellt aus jeder Filterung heraus.
+    congstar schreibt "Allnet Flat L (Postpaid Mobilfunk)", Blatt 559 (19.11.2026)
+    dahinter "Vermarktung seit: 01/07/2026". Ohne beides im Muster trug der Name den
+    Zusatz mit (auch "... (Postpaid" bei Umbruch), die Art blieb leer (faellt aus
+    jeder Filterung) und ein neuer Name gab eine neue `tarif_id`.
     """
     muster = re.compile(
-        r"^(.{3,80}?)\s*\((?:(?:Post|Pre)paid\s+)?(Mobilfunk|Festnetz)\)\s*$", re.I
+        r"^(.{3,80}?)\s*\((?:(?:Post|Pre)paid\s+)?(Mobilfunk|Festnetz)\)"
+        r"\s*(?:Vermarktung seit\b.*)?$",
+        re.I,
     )
     for zeile in text.splitlines():
         treffer = muster.match(zeile.strip())
