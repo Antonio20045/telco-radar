@@ -7,7 +7,7 @@ ruft ``referenztabelle`` weiter auf.
 from __future__ import annotations
 
 from ..tarif_model import PREISTYP_LIVE_SHOP
-from ..tco_model import SimOnlyReferenz, tco_24
+from ..tco_model import SimOnlyReferenz, kosten_ueber
 
 EIGEN = "vodafone"
 
@@ -40,7 +40,8 @@ def referenztabelle(referenzen: list) -> list[dict]:
     for r in referenzen:
         if not isinstance(r, SimOnlyReferenz) or r.tarif_sim_only_monatlich is None:
             continue
-        kennzahl, allein = tco_24(r.als_buendel()), tco_24(r.als_buendel(False))
+        kennzahl = kosten_ueber(r.als_buendel())
+        allein = kosten_ueber(r.als_buendel(False))
         zeilen.append(
             {
                 "anbieter": r.anbieter,
@@ -48,9 +49,9 @@ def referenztabelle(referenzen: list) -> list[dict]:
                 "tarif": r.tarif_name,
                 "tarif_id": r.tarif_id,
                 "monatlich": r.tarif_sim_only_monatlich,
-                "ueber_horizont": (kennzahl.gesamt if kennzahl.belastbar else None),
-                "tarif_ueber_horizont": allein.gesamt if allein.belastbar else None,
-                "leitzahl_monate": kennzahl.leitzahl_monate,
+                "ueber_horizont": kennzahl.gesamt,
+                "tarif_ueber_horizont": allein.gesamt,
+                "leitzahl_monate": kennzahl.monate,
                 "anschlusspreis": r.anschlusspreis,
                 "quelle_url": r.quelle_url,
                 "abgerufen_am": r.abgerufen_am,

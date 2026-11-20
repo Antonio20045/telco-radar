@@ -302,9 +302,9 @@ def geraetepreis(b: Buendel) -> float | None:
     """Was das Gerät im Bündel kostet: Anzahlung plus alle Raten; ein Vertrag ohne
     eigene Rate (1&1) über seine Laufzeit. None, wenn ein Posten fehlt.
 
-    Bei 1&1 ist die gemessene Zuzahlung die Ablöse bei Kündigung nach Monat 24;
-    wer alle Monate zahlt, zahlt sie nicht (F9, 14.10.2026: sie stand zusätzlich
-    zu Monat 25–36 in der Summe)."""
+    Bei 1&1 zählt nur der Bündelbetrag über die Laufzeit: Zeilen vor dem 20.11.2026
+    trugen hier eine Ablöse, die wer alle Monate zahlt nicht zahlt (F9, 14.10.2026);
+    sie trennt `rechenweise` Stufe 2 von heutigen Zeilen."""
     if b.geraeteraten is not None:
         return b.geraeteraten.gesamt
     if b.buendel_monatlich is not None and b.laufzeit_monate:

@@ -531,7 +531,7 @@ def _bestandteile_mit_kategorie(posten_je_name: dict) -> list:
 def label_der_leitzahl(monate: int | None, tarifmonate: int | None = None) -> str:
     """ "Kosten über 24 Tarifmonate und 36 Geräteraten" - das Etikett der Leitzahl.
 
-    Zeitraum aus `Tco.leitzahl_monate` (Clean Code 7), Tarifmonate aus
+    Zeitraum aus `Kosten.monate` (Clean Code 7), Tarifmonate aus
     `Kosten.tarifmonate`; den Text baut `geraete_zeitraum_wort.zeitraum_text`.
     """
     if monate is None:

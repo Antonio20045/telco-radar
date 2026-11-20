@@ -251,22 +251,21 @@ def test_ein_36_raten_buendel_erscheint_nicht_in_der_24er_ansicht(_basis):
 
 
 def test_1und1_steht_unter_24_monaten_mit_delta(_basis):
-    """Ein Betrag für Tarif und Gerät über 36 Monate wird nur über 24 Monate
-    verglichen (Manager, 05.11.2026): 24 Beträge plus Ablöse stehen unter 24 mit
-    Δ gegen Vodafone 24, die 36er-Ansicht nennt den Grund.
+    """1&1 „24 Monate Fix“ (ein Betrag für Tarif und Gerät) steht unter 24 mit Δ
+    gegen Vodafone 24; die 36er-Ansicht nennt es „nicht erfasst“.
 
     Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; die
     1&1-Zeile prüft das Fragment."""
     _browser, basis = _basis
     with _oeffne(_basis, "?laufzeit=36") as s:
         assert _gedrueckt(s) == ["36"]
-        assert _fehlend(s).get("1&1", "").startswith("Nur über 24 Monate verglichen")
+        assert _fehlend(s).get("1&1", "").startswith("Mit 36 Raten nicht erfasst")
         _waehle(s, "24")
         assert "1&1" not in _fehlend(s)
     assert not [z for z in _lager_zeilen(basis, "36") if z["anbieter"] == "1&1"]
     eins = [z for z in _lager_zeilen(basis, "24") if z["anbieter"] == "1&1"]
     assert [float(z["gesamt"]) for z in eins] == [SOLL[24]["1&1"]], eins
-    assert eins[0]["raten"].startswith("24 Monate + Ablöse"), eins
+    assert eins[0]["raten"].startswith("24 Monatsraten"), eins
     delta = " ".join(eins[0]["delta"].split())
     assert delta.startswith(f"−{_euro(SOLL[24]['Vodafone'] - SOLL[24]['1&1'])} €")
 

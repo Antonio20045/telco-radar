@@ -51,7 +51,7 @@ def _zeilen(*buendel):
 
 
 PREISSPALTEN = (
-    "Zuzahlung EUR",
+    "Gerät einmalig EUR",
     "Tarif/Monat EUR",
     "Geräterate EUR",
     "Bündel/Monat EUR",

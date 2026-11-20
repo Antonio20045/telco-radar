@@ -3,8 +3,8 @@
 Ein Bild gehört zu (Gerät, Anbieter): ``geraet_id`` und ``anbieter`` stehen im
 Klick-Rohsatz (``device_id``, ``speicher_gb``, ``anbieter``). Hat ein Anbieter für ein
 Gerät mehrere Tarife und Laufzeiten, gewinnt der Rohsatz mit den niedrigsten
-Gesamtkosten über
-``TCO_HORIZONT`` Monate (bei Gleichstand die kleinere ``beleg_id``): es ist der Preis,
+Gesamtkosten (``tco_kosten.kosten_ueber``, bei Gleichstand die kleinere
+``beleg_id``): es ist der Preis,
 den die Seite als Leitzahl zeigt. Die Gesamtkosten rechnet ``tco_kosten`` an derselben
 Stelle wie die Seite (CLAUDE.md Clean Code 1); eine Lücke heißt ``None`` und verliert
 gegen jede Zahl.

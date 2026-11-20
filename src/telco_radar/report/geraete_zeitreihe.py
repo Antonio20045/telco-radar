@@ -382,7 +382,7 @@ def _zeitraeume_aus(messungen: dict, tarife: dict | None = None) -> dict:
     """{(modell, band): {anbieter: [Monate, ...]}} - DER ZEITRAUM JE KURVE.
 
     P0-B-z1: der Zeitraum der Punkte, aus DERSELBEN Lesung der Historie wie die Punkte
-    selbst (`_messungen` legt ihn je Messung ab, gelesen aus `Tco.leitzahl_monate`).
+    selbst (`_messungen` legt ihn je Messung ab, gelesen aus `Kosten.monate`).
     Keine zweite Ableitung, keine Nachrechnung: `_svg` schreibt ihn ans Kurvenende,
     die Wochenbewegung prueft an ihm, ob ein Vorzeichen eine Aussage ist.
 

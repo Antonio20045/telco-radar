@@ -2,16 +2,16 @@
 Zeitreihen-Punkt einer 1&1-Linie darf nie einen Wert zeigen, den der HEUTIGE
 Gerätestand als „1&1-Wert widersprüchlich, neu messen“ führt.
 
-Befund: Galaxy S26 256 GB, Tarif S, maß die Einmalzahlung nach Monat 24 am
-12.09., 07.10. und 03.11. jeweils mit 220 € - damals war das noch der Wert
-aller drei Tarife (S/M/L), also kein Widerspruch (Entscheidung 2: diese
-älteren Punkte bleiben unverändert sichtbar). Am 05.11. weicht S (220 €) von
-M/L (280 €) ab; die Tafel führt S seitdem als benannte Lücke, nicht als Zahl.
-Die alte Tages-Regel von `_messungen` sah das nicht, weil sie nur INNERHALB
-eines Tages prüft: der 05.11.-Punkt von S allein widerspricht sich nicht
-selbst. Die Zeitreihen-Seite zeigte darum weiter 1.051,66 € (24 × 32,99 +
-220 € + 39,90) als „zuletzt“, obwohl die aktuelle Tafel diesen Tarif schon als
-widersprüchlich führt. Der Fix (`geraete_zeitreihe_auswahl.py`) vergleicht den
+Befund: Galaxy S26 256 GB, Tarif S, maß die Einmalzahlung nach Monat 24 am 12.09.,
+07.10. und 03.11. jeweils mit 220 € - damals war das noch der Wert aller drei Tarife
+(S/M/L), also kein Widerspruch (Entscheidung 2: diese älteren Punkte bleiben
+unverändert sichtbar). Am 05.11. weicht S (220 €) von M/L (280 €) ab; die Tafel
+führt S seitdem als benannte Lücke, nicht als Zahl. Die alte Tages-Regel von
+`_messungen` sah das nicht, weil sie nur INNERHALB eines Tages prüft: der
+05.11.-Punkt von S allein widerspricht sich nicht selbst. Die Zeitreihen-Seite
+zeigte darum weiter 1.051,66 € (damals 24 × 32,99 + 220 € + 39,90; seit 20.11.2026
+zählen alle 36 Beträge) als „zuletzt“, obwohl die aktuelle Tafel diesen Tarif schon
+als widersprüchlich führt. Der Fix (`geraete_zeitreihe_auswahl.py`) vergleicht den
 JÜNGSTEN Punkt jeder 1&1-Linie zusätzlich gegen den heutigen Gerätestand
 (`geraete_tco.json`) und entfernt nur ihn, wenn er dort abweicht.
 """
@@ -55,7 +55,7 @@ def _zeile(bid, tarif_id, datum, monatlich, zuzahlung):
         "geraet_zuzahlung": zuzahlung,
         "laufzeit_monate": 36,
         "anschlusspreis": ANSCHLUSS,
-        "gesamt": round(24 * monatlich + zuzahlung + ANSCHLUSS, 2),
+        "gesamt": round(36 * monatlich + zuzahlung + ANSCHLUSS, 2),
         "quelle_url": f"https://beispiel.test/{tarif_id}",
         "abgerufen_am": datum,
         "zustand": "neu",
@@ -120,11 +120,11 @@ def _state(tmp_path):
 def test_der_juengste_punkt_der_widerspruechlichen_1und1_linie_faellt_weg(tmp_path):
     state, tco = _state(tmp_path)
     mess = geraete_zeitreihe._messungen(state, tco, heute="2026-11-05")
-    s_tage = mess[(MODELL, "s", 24)]["1&1"]
+    s_tage = mess[(MODELL, "s", 36)]["1&1"]
     assert "2026-11-05" not in s_tage, s_tage
     assert set(s_tage) == {"2026-09-12", "2026-10-07", "2026-11-03"}
-    alt = round(24 * 32.99 + 220.0 + ANSCHLUSS, 2)
-    assert alt == 1051.66
+    alt = round(36 * 32.99 + 220.0 + ANSCHLUSS, 2)
+    assert alt == 1447.54
     assert all(m["wert"] == alt for m in s_tage.values())
 
 
@@ -133,10 +133,10 @@ def test_aeltere_punkte_der_widerspruechlichen_linie_bleiben_unveraendert(tmp_pa
     220 € - kein Widerspruch, die Punkte bleiben stehen."""
     state, tco = _state(tmp_path)
     mess = geraete_zeitreihe._messungen(state, tco, heute="2026-11-05")
-    s_tage = mess[(MODELL, "s", 24)]["1&1"]
+    s_tage = mess[(MODELL, "s", 36)]["1&1"]
     for datum in ("2026-09-12", "2026-10-07", "2026-11-03"):
         assert datum in s_tage
-        assert s_tage[datum]["wert"] == 1051.66
+        assert s_tage[datum]["wert"] == 1447.54
 
 
 def test_die_m_und_l_linien_behalten_ihren_juengsten_punkt(tmp_path):
@@ -144,11 +144,11 @@ def test_die_m_und_l_linien_behalten_ihren_juengsten_punkt(tmp_path):
     bleibt stehen, nur S fällt weg."""
     state, tco = _state(tmp_path)
     mess = geraete_zeitreihe._messungen(state, tco, heute="2026-11-05")
-    m_tage = mess[(MODELL, "m", 24)]["1&1"]
-    l_tage = mess[(MODELL, "l", 24)]["1&1"]
+    m_tage = mess[(MODELL, "m", 36)]["1&1"]
+    l_tage = mess[(MODELL, "l", 36)]["1&1"]
     assert "2026-11-05" in m_tage and "2026-11-05" in l_tage
-    assert m_tage["2026-11-05"]["wert"] == round(24 * 37.99 + 280.0 + ANSCHLUSS, 2)
-    assert l_tage["2026-11-05"]["wert"] == round(24 * 42.99 + 280.0 + ANSCHLUSS, 2)
+    assert m_tage["2026-11-05"]["wert"] == round(36 * 37.99 + 280.0 + ANSCHLUSS, 2)
+    assert l_tage["2026-11-05"]["wert"] == round(36 * 42.99 + 280.0 + ANSCHLUSS, 2)
 
 
 def test_gegenprobe_ohne_heutigen_widerspruch_bleibt_der_juengste_punkt(tmp_path):
@@ -161,5 +161,5 @@ def test_gegenprobe_ohne_heutigen_widerspruch_bleibt_der_juengste_punkt(tmp_path
         b["geraet_zuzahlung"] = 220.0
     heute_datei.write_text(json.dumps(daten), encoding="utf-8")
     mess = geraete_zeitreihe._messungen(state, tco, heute="2026-11-05")
-    s_tage = mess[(MODELL, "s", 24)]["1&1"]
+    s_tage = mess[(MODELL, "s", 36)]["1&1"]
     assert "2026-11-05" in s_tage

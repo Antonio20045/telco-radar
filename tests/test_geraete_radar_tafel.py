@@ -18,7 +18,7 @@ Test hält die NEUSTRUKTURIERUNG nach S2/S3:
 
 Gemessen wird am gerenderten Paar (geraete.html derselben Site), gebaut
 in tmp_path nach der Bauform von `test_wettbewerbsradar._seite`: die
-Karten entstehen auf dem echten Weg über `karten.modelle()` → `tco_24()`,
+Karten entstehen auf dem echten Weg über `karten.modelle()` → `kosten_ueber()`,
 keine handgebauten Dicts (Adapter-Lektion vom 11.08.).
 """
 

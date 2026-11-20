@@ -105,7 +105,7 @@ def test_ein_anbieter_ohne_buendel_dieser_laufzeit_heisst_nicht_erfasst(g):
     sechsunddreissig = {f["anbieter"]: f["grund"] for f in _band(g, 36)["fehlend"]}
     assert sechsunddreissig == {
         "o2": "o2 ist mit 36 Raten nicht erfasst.",
-        "1&1": "1&1 wird nur über 24 Monate verglichen.",
+        "1&1": "1&1 ist mit 36 Raten nicht erfasst.",
     }
 
 

@@ -37,7 +37,7 @@ from telco_radar.report import (
 )
 from telco_radar.report.html import render_site
 
-ABLOESE = "24 Monate + Ablöse"
+VERTRAG = "mit 24 Monatsraten"
 
 
 def _katalogtext(tmp_path, anbieter: str) -> str:
@@ -56,11 +56,13 @@ def test_a6_katalog_nennt_beim_1und1_vertrag_keine_36_raten(tmp_path):
     zeile = vergleich._nur_im_buendel(
         tmp_path / "a", [s for s in vergleich.bestand() if s["anbieter"] == "1&1"]
     )
-    assert zeile["buendel_anbieter"] == "1&1" and zeile["buendel_raten"] == 36, zeile
-    assert zeile["buendel_raten_zusatz"] == f" · {ABLOESE}", zeile
+    """Seit 20.11.2026 (1&1 „24/36 Monate Fix“, Ablöse entfallen) heißt der
+    Bündelbetrag „Monatsraten“, nie „Raten“ wie eine Geräterate neben dem Tarif."""
+    assert zeile["buendel_anbieter"] == "1&1" and zeile["buendel_raten"] == 24, zeile
+    assert zeile["buendel_raten_zusatz"] == f" {VERTRAG}", zeile
     text = _katalogtext(tmp_path / "b", "1&1")
-    assert "36 Raten" not in text, text
-    assert f"/Monat · {ABLOESE} bei 1&1" in text, text
+    assert "24 Raten" not in text, text
+    assert f"/Monat {VERTRAG} bei 1&1" in text, text
 
 
 def test_a6_gegenprobe_echte_raten_behalten_ihr_wort(tmp_path):
