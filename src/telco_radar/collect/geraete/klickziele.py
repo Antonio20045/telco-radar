@@ -27,6 +27,7 @@ Seiten kommen dann aus den Kacheln der Übersichten in der Ergebnisdatei dieses
 Schlüssels (``klickliste_kacheln``), reihum verteilt auf alle Einträge mit derselben
 Quelle. Ohne gelesene Kachel bleibt die Seitenliste leer und ``seitengrund`` nennt den
 Grund; dann leitet ``klickliste_auto`` die Seiten dieses Anbieters ab, sonst nicht.
+Fehlt eine Übersicht oder kommt sie aus dem Vorrat, nennt ``seitengrund`` das auch.
 """
 
 from __future__ import annotations
@@ -41,7 +42,7 @@ import yaml
 from ...geraete_config import lade_katalog, lade_quellen
 from ...geraete_model import Katalog
 from .klickliste_auto import KlicklisteAutoFehler, leite_ab
-from .klickliste_kacheln import KachelquelleFehler, lies_kachelseiten, verteile
+from .klickliste_kacheln import lies_kachelseiten, verteile
 from .robots import host_von
 
 DATEI = Path("config") / "klick_erkundung.yaml"
@@ -194,11 +195,7 @@ def _mit_kachelseiten(
         if ziel.seitenquelle is not None:
             gruppen.setdefault(ziel.seitenquelle, []).append(stelle)
     for quelle, stellen in gruppen.items():
-        try:
-            kacheln = lies_kachelseiten(root, quelle, katalog)
-        except KachelquelleFehler as fehler:
-            grund = f"Seiten aus der Übersicht: {fehler}"
-            raise ErkundungszielFehler(grund) from fehler
+        kacheln = lies_kachelseiten(root, quelle, katalog)
         for luecke in kacheln.luecken:
             log.warning("Seiten aus der Übersicht %s: %s", quelle, luecke)
         basis = quellen.nach_name(ziele[stellen[0]].name).basis_url
@@ -209,9 +206,9 @@ def _mit_kachelseiten(
             except ErkundungszielFehler as fehler:
                 log.warning("Seiten aus der Übersicht: Seite entfällt: %s", fehler)
         leer: str | None = None
-        if not seiten:
+        if kacheln.luecken or not seiten:
             luecken = "; ".join(kacheln.luecken) or "keine Kachel mit Produktlink"
-            leer = f"keine Seite aus der Übersicht {quelle}: {luecken}"
+            leer = f"{len(seiten)} Seiten aus den Übersichten ({luecken})"
         teile = verteile(seiten, len(stellen))
         for stelle, teil in zip(stellen, teile, strict=True):
             ziele[stelle] = replace(ziele[stelle], seiten=tuple(teil), seitengrund=leer)

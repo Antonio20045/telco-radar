@@ -298,8 +298,7 @@ def _datei(
 ) -> tuple[dict, list[dict], list[dict]]:
     """Kopf einer Ergebnisdatei für die Bilanz und, wenn verwendet, ihre Rohsätze und
     Gerätepreise ohne Tarif."""
-    status = daten.get("laufstatus")
-    datum = daten.get("datum")
+    status, datum = daten.get("laufstatus"), daten.get("datum")
     alter = alter_tage(datum, heute)
     eintrag = {
         "anbieter": daten.get("name"),
@@ -307,6 +306,7 @@ def _datei(
         "alter_tage": alter,
         "laufstatus": status,
         "grund": daten.get("grund"),
+        "seitengrund": daten.get("seitengrund"),
         "ueberfaellig": list(daten.get("ueberfaellig") or []),
         "verwendet": False,
         "warum_nicht": None,

@@ -12,8 +12,8 @@
    "datei": "telekom_uebersichten_20261120.json",
    "quelle": "data/state/klick/telekom.json @ origin/main 82f01eca (Klick-Tageslauf 20.11.2026, alle fünf Übersichten MagentaMobil M, XS, S, L, XL)",
    "commit": "82f01eca",
-   "filter": "Felder datum, name, uebersichten[].adresse/status/grund und je Satz nur titel, speicher_gb, url (ohne Preise)",
-   "sha256_roh": "3db56b23924604b80dd74d2684ad9d52a0fa0212c0019334b4e8c45afc6cc965"
+   "filter": "Felder datum, name, uebersichten[].adresse/status/grund und je Satz nur titel, speicher_gb, tarif_name, url (ohne Preise)",
+   "sha256_roh": "3343e7f4ba06cab0d9ed39b6bfa1323a187b000ce729ebdc2364b4021700979f"
   }
  ]
 }

@@ -22,8 +22,10 @@ Das Gerät kommt über den Titel aus dem Katalog (``erkenne_geraet``), der Zusta
 dem Titel (``zustand_aus_titel``: „Erneuert“ ist ``refurbished``); ein unbekanntes Gerät
 oder ein unbestimmbarer Zustand bekommt keine Seite (Protokoll). Den Modellnamen für
 den Kanarienwert schreibt die Kachel (``_modellname``). Eine nicht gelesene Übersicht
-liefert keine Seite und steht mit Grund in ``Kachelseiten.luecken``; sie ist nicht
-„leer“.
+liefert ihre Seiten aus dem Vorrat: den Kacheln, die sie zuletzt ganz gelesen hatte
+(``fuehre_vorrat`` in der Ablage, ``kachelvorrat`` mit Lesedatum), höchstens
+``VORRAT_HOECHSTALTER_TAGE`` alt. Jede nicht ganz gelesene Übersicht steht mit Grund in
+``Kachelseiten.luecken``; sie ist nicht „leer“ und verschwindet nie still.
 
 ``verteile`` legt die Seiten reihum auf die Einträge einer Gruppe (je ein Matrix-Job);
 sortiert nach Gerät und Tarif, damit Seiten eines Geräts nicht im selben Job
@@ -32,10 +34,12 @@ hintereinander stehen. Rein, ohne Netz.
 
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 from typing import TypeVar
 from urllib.parse import parse_qs, urlsplit
@@ -50,11 +54,11 @@ T = TypeVar("T")
 PRODUKTPFAD = "/shop/geraet/"
 TARIF_PARAMETER = "tariffId"
 ZUSTAND_UNBEKANNT = "unbekannt"
+VORRAT = "kachelvorrat"
+VORRAT_HOECHSTALTER_TAGE = 7
+"""So viele Tage darf der Vorrat einer nicht gelesenen Übersicht älter sein als die
+Ergebnisdatei; danach ist der Tarif eine benannte Lücke."""
 _SPEICHER_AM_ENDE = re.compile(r"\s+\d{1,4}\s*(?:GB|TB)\s*$", re.IGNORECASE)
-
-
-class KachelquelleFehler(ValueError):
-    """Die Ergebnisdatei der Übersichten ist da, aber nicht lesbar."""
 
 
 @dataclass
@@ -67,30 +71,35 @@ class Kachelseiten:
 
 
 def lies_kachelseiten(root: Path, schluessel: str, katalog: Katalog) -> Kachelseiten:
-    """Die Seiten aus ``data/state/klick/<schluessel>.json``; fehlt die Datei, keine
-    Seite mit Lücke. Ist sie unlesbar, wirft ``KachelquelleFehler``."""
+    """Die Seiten aus ``data/state/klick/<schluessel>.json``; fehlt die Datei oder ist
+    sie unlesbar, keine Seite und die Lücke mit Grund (nie eine Ausnahme: der Plan
+    der übrigen Anbieter hängt nicht an dieser Datei)."""
     pfad = root / ORDNER / f"{schluessel}.json"
     try:
         daten = json.loads(pfad.read_text(encoding="utf-8"))
     except FileNotFoundError:
-        return Kachelseiten(luecken=[f"{pfad}: keine Ergebnisdatei der Übersichten"])
+        return Kachelseiten(
+            luecken=[f"{pfad.name}: keine Ergebnisdatei der Übersichten"]
+        )
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as fehler:
-        raise KachelquelleFehler(f"{pfad}: nicht lesbar ({fehler})") from fehler
+        return Kachelseiten(luecken=[f"{pfad.name}: nicht lesbar ({fehler})"])
     if not isinstance(daten, dict):
-        raise KachelquelleFehler(f"{pfad}: keine Zuordnung")
+        return Kachelseiten(luecken=[f"{pfad.name}: keine Zuordnung"])
     return seiten_aus_kacheln(daten, katalog)
 
 
 def seiten_aus_kacheln(daten: dict, katalog: Katalog) -> Kachelseiten:
-    """Je Produkt und Tarif eine Seite aus den Sätzen der gelesenen Übersichten."""
+    """Je Produkt und Tarif eine Seite aus den Kacheln jeder Übersicht: der ganz
+    gelesenen, sonst ihres Vorrats (``fuehre_vorrat``), wenn er höchstens
+    ``VORRAT_HOECHSTALTER_TAGE`` älter als die Datei ist; jede nicht ganz gelesene
+    Übersicht ist eine benannte Lücke."""
     ergebnis = Kachelseiten(datum=daten.get("datum"))
     je_seite: dict[tuple[str, str], dict] = {}
     for uebersicht in daten.get("uebersichten") or []:
-        if uebersicht.get("status") not in GELESENE_SEITEN:
-            grund = uebersicht.get("grund") or uebersicht.get("status")
-            ergebnis.luecken.append(f"{uebersicht.get('adresse')}: {grund}")
-            continue
-        for satz in _kacheln(uebersicht):
+        kacheln = _kacheln(uebersicht) if _gelesen(uebersicht) else []
+        if not _ganz(uebersicht):
+            kacheln += _vorrat(uebersicht, daten.get("datum"), ergebnis.luecken)
+        for satz in kacheln:
             seite = _seite(satz, katalog)
             if seite is None:
                 continue
@@ -102,6 +111,82 @@ def seiten_aus_kacheln(daten: dict, katalog: Katalog) -> Kachelseiten:
         je_seite[s] for s in sorted(je_seite, key=lambda s: (je_seite[s]["geraet"], s))
     ]
     return ergebnis
+
+
+def fuehre_vorrat(neu: dict, alt: dict | None) -> dict:
+    """``neu`` mit ``kachelvorrat`` an jeder nicht ganz gelesenen Übersicht: die
+    Kacheln derselben Übersicht in ``alt`` (der abgelegten Datei davor), wenn sie dort
+    ganz gelesen war, sonst deren Vorrat, beides mit Lesedatum. Eine ganz gelesene
+    Übersicht braucht keinen; sie ist selbst der nächste Vorrat."""
+    vorher = {u.get("adresse"): u for u in (alt or {}).get("uebersichten") or []}
+    ergebnis = copy.deepcopy(neu)
+    for uebersicht in ergebnis.get("uebersichten") or []:
+        frueher = vorher.get(uebersicht.get("adresse"))
+        if _ganz(uebersicht) or frueher is None:
+            continue
+        if _ganz(frueher):
+            vorrat = {
+                "datum": (alt or {}).get("datum"),
+                "tarif": _tarifname(frueher),
+                "kacheln": [_knapp(k) for k in _kacheln(frueher)],
+            }
+        else:
+            vorrat = frueher.get(VORRAT)
+        if isinstance(vorrat, dict):
+            uebersicht[VORRAT] = vorrat
+    return ergebnis
+
+
+def _gelesen(uebersicht: dict) -> bool:
+    return uebersicht.get("status") in GELESENE_SEITEN
+
+
+def _ganz(uebersicht: dict) -> bool:
+    """Gelesen, vollständig und mit mindestens einer Kachel."""
+    return (
+        _gelesen(uebersicht)
+        and uebersicht.get("vollstaendig") is not False
+        and bool(_kacheln(uebersicht))
+    )
+
+
+def _vorrat(uebersicht: dict, datum: object, luecken: list[str]) -> list[dict]:
+    """Die Kacheln des Vorrats, wenn er jung genug ist; die Lücke immer mit Grund."""
+    grund = uebersicht.get("grund") or uebersicht.get("unvollstaendig")
+    roh = uebersicht.get(VORRAT)
+    vorrat: dict = roh if isinstance(roh, dict) else {}
+    name = vorrat.get("tarif") or _tarifname(uebersicht) or uebersicht.get("adresse")
+    kopf = f"Übersicht {name} am {_tag(datum)} nicht ganz gelesen ({grund or 'leer'})"
+    alter = _tage(vorrat.get("datum"), datum)
+    if alter is None or not 0 <= alter <= VORRAT_HOECHSTALTER_TAGE:
+        jung = f"keine Kacheln jünger als {VORRAT_HOECHSTALTER_TAGE} Tage"
+        luecken.append(f"{kopf}, {jung}")
+        return []
+    luecken.append(f"{kopf}, Seiten aus den Kacheln vom {_tag(vorrat['datum'])}")
+    return [k for k in vorrat.get("kacheln") or [] if isinstance(k, dict)]
+
+
+def _tarifname(uebersicht: dict) -> str | None:
+    namen = [s.get("tarif_name") for s in uebersicht.get("saetze") or []]
+    return next((n for n in namen if isinstance(n, str) and n), None)
+
+
+def _knapp(kachel: dict) -> dict:
+    return {f: kachel.get(f) for f in ("titel", "speicher_gb", "url")}
+
+
+def _tage(von: object, bis: object) -> int | None:
+    try:
+        return (date.fromisoformat(str(bis)) - date.fromisoformat(str(von))).days
+    except ValueError:
+        return None
+
+
+def _tag(datum: object) -> str:
+    try:
+        return date.fromisoformat(str(datum)).strftime("%d.%m.%Y")
+    except ValueError:
+        return str(datum)
 
 
 def verteile(seiten: list[T], anzahl: int) -> list[list[T]]:

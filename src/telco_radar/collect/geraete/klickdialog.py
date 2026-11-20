@@ -7,7 +7,8 @@ Klick ab; jeder Knopf danach lief 15 s in die Frist, 622 von 1206 Kombinationen 
 „nicht klickbar“. ``blockierender_dialog`` erkennt nach einem Klick einen sichtbaren
 Dialog (``DIALOG_SELEKTOR``), der den geklickten Knopf verdeckt: an der Mitte des Knopfs
 liegt ein fremdes Element. Ein Dialog, der den Knopf frei lässt, stört nicht und bleibt.
-``schliesse`` klickt den Schließen-Knopf des Dialogs (``SCHLIESSEN_SELEKTOR``), sonst
+``schliesse`` klickt den Schließen-Knopf in diesem Dialog (``SCHLIESSEN_SELEKTOR``
+unter ``MARKE``, nie einen anderen der Seite), sonst
 drückt sie Escape, und prüft danach erneut. Geht er nicht zu, ist das ein benannter
 Grund („Dialog „…“ nicht zu schließen“), keine Kette von Zeitüberschreitungen.
 """
@@ -31,12 +32,14 @@ SCHLIESSEN_SELEKTOR = (
     'button[aria-label="Close dialog"], button.ODSDialog-CloseButton, '
     'button[aria-label*="schließen" i], button[aria-label*="close" i]'
 )
+MARKE = "data-klick-dialog"
+"""Markiert den verdeckenden Dialog, damit nur sein eigener Schließen-Knopf zählt."""
 TITEL_LAENGE = 60
 WARTEN_MS = 500
 GRUND_DIALOG = "Dialog"
 GRUND_NICHT_ZU = "nicht zu schließen"
 
-_DIALOG_JS = """(knopf, selektor) => {
+_DIALOG_JS = """(knopf, [selektor, marke]) => {
   const sichtbar = (e) => {
     const r = e.getBoundingClientRect();
     const s = getComputedStyle(e);
@@ -49,6 +52,8 @@ _DIALOG_JS = """(knopf, selektor) => {
   const oben = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
   if (oben === null || oben === knopf || knopf.contains(oben)) return null;
   const d = dialoge.find((e) => e.contains(oben)) || dialoge[dialoge.length - 1];
+  document.querySelectorAll('[' + marke + ']').forEach((e) => e.removeAttribute(marke));
+  d.setAttribute(marke, '');
   const kopf = document.getElementById(d.getAttribute('aria-labelledby') || '')
     || d.querySelector('h1, h2, h3');
   const titel = (d.getAttribute('aria-label') || (kopf && kopf.innerText)
@@ -63,7 +68,7 @@ def blockierender_dialog(knopf: Locator, frist_ms: int) -> str | None:
     Ist der Knopf nach dem Klick weg (neu gezeichnet, Navigation), gilt: kein Dialog.
     """
     try:
-        titel = knopf.evaluate(_DIALOG_JS, DIALOG_SELEKTOR, timeout=frist_ms)
+        titel = knopf.evaluate(_DIALOG_JS, [DIALOG_SELEKTOR, MARKE], timeout=frist_ms)
     except PlaywrightFehler:
         return None
     return None if titel is None else str(titel)[:TITEL_LAENGE]
@@ -95,7 +100,8 @@ def schliesse(seite: Page, knopf: Locator, titel: str, frist_ms: int) -> str | N
     """Schließt den Dialog ``titel``; ``None``, wenn der Knopf danach frei ist, sonst
     der Grund."""
     log.info("Klick-Crawler: Dialog „%s“ nach Klick, wird geschlossen", titel)
-    schliessen = seite.locator(SCHLIESSEN_SELEKTOR).filter(visible=True)
+    dialog = seite.locator(f"[{MARKE}]")
+    schliessen = dialog.locator(SCHLIESSEN_SELEKTOR).filter(visible=True)
     try:
         if schliessen.count() > 0:
             schliessen.first.click(timeout=frist_ms)

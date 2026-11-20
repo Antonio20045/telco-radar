@@ -76,10 +76,19 @@ def _karte():
     return klickkarte_aus_daten(daten, "Beispielkarte")
 
 
-def _mit_dialog(schliessbar: bool):
+KOEDER = (
+    '<button type="button" aria-label="Close dialog" '
+    'onclick="this.dataset.geklickt = 1">Chat schließen</button>'
+)
+"""Ein fremder, sichtbarer Schließen-Knopf vor dem Dialog (etwa eines Chat-Fensters)."""
+
+
+def _mit_dialog(schliessbar: bool, koeder: bool = False):
     innen = _beispiel()
     vorlage = f'<template id="dialogvorlage">{DIALOG}</template>'
     zusatz = STIL + vorlage + f"<script>const ZU = {str(schliessbar).lower()};</script>"
+    if koeder:
+        zusatz = KOEDER + zusatz
 
     def antworte(pfad: str) -> Antwort:
         antwort = innen(pfad)
@@ -90,13 +99,13 @@ def _mit_dialog(schliessbar: bool):
     return antworte
 
 
-def _laufe(chromium, schliessbar: bool):
+def _laufe(chromium, schliessbar: bool, koeder: bool = False):
     from telco_radar.collect.geraete.klickcrawler import klicke_durch
     from telco_radar.collect.geraete.klicktor import Hostschleuse
 
     waechter = RobotsWaechter(hole=lambda url: (200, ROBOTS))
     schleuse = Hostschleuse(waechter, lambda: JETZT)
-    with klickserver(_mit_dialog(schliessbar)) as server:
+    with klickserver(_mit_dialog(schliessbar, koeder)) as server:
         return klicke_durch(
             chromium,
             server.adresse(PRODUKTPFAD),
@@ -148,3 +157,16 @@ def test_dialog_ohne_schliessen_wird_benannt_ohne_fristkette(chromium):
     gruende = [e.grund or "" for e in lauf.ergebnisse]
     assert not [g for g in gruende if "nicht klickbar" in g]
     assert any("Dialog „Einmalzahlung“ nicht zu schließen" in g for g in gruende)
+
+
+def test_nur_der_schliessen_knopf_des_dialogs_zaehlt(chromium):
+    """Prüferbefund PR 173: ein anderer sichtbarer Schließen-Knopf der Seite steht vor
+    dem Dialog; geklickt wird nur der im verdeckenden Dialog."""
+    lauf = _laufe(chromium, schliessbar=True, koeder=True)
+
+    gruende = [e.grund or "" for e in lauf.ergebnisse]
+    assert not [g for g in gruende if "nicht zu schließen" in g]
+    assert any(
+        "Dialog „Einmalzahlung“ nach Klick auf speicher geschlossen" in g
+        for g in gruende
+    )

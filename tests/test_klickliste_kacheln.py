@@ -109,7 +109,10 @@ def test_nicht_gelesene_uebersicht_ist_luecke_nicht_leer(daten, katalog):
 
     ergebnis = seiten_aus_kacheln(roh, katalog)
 
-    assert ergebnis.luecken == [f"{m['adresse']}: Abruf gestört (HTTP 403)"]
+    assert ergebnis.luecken == [
+        "Übersicht MagentaMobil M am 20.11.2026 nicht ganz gelesen"
+        " (Abruf gestört (HTTP 403)), keine Kacheln jünger als 7 Tage"
+    ]
     assert TARIF_M not in {_tarif(s["url"]) for s in ergebnis.seiten}
     assert ergebnis.seiten
 
@@ -184,7 +187,7 @@ def test_ohne_uebersicht_nennt_der_lauf_den_grund(wurzel):
     assert telekom and all(z.seiten == () for z in telekom)
     grund = telekom[0].seitengrund
     assert grund is not None
-    assert "keine Seite aus der Übersicht telekom" in grund
+    assert "0 Seiten aus den Übersichten (telekom.json: keine Ergebnisdatei" in grund
     assert laufstatus([], grund) == ("nicht_gelesen", grund)
 
 

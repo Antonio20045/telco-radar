@@ -316,6 +316,7 @@ def fahre(
         "seiten": seiten,
         "uebersichten": uebersichten,
         "ueberfaellig": faellig,
+        "seitengrund": ziel.seitengrund,
     }
     log.info(
         "Klick-Tageslauf %s: %s %s, %d Seiten, %d überfällig",
