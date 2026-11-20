@@ -43,11 +43,10 @@ def _anzeige_je_spalte(chromium, basis, breite, hoehe):
         seite.goto(f"{basis}/geraete.html")
         tabelle = seite.locator("#gr-katalogtabelle")
         assert tabelle.count() == 1
-        # Standardansicht beim Laden ist die TCO-Ansicht (app.js).
-        assert "gr-katalog--tco" in (tabelle.get_attribute("class") or "")
-        monat = tabelle.locator(
-            'tbody>tr.gr-a-zeile>td[data-k="Ø €/Monat"]'
-        ).first
+        assert "gr-katalog--tco" in (tabelle.get_attribute("class") or ""), (
+            "Standardansicht beim Laden ist die TCO-Ansicht (app.js)"
+        )
+        monat = tabelle.locator('tbody>tr.gr-a-zeile>td[data-k="Ø €/Monat"]').first
         stufe = tabelle.locator('tbody>tr.gr-a-zeile>td[data-k="Stufe"]').first
         assert monat.count() == 1
         assert stufe.count() == 1

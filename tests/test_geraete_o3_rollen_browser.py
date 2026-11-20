@@ -661,10 +661,6 @@ _KATALOG_MESSEN = """() => {
   };
 }"""
 
-# RUHIG-RUNDE3-1119-R4 (20.11.2026): "Ø €/Monat" und "Stufe" bleiben am
-# Telefon in der TCO-Karte absichtlich ausgeblendet (title der Preis-
-# Zelle traegt den Wert stattdessen) - die uebrigen gr-sp--tco-Zellen
-# (Kosten über … Monate, Unterschied zu Vodafone) bleiben Block.
 _AM_TELEFON_VERSTECKT = {"Ø €/Monat", "Stufe"}
 
 
@@ -674,7 +670,12 @@ def test_der_katalog_steht_am_telefon_als_karten(ctx):
     Rollbehälter. Jetzt stapelt jede sichtbare Modellzeile ihre Zellen:
     nichts ragt über den Behälter, der Umschalter tauscht die Zellen der
     Ansicht, jede Zelle nennt ihre Spalte. Gegenprobe am Schirm: dort
-    bleibt die Tabelle eine Tabelle."""
+    bleibt die Tabelle eine Tabelle.
+
+    RUHIG-RUNDE3-1119-R4 (20.11.2026): „Ø €/Monat“ und „Stufe“ bleiben am Telefon
+    in der TCO-Karte absichtlich ausgeblendet (``_AM_TELEFON_VERSTECKT``; der title
+    der Preiszelle trägt den Wert), die übrigen gr-sp--tco-Zellen (Kosten über …
+    Monate, Unterschied zu Vodafone) bleiben Block."""
     _site, wurzel, browser = ctx
     s = browser.new_page(viewport={"width": 390, "height": 844})
     try:
@@ -713,9 +714,9 @@ def test_der_katalog_steht_am_telefon_als_karten(ctx):
         s.wait_for_timeout(300)
         m = s.evaluate(_KATALOG_MESSEN)
         an = [z for z in m["zeilen"] if z["an"]]
-        assert an and all(
-            c["display"] == "table-cell" for z in an for c in z["tco"]
-        ), an
+        assert an and all(c["display"] == "table-cell" for z in an for c in z["tco"]), (
+            an
+        )
     finally:
         s.close()
 
