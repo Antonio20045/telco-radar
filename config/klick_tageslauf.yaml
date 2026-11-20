@@ -1676,8 +1676,10 @@ anbieter:
     # Tarifdetail-Seiten je Tarif mit Smartphone (Einstiege `kind: klick` in
     # config/geraete_quellen.yaml, wörtlich die data-iframe-Adressen der
     # Tarifübersichten vom 29.09.2026, ohne Unlimited XS „Ohne Handy“). Gelesen
-    # wird nur der Anschlusspreis je Tarif-Slug (`einsundeins.anschluss_saetze`);
-    # er kommt auf jeden Produktseiten-Satz mit demselben Tarif (Pitch 2, Schnitt 3).
+    # wird nur der Anschlusspreis je Tarif-Slug und Tarifname
+    # (`klickanschluss.anschluss_saetze`); er kommt auf jeden Produktseiten-Satz mit
+    # demselben Tarif (Pitch 2, Schnitt 3; seit 20.11.2026 über den Namen der Kachel,
+    # Unlimited XL heißt dort `…-xl-mvl`, hier `…-xl-ovl`).
     uebersichten:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
@@ -1686,124 +1688,24 @@ anbieter:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
-      # Danach die sieben Geräteraster (Pitch 2, Schnitt 4; `klickraster`): je Tarif
-      # alle Geräte an der vorausgewählten Speichergröße. Nach den Detailseiten: deren
-      # Anschluss tragen seit Schnitt 3 auch die Produktseiten-Sätze, er bleibt vorn. Das
-      # Raster All-Net-Flat S zuerst, denn ohne es ist keine Größe gemessen und kein
-      # anderes Raster wird Rohsatz. Seine Sätze selbst werden keine Rohsätze.
-      - https://mobile.1und1.de/smartphones-all-net-flat-s
-      - https://mobile.1und1.de/smartphones-all-net-flat-m
-      - https://mobile.1und1.de/smartphones-all-net-flat-l
-      - https://mobile.1und1.de/smartphones-unlimited-s
-      - https://mobile.1und1.de/smartphones-unlimited-m
-      - https://mobile.1und1.de/smartphones-unlimited-l
-      - https://mobile.1und1.de/smartphones-unlimited-xl
-    seiten:
-      - geraet: apple-iphone-17-pro
-        speicher_gb: 256
-        url: https://mobile.1und1.de/iphone-17-pro
-      - geraet: samsung-galaxy-s26
-        speicher_gb: 256
-        url: https://mobile.1und1.de/samsung-galaxy-s26
-      - geraet: apple-iphone-17
-        speicher_gb: 256
-        url: https://mobile.1und1.de/iphone-17
-      - geraet: apple-iphone-17-pro-max
-        speicher_gb: 256
-        url: https://mobile.1und1.de/iphone-17-pro-max
-      - geraet: samsung-galaxy-s26-ultra
-        speicher_gb: 256
-        url: https://mobile.1und1.de/samsung-galaxy-s26-ultra
-      - geraet: google-pixel-11
-        speicher_gb: 256
-        url: https://mobile.1und1.de/google-pixel-11
-      # Ab hier alle übrigen Geräte, die 1&1 am 09.10.2026 auf der Übersicht
-      # https://mobile.1und1.de/smartphones führt und die im Katalog stehen (Klick-
-      # Erkundung 09.10.2026, Zweig klick-erkundung,
-      # erkundung/1und1raster/2026-10-09/bedienelemente-1.json). Adressen wörtlich aus
-      # data/state/geraete_db.json. Ohne speicher_gb: die Karte klickt jede Speichergröße.
-      # `modell` nur, wo 1&1 das Gerät anders nennt als der Katalog (aria-label
-      # „Speicherauswahl <Name>“ ist der Kanarienwert).
-      # HONOR 600 bis Xiaomi REDMI 17C (am Ende) seit Antonios Katalogentscheidung
-      # vom 10.10.2026; Adressen wörtlich aus den Rasterkacheln vom 09.10.2026.
-      - geraet: fairphone-6
-        modell: "Fairphone (Gen. 6)"
-        url: https://mobile.1und1.de/fairphone-6
-      - geraet: google-pixel-10a
-        url: https://mobile.1und1.de/google-pixel-10a
-      - geraet: google-pixel-11-pro
-        url: https://mobile.1und1.de/google-pixel-11-pro
-      - geraet: google-pixel-11-pro-fold
-        url: https://mobile.1und1.de/google-pixel-11-pro-fold
-      - geraet: google-pixel-11-pro-xl
-        url: https://mobile.1und1.de/google-pixel-11-pro-xl
-      - geraet: apple-iphone-16
-        url: https://mobile.1und1.de/iphone-16
-      - geraet: apple-iphone-16-plus
-        url: https://mobile.1und1.de/iphone-16-plus
-      - geraet: apple-iphone-16e
-        url: https://mobile.1und1.de/iphone-16e
-      - geraet: apple-iphone-17e
-        url: https://mobile.1und1.de/iphone-17e
-      - geraet: apple-iphone-18-pro
-        url: https://mobile.1und1.de/iphone-18-pro
-      - geraet: apple-iphone-18-pro-max
-        url: https://mobile.1und1.de/iphone-18-pro-max
-      - geraet: apple-iphone-air
-        url: https://mobile.1und1.de/iphone-air
-      - geraet: nothing-phone-3
-        url: https://mobile.1und1.de/nothing-phone-3
-      - geraet: nothing-phone-4a-pro
-        url: https://mobile.1und1.de/nothing-phone-4a-pro
-      - geraet: samsung-galaxy-a17
-        url: https://mobile.1und1.de/samsung-galaxy-a17-5g
-      - geraet: samsung-galaxy-a27
-        url: https://mobile.1und1.de/samsung-galaxy-a27-5g
-      - geraet: samsung-galaxy-a57
-        url: https://mobile.1und1.de/samsung-galaxy-a57
-      - geraet: samsung-galaxy-s26-fe
-        url: https://mobile.1und1.de/samsung-galaxy-s26-fe
-      - geraet: samsung-galaxy-s26-plus
-        modell: "Samsung Galaxy S26+"
-        url: https://mobile.1und1.de/samsung-galaxy-s26-plus
-      - geraet: samsung-galaxy-z-flip8
-        url: https://mobile.1und1.de/samsung-galaxy-z-flip8
-      - geraet: samsung-galaxy-z-fold8
-        url: https://mobile.1und1.de/samsung-galaxy-z-fold8
-      - geraet: samsung-galaxy-z-fold8-ultra
-        url: https://mobile.1und1.de/samsung-galaxy-z-fold8-ultra
-      - geraet: xiaomi-17
-        url: https://mobile.1und1.de/xiaomi-17
-      - geraet: xiaomi-17-ultra
-        url: https://mobile.1und1.de/xiaomi-17-ultra
-      - geraet: xiaomi-17t
-        url: https://mobile.1und1.de/xiaomi-17t
-      - geraet: xiaomi-17t-pro
-        url: https://mobile.1und1.de/xiaomi-17t-pro
-      - geraet: xiaomi-redmi-note-17
-        modell: "Xiaomi REDMI Note 17 5G"
-        url: https://mobile.1und1.de/xiaomi-redmi-note-17-5g
-      - geraet: xiaomi-redmi-note-17-pro
-        modell: "Xiaomi REDMI Note 17 Pro 5G"
-        url: https://mobile.1und1.de/xiaomi-redmi-note-17-pro-5g
-      - geraet: xiaomi-redmi-note-17-pro-max
-        modell: "Xiaomi REDMI Note 17 Pro Max 5G"
-        url: https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g
-      - geraet: honor-600
-        url: https://mobile.1und1.de/honor-600
-      - geraet: honor-magic-v6
-        url: https://mobile.1und1.de/honor-magic-v6
-      - geraet: honor-magic8-lite
-        url: https://mobile.1und1.de/honor-magic8-lite
-      - geraet: motorola-moto-g77
-        url: https://mobile.1und1.de/motorola-moto-g77
-      - geraet: motorola-razr-70
-        url: https://mobile.1und1.de/motorola-razr-70
-      - geraet: samsung-galaxy-s25-edge
-        url: https://mobile.1und1.de/samsung-galaxy-s25-edge
-      - geraet: xiaomi-redmi-17c
-        modell: "Xiaomi REDMI 17C"
-        url: https://mobile.1und1.de/xiaomi-redmi-17c-5g
+      # Die Geräteübersicht: je Kachel der Produktlink (`klickraster.liste_saetze`),
+      # daraus die Seiten beider 1&1-Einträge (`seiten_aus_uebersicht`, ab dem Lauf
+      # danach). Die sieben Geräteraster (smartphones-all-net-flat-s …) stehen seit
+      # 20.11.2026 nicht mehr hier: sie lesen sich seit dem Shop-Umbau nicht mehr, und
+      # jede Produktseite liest alle sieben Tarife selbst (Tarifauswahl im Bestellweg).
+      - https://mobile.1und1.de/smartphones
+    # Seiten (seit 20.11.2026) aus den Kacheln der Geräteübersicht des letzten
+    # abgelegten Laufs (data/state/klick/1und1.json, `klickliste_kacheln`): je Gerät
+    # der Produktlink wörtlich, neue Modelle kommen ohne Handarbeit (Xiaomi 18 Pro).
+    # Fehlt die Übersicht, gilt ihr Vorrat (7 Tage), ohne jede Kachel die Seiten des
+    # letzten Laufs. Zwei Einträge (je ein Matrix-Job): 41 Seiten × 88–133 s
+    # (Lokallauf 20.11.2026) sind bis 91 min; geteilt je ~45 min, Luft für Ausreißer.
+    seiten_aus_uebersicht: 1und1
+
+  - schluessel: 1und1-2
+    name: 1&1
+    karte: 1und1
+    seiten_aus_uebersicht: 1und1
 
   # Telekom alle fünf Tarife (Antonio 11.10.2026: alles, immer). Eine Produktseite zeigt
   # einen Tarif (tariffId), also je Gerät und Tarif eine Seite. Die Seiten stehen nicht

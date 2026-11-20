@@ -41,7 +41,9 @@ FIX = WURZEL / "tests" / "fixtures" / "geraete"
 KARTEN = WURZEL / "config" / "klickkarten"
 O2_KARTE = lade_klickkarte(KARTEN / "o2.yaml")
 TELEKOM_KARTE = lade_klickkarte(KARTEN / "telekom.yaml")
-EINSUNDEINS_KARTE = lade_klickkarte(KARTEN / "1und1.yaml")
+EINSUNDEINS_KARTE = lade_klickkarte(
+    WURZEL / "tests" / "fixtures" / "klickcrawler" / "einsundeins_karte_20261009.yaml"
+)
 O2_SEITE = Seitenziel(
     "apple-iphone-17-pro",
     256,

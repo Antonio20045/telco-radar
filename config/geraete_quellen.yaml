@@ -851,7 +851,11 @@ anbieter:
 
   - name: 1&1
     typ: netzbetreiber
-    erfassung: adapter+klick
+    erfassung: klick
+    grund: >-
+      Preise misst seit 20.11.2026 nur der Klick-Lauf (Tarifauswahl im
+      Bestellweg, alle Tarife je Speicher und Laufzeit); der Gerätelauf ruft
+      1&1 nicht ab.
     gruppe: United Internet
     rang: 4
     methode: einsundeins_buendel
@@ -917,7 +921,14 @@ anbieter:
       /xml/, /static/, /modules/ sowie einzelne Aktions- und
       Bestellstrecken. /smartphones und die Produktseiten sind frei, der
       Parameter ?chosenTariff= ist ausdrücklich erlaubt.
-      SEIT 20.11.2026 NUR GEMESSEN: die Geräteseite trägt je Variante
+      SEIT 20.11.2026 NUR NOCH KLICK (zweiter Shop-Umbau desselben Tages):
+      der Klick-Lauf wählt je Gerät Speicher und Laufzeit ("24/36 Monate
+      Fix") auf der Produktseite, klickt einmal "Weiter zur Tarifauswahl"
+      und liest auf der Tarifauswahl je Tarif Geräterate und Tarifpreis
+      (data-tariff-price-hint, gegen den sichtbaren Text geprüft). Alle
+      sieben Tarife, kein Kundendatum, keine Bestellung. Der Abschnitt
+      darunter beschreibt den Adapterweg bis dahin.
+      BIS 20.11.2026 NUR GEMESSEN: die Geräteseite trägt je Variante
       "24 Monate Fix" und "36 Monate Fix" (hwdVariantsHardwarePrices), beide
       werden je Speichergröße gelesen. Sie trägt nur EINEN Tarif
       (All-Net-Flat S); die übrigen Tarife wählt der Kunde erst im
@@ -930,10 +941,11 @@ anbieter:
       config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson) -
       dort trägt derselbe Anbieter seine eigene Marke, hier trägt das
       Gerät die des Herstellers.
+    # Kein Einstieg des Gerätelaufs mehr (seit 20.11.2026): Preise misst nur der
+    # Klick-Lauf (config/klickkarten/1und1.yaml, Tarifauswahl im Bestellweg), je Gerät
+    # alle Tarife × Speicher × 24/36 Monate Fix. Der Adapter las nur noch All-Net-Flat
+    # S; sein Bündelweg ist entfernt (ein Weg je Anbieter).
     einstiege:
-      - url: https://mobile.1und1.de/smartphones
-        label: Smartphones
-        kind: static
       # Tarifdetail-Seiten (kind klick: nur der Klick-Tageslauf liest sie, als
       # `uebersichten` in config/klick_tageslauf.yaml; der Gerätelauf ruft sie
       # nicht ab). Jede Adresse steht wörtlich als data-iframe auf den
@@ -962,31 +974,10 @@ anbieter:
       - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
         label: Tarifdetails Unlimited XL
         kind: klick
-      # Geräteraster je Tarif (kind klick, Pitch 2 Schnitt 4): je Gerät eine Kachel mit
-      # Monatspreis inklusive Tarif (36 Monate), gelesen von `klickraster`. Adressen
-      # wörtlich als targetpage der Tarifübersichten vom 29.09.2026 (Fixtures
-      # einsundeins_tarifuebersicht_*); der Gerätelauf ruft sie seit 20.11.2026
-      # nicht mehr ab (Tarifstufen werden nicht mehr hergeleitet).
-      - url: https://mobile.1und1.de/smartphones-all-net-flat-s
-        label: Geräteraster All-Net-Flat S
-        kind: klick
-      - url: https://mobile.1und1.de/smartphones-all-net-flat-m
-        label: Geräteraster All-Net-Flat M
-        kind: klick
-      - url: https://mobile.1und1.de/smartphones-all-net-flat-l
-        label: Geräteraster All-Net-Flat L
-        kind: klick
-      - url: https://mobile.1und1.de/smartphones-unlimited-s
-        label: Geräteraster Unlimited S
-        kind: klick
-      - url: https://mobile.1und1.de/smartphones-unlimited-m
-        label: Geräteraster Unlimited M
-        kind: klick
-      - url: https://mobile.1und1.de/smartphones-unlimited-l
-        label: Geräteraster Unlimited L
-        kind: klick
-      - url: https://mobile.1und1.de/smartphones-unlimited-xl
-        label: Geräteraster Unlimited XL
+      # Geräteübersicht (kind klick): nur der Klick-Tageslauf liest sie, je Kachel der
+      # Produktlink als Seite des Klick-Laufs (seit 20.11.2026).
+      - url: https://mobile.1und1.de/smartphones
+        label: Smartphone-Übersicht
         kind: klick
 
   # ===================================================== DISCOUNT & ZWEITMARKEN

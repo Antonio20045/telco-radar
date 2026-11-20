@@ -25,7 +25,8 @@ Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
 Statt ``seiten`` darf ein Eintrag ``seiten_aus_uebersicht: <schluessel>`` tragen: seine
 Seiten kommen dann aus den Kacheln der Übersichten in der Ergebnisdatei dieses
 Schlüssels (``klickliste_kacheln``), reihum verteilt auf alle Einträge mit derselben
-Quelle. Ohne gelesene Kachel bleibt die Seitenliste leer und ``seitengrund`` nennt den
+Quelle. Ohne jede Kachel gelten die Produktseiten, die die Ergebnisdatei selbst
+besucht hat; fehlen auch sie, bleibt die Seitenliste leer und ``seitengrund`` nennt den
 Grund; dann leitet ``klickliste_auto`` die Seiten dieses Anbieters ab, sonst nicht.
 Fehlt eine Übersicht oder kommt sie aus dem Vorrat, nennt ``seitengrund`` das auch.
 """

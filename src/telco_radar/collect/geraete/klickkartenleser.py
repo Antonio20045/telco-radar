@@ -264,7 +264,11 @@ class Kartenleser:
         )
 
     def weiter(
-        self, roh: object, knoepfe: Mapping[str, Knopf], textlesung: Textlesung
+        self,
+        roh: object,
+        knoepfe: Mapping[str, Knopf],
+        textlesung: Textlesung,
+        eigene_quelle: bool = False,
     ) -> Weiterschritt | None:
         """Der Klick in die Bestellstrecke und die Dimension der Folgeseite."""
         if roh is None:
@@ -285,15 +289,17 @@ class Kartenleser:
                 raise self.fehler(ort, GRUND_KLICKEN_KNOPF)
             self._ohne_zweiten_klick(textlesung)
         else:
-            self._kacheln(knopf, ort, textlesung)
+            self._kacheln(knopf, ort, textlesung, eigene_quelle)
         return Weiterschritt(
             selektor=self.text(daten, "selektor", feld),
             text=self.text(daten, "text", feld),
             **{art: dimension},
         )
 
-    def _kacheln(self, knopf: Knopf, ort: str, textlesung: Textlesung) -> None:
-        """Kacheln: Selektor ohne Marke, Bereich gleich den Kacheln, Muster darin."""
+    def _kacheln(
+        self, knopf: Knopf, ort: str, textlesung: Textlesung, eigene: bool
+    ) -> None:
+        """Kacheln ohne Marke, Bereich gleich Kacheln; ``eigene``: Muster auch außen."""
         if knopf.selektor is None:
             raise self.fehler(ort, GRUND_KACHEL_KNOPF)
         if knopf.marke is not None:
@@ -301,9 +307,9 @@ class Kartenleser:
         if textlesung.selektoren != (knopf.selektor,):
             raise self.fehler("zusammenfassung.selektor", GRUND_KACHEL_BEREICH)
         self._ohne_zweiten_klick(textlesung)
-        eigene = [f for f, m in textlesung.muster.items() if m.selektor is not None]
-        if eigene:
-            ort = f"zusammenfassung.muster.{eigene[0]}"
+        ausser = [f for f, m in textlesung.muster.items() if m.selektor is not None]
+        if ausser and not eigene:
+            ort = f"zusammenfassung.muster.{ausser[0]}"
             raise self.fehler(ort, GRUND_KACHEL_MUSTER)
 
     def _ohne_zweiten_klick(self, textlesung: Textlesung) -> None:

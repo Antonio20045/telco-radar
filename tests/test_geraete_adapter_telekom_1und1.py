@@ -702,7 +702,8 @@ def test_einsundeins_landet_als_buendellistung_im_bestand(
     katalog, farben, ee_kategorie, ee_produkt
 ):
     """Der ganze Weg: Kachelernte, eine Produktseite, eine Buendellistung -
-    mit Tarif und Laufzeit, ohne Barpreis."""
+    mit Tarif und Laufzeit, ohne Barpreis. Seit 20.11.2026 ohne Bündelweg (nur
+    der Klick-Lauf misst 1&1): keine Seite gilt mehr als „ohne lesbare Bündel“."""
     anbieter = Anbieter(
         name="1&1",
         typ="netzbetreiber",
@@ -731,7 +732,8 @@ def test_einsundeins_landet_als_buendellistung_im_bestand(
         RobotsWaechter(hole=hole),
         datetime(2026, 9, 4, 3, tzinfo=UTC),
     )
-    assert bilanz.gedeckelt == ["41 Produktseiten ohne lesbare Buendel"]
+    assert bilanz.gedeckelt == []
+    assert bilanz.buendel == []
     treffer = [l for l in bilanz.listungen if l.quelle_url == _EE_PRODUKT]
     assert len(treffer) == 1
     assert treffer[0].preis_ohne_vertrag is None
@@ -742,7 +744,8 @@ def test_einsundeins_landet_als_buendellistung_im_bestand(
 
 def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
     """Beide Anbieter sind aktiv, tragen einen GEBAUTEN Adapter und
-    erklaeren sich weiterhin woertlich auf /geraete-quellen.html."""
+    erklaeren sich weiterhin woertlich auf /geraete-quellen.html. 1&1 liest
+    seit 20.11.2026 nur der Klick-Lauf: kein Einstieg des Geraetelaufs."""
     quellen = lade_quellen(_WURZEL)
     for name, methode in (
         ("Telekom", "telekom_kategorie"),
@@ -750,7 +753,7 @@ def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
     ):
         anbieter = quellen.nach_name(name)
         assert anbieter.aktiv is True, name
-        assert anbieter.crawlbar is True, name
+        assert anbieter.crawlbar is (name == "Telekom"), name
         assert anbieter.methode == methode, name
-        assert anbieter.grund == "", name
+        assert anbieter.grund == "" or "Klick-Lauf" in anbieter.grund, name
         assert "04.09.2026" in anbieter.hinweis, name

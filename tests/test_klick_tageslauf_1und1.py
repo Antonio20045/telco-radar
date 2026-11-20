@@ -1,10 +1,12 @@
-"""Klick-Tageslauf für 1&1: alle 35 Geräte der Übersicht, die im Katalog stehen, und
-die sieben Neugeräte aus Antonios Katalogentscheidung vom 10.10.2026.
+"""Klick-Tageslauf für 1&1: Seiten aus der Geräteübersicht (seit 20.11.2026).
 
-Jede Adresse steht wörtlich im Bestand (``geraete_db.json`` des Schnappschusses), die
-der Neugeräte wörtlich in den Rasterkacheln des Klick-Laufs vom 09.10.2026;
-``modell`` je Seite ersetzt den Katalognamen im Kanarienwert, wo 1&1 das Gerät
-anders nennt.
+Bis zum 20.11.2026 standen 42 Seiten von Hand in der Tagesdatei. Jetzt kommen sie aus
+den Kacheln der Geräteübersicht ``https://mobile.1und1.de/smartphones`` in der
+Ergebnisdatei des letzten Laufs (``klickliste_kacheln``), reihum auf die Einträge
+``1und1`` und ``1und1-2``. Die Fixture ``einsundeins_smartphones_20261120.html`` sind
+die 41 Kacheln dieses Tages; der Katalog des Schnappschusses kennt 39 davon (ohne
+Xiaomi 18 Pro/Pro Max). Der Kanarienwert ist der Modellname in der Schreibweise der
+Kachel (am 20.11.2026 an allen 41 Produktseiten gegen ``aria-label`` geprüft).
 """
 
 from __future__ import annotations
@@ -16,87 +18,79 @@ from urllib.parse import urlsplit
 
 import pytest
 import yaml
-from bestand_pfad import WURZEL, ZUSTAND, lese_wurzel
+from bestand_pfad import WURZEL, lese_wurzel, verlinke_neben_data
 
+from telco_radar.collect.geraete.klickraster import einsundeins_saetze
 from telco_radar.collect.geraete.klickziele import (
     TAGESDATEI,
     ErkundungszielFehler,
     lade_ziele,
 )
 
-ALTE_SEITEN = [
-    ("apple-iphone-17-pro", "https://mobile.1und1.de/iphone-17-pro"),
-    ("samsung-galaxy-s26", "https://mobile.1und1.de/samsung-galaxy-s26"),
-    ("apple-iphone-17", "https://mobile.1und1.de/iphone-17"),
-    ("apple-iphone-17-pro-max", "https://mobile.1und1.de/iphone-17-pro-max"),
-    ("samsung-galaxy-s26-ultra", "https://mobile.1und1.de/samsung-galaxy-s26-ultra"),
-    ("google-pixel-11", "https://mobile.1und1.de/google-pixel-11"),
-]
-NEUE_SEITEN = [
-    ("honor-600", "https://mobile.1und1.de/honor-600"),
-    ("honor-magic-v6", "https://mobile.1und1.de/honor-magic-v6"),
-    ("honor-magic8-lite", "https://mobile.1und1.de/honor-magic8-lite"),
-    ("motorola-moto-g77", "https://mobile.1und1.de/motorola-moto-g77"),
-    ("motorola-razr-70", "https://mobile.1und1.de/motorola-razr-70"),
-    ("samsung-galaxy-s25-edge", "https://mobile.1und1.de/samsung-galaxy-s25-edge"),
-    ("xiaomi-redmi-17c", "https://mobile.1und1.de/xiaomi-redmi-17c-5g"),
-]
-ANBIETERNAMEN = {
-    "fairphone-6": "Fairphone (Gen. 6)",
-    "samsung-galaxy-s26-plus": "Samsung Galaxy S26+",
-    "xiaomi-redmi-note-17": "Xiaomi REDMI Note 17 5G",
-    "xiaomi-redmi-note-17-pro": "Xiaomi REDMI Note 17 Pro 5G",
-    "xiaomi-redmi-note-17-pro-max": "Xiaomi REDMI Note 17 Pro Max 5G",
-    "xiaomi-redmi-17c": "Xiaomi REDMI 17C",
+UEBERSICHT = "https://mobile.1und1.de/smartphones"
+FIXTURE = WURZEL / "tests/fixtures/klickcrawler/einsundeins_smartphones_20261120.html"
+MODELLE = {
+    "apple-iphone-17-pro": "iPhone 17 Pro",
+    "fairphone-6": "(Gen. 6)",
+    "google-pixel-10a": "Pixel 10a",
+    "samsung-galaxy-s26-plus": "Galaxy S26+",
+    "xiaomi-redmi-17c": "REDMI 17C",
 }
 
 
+def _ziele(wurzel: Path) -> list:
+    return [z for z in lade_ziele(wurzel, TAGESDATEI, hoechste=None) if z.name == "1&1"]
+
+
 @pytest.fixture(scope="module")
-def einsundeins():
-    ziele = lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
-    return {z.schluessel: z for z in ziele}["1und1"]
-
-
-def _bestandsadressen() -> set[str]:
-    db = json.loads((ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))
-    return {
-        e.get("quelle_url")
-        for e in db["listungen"]
-        if isinstance(e, dict) and e.get("quelle_url")
+def mit_uebersicht(tmp_path_factory) -> list:
+    """Eine eigene Wurzel (``lese_wurzel`` ist geteilt und bleibt unverändert) mit dem
+    Auto-Katalog des Schnappschusses und der Ergebnisdatei der Übersicht."""
+    wurzel = tmp_path_factory.mktemp("wurzel")
+    shutil.copytree(lese_wurzel() / "data", wurzel / "data")
+    verlinke_neben_data(wurzel)
+    saetze = einsundeins_saetze(FIXTURE.read_text(encoding="utf-8"), UEBERSICHT)
+    daten = {
+        "anbieter": "1und1",
+        "name": "1&1",
+        "datum": "2026-11-20",
+        "seiten": [],
+        "uebersichten": [
+            {
+                "adresse": UEBERSICHT,
+                "status": "gelesen",
+                "vollstaendig": True,
+                "saetze": saetze,
+            }
+        ],
     }
+    ordner = wurzel / "data" / "state" / "klick"
+    ordner.mkdir(parents=True, exist_ok=True)
+    (ordner / "1und1.json").write_text(json.dumps(daten), encoding="utf-8")
+    return _ziele(wurzel)
 
 
-def _nicht_im_bestand(adressen: list[str]) -> list[str]:
-    bestand = _bestandsadressen()
-    return [a for a in adressen if a not in bestand]
+def test_seiten_aus_der_geraeteuebersicht_auf_zwei_eintraege(mit_uebersicht):
+    seiten = [s for z in mit_uebersicht for s in z.seiten]
 
-
-def test_1und1_liest_alle_35_geraete_der_uebersicht(einsundeins):
-    seiten = einsundeins.seiten
-
-    assert len(seiten) == 42
+    assert [z.schluessel for z in mit_uebersicht] == ["1und1", "1und1-2"]
+    assert [len(z.seiten) for z in mit_uebersicht] == [20, 19]
     assert {urlsplit(s.adresse).hostname for s in seiten} == {"mobile.1und1.de"}
-    assert len({s.geraet for s in seiten}) == 42
-    assert [(s.geraet, s.adresse) for s in seiten[-7:]] == NEUE_SEITEN
-    assert [(s.geraet, s.adresse) for s in seiten[:6]] == ALTE_SEITEN
-    assert all(s.speicher_gb == 256 for s in seiten[:6])
+    assert len({s.geraet for s in seiten}) == len(seiten) == 39
+    assert {z.seitengrund for z in mit_uebersicht} == {None}
 
 
-def test_jede_1und1_adresse_steht_woertlich_im_bestand(einsundeins):
-    neu = {a for _, a in NEUE_SEITEN}
-    adressen = [s.adresse for s in einsundeins.seiten if s.adresse not in neu]
-    erfunden = "https://mobile.1und1.de/iphone-99-pro"
+def test_modellname_der_kachel_ist_der_kanarienwert(mit_uebersicht):
+    modelle = {s.geraet: s.modell for z in mit_uebersicht for s in z.seiten}
 
-    assert _nicht_im_bestand(adressen) == []
-    assert _nicht_im_bestand([*adressen, erfunden]) == [erfunden]
+    assert {g: modelle[g] for g in MODELLE} == MODELLE
 
 
-def test_anbietername_ersetzt_den_katalognamen_im_kanarienwert(einsundeins):
-    modelle = {s.geraet: s.modell for s in einsundeins.seiten}
+def test_gegenprobe_ohne_ergebnisdatei_keine_seite_mit_grund():
+    ziele = _ziele(lese_wurzel())
 
-    assert {g: modelle[g] for g in ANBIETERNAMEN} == ANBIETERNAMEN
-    assert modelle["apple-iphone-17-pro"] == "iPhone 17 Pro"
-    assert modelle["google-pixel-10a"] == "Pixel 10a"
+    assert [len(z.seiten) for z in ziele] == [0, 0]
+    assert all("keine Ergebnisdatei" in (z.seitengrund or "") for z in ziele)
 
 
 @pytest.fixture

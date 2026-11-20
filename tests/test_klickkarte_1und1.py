@@ -12,7 +12,10 @@ Dateien in ``tests/fixtures/geraete/_herkunft.json``. Die Kachel 24 bestätigt d
 Globale nie (sie nennt 36); seit dem 08.10.2026 bestätigt die Kachel sich selbst
 (``klickkachel``): Label und Betrag in derselben Kachel, 59,99 € ohne Einmalzahlung;
 die Einmalzahlung kommt nie aus dem Kacheltext, auch wenn er eine nennt (24+12: 360 €).
-Gegenproben: ein anderes Label, keines oder mehr als eines (beide Labels der Erkundung
+Die Karte ist die bis zum Shop-Umbau vom 20.11.2026
+(``fixtures/klickcrawler/einsundeins_karte_20261009.yaml``); die heutige prüft
+``test_klickkarte_1und1_tarifauswahl.py``. Gegenproben: ein anderes Label, keines
+oder mehr als eines (beide Labels der Erkundung
 in einer Kachel) ist Befund, die Kachel 24+12 bleibt beim
 Echo gegen die Globale (eine fremde Kachel ist dort Befund), 512 GB liest seinen
 eigenen Betrag, nie den eines Zubehör-Bündels, und eine Farbe, die es nicht gibt,
@@ -44,11 +47,12 @@ from telco_radar.collect.geraete.klickkachel import (
     kacheldimension,
     kachelpfade,
 )
-from telco_radar.collect.geraete.klickkartenprobe import GELADEN, lade_karte
+from telco_radar.collect.geraete.klickkarte import lade_klickkarte
 from telco_radar.collect.geraete.klickstrecke import KAUFWORT
 from telco_radar.collect.geraete.klicktext import Buendelwerte, Preiswerte
 
-KARTEN = Path(__file__).resolve().parents[1] / "config" / "klickkarten"
+ALTE_KARTE = Path(__file__).parent / "fixtures" / "klickcrawler"
+ALTE_KARTE = ALTE_KARTE / "einsundeins_karte_20261009.yaml"
 FIXTURES = Path(__file__).parent / "fixtures" / "geraete"
 SEITE = FIXTURES / "einsundeins_produktseite_iphone_17_pro.html.gz"
 BESTELLWEG = FIXTURES / "einsundeins_bestellweg_laufzeit_20261007.json"
@@ -66,9 +70,7 @@ PLATZ = {"speicher": "256", "tarif": "tariff-anf-s-mvl", "farbe": "COSMIC_ORANGE
 
 @pytest.fixture(scope="module")
 def karte():
-    lage = lade_karte(KARTEN, "1und1")
-    assert (lage.status, lage.grund) == (GELADEN, None)
-    return lage.karte
+    return lade_klickkarte(ALTE_KARTE)
 
 
 @pytest.fixture(scope="module")
