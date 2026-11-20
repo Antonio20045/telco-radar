@@ -22,7 +22,7 @@ from datetime import UTC, datetime
 from urllib.parse import urlsplit
 
 import pytest
-from bestand_pfad import lese_wurzel
+from bestand_pfad import kachel_wurzel
 from klickergebnisse import WURZEL
 from klickserver import Antwort, html, klickserver
 
@@ -205,7 +205,7 @@ def test_langsames_skript_haelt_das_lesen_nicht_auf(chromium, karte, roh):
 
 
 def test_tagesdatei_nennt_alle_fuenf_tarife_wortlich():
-    ziele = lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
+    ziele = lade_ziele(kachel_wurzel(), TAGESDATEI, hoechste=None)
     telekom = next(z for z in ziele if z.schluessel == "telekom")
     basis = "https://www.telekom.de/shop/geraete/smartphones?tariffId="
     assert telekom.uebersichten == tuple(basis + t for t in TARIFE)
@@ -219,7 +219,7 @@ class _Uhr:
 
 
 def test_gestoerte_folgeseite_haelt_den_anbieter_an(karte):
-    ziele = lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
+    ziele = lade_ziele(kachel_wurzel(), TAGESDATEI, hoechste=None)
     telekom = next(z for z in ziele if z.schluessel == "telekom")
     telekom = dataclasses.replace(telekom, uebersichten=telekom.uebersichten[:1])
     adresse = telekom.uebersichten[0]

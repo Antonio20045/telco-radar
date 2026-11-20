@@ -50,3 +50,23 @@ def lese_wurzel() -> Path:
     shutil.copy2(ZUSTAND / AUTO_KATALOG, ziel / "data" / "state" / AUTO_KATALOG)
     verlinke_neben_data(ziel)
     return ziel
+
+
+KACHELN = (
+    WURZEL / "tests" / "fixtures" / "klickliste" / "telekom_uebersichten_20261120.json"
+)
+"""Die fünf Telekom-Übersichten des Klick-Laufs vom 20.11.2026 (nur Titel, Speicher,
+Produktlink): Quelle der Telekom-Seiten (``klickliste_kacheln``)."""
+
+
+@functools.cache
+def kachel_wurzel() -> Path:
+    """Wie ``lese_wurzel``, dazu ``data/state/klick/telekom.json`` aus ``KACHELN``:
+    die Telekom-Einträge der Tagesdatei bekommen daraus ihre Seiten."""
+    ziel = Path(tempfile.mkdtemp(prefix="kacheln-"))
+    atexit.register(shutil.rmtree, ziel, ignore_errors=True)
+    (ziel / "data" / "state" / "klick").mkdir(parents=True)
+    shutil.copy2(ZUSTAND / AUTO_KATALOG, ziel / "data" / "state" / AUTO_KATALOG)
+    shutil.copy2(KACHELN, ziel / "data" / "state" / "klick" / "telekom.json")
+    verlinke_neben_data(ziel)
+    return ziel

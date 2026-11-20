@@ -12,7 +12,13 @@ from __future__ import annotations
 
 from ..collect.geraete.klickergebnis import GELESENE_SEITEN
 from ..collect.geraete.klicklauf import ERFASST, LAUF_GELESEN, NICHT_ANGEBOTEN
-from ..collect.geraete.klickrohsatz import Klickausbeute, ausbeute, speicher_gb
+from ..collect.geraete.klickrohsatz import (
+    ZUSTAND_NEU,
+    Klickausbeute,
+    ausbeute,
+    seite_zustand,
+    speicher_gb,
+)
 from ..geraete_model import Katalog
 from .klick_erfassung import GESPERRT, OFFEN
 
@@ -36,13 +42,15 @@ def ausbeute_der_seiten(
 
 
 def speicher_seite(seiten: list[dict]) -> dict[str, dict[str, list[int]]]:
-    """Je Gerät die Speicher, die eine gelesene Seite gesperrt zeigt
+    """Je Gerät die Speicher, die eine gelesene Seite mit Neuware gesperrt zeigt
     (``nicht_angeboten``, Schlüssel ``GESPERRT``), und die, die sie weder so zeigte
     noch erfasste (``OFFEN``).
     Ohne offene Speicher belegt die Seite, dass sie nur die gelesenen anbietet."""
     je_geraet: dict[str, dict[str, set[int]]] = {}
     for seite in seiten:
         if seite.get("status") != LAUF_GELESEN or not seite.get("geraet"):
+            continue
+        if seite_zustand(seite) != ZUSTAND_NEU:
             continue
         ziel = je_geraet.setdefault(str(seite["geraet"]), {GESPERRT: set()})
         for k in seite.get("kombinationen") or []:

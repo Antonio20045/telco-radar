@@ -16,7 +16,7 @@ import re
 from dataclasses import replace
 
 import pytest
-from bestand_pfad import lese_wurzel
+from bestand_pfad import kachel_wurzel, lese_wurzel
 from klickergebnisse import O2_SEITE, WURZEL, erfasst, o2_lesung
 
 from telco_radar.analyze.klick_ablage import lege_ab
@@ -71,7 +71,7 @@ _SKRIPT = WURZEL / "scripts" / "klick_tageslauf.py"
 
 @pytest.fixture(scope="module")
 def ziele():
-    alle = lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
+    alle = lade_ziele(kachel_wurzel(), TAGESDATEI, hoechste=None)
     return {z.schluessel: z for z in alle}
 
 
@@ -166,7 +166,7 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
         assert karte.is_file()
     assert O2_SEITE.adresse in {s.adresse for s in ziele["o2"].seiten}
     telekom = _seiten_von(ziele, "Telekom")
-    assert len(telekom) == len(set(telekom)) == 324
+    assert len(telekom) == len(set(telekom)) == 238
     vodafone = _seiten_von(ziele, "Vodafone")
     assert len(vodafone) == len(set(vodafone)) == 42
     with pytest.raises(ErkundungszielFehler, match="höchstens 2"):
@@ -673,7 +673,8 @@ TARIFE = {"MF_17779", "MF_17785", "MF_17791", "MF_17797", "MF_17803"}
 def test_telekom_jedes_geraet_je_tarif_eine_seite(ziele):
     """Preisprüfung 11.10.2026: iPhone Air nur in M mit 12 und 24 Raten, weil die
     Telekom-Seite nur den Tarif ihrer Adresse zeigt und nur das 17 Pro alle fünf
-    Tarifseiten hatte. Jetzt je Gerät und Tarif genau eine Seite."""
+    Tarifseiten hatte. Jetzt je Gerät und Tarif genau eine Seite, seit 20.11.2026 aus
+    den Kacheln der fünf Übersichten (51 Geräte im Katalog, 40 in allen fünf)."""
     paare = [
         (s.geraet, re.search(r"tariffId=(MF_\d+)", s.adresse)[1])
         for z in ziele.values()
@@ -686,4 +687,5 @@ def test_telekom_jedes_geraet_je_tarif_eine_seite(ziele):
         je_geraet.setdefault(geraet, set()).add(tarif)
     for geraet in ("apple-iphone-air", "apple-iphone-17-pro", "samsung-galaxy-s26"):
         assert je_geraet[geraet] == TARIFE
-    assert sum(len(t) == 5 for t in je_geraet.values()) >= 50
+    assert len(je_geraet) == 51
+    assert sum(len(t) == 5 for t in je_geraet.values()) == 40

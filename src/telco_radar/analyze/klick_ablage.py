@@ -4,7 +4,10 @@ Der Workflow ``klick.yml`` lädt die Ergebnisdateien seiner Matrix-Jobs herunter
 ``lege_ab`` schreibt jede nach ``data/state/klick/<schluessel>.json``
 (``klickergebnis.ORDNER``), auch eine gestörte, leere oder ungelesene, damit der
 Gerätelauf ihren Zustand sieht. Fehlt das Ergebnis eines Anbieters, bleibt seine alte
-Datei liegen; der Gerätelauf nimmt nur eine Datei von heute als Messung.
+Datei liegen; der Gerätelauf nimmt nur eine Datei von heute als Messung. Eine Datei
+mit Übersichten bekommt an jeder nicht ganz gelesenen Übersicht den Kachelvorrat der
+bisher abgelegten (``klickliste_kacheln.fuehre_vorrat``): daraus kommen die
+Produktseiten des nächsten Laufs, statt still zu verschwinden.
 
 Den Lesestand ``STAND_DATEI`` führt die Ablage für jede Datei fort, gleich welcher
 Laufstatus: jede ganz gelesene Seite (``ROTATION_GELESEN``) bekommt das Datum der Datei.
@@ -18,6 +21,8 @@ Bestand (``klick_zusammenfuehrung``).
 
 from __future__ import annotations
 
+import json
+import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -31,7 +36,9 @@ from ..collect.geraete.klickergebnis import (
     schreibe,
 )
 from ..collect.geraete.klicklauf import LAUF_GESTOERT, STOERUNG_SEITE
+from ..collect.geraete.klickliste_kacheln import fuehre_vorrat
 
+log = logging.getLogger(__name__)
 SCHLUESSEL = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 """Anbieterschlüssel wie in ``config/klick_tageslauf.yaml``; zugleich der Dateiname."""
 
@@ -54,6 +61,18 @@ def _scheiterte_an_ihrer_form(seite: dict) -> bool:
     )
 
 
+def _alt(pfad: Path) -> dict | None:
+    """Die bisher abgelegte Datei; fehlt sie oder ist sie unlesbar, ``None`` (Log)."""
+    try:
+        daten = json.loads(pfad.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as fehler:
+        log.warning("Klick-Ablage: %s unlesbar, kein Kachelvorrat (%s)", pfad, fehler)
+        return None
+    return daten if isinstance(daten, dict) else None
+
+
 def lege_ab(ergebnisse: list[dict], ziel: Path) -> Ablage:
     """Schreibt die Ergebnisse nach ``ziel`` und den Lesestand daneben."""
     stand = lies_stand(ziel / STAND_DATEI)
@@ -64,7 +83,10 @@ def lege_ab(ergebnisse: list[dict], ziel: Path) -> Ablage:
         if not SCHLUESSEL.match(schluessel):
             ablage.abgelehnt.append(f"Anbieterschlüssel {schluessel!r} ungültig")
             continue
-        schreibe(ziel / f"{schluessel}.json", daten)
+        pfad = ziel / f"{schluessel}.json"
+        if daten.get("uebersichten"):
+            daten = fuehre_vorrat(daten, _alt(pfad))
+        schreibe(pfad, daten)
         ablage.abgelegt.append(schluessel)
         for seite in daten.get("seiten") or []:
             if seite.get("status") in ROTATION_GELESEN:

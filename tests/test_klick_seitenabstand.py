@@ -9,7 +9,7 @@ Netz. Jede Seite trägt in der Ergebnisdatei ``http_status`` und ``sperre``.
 from __future__ import annotations
 
 import pytest
-from bestand_pfad import lese_wurzel
+from bestand_pfad import kachel_wurzel
 from klickergebnisse import WURZEL
 
 from telco_radar.collect.geraete.klickkarte import lade_klickkarte
@@ -29,7 +29,7 @@ SEITE_S = 300.0
 
 @pytest.fixture(scope="module")
 def telekom():
-    alle = lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
+    alle = lade_ziele(kachel_wurzel(), TAGESDATEI, hoechste=None)
     return {z.schluessel: z for z in alle}["telekom"]
 
 
