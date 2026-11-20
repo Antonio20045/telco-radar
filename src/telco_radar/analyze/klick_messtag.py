@@ -17,6 +17,13 @@ belastbarere Zeuge -, sonst mit dem Bestandseintrag selbst.
 Die Preisgrenze gilt nur für ``ANBIETER_PREISGRENZE`` (Befund 13.11.2026 betraf nur
 congstar): bei jedem anderen Anbieter weicht eine ältere, frische Klick-Messung
 unverändert wie vor diesem Befund - unabhängig davon, ob sie widerspricht.
+
+Bei ``NUR_HEUTE`` (1&1, Befund 20.11.2026) hat nur eine Klick-Messung von heute
+Vorrang: 1&1 hat an diesem Tag Preismodell und Markup gewechselt ("24 Monate Fix",
+"36 Monate Fix" statt 24+12 mit Schlusszahlung), der Klick-Lauf ist seitdem gestört,
+und die Klick-Werte vom Vortag beschreiben das alte Angebot. Die heutige
+Adaptermessung trägt ihre eigene Gegenprobe gegen den sichtbaren Seitentext
+(``einsundeins.sichtbare_geraeteraten``).
 """
 
 from __future__ import annotations
@@ -36,6 +43,9 @@ Geraet = Callable[[str], tuple[str, int | None]]
 ANBIETER_PREISGRENZE = "congstar"
 """Nur bei diesem Anbieter weicht eine ältere, frische Klick-Messung dem heutigen
 Bündel nicht mehr unbedingt - sondern nur, wenn sie ihm widerspricht."""
+
+NUR_HEUTE = frozenset({"1&1"})
+"""Bei diesen Anbietern weicht ein heutiges Bündel nur einer Klick-Messung von heute."""
 
 
 @dataclass
@@ -58,7 +68,7 @@ def teile_nach_messtag(
     for satz in buendel:
         eintrag = nach_id(satz.id)
         alter = None if eintrag is None else klickalter(satz, eintrag, heute)
-        if eintrag is None or alter is None:
+        if eintrag is None or alter is None or (alter and satz.anbieter in NUR_HEUTE):
             teile.bleiben.append(satz)
             continue
         if alter == 0 or satz.anbieter != ANBIETER_PREISGRENZE:

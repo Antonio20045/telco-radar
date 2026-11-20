@@ -13,6 +13,9 @@ Stufen:
   1  bis 07.10.2026 (Zeilen ohne Feld)
   2  Vodafone ab 07.10.2026: Online-Aktionspreis des Tarifs als Preisphase,
      `tarif_monatlich` ist der Preis in Monat 1 (`collect/geraete/vodafone_aktion.py`)
+  2  1&1 ab 20.11.2026: "24 Monate Fix"/"36 Monate Fix" der Preiskarte statt 24+12
+     mit Schlusszahlung; 36 Monate tragen keine Schlusszahlung mehr
+     (`collect/geraete/einsundeins.py`)
 """
 
 from __future__ import annotations
@@ -24,7 +27,7 @@ from .tco_model import Buendel
 
 FELD = "rechenweise"
 ERSTE = 1
-JE_ANBIETER = {"vodafone": 2}
+JE_ANBIETER = {"vodafone": 2, "1-1": 2}
 BRUCH = "Rechenweise geändert"
 
 
