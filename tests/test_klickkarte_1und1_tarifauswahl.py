@@ -29,6 +29,7 @@ from bs4 import BeautifulSoup
 
 from telco_radar.collect.geraete.klickantwort import lies_antwort
 from telco_radar.collect.geraete.klickbeleg import pfadtext
+from telco_radar.collect.geraete.klickfarbe import sku_farbe
 from telco_radar.collect.geraete.klickkarte import (
     KlickkartenFehler,
     klickkarte_aus_daten,
@@ -39,6 +40,7 @@ from telco_radar.collect.geraete.klickquellen import Quellenleser
 from telco_radar.collect.geraete.klickrohsatz import ausbeute
 from telco_radar.collect.geraete.klicktextleser import Textleser
 from telco_radar.geraete_config import lade_katalog
+from telco_radar.tco_model import buendel_id
 
 WURZEL = Path(__file__).resolve().parents[1]
 KARTE = WURZEL / "config" / "klickkarten" / "1und1.yaml"
@@ -432,3 +434,79 @@ def test_einmalzahlung_null_wird_zuzahlung_null():
 
     assert (satz["geraet_zuzahlung"], satz["einmalzahlung"]) == (0.0, 0.0)
     assert ohne["geraet_zuzahlung"] is None
+
+
+FLEX = FIX / "einsundeins_tarifauswahl_flex_20261120.html"
+
+
+def test_gegenprobe_flex_kachel_ist_befund_mit_grund(karte, chromium):
+    """„24 + 12 Monate Flex“ trägt dieselbe Laufzeitzahl 24, aber ``flex: true``
+    (12 weitere Raten): keine Fix-Zeile, sondern Befund mit Grund."""
+    seite = chromium.new_page()
+    try:
+        seite.set_content(FLEX.read_text(encoding="utf-8"))
+        kachel = seite.locator(karte.textlesung.selektoren[0]).first
+        platz = {"speicher": "256", "tarif": TARIFE[0], "laufzeit": "24"}
+        gelesen = Quellenleser(seite, karte, None).lies(0, False, platz, kachel=kachel)
+    finally:
+        seite.close()
+    assert gelesen.lesung is None
+    assert gelesen.befund is not None
+    assert gelesen.befund.grund == "Kachel nennt flex = True, verlangt False"
+
+
+def test_fix_kachel_traegt_flex_false(karte, seite):
+    kachel = seite.locator(karte.textlesung.selektoren[0]).first
+    platz = {"speicher": "512", "tarif": TARIFE[0], "laufzeit": "24"}
+    gelesen = Quellenleser(seite, karte, None).lies(0, False, platz, kachel=kachel)
+
+    assert gelesen.befund is None
+    assert karte.antwort.gleich == {"flex": False}
+
+
+def _bestandszeile(geraet: str, speicher: str, zustand: str | None = None) -> dict:
+    daten = _daten(TARIFE[0], NAMEN[0], NAMEN[0])
+    seite = daten["seiten"][0]
+    seite["geraet"] = geraet
+    seite["adresse"] = f"https://mobile.1und1.de/{geraet.removeprefix('apple-')}"
+    if zustand is not None:
+        seite["zustand"] = zustand
+    kombination = seite["kombinationen"][0]
+    kombination["variante"]["speicher"] = speicher
+    return daten
+
+
+def test_klickzeile_traegt_die_bundle_id_des_bestands():
+    """Das Bündel iPhone 17 / 256 GB / All-Net-Flat S / 24 Monate steht im Bestand mit
+    der Farbe des Adapters (NEBELBLAU, erste Variante der Preiskarte, nicht die
+    vorgewählte LAVENDEL): ``buendel--1-1--apple-iphone-17-256gb-nebelblau--1-1-all-
+    net-flat-s--24m`` (data/state/geraete_tco.json, main c1738cfe). Die Klick-Zeile
+    schreibt dasselbe Bündel fort."""
+    katalog = lade_katalog(lese_wurzel())
+    (satz,) = ausbeute(_bestandszeile("apple-iphone-17", "256"), katalog).rohsaetze
+    neu = buendel_id(
+        satz["sku_id"], satz["anbieter"], satz["tarif_name"], satz["laufzeit_monate"]
+    )
+
+    assert satz["sku_id"] == "apple-iphone-17-256gb-nebelblau"
+    assert (
+        neu == "buendel--1-1--apple-iphone-17-256gb-nebelblau--1-1-all-net-flat-s--24m"
+    )
+
+
+def test_gegenprobe_ohne_bestandsfarbe_bleibt_ohne_farbe():
+    katalog = lade_katalog(lese_wurzel())
+    (satz,) = ausbeute(_bestandszeile("apple-iphone-17", "512"), katalog).rohsaetze
+    assert satz["sku_id"] == "apple-iphone-17-512gb-nebelblau"
+    assert sku_farbe("1&1", "apple-iphone-99", 256) is None
+    assert sku_farbe("Telekom", "apple-iphone-17", 256) is None
+
+
+def test_gegenprobe_erneuert_bekommt_keine_bestandsfarbe():
+    katalog = lade_katalog(lese_wurzel())
+    daten = _bestandszeile("apple-iphone-17", "256", "refurbished")
+    (satz,) = ausbeute(daten, katalog).rohsaetze
+    assert (
+        satz["sku_id"].endswith("ohne-farbe-refurbished")
+        or "nebelblau" not in (satz["sku_id"])
+    )

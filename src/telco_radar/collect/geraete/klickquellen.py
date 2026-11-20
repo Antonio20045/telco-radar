@@ -212,6 +212,11 @@ class Quellenleser:
         except (PlaywrightFehler, ValueError) as fehler:
             grund = f"Kachel {quelle.ort} nicht lesbar: {kurz(fehler)}"
             return None, Befund("antwort", grund)
+        for pfad, soll in quelle.gleich.items():
+            ist = am_pfad(daten, pfad, {})
+            if ist != soll or type(ist) is not type(soll):
+                grund = f"Kachel nennt {pfad} = {ist!r}, verlangt {soll!r}"
+                return None, Befund("antwort", grund)
         return Nutzlast(stelle, daten), None
 
     def _globale(

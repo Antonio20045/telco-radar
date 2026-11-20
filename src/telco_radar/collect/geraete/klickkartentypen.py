@@ -221,7 +221,8 @@ class Antwortmuster:
     Genau eines von ``url_muster`` (mitgeschnittene Antwort), ``skript`` (JSON im
     ersten Treffer des CSS-Selektors), ``globale`` (globale Variablen der Seite) und
     ``seitenwerte`` (die benannten Seitenwerte, Pfad ist ihr Name) und ``kachel`` (JSON
-    im Attribut ``attribut`` des ersten Treffers in der gelesenen Kachel).
+    im Attribut ``attribut`` des ersten Treffers in der gelesenen Kachel; ``gleich``:
+    Pfade, deren Wert die Kachel tragen muss, sonst Befund).
     ``laden``: die Antwort gilt für jede Kombination, nicht nur für den Klick, nach dem
     sie kam; ``start``: die Quelle gilt nur, bis die Seite zum ersten Mal geklickt
     wurde. ``erkennung`` wählt unter Antworten derselben Adresse die mit einem Wert an
@@ -245,6 +246,7 @@ class Antwortmuster:
     platzhalter: Mapping[str, str] = field(default_factory=dict)
     kachel: str | None = None
     attribut: str | None = None
+    gleich: Mapping[str, object] = field(default_factory=dict)
 
     def passt(self, url: str) -> bool:
         """Wahr, wenn ``url`` die mitzuschneidende Antwort ist."""

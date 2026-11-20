@@ -98,6 +98,13 @@
       "abgerufen_am": "2026-11-20",
       "bytes_roh": 15898,
       "sha256_roh": "a31afbd9a07274cd454d8863b9ffa04b8971f97ba986c2c213407cab14d21bd0"
+    },
+    {
+      "datei": "einsundeins_tarifauswahl_flex_20261120.html",
+      "quelle": "Ausschnitt (sichtbare Tarifboxen ohne Bilder und Leistungstexte, dazu die Preisleiste #pso) der Folgeseite /flow2/mobile/ssc-private/tariffselect nach „Weiter zur Tarifauswahl“ auf https://mobile.1und1.de/iphone-17 mit 256 GB und „24 + 12 Monate Flex“ (Gegenprobe: flex true), gerendert mit Playwright-Chromium ohne Tarnung, Kennung TelcoRadar/1.0; Warenkorb ohne Kundendaten, kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-20",
+      "bytes_roh": 35423,
+      "sha256_roh": "8b197a34333b80f005edc1fefa2074e5403f2ebac10258a25254449da703d4cd"
     }
   ]
 }

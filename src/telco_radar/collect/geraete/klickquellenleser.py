@@ -57,6 +57,7 @@ QUELLENARTEN = ("url_muster", "skript", "global", "seitenwerte", "kachel")
 QUELLENTEILE = (
     *QUELLENARTEN,
     "attribut",
+    "gleich",
     "laden",
     "start",
     "erkennung",
@@ -232,6 +233,13 @@ def _quelle(
     attribut = leser.wahlweise_text(daten, "attribut", feld)
     if (kachel is None) != (attribut is None):
         raise leser.fehler(f"{feld}.attribut", GRUND_NUR_KACHEL)
+    roh_gleich = daten.get("gleich") or {}
+    namen_gleich = tuple(roh_gleich) if isinstance(roh_gleich, Mapping) else ()
+    gleich = leser.zuordnung(roh_gleich, f"{feld}.gleich", namen_gleich)
+    if gleich and kachel is None:
+        raise leser.fehler(f"{feld}.gleich", GRUND_NUR_KACHEL)
+    for pfad in gleich:
+        _pruefe_pfad(leser, str(pfad), f"{feld}.gleich", namen)
     for nur in ("laden", "segment"):
         if url is None and daten.get(nur) is not None:
             raise leser.fehler(f"{feld}.{nur}", GRUND_NUR_URL)
@@ -258,6 +266,7 @@ def _quelle(
         platzhalter=platzhalter,
         kachel=kachel,
         attribut=attribut,
+        gleich=dict(gleich),
     )
 
 

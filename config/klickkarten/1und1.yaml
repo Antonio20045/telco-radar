@@ -145,6 +145,9 @@ zusammenfassung:
 antwort:
   kachel: 'input[name="tariff-plan"]'
   attribut: data-tariff-price-hint
+  # Nur „Fix“: dieselbe Laufzeitzahl trägt auch „+ 12 Monate Flex“ (flex: true, 12
+  # weitere Raten); eine Kachel mit flex ≠ false ist Befund mit Grund.
+  gleich: {flex: false}
   pfade:
     buendelbetrag: {pfad: hardwarePricePerMonth, summe: [tariffPricePerMonth]}
     # Einmalige Gerätezahlung = genannter Gerätegesamtpreis − Raten × Geräterate
