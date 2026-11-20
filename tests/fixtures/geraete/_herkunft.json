@@ -1084,6 +1084,106 @@
       "gzip": true,
       "bytes_roh": 379851,
       "sha256_roh": "5474ff5ffc192b28463c904f07e984176ba445a63d0fe475396ea535087a1005"
+    },
+    {
+      "datei": "einsundeins_produktseite_iphone_17_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/iphone-17",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-17. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 390979 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
+      "gzip": true,
+      "bytes_roh": 278852,
+      "sha256_roh": "9e9e17ff24aab802dd95d26e3263280b0a1b520a9a068448b2f8d7aa9e561de5"
+    },
+    {
+      "datei": "einsundeins_produktseite_iphone_17e_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/iphone-17e",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-17e. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 361347 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
+      "gzip": true,
+      "bytes_roh": 283509,
+      "sha256_roh": "6b8efd90cfe2e66adae8187b7fcbea859a5bcc84425f50b22a8f1f045de34214"
+    },
+    {
+      "datei": "einsundeins_produktseite_iphone_17_pro_max_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/iphone-17-pro-max",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-17-pro-max. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 408831 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
+      "gzip": true,
+      "bytes_roh": 280981,
+      "sha256_roh": "4781fac274cc225ada69b65de0f58abc8b87e97079a460439a1655b7486b98b9"
+    },
+    {
+      "datei": "einsundeins_produktseite_iphone_18_pro_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/iphone-18-pro",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-18-pro. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 830617 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
+      "gzip": true,
+      "bytes_roh": 339229,
+      "sha256_roh": "43f8b809a87a7f2faac18763c9954f74b4d0b1c59760a4de42722c9f2de63bd7"
+    },
+    {
+      "datei": "einsundeins_produktseite_iphone_18_pro_max_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/iphone-18-pro-max",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-18-pro-max. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 780972 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
+      "gzip": true,
+      "bytes_roh": 289997,
+      "sha256_roh": "f76f4157b515c76ee678749406c65ded71ab763b00706177593a133de76ed253"
+    },
+    {
+      "datei": "einsundeins_produktseite_iphone_duo_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/iphone-duo",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-duo. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 600615 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
+      "gzip": true,
+      "bytes_roh": 273310,
+      "sha256_roh": "a0c8256d0275c5a41da36af75aacf793729ef71ee8ecd62f07c60278af5f52ed"
+    },
+    {
+      "datei": "einsundeins_produktseite_galaxy_s26_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/samsung-galaxy-s26",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /samsung-galaxy-s26. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 409111 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
+      "gzip": true,
+      "bytes_roh": 296842,
+      "sha256_roh": "80b6d2fb3713a1ab59aa15cf884ad7e957f9625071a76c7d6dadd9350d3b40cf"
+    },
+    {
+      "datei": "einsundeins_tarifraster_all_net_flat_s_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/smartphones-all-net-flat-s",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt die Rasterseite. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt ab '<div class=\"hardware-container__items\" id=\"hardware-list\">' bis zum letzten '</form>' - dort stehen alle 41 Kacheln mit data-hardware-months=48; gemessene Vollantwort 593603 B, Ausschnitt unveraendert.",
+      "gzip": true,
+      "bytes_roh": 363921,
+      "sha256_roh": "e6688f9aab0bf0764c1e064eefd698c4893f00744c53c7e6f9aaf1e3f06be6de"
+    },
+    {
+      "datei": "einsundeins_tarifraster_all_net_flat_m_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/smartphones-all-net-flat-m",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt die Rasterseite. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt ab '<div class=\"hardware-container__items\" id=\"hardware-list\">' bis zum letzten '</form>' - dort stehen alle 41 Kacheln mit data-hardware-months=48; gemessene Vollantwort 592888 B, Ausschnitt unveraendert.",
+      "gzip": true,
+      "bytes_roh": 363921,
+      "sha256_roh": "6b875e478b707106dd17920b552d3b094252880104bbe89b0c2d0fc8edf90a44"
+    },
+    {
+      "datei": "einsundeins_tarifuebersicht_all_net_flat_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/all-net-flat-vergleich",
+      "abgerufen_am": "2026-11-20",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /all-net-flat-vergleich. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt, der alle 'targetpage'-Links der sieben Geraeteraster und die 'Tarifdetails'-Anker traegt; gemessene Vollantwort 479784 B, Ausschnitt unveraendert.",
+      "gzip": true,
+      "bytes_roh": 185757,
+      "sha256_roh": "30d273256800da5782db4836380d1f78b8523a95670a4189a97fd6286a24c083"
     }
   ]
 }
