@@ -11,15 +11,19 @@ gespeicherte Werte verglichen werden (``vergleiche``) und die Tagesdatei
 
 Status einer Prüfung (``STATUS``):
 
-- ``bestaetigt``: jeder Pflichtposten des Anbieters ist auf der Seite gelesen und
-  gleich dem gespeicherten Wert;
-- ``abweichend``: mindestens ein gelesener Posten weicht ab, beide Werte stehen in
-  ``abweichungen``;
+- ``bestaetigt``: jeder Posten des Rechenwegs ist auf der Seite gelesen und gleich
+  dem gespeicherten Wert;
+- ``teilweise``: was die Seite zeigt, stimmt, aber ein Posten des Rechenwegs ist
+  nicht gelesen (``grund`` nennt geprüfte und fehlende);
+- ``abweichend``: mindestens ein gelesener Posten weicht ab oder fehlt im Bestand,
+  beide Werte stehen in ``abweichungen``;
 - ``nicht_pruefbar``: die Seite war nicht lesbar oder ein Pflichtposten fehlt; ``grund``
   nennt es (Sperre, Zeitbudget, Tarif nicht wählbar, …).
 
 Was der Anbieter auf diesem Weg nicht zeigt, steht in ``nicht_gelesen`` und ist keine
-Bestätigung. Ein gespeicherter Wert ``None`` ist eine Lücke und wird nicht verglichen.
+Bestätigung. Ein gespeicherter Wert ``None``, den die Seite nennt, ist eine Abweichung.
+Eine Preisänderung ist ein geänderter Posten gegenüber der letzten Messung davor
+(``aenderungen``), dieselbe Definition für Auswahl und Seite.
 """
 
 from __future__ import annotations
@@ -36,9 +40,10 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 BESTAETIGT = "bestaetigt"
+TEILWEISE = "teilweise"
 ABWEICHEND = "abweichend"
 NICHT_PRUEFBAR = "nicht_pruefbar"
-STATUS = (BESTAETIGT, ABWEICHEND, NICHT_PRUEFBAR)
+STATUS = (BESTAETIGT, TEILWEISE, ABWEICHEND, NICHT_PRUEFBAR)
 
 ANLASS_AENDERUNG = "preisaenderung"
 ANLASS_STICHPROBE = "stichprobe"
@@ -71,8 +76,6 @@ GANZZAHLFELDER = ("laufzeit_monate",)
 FELDER = BETRAGSFELDER + GANZZAHLFELDER
 """Die Posten eines Bündels, die eine Gegenprobe lesen kann (Namen wie im Bestand)."""
 
-AENDERUNGSFELDER = (*FELDER, "gesamt")
-"""Ändert sich einer dieser Werte zum Vortag, ist das Bündel eine Preisänderung."""
 
 FELDNAMEN = {
     "tarif_monatlich": "Tarif monatlich",
@@ -135,7 +138,7 @@ class Ergebnis:
     def __post_init__(self) -> None:
         if self.status not in STATUS:
             raise ValueError(f"unbekannter Status {self.status!r}")
-        if self.status == NICHT_PRUEFBAR and not self.grund:
+        if self.status in (NICHT_PRUEFBAR, TEILWEISE) and not self.grund:
             raise ValueError("nicht prüfbar ohne Grund")
         if self.status == ABWEICHEND and not self.abweichungen:
             raise ValueError("abweichend ohne abweichenden Posten")
@@ -150,33 +153,53 @@ def gleich(a: float | int, b: float | int) -> bool:
     return abs(float(a) - float(b)) < TOLERANZ_EUR
 
 
-def vergleiche(
-    gespeichert: Mapping, gelesen: Mapping, pflicht: Iterable[str]
-) -> tuple[str, list[dict], list[str], str | None]:
-    """(Status, Abweichungen, nicht gelesene Pflichtposten, Grund).
+def rechenweg_felder(gespeichert: Mapping) -> list[str]:
+    """Die Posten, die der Rechenweg dieses Bündels nutzt (Betrag nicht 0 oder None);
+    die Ratenzahl, wenn eine Rate oder ein Monatsbetrag für Tarif und Gerät zählt."""
+    out: list[str] = []
+    if gespeichert.get("buendel_monatlich") is not None:
+        out += ["buendel_monatlich", "laufzeit_monate"]
+    else:
+        if gespeichert.get("tarif_monatlich"):
+            out.append("tarif_monatlich")
+        if gespeichert.get("geraet_monatsrate"):
+            out += ["geraet_monatsrate", "laufzeit_monate"]
+    return out + [
+        f for f in ("geraet_zuzahlung", "anschlusspreis") if gespeichert.get(f)
+    ]
 
-    Verglichen wird jeder Posten aus ``FELDER``, der gespeichert UND gelesen ist. Eine
-    Abweichung entscheidet vor einer Lücke: ``abweichend`` auch dann, wenn ein
-    anderer Pflichtposten nicht gelesen wurde. Ein gespeicherter Pflichtwert None ist
-    keine Lücke der Seite und fehlt im Vergleich.
+
+def _namen(felder: Iterable[str]) -> str:
+    return ", ".join(FELDNAMEN.get(f, f) for f in felder)
+
+
+def vergleiche(
+    gespeichert: Mapping, gelesen: Mapping
+) -> tuple[str, list[dict], list[str], str | None]:
+    """(Status, Abweichungen, nicht gelesene Posten des Rechenwegs, Grund).
+
+    Verglichen wird jeder Posten aus ``FELDER``, den die Seite zeigt. Weicht er ab
+    oder fehlt er im Bestand (gespeichert None, Seite nennt ihn), ist das Bündel
+    ``abweichend``. ``bestaetigt`` heißt: jeder Posten des Rechenwegs
+    (``rechenweg_felder``) ist gelesen und gleich; fehlt einer, ist es ``teilweise``
+    mit den geprüften und den nicht gelesenen Posten im Grund.
     """
     abweichungen = [
-        {"feld": f, "gespeichert": gespeichert[f], "gelesen": gelesen[f]}
+        {"feld": f, "gespeichert": gespeichert.get(f), "gelesen": gelesen[f]}
         for f in FELDER
-        if gespeichert.get(f) is not None
-        and gelesen.get(f) is not None
-        and not gleich(gespeichert[f], gelesen[f])
+        if gelesen.get(f) is not None
+        and (gespeichert.get(f) is None or not gleich(gespeichert[f], gelesen[f]))
     ]
-    fehlt = [
-        f for f in pflicht if gespeichert.get(f) is not None and gelesen.get(f) is None
-    ]
+    noetig = rechenweg_felder(gespeichert)
+    fehlt = [f for f in noetig if gelesen.get(f) is None]
     if abweichungen:
         return ABWEICHEND, abweichungen, fehlt, None
+    geprueft = [f for f in FELDER if gelesen.get(f) is not None]
+    if not geprueft:
+        return NICHT_PRUEFBAR, [], fehlt, "Kein Preis auf der Seite gelesen"
     if fehlt:
-        namen = ", ".join(FELDNAMEN.get(f, f) for f in fehlt)
-        return NICHT_PRUEFBAR, [], fehlt, f"Auf der Seite nicht ablesbar: {namen}"
-    if not any(f in gelesen for f in pflicht):
-        return NICHT_PRUEFBAR, [], [], "Kein Preis auf der Seite gelesen"
+        grund = f"Bestätigt: {_namen(geprueft)}; nicht gelesen: {_namen(fehlt)}"
+        return TEILWEISE, [], fehlt, grund
     return BESTAETIGT, [], [], None
 
 
@@ -185,15 +208,68 @@ def gespeicherte_werte(buendel: Mapping) -> dict:
     return {f: buendel.get(f) for f in FELDER}
 
 
-def geaendert(heute: Mapping, vortag: Mapping) -> bool:
-    """Ob sich Gesamtkosten oder ein Posten zwischen zwei Messungen geändert haben."""
-    for f in AENDERUNGSFELDER:
-        a, b = heute.get(f), vortag.get(f)
+def geaendert(heute: Mapping, vorher: Mapping) -> bool:
+    """Ob sich ein Posten zwischen zwei Messungen geändert hat (eine Lücke, die zum
+    Wert wird oder umgekehrt, zählt). Das eingefrorene ``gesamt`` der Historie zählt
+    nie: bis 19.11.2026 rechnete es eine andere Formel."""
+    for f in FELDER:
+        a, b = heute.get(f), vorher.get(f)
         if (a is None) != (b is None):
             return True
         if a is not None and b is not None and not gleich(a, b):
             return True
     return False
+
+
+def gemessen(saetze: Iterable[Mapping], datum: str) -> dict[str, Mapping]:
+    """Die Zeilen, die an ``datum`` gemessen sind (``abgerufen_am`` = ``datum``)."""
+    return {
+        z["id"]: z
+        for z in saetze
+        if z.get("id") and z.get("abgerufen_am") == z.get("datum") == datum
+    }
+
+
+def letzte_messungen(tage: Iterable[tuple[str, list]]) -> dict[str, Mapping]:
+    """Je Bündel die letzte Messung aus (Datum, Zeilen) in Datumsfolge."""
+    zuletzt: dict[str, Mapping] = {}
+    for datum, saetze in tage:
+        zuletzt.update(gemessen(saetze, datum))
+    return zuletzt
+
+
+def aenderungen(
+    heute: Mapping[str, Mapping], vorher: Mapping[str, Mapping]
+) -> list[tuple[Mapping, Mapping]]:
+    """(heute, letzte Messung davor) je Bündel, dessen Posten sich geändert haben.
+
+    DIE Definition einer Preisänderung, für die Seite „Preisänderungen“ und die
+    Auswahl der Gegenprobe gleich: ``heute`` sind die gemessenen Zeilen eines Tages,
+    ``vorher`` die letzte Messung jedes Bündels vor diesem Tag (``letzte_messungen``).
+    """
+    out = []
+    for bid, zeile in heute.items():
+        alt = vorher.get(bid)
+        if alt is not None and geaendert(zeile, alt):
+            out.append((zeile, alt))
+    return out
+
+
+def gewicht(heute: Mapping, vorher: Mapping) -> float:
+    """Wie groß eine Änderung ist (Betrag je Posten, Monatsbeträge über ihre Monate);
+    nur für die Reihenfolge, nie für die Frage, ob sich etwas geändert hat."""
+    monate = heute.get("laufzeit_monate") or 24
+    summe = 0.0
+    for f in BETRAGSFELDER:
+        a, b = heute.get(f), vorher.get(f)
+        if a is not None and b is not None:
+            faktor = (
+                monate
+                if f in ("tarif_monatlich", "geraet_monatsrate", "buendel_monatlich")
+                else 1
+            )
+            summe += abs(a - b) * faktor
+    return summe
 
 
 def anbieter_aus_id(buendel_id: str) -> str:
@@ -205,34 +281,25 @@ def anbieter_aus_id(buendel_id: str) -> str:
 def auswahl(
     datum: str,
     heute: Iterable[Mapping],
-    vortag: Iterable[Mapping],
+    vorher: Iterable[Mapping],
     je_anbieter: int = STICHPROBE_JE_ANBIETER,
 ) -> list[tuple[str, str]]:
     """Die Bündel, die ``datum`` prüft: (Bündel-Schlüssel, Anlass), Änderungen zuerst.
 
-    ``heute`` und ``vortag`` sind die Historienzeilen zweier Messtage. Gezählt wird nur
-    eine Zeile, die an ihrem Tag gemessen ist (``abgerufen_am`` = ``datum`` der Zeile).
-    Jede geänderte Zeile kommt dran, größte Änderung der Gesamtkosten zuerst; dazu
-    je Anbieter ``je_anbieter`` unveränderte, zufällig, aber je Datum und Anbieter
-    fest (``random.Random(f"{datum}|{anbieter}")``): derselbe Tag wählt dieselben.
+    ``heute`` sind die Historienzeilen des Tages, ``vorher`` je Bündel die letzte
+    Messung davor (``letzte_messungen``). Jede Änderung nach ``aenderungen`` kommt dran,
+    die größte zuerst (``gewicht``); dazu je Anbieter ``je_anbieter`` unveränderte,
+    zufällig, aber je Datum und Anbieter fest (Zufall aus „Datum|Anbieter“).
     """
-    gemessen = {
-        z["id"]: z
-        for z in heute
-        if z.get("id") and z.get("abgerufen_am") == z.get("datum") == datum
-    }
-    alt = {z["id"]: z for z in vortag if z.get("id")}
-    aenderungen: list[tuple[float, str]] = []
+    tag = gemessen(heute, datum)
+    alt = {z["id"]: z for z in vorher if z.get("id")}
+    geaenderte = sorted(aenderungen(tag, alt), key=lambda p: (-gewicht(*p), p[0]["id"]))
+    gewaehlt = [(z["id"], ANLASS_AENDERUNG) for z, _ in geaenderte]
+    schon = {bid for bid, _ in gewaehlt}
     ruhig: dict[str, list[str]] = defaultdict(list)
-    for bid, zeile in gemessen.items():
-        vorher = alt.get(bid)
-        if vorher is not None and geaendert(zeile, vorher):
-            neu, vor = zeile.get("gesamt"), vorher.get("gesamt")
-            abstand = abs(neu - vor) if neu is not None and vor is not None else 0.0
-            aenderungen.append((-abstand, bid))
-        else:
+    for bid in tag:
+        if bid not in schon:
             ruhig[anbieter_aus_id(bid)].append(bid)
-    gewaehlt = [(bid, ANLASS_AENDERUNG) for _, bid in sorted(aenderungen)]
     for anbieter in sorted(ruhig):
         kandidaten = sorted(ruhig[anbieter])
         zufall = random.Random(f"{datum}|{anbieter}")

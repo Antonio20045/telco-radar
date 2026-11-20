@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
 
 from ...gegenprobe import Sichtwerte
 
@@ -232,15 +231,33 @@ def vodafone(text: str) -> Sichtwerte:
 
 
 def einsundeins(text: str) -> Sichtwerte:
-    """1&1-Produktseite, Preisübersicht: Ratenzahlung Hardware (N Monate), Tarifname
-    und „Monatliche Gesamtkosten“ (ein Betrag für Tarif und Gerät)."""
+    """1&1-Produktseite, Preisübersicht: Geräterate (erster Betrag „€/Mon.“),
+    Ratenzahlung Hardware (N Monate), Tarifname und Tarifpreis der Kachel, „Monatliche
+    Gesamtkosten“ (ein Betrag für Tarif und Gerät) und, wenn sichtbar, der
+    Anschlusspreis. Geräterate und Tarif stehen als Nachweis in ``roh`` (der Bestand
+    führt bei 1&1 nur den gemeinsamen Betrag)."""
     s = Sichtwerte()
     raten = re.search(r"Ratenzahlung\s+Hardware:\s*(\d+)\s*Monate", text, _I)
     s.laufzeit_monate = int(raten.group(1)) if raten else None
     s.buendel_monatlich = _nach(text, r"Monatliche\s+Gesamtkosten")
-    name = re.search(r"(1&1\s+[^\n€]*?)\s+" + _EURO, text)
-    s.tarif_name = name.group(1).strip() if name else None
-    _roh(s, {"Monatliche Gesamtkosten": s.buendel_monatlich})
+    geraet = re.search(_EURO + r"\s*/\s*Mon\.", text)
+    tarif = re.search(
+        r"(1&1\s+[^\n€]*?)\s+" + _EURO + r"(?:\s+" + _EURO + r"\s*/\s*Mon\.)?", text
+    )
+    s.tarif_name = tarif.group(1).strip() if tarif else None
+    kachel = None
+    if tarif:
+        kachel = betrag(tarif.group(3) or tarif.group(2))
+    s.anschlusspreis = _nach(text, r"(?:Anschlusspreis|Bereitstellung(?:spreis)?)")
+    _roh(
+        s,
+        {
+            "Gerät monatlich": betrag(geraet.group(1)) if geraet else None,
+            "Tarif monatlich (Kachel)": kachel,
+            "Monatliche Gesamtkosten": s.buendel_monatlich,
+            "Anschlusspreis": s.anschlusspreis,
+        },
+    )
     if s.laufzeit_monate is not None:
         s.roh["Ratenzahlung Hardware"] = f"{s.laufzeit_monate} Monate"
     return s
@@ -257,35 +274,14 @@ def _roh(s: Sichtwerte, werte: dict[str, float | None]) -> None:
             s.roh[name] = _euro_text(wert)
 
 
-@dataclass(frozen=True)
-class Leser:
-    """Der Leser eines Anbieters und die Posten, die sein Weg zeigen muss."""
-
-    lies: Callable[[str], Sichtwerte]
-    pflicht: tuple[str, ...]
-
-
-GETRENNT = (
-    "tarif_monatlich",
-    "geraet_monatsrate",
-    "laufzeit_monate",
-    "geraet_zuzahlung",
-    "anschlusspreis",
-)
-LESER: dict[str, Leser] = {
-    "telekom": Leser(telekom, GETRENNT),
-    "o2": Leser(o2, GETRENNT),
-    "congstar": Leser(congstar, GETRENNT),
-    "vodafone": Leser(vodafone, GETRENNT),
-    "1-1": Leser(einsundeins, ("buendel_monatlich", "laufzeit_monate")),
-    "saturn-mediamarkt-telekom-netz": Leser(
-        tarifwelt, ("tarif_monatlich", "geraet_zuzahlung", "anschlusspreis")
-    ),
-    "saturn-mediamarkt-vodafone-netz": Leser(
-        tarifwelt, ("tarif_monatlich", "geraet_zuzahlung", "anschlusspreis")
-    ),
-    "saturn-mediamarkt-o2-netz": Leser(
-        tarifwelt, ("tarif_monatlich", "geraet_zuzahlung", "anschlusspreis")
-    ),
+LESER: dict[str, Callable[[str], Sichtwerte]] = {
+    "telekom": telekom,
+    "o2": o2,
+    "congstar": congstar,
+    "vodafone": vodafone,
+    "1-1": einsundeins,
+    "saturn-mediamarkt-telekom-netz": tarifwelt,
+    "saturn-mediamarkt-vodafone-netz": tarifwelt,
+    "saturn-mediamarkt-o2-netz": tarifwelt,
 }
 """Leser je Anbieter-Schlüssel des Bündels (``gegenprobe.anbieter_aus_id``)."""

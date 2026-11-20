@@ -112,30 +112,26 @@ FAELLE = [(n, f) for n, (w, _) in ERWARTET.items() for f in gp.FELDER]
 
 @pytest.mark.parametrize(("anbieter", "feld"), FAELLE)
 def test_jeder_posten_der_aufnahme(texte, anbieter, feld):
-    werte = sicht.LESER[anbieter].lies(texte[anbieter]).werte()
+    werte = sicht.LESER[anbieter](texte[anbieter]).werte()
     assert werte.get(feld) == ERWARTET[anbieter][0].get(feld)
 
 
 @pytest.mark.parametrize("anbieter", list(ERWARTET))
 def test_tarifname_der_aufnahme(texte, anbieter):
-    assert (
-        sicht.LESER[anbieter].lies(texte[anbieter]).tarif_name
-        == (ERWARTET[anbieter][1])
-    )
+    assert sicht.LESER[anbieter](texte[anbieter]).tarif_name == (ERWARTET[anbieter][1])
 
 
 @pytest.mark.parametrize("anbieter", list(ERWARTET))
 def test_status_gegen_den_bestand_des_tages(texte, anbieter):
-    leser = sicht.LESER[anbieter]
-    gelesen = leser.lies(texte[anbieter]).werte()
+    gelesen = sicht.LESER[anbieter](texte[anbieter]).werte()
     gespeichert = GESPEICHERT.get(anbieter, ERWARTET[anbieter][0])
-    status, *_ = gp.vergleiche(gespeichert, gelesen, leser.pflicht)
+    status, *_ = gp.vergleiche(gespeichert, gelesen)
     assert status == STATUS[anbieter]
 
 
 @pytest.mark.parametrize("anbieter", list(ERWARTET))
 def test_jeder_gelesene_betrag_steht_im_text(texte, anbieter):
-    s = sicht.LESER[anbieter].lies(texte[anbieter])
+    s = sicht.LESER[anbieter](texte[anbieter])
     for wert in (w for w in s.roh.values() if w.endswith(" €")):
         zahl = wert.removesuffix(" €").replace(".", "")
         kurz = zahl.removesuffix(",00")
@@ -222,6 +218,22 @@ def test_congstar_ohne_passende_zahlweise_bleibt_anzahlung_offen():
     s = sicht.congstar(text)
     assert s.laufzeit_monate == 36
     assert s.geraet_zuzahlung is None and s.anschlusspreis is None
+
+
+def test_einsundeins_geraet_und_tarif_ergeben_den_monatsbetrag(texte):
+    roh = sicht.einsundeins(texte["1-1"]).roh
+    geraet = sicht.betrag(roh["Gerät monatlich"].removesuffix(" €"))
+    tarif = sicht.betrag(roh["Tarif monatlich (Kachel)"].removesuffix(" €"))
+    gesamt = sicht.betrag(roh["Monatliche Gesamtkosten"].removesuffix(" €"))
+    assert round(geraet + tarif, 2) == gesamt == 57.99
+
+
+def test_einsundeins_liest_sichtbaren_anschlusspreis():
+    text = (
+        "1&1 All-Net-Flat S\n14,99 €\nAnschlusspreis 39,90 €\n"
+        "Monatliche Gesamtkosten\n57,99 €"
+    )
+    assert sicht.einsundeins(text).anschlusspreis == 39.9
 
 
 def test_jeder_anbieter_mit_weg_hat_einen_leser():
