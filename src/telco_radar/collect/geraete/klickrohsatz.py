@@ -5,7 +5,8 @@ einer Ergebnisdatei (``klickergebnis``) Bündel-Rohsätze im Format, das
 ``analyze.tco_buendel.aus_rohsaetzen`` liest, nur aus Kombinationen mit Status
 ``erfasst`` und nur von gelesenen Seiten. Das Gerät kommt aus dem Katalog über die
 Geräte-ID der Seite, der Speicher aus der gelesenen Variante (muss beim Gerät stehen),
-die SKU über ``geraete_model.sku_id`` ohne Farbe (die Karte klickt keine Farbe).
+die SKU über ``geraete_model.sku_id`` ohne Farbe (die Karte klickt keine Farbe), außer
+``klickfarbe`` nennt die Farbe des Bestands (1&1).
 Ratenzahl ist die bestätigte Ratenzahl, sonst die gewählte Laufzeit.
 
 Werte: Anzahlung, Rate, Tarifpreis ab Monat 1, Tarifbindung, Anschluss und Volumen wie
@@ -66,9 +67,10 @@ from ...geraete_model import (
     zustand_aus_titel,
 )
 from ...tarif_model import QUELLE_KLICK
-from .klickanschluss import ART_ANSCHLUSS
+from .klickanschluss import ART_ANSCHLUSS, anschluesse
 from .klickcrawler import GRUND_NICHT_BESUCHT
 from .klickergebnis import GELESENE_SEITEN
+from .klickfarbe import sku_farbe
 from .klickkarte import EIN_VERTRAG
 from .klicklauf import (
     BEFUND,
@@ -79,7 +81,7 @@ from .klicklauf import (
     NICHT_ERFASST,
 )
 from .klickpfad import ohne_markup
-from .klickraster import ART_RASTER, raster_roh
+from .klickraster import ART_LISTE, ART_RASTER, raster_roh
 from .klickratenplan import RatenplanRegelFehlt, buendelphasen
 
 log = logging.getLogger(__name__)
@@ -148,7 +150,7 @@ def speicher_gb(text: object) -> int | None:
 def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
     """Alle Rohsätze und Lücken einer Ergebnisdatei."""
     ergebnis = Klickausbeute(anbieter=str(daten.get("name") or ""))
-    anschluss = _anschluesse(daten)
+    anschluss = anschluesse(daten)
     for seite in daten.get("seiten") or []:
         if seite.get("status") not in GELESENE_SEITEN:
             ergebnis.luecken[LUECKE_SEITE] += 1
@@ -185,7 +187,7 @@ def _nimm_uebersicht(
     ergebnis: Klickausbeute, uebersicht: dict, daten: dict, katalog: Katalog
 ) -> bool:
     """Rohsätze und angebotene Geräte einer gelesenen Übersicht; wahr, wenn jeder
-    Gerätetitel im Katalog steht. Rastersätze zählen nur als angeboten."""
+    Gerätetitel im Katalog steht. Raster- und Listensätze zählen nur als angeboten."""
     erkannt = True
     for roh in uebersicht.get("saetze") or []:
         if roh.get("art") == ART_ANSCHLUSS:
@@ -195,7 +197,7 @@ def _nimm_uebersicht(
         neuware = zustand_aus_titel(titel) == ZUSTAND_NEU
         erkannt = erkannt and (geraet is not None or not neuware)
         ergebnis.angeboten.update([geraet.device_id] if geraet else [])
-        if roh.get("art") != ART_RASTER:
+        if roh.get("art") not in (ART_RASTER, ART_LISTE):
             _nimm(ergebnis, uebersicht_rohsatz(roh, uebersicht, daten, katalog))
     return erkannt
 
@@ -205,20 +207,6 @@ def _nimm(ergebnis: Klickausbeute, satz: dict | str) -> None:
         ergebnis.rohsaetze.append(satz)
     else:
         ergebnis.luecken[satz] += 1
-
-
-def _anschluesse(daten: dict) -> dict[str, float]:
-    """Anschlusspreis je Tarif-Slug aus heute gelesenen Tarifdetail-Seiten (1&1,
-    ``klickanschluss.anschluss_saetze``), nur bei ``ein_vertrag``."""
-    if daten.get("vertragsform") != EIN_VERTRAG:
-        return {}
-    return {
-        str(roh.get("tarif_slug")): roh["anschlusspreis"]
-        for u in daten.get("uebersichten") or []
-        if u.get("status") in GELESENE_SEITEN
-        for roh in u.get("saetze") or []
-        if roh.get("art") == ART_ANSCHLUSS
-    }
 
 
 def uebersicht_rohsatz(
@@ -328,8 +316,13 @@ def rohsatz(
     laufzeit = werte.get("ratenzahl")
     laufzeit = variante.get("laufzeit") if laufzeit is None else laufzeit
     zustand = seite_zustand(seite)
+    farbe = (
+        None
+        if zustand != ZUSTAND_NEU
+        else sku_farbe(daten.get("name"), geraet.device_id, gb)
+    )
     satz = {
-        "sku_id": sku_id(geraet.device_id, gb, None, zustand),
+        "sku_id": sku_id(geraet.device_id, gb, farbe, zustand),
         "anbieter": str(daten.get("name") or ""),
         "zustand": zustand,
         "device_id": geraet.device_id,

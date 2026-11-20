@@ -121,22 +121,36 @@ def test_anderer_tarif(gespeichert, gelesen, anders):
     assert SKRIPT.anderer_tarif(gespeichert, gelesen) is anders
 
 
-def test_historie_nimmt_den_letzten_tag_davor(tmp_path):
-    for tag in ("2026-11-17", "2026-11-19", "2026-11-20"):
-        (tmp_path / f"{tag}.jsonl").write_text(
-            json.dumps({"id": tag, "datum": tag}) + "\n", encoding="utf-8"
-        )
-    heute, vortag, datum = SKRIPT.lies_historie(tmp_path, "2026-11-20")
-    assert (heute[0]["id"], vortag[0]["id"], datum) == (
-        "2026-11-20",
-        "2026-11-19",
-        "2026-11-19",
+def _tagesdatei(ordner, tag, *zeilen):
+    ordner.mkdir(exist_ok=True)
+    (ordner / f"{tag}.jsonl").write_text(
+        "".join(json.dumps(z) + "\n" for z in zeilen), encoding="utf-8"
     )
 
 
+def _messung(bid, tag, rate):
+    return {"id": bid, "datum": tag, "abgerufen_am": tag, "geraet_monatsrate": rate}
+
+
+def test_historie_nimmt_je_buendel_die_letzte_messung_davor(tmp_path):
+    ordner = tmp_path / "geraete_tco_historie"
+    _tagesdatei(ordner, "2026-11-17", _messung("a", "2026-11-17", 1.0))
+    _tagesdatei(ordner, "2026-11-19", _messung("b", "2026-11-19", 2.0))
+    _tagesdatei(ordner, "2026-11-20", _messung("a", "2026-11-20", 3.0))
+    heute, vorher, datum = SKRIPT.lies_historie(ordner, "2026-11-20")
+    assert [z["id"] for z in heute] == ["a"]
+    assert {z["id"]: z["datum"] for z in vorher} == {
+        "a": "2026-11-17",
+        "b": "2026-11-19",
+    }
+    assert datum == "2026-11-19"
+    assert gp.auswahl("2026-11-20", heute, vorher, 0) == [("a", gp.ANLASS_AENDERUNG)]
+
+
 def test_historie_ohne_vortag(tmp_path):
-    (tmp_path / "2026-11-20.jsonl").write_text("{}\n", encoding="utf-8")
-    assert SKRIPT.lies_historie(tmp_path, "2026-11-20")[1:] == ([], None)
+    ordner = tmp_path / "geraete_tco_historie"
+    _tagesdatei(ordner, "2026-11-20", _messung("a", "2026-11-20", 1.0))
+    assert SKRIPT.lies_historie(ordner, "2026-11-20")[1:] == ([], None)
 
 
 def test_ohne_lauf_steht_der_grund_in_der_zeile():

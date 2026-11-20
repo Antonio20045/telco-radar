@@ -7,6 +7,7 @@ from dataclasses import replace
 from bestand_pfad import lese_wurzel
 from klickergebnisse import einsundeins_lesung, erfasst, ergebnisdatei, lauf
 
+from telco_radar.collect.geraete.klickfarbe import sku_farbe
 from telco_radar.collect.geraete.klickrohsatz import ausbeute
 from telco_radar.collect.geraete.klickziele import Seitenziel
 from telco_radar.geraete_config import lade_katalog
@@ -28,5 +29,7 @@ def test_128_gb_wird_rohsatz():
 
     (satz,) = ausbeute(daten, katalog).rohsaetze
 
-    assert satz["sku_id"] == sku_id("nothing-phone-4a-pro", 128, None, "neu")
+    farbe = sku_farbe("1&1", "nothing-phone-4a-pro", 128)
+    assert farbe == "silber"
+    assert satz["sku_id"] == sku_id("nothing-phone-4a-pro", 128, farbe, "neu")
     assert (satz["buendel_monatlich"], satz["geraet_zuzahlung"]) == (25.99, 140.0)

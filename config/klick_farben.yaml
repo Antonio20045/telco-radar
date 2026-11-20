@@ -1,0 +1,147 @@
+# =============================================================================
+# SKU-Farbe der Klick-Sätze (`collect/geraete/klickfarbe.py`)
+# =============================================================================
+# Die Klick-Karte klickt keine Farbe; ihre Sätze tragen die SKU „…-ohne-farbe“. Bei 1&1
+# trägt der Bestand (data/state/geraete_tco.json) aber die Farbe, die der Adapter bis
+# 20.11.2026 las: die erste Variante der Preiskarte `hwdVariantsHardwarePrices` (iPhone
+# 17: NEBELBLAU), nicht die vorgewählte der Seite (LAVENDEL). Die Seite nennt diese
+# Reihenfolge nirgends sichtbar; damit die Bündel-IDs fortlaufen (kein zweites Bündel
+# neben dem Bestand), steht die Farbe je Gerät und Speicher hier fest.
+#
+# Herkunft: 1&1-Bündel im Zustand „neu“ in data/state/geraete_tco.json, Stand main
+# c1738cfe (20.11.2026): je Gerät und Speicher die Farbe des jüngsten Bündels mit
+# All-Net-Flat S (sonst des jüngsten überhaupt), ohne „ohne-farbe“. Ein Gerät, das
+# hier fehlt (neu seit dem Adapter), behält „ohne-farbe“.
+anbieter:
+  "1&1":
+    apple-iphone-15:
+      128: blau
+      256: blau
+    apple-iphone-16:
+      128: blau
+    apple-iphone-16-plus:
+      128: weiss
+      256: blau
+    apple-iphone-16e:
+      128: schwarz
+    apple-iphone-17:
+      256: nebelblau
+      512: nebelblau
+    apple-iphone-17-pro:
+      256: cosmic-orange
+      512: tiefblau
+      1024: cosmic-orange
+    apple-iphone-17-pro-max:
+      256: silber
+      512: silber
+      1024: silber
+      2048: silber
+    apple-iphone-17e:
+      256: schwarz
+      512: schwarz
+    apple-iphone-18-pro:
+      256: polar
+      512: polar
+      1024: polar
+      2048: polar
+    apple-iphone-18-pro-max:
+      256: polar
+      512: polar
+      1024: polar
+      2048: polar
+    apple-iphone-air:
+      256: lichtgold
+      512: wolkenweiss
+      1024: space-schwarz
+    apple-iphone-duo:
+      256: sternenweiss
+      512: nachthimmel
+      1024: nachthimmel
+      2048: nachthimmel
+    fairphone-6:
+      256: forest-green
+    google-pixel-10a:
+      128: violett
+      256: violett
+    google-pixel-11:
+      256: frost
+      512: frost
+    google-pixel-11-pro:
+      256: canyon
+      512: canyon
+    google-pixel-11-pro-fold:
+      256: schwarz
+      512: olive
+    google-pixel-11-pro-xl:
+      256: canyon
+      512: canyon
+    honor-600:
+      256: quantum-black
+    honor-magic-v6:
+      512: schwarz
+    honor-magic8-lite:
+      256: midnight-black
+    motorola-moto-g77:
+      256: pantone-black-olive
+    motorola-razr-70:
+      256: hematite
+    nothing-phone-3:
+      256: schwarz
+    nothing-phone-4a-pro:
+      128: silber
+    samsung-galaxy-a17:
+      128: schwarz
+    samsung-galaxy-a27:
+      128: schwarz
+    samsung-galaxy-a57:
+      128: awesome-gray
+      256: awesome-gray
+    samsung-galaxy-s25:
+      128: silber
+      256: blueblack
+    samsung-galaxy-s25-edge:
+      256: titanium-jetblack
+    samsung-galaxy-s26:
+      256: schwarz
+      512: schwarz
+    samsung-galaxy-s26-fe:
+      128: pistachio
+      256: pistachio
+    samsung-galaxy-s26-plus:
+      256: cobalt-violet
+      512: cobalt-violet
+    samsung-galaxy-s26-ultra:
+      256: cobalt-violet
+      512: cobalt-violet
+      1024: cobalt-violet
+    samsung-galaxy-z-flip8:
+      256: grau
+      512: grau
+    samsung-galaxy-z-fold8:
+      256: grau
+      512: grau
+    samsung-galaxy-z-fold8-ultra:
+      256: grau
+      512: grau
+      1024: grau
+    xiaomi-17:
+      512: schwarz
+    xiaomi-17-ultra:
+      512: schwarz
+    xiaomi-17t:
+      256: schwarz
+    xiaomi-17t-pro:
+      512: schwarz
+    xiaomi-18-pro:
+      256: velvet-red
+    xiaomi-18-pro-max:
+      256: velvet-red
+      512: velvet-red
+    xiaomi-redmi-17c:
+      128: schwarz
+    xiaomi-redmi-note-17:
+      128: violett
+    xiaomi-redmi-note-17-pro:
+      256: sky-blue
+    xiaomi-redmi-note-17-pro-max:
+      256: cloud-blush

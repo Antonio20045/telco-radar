@@ -8,13 +8,6 @@ import pytest
 
 from telco_radar import gegenprobe as gp
 
-GETRENNT = (
-    "tarif_monatlich",
-    "geraet_monatsrate",
-    "laufzeit_monate",
-    "geraet_zuzahlung",
-    "anschlusspreis",
-)
 GESPEICHERT = {
     "tarif_monatlich": 49.95,
     "geraet_monatsrate": 5.0,
@@ -32,7 +25,7 @@ def _gelesen(**anders):
 
 
 def test_alles_gleich_ist_bestaetigt():
-    status, abw, fehlt, grund = gp.vergleiche(GESPEICHERT, _gelesen(), GETRENNT)
+    status, abw, fehlt, grund = gp.vergleiche(GESPEICHERT, _gelesen())
     assert (status, abw, fehlt, grund) == (gp.BESTAETIGT, [], [], None)
 
 
@@ -47,66 +40,88 @@ def test_alles_gleich_ist_bestaetigt():
     ],
 )
 def test_abweichung_nennt_beide_werte(feld, gelesen):
-    status, abw, _, _ = gp.vergleiche(
-        GESPEICHERT, _gelesen(**{feld: gelesen}), GETRENNT
-    )
+    status, abw, _, _ = gp.vergleiche(GESPEICHERT, _gelesen(**{feld: gelesen}))
     assert status == gp.ABWEICHEND
     assert abw == [{"feld": feld, "gespeichert": GESPEICHERT[feld], "gelesen": gelesen}]
 
 
 def test_ein_cent_unterschied_ist_eine_abweichung():
-    status, _, _, _ = gp.vergleiche(
-        GESPEICHERT, _gelesen(tarif_monatlich=49.96), GETRENNT
-    )
+    status, *_ = gp.vergleiche(GESPEICHERT, _gelesen(tarif_monatlich=49.96))
     assert status == gp.ABWEICHEND
 
 
 def test_rundungsrauschen_unter_einem_cent_ist_gleich():
-    status, _, _, _ = gp.vergleiche(
-        GESPEICHERT, _gelesen(tarif_monatlich=49.95000001), GETRENNT
-    )
+    status, *_ = gp.vergleiche(GESPEICHERT, _gelesen(tarif_monatlich=49.95000001))
     assert status == gp.BESTAETIGT
 
 
-def test_fehlender_pflichtposten_ist_nicht_pruefbar_mit_namen():
+def test_ungelesener_posten_des_rechenwegs_ist_nur_teilweise():
     status, abw, fehlt, grund = gp.vergleiche(
-        GESPEICHERT, _gelesen(anschlusspreis=None), GETRENNT
+        GESPEICHERT, _gelesen(anschlusspreis=None)
     )
-    assert status == gp.NICHT_PRUEFBAR
-    assert fehlt == ["anschlusspreis"]
-    assert grund == "Auf der Seite nicht ablesbar: Anschlusspreis"
+    assert (status, abw, fehlt) == (gp.TEILWEISE, [], ["anschlusspreis"])
+    assert grund.endswith("; nicht gelesen: Anschlusspreis")
+    assert grund.startswith("Bestätigt: Tarif monatlich, Geräterate")
 
 
 def test_abweichung_geht_vor_fehlendem_posten():
     gelesen = _gelesen(anschlusspreis=None, geraet_monatsrate=9.5)
-    status, abw, fehlt, _ = gp.vergleiche(GESPEICHERT, gelesen, GETRENNT)
+    status, abw, fehlt, _ = gp.vergleiche(GESPEICHERT, gelesen)
     assert status == gp.ABWEICHEND
     assert fehlt == ["anschlusspreis"]
     assert [a["feld"] for a in abw] == ["geraet_monatsrate"]
 
 
-def test_gespeicherte_luecke_wird_nicht_verglichen_und_fehlt_nicht():
+def test_luecke_im_bestand_die_die_seite_nennt_ist_eine_abweichung():
     gespeichert = {**GESPEICHERT, "anschlusspreis": None}
-    status, _, fehlt, _ = gp.vergleiche(
-        gespeichert, _gelesen(anschlusspreis=None), GETRENNT
-    )
+    status, abw, _, _ = gp.vergleiche(gespeichert, _gelesen(anschlusspreis=39.95))
+    assert status == gp.ABWEICHEND
+    assert abw == [{"feld": "anschlusspreis", "gespeichert": None, "gelesen": 39.95}]
+
+
+def test_null_posten_braucht_keine_lesung():
+    gespeichert = {**GESPEICHERT, "anschlusspreis": 0.0}
+    status, *_ = gp.vergleiche(gespeichert, _gelesen(anschlusspreis=None))
     assert status == gp.BESTAETIGT
-    assert fehlt == []
 
 
 def test_nichts_gelesen_ist_nicht_bestaetigt():
-    leer = dict.fromkeys(GESPEICHERT)
-    status, _, _, grund = gp.vergleiche(leer, {}, GETRENNT)
+    status, _, _, grund = gp.vergleiche(GESPEICHERT, {})
     assert status == gp.NICHT_PRUEFBAR
     assert grund == "Kein Preis auf der Seite gelesen"
 
 
-def test_nicht_pflichtiger_posten_wird_trotzdem_verglichen():
-    status, abw, _, _ = gp.vergleiche(
-        GESPEICHERT, _gelesen(anschlusspreis=0.0), ("tarif_monatlich",)
+def test_ein_vertrag_braucht_betrag_raten_und_anschluss():
+    vertrag = {
+        "buendel_monatlich": 57.99,
+        "laufzeit_monate": 24,
+        "anschlusspreis": 39.9,
+    }
+    assert gp.rechenweg_felder(vertrag) == [
+        "buendel_monatlich",
+        "laufzeit_monate",
+        "anschlusspreis",
+    ]
+    status, _, fehlt, _ = gp.vergleiche(
+        vertrag, {"buendel_monatlich": 57.99, "laufzeit_monate": 24}
     )
-    assert status == gp.ABWEICHEND
-    assert abw[0]["feld"] == "anschlusspreis"
+    assert (status, fehlt) == (gp.TEILWEISE, ["anschlusspreis"])
+
+
+def test_tarifwelt_ohne_rate_braucht_keine_ratenzahl():
+    tarifwelt = {
+        "tarif_monatlich": 34.99,
+        "geraet_monatsrate": 0.0,
+        "laufzeit_monate": 24,
+        "geraet_zuzahlung": 149.99,
+        "anschlusspreis": 39.99,
+    }
+    gelesen = {
+        "tarif_monatlich": 34.99,
+        "geraet_zuzahlung": 149.99,
+        "anschlusspreis": 39.99,
+    }
+    assert gp.vergleiche(tarifwelt, gelesen)[0] == gp.BESTAETIGT
 
 
 def _zeile(bid, datum, gesamt, **werte):
@@ -126,14 +141,14 @@ def _id(anbieter, n):
 
 def test_auswahl_nimmt_jede_aenderung_groesste_zuerst():
     heute = [
-        _zeile(_id("o2", 1), "2026-11-20", 110.0),
-        _zeile(_id("o2", 2), "2026-11-20", 300.0),
-        _zeile(_id("o2", 3), "2026-11-20", 100.0),
+        _zeile(_id("o2", 1), "2026-11-20", 0, geraet_monatsrate=11.0),
+        _zeile(_id("o2", 2), "2026-11-20", 0, geraet_monatsrate=20.0),
+        _zeile(_id("o2", 3), "2026-11-20", 0, geraet_monatsrate=10.0),
     ]
     vortag = [
-        _zeile(_id("o2", 1), "2026-11-19", 100.0),
-        _zeile(_id("o2", 2), "2026-11-19", 200.0),
-        _zeile(_id("o2", 3), "2026-11-19", 100.0),
+        _zeile(_id("o2", 1), "2026-11-19", 0, geraet_monatsrate=10.0),
+        _zeile(_id("o2", 2), "2026-11-19", 0, geraet_monatsrate=10.0),
+        _zeile(_id("o2", 3), "2026-11-19", 0, geraet_monatsrate=10.0),
     ]
     wahl = gp.auswahl("2026-11-20", heute, vortag, je_anbieter=0)
     assert wahl == [
@@ -146,6 +161,24 @@ def test_auswahl_erkennt_postenaenderung_bei_gleicher_summe():
     heute = [_zeile(_id("o2", 1), "2026-11-20", 100.0, anschlusspreis=0.0)]
     vortag = [_zeile(_id("o2", 1), "2026-11-19", 100.0, anschlusspreis=39.99)]
     assert gp.auswahl("2026-11-20", heute, vortag, 0) == [
+        (_id("o2", 1), gp.ANLASS_AENDERUNG)
+    ]
+
+
+def test_nur_eingefrorenes_gesamt_anders_ist_keine_aenderung():
+    heute = [_zeile(_id("o2", 1), "2026-11-20", 950.0)]
+    vortag = [_zeile(_id("o2", 1), "2026-11-19", 900.0)]
+    assert gp.auswahl("2026-11-20", heute, vortag, 0) == []
+
+
+def test_letzte_messung_davor_auch_ueber_eine_luecke():
+    tage = [
+        ("2026-11-18", [_zeile(_id("o2", 1), "2026-11-18", 0, anschlusspreis=39.99)]),
+        ("2026-11-19", [_zeile(_id("o2", 2), "2026-11-19", 0)]),
+    ]
+    vorher = list(gp.letzte_messungen(tage).values())
+    heute = [_zeile(_id("o2", 1), "2026-11-20", 0, anschlusspreis=0.0)]
+    assert gp.auswahl("2026-11-20", heute, vorher, 0) == [
         (_id("o2", 1), gp.ANLASS_AENDERUNG)
     ]
 

@@ -39,6 +39,7 @@ from pathlib import Path
 import yaml
 
 from telco_radar import gegenprobe as gp
+from telco_radar import tco_historie
 from telco_radar.analyze.geraete_pruefstatus import buendel_aus_satz
 from telco_radar.collect.geraete.gegenprobe_browser import (
     Gesperrt,
@@ -80,16 +81,14 @@ def kennungen(root: Path) -> dict[str, str]:
 def lies_historie(
     ordner: Path, datum: str
 ) -> tuple[list[dict], list[dict], str | None]:
-    """Zeilen des Tages ``datum`` und des vorigen Messtags (dessen Datum oder None)."""
-    tage = sorted(p.stem for p in ordner.glob("*.jsonl"))
-    vorher = [t for t in tage if t < datum]
-
-    def zeilen(tag: str) -> list[dict]:
-        text = (ordner / f"{tag}.jsonl").read_text(encoding="utf-8")
-        return [json.loads(z) for z in text.splitlines() if z.strip()]
-
-    heute = zeilen(datum) if datum in tage else []
-    return heute, zeilen(vorher[-1]) if vorher else [], vorher[-1] if vorher else None
+    """Zeilen des Tages ``datum``, je Bündel die letzte Messung davor
+    (``gegenprobe.letzte_messungen``, wie die Seite „Preisänderungen“) und das Datum
+    des vorigen Messtags (oder None)."""
+    tage = tco_historie.tage(ordner.parent / f"{ordner.name}.jsonl")
+    vorher = [(tag, saetze) for tag, saetze in tage if tag < datum]
+    heute = next((saetze for tag, saetze in tage if tag == datum), [])
+    zuletzt = gp.letzte_messungen(vorher)
+    return heute, [dict(z) for z in zuletzt.values()], vorher[-1][0] if vorher else None
 
 
 def _norm(text: str) -> str:
@@ -155,7 +154,7 @@ def pruefe(
         return gp.Ergebnis(**basis, status=gp.NICHT_PRUEFBAR, grund=grund), None
     except NichtPruefbar as fehler:
         return gp.Ergebnis(**basis, status=gp.NICHT_PRUEFBAR, grund=str(fehler)), None
-    sicht = leser.lies(lesung.text)
+    sicht = leser(lesung.text)
     gelesen = sicht.werte()
     extra = {
         "seite": lesung.seite,
@@ -167,9 +166,7 @@ def pruefe(
         grund = f"Die Seite zeigt einen anderen Tarif: {sicht.tarif_name}"
         ergebnis = gp.Ergebnis(**basis, **extra, status=gp.NICHT_PRUEFBAR, grund=grund)
         return ergebnis, lesung
-    status, abweichungen, fehlt, grund = gp.vergleiche(
-        basis["gespeichert"], gelesen, leser.pflicht
-    )
+    status, abweichungen, fehlt, grund = gp.vergleiche(basis["gespeichert"], gelesen)
     nicht_gelesen = [
         f for f in gp.FELDER if satz.get(f) is not None and f not in gelesen
     ]

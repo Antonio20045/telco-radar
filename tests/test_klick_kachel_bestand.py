@@ -34,6 +34,7 @@ from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.collect.geraete.einsundeins import lies_buendel
 from telco_radar.collect.geraete.klickecho import variante_aus
+from telco_radar.collect.geraete.klickfarbe import sku_farbe
 from telco_radar.collect.geraete.klickkachel import QUELLE_KACHEL, kachel_echo
 from telco_radar.collect.geraete.klicklauf import ERFASST, Kombiergebnis
 from telco_radar.geraete_config import lade_katalog
@@ -152,5 +153,7 @@ def test_gegenprobe_tarif_mit_namen_behaelt_die_eigene_sku(katalog):
     )
 
     (satz,) = [s for s in zug.rohsaetze if s.get("quelle_art") == "klick"]
-    assert satz["sku_id"] == sku_id("apple-iphone-17-pro", 256, None, "neu")
+    farbe = sku_farbe("1&1", "apple-iphone-17-pro", 256)
+    assert farbe == "cosmic-orange"
+    assert satz["sku_id"] == sku_id("apple-iphone-17-pro", 256, farbe, "neu")
     assert (satz["tarif_name"], satz["laufzeit_monate"]) == (name, 24)
