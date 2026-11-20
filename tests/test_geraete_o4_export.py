@@ -50,7 +50,7 @@ SPALTEN_TCO = [
     "Tarif",
     "Band",
     "Zustand",
-    "Zuzahlung EUR",
+    "Anzahlung EUR",
     "Tarif/Monat EUR",
     "Geräterate EUR",
     "Bündel/Monat EUR",
@@ -66,7 +66,11 @@ SPALTEN_TCO = [
     "Status",
     "Lücke",
     "Versand EUR",
+    "Ablöse nach Monat 24 EUR",
 ]
+
+
+_ABLOESE = "Ablöse nach Monat 24 EUR"
 
 
 @pytest.fixture(scope="module")
@@ -309,9 +313,9 @@ def test_die_band_spalte_ist_gefuellt_wo_ein_band_ist(tco_csv, store):
 
 
 def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
-    """Stichprobe: die Leitzahl-Spalte trägt `tco_model.tco_24()` - dieselbe
+    """Stichprobe: die Leitzahl-Spalte trägt `tco_model.kosten_ueber()` - dieselbe
     Funktion wie Karte, Graph und Radar, keine Export-Sonderrechnung."""
-    from telco_radar.tco_model import Buendel, tco_24
+    from telco_radar.tco_model import Buendel, kosten_ueber
 
     kopf, zeilen = tco_csv
     idx = {name: i for i, name in enumerate(kopf)}
@@ -325,7 +329,8 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
         for b in store["buendel"]
         if b["anbieter"] == probe[idx["Anbieter"]]
         and b["tarif_name"] == probe[idx["Tarif"]]
-        and b.get("geraet_zuzahlung") == _zahl(probe[idx["Zuzahlung EUR"]])
+        and b.get("geraet_zuzahlung")
+        in (_zahl(probe[idx["Anzahlung EUR"]]), _zahl(probe[idx[_ABLOESE]]))
         and b.get("tarif_monatlich") == _zahl(probe[idx["Tarif/Monat EUR"]])
         and b.get("geraet_monatsrate") == _zahl(probe[idx["Geräterate EUR"]])
         and b.get("buendel_monatlich") == _zahl(probe[idx["Bündel/Monat EUR"]])
@@ -336,13 +341,13 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
     assert kandidaten, "Stichprobe trifft keinen Satz des Stores"
     werte = set()
     for satz in kandidaten:
-        erg = tco_24(
+        erg = kosten_ueber(
             Buendel(
                 **{k: v for k, v in satz.items() if k in Buendel.__dataclass_fields__}
             )
         )
-        assert erg.belastbar, (
-            f"Stichprobe {probe} trägt eine Zahl, obwohl tco_24 unbelastbar ist"
+        assert erg.gesamt is not None, (
+            f"Stichprobe {probe} trägt eine Zahl, obwohl kosten_ueber unbelastbar ist"
         )
         werte.add(erg.gesamt)
     assert len(werte) == 1, (
@@ -351,19 +356,19 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
     assert float(
         _o4_leitzahl(probe, idx).replace(".", "").replace(",", ".")
     ) == pytest.approx(werte.pop(), abs=0.005), (
-        f"Leitzahl der Stichprobe {probe} stimmt nicht mit tco_24() überein"
+        f"Leitzahl der Stichprobe {probe} stimmt nicht mit kosten_ueber() überein"
     )
 
 
 def test_die_tco24_einer_simonly_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
     """A4: derselbe Kreuzcheck wie bei den Bündeln, fuer die zweite
-    Zeilenart - die Leitzahl einer SIM-only-Zeile ist `tco_24` ueber
+    Zeilenart - die Leitzahl einer SIM-only-Zeile ist `kosten_ueber` ueber
     `SimOnlyReferenz.als_buendel()` (Clean Code 1: EINE Rechnung), nicht
     tarif * 24. Bis A4 fehlte der Anschlusspreis in der Zelle; am
     Bestand vom 20.09.2026 tragen 19 von 45 Referenzen einen, die Probe
     waehlt deshalb eine MIT Anschlusspreis - nur dort unterscheiden sich
     alte und neue Rechnung ueberhaupt."""
-    from telco_radar.tco_model import SimOnlyReferenz, tco_24
+    from telco_radar.tco_model import SimOnlyReferenz, kosten_ueber
 
     kopf, zeilen = tco_csv
     idx = {name: i for i, name in enumerate(kopf)}
@@ -407,9 +412,9 @@ def test_die_tco24_einer_simonly_zeile_ist_gerechnet_nach_geraten(tco_csv, store
         ref = SimOnlyReferenz(
             **{k: v for k, v in s.items() if k in SimOnlyReferenz.__dataclass_fields__}
         )
-        erg = tco_24(ref.als_buendel())
-        assert erg.belastbar, (
-            f"Stichprobe {probe} trägt eine Zahl, obwohl tco_24 unbelastbar ist"
+        erg = kosten_ueber(ref.als_buendel())
+        assert erg.gesamt is not None, (
+            f"Stichprobe {probe} trägt eine Zahl, obwohl kosten_ueber unbelastbar ist"
         )
         werte.add(erg.gesamt)
     assert len(werte) == 1, (
@@ -418,7 +423,7 @@ def test_die_tco24_einer_simonly_zeile_ist_gerechnet_nach_geraten(tco_csv, store
     assert float(
         _o4_leitzahl(probe, idx).replace(".", "").replace(",", ".")
     ) == pytest.approx(werte.pop(), abs=0.005), (
-        f"Leitzahl der SIM-only-Stichprobe {probe} stimmt nicht mit tco_24() überein"
+        f"Leitzahl der SIM-only-Stichprobe {probe} weicht von kosten_ueber() ab"
     )
 
 
@@ -876,7 +881,8 @@ def test_p5_jede_bepreiste_buendelzeile_geht_mit_versand_auf(tco_csv):
     abweichungen = []
     for z in buendel:
         leitzahl = _o4_dezimal(_o4_leitzahl(z, idx))
-        zuzahlung = _o4_dezimal(z[idx["Zuzahlung EUR"]]) or 0.0
+        zuzahlung = _o4_dezimal(z[idx["Anzahlung EUR"]]) or 0.0
+        zuzahlung += _o4_dezimal(z[idx[_ABLOESE]]) or 0.0
         anschluss = _o4_dezimal(z[idx["Anschlusspreis EUR"]]) or 0.0
         versand = _o4_dezimal(z[idx["Versand EUR"]]) or 0.0
         tarifmonate = _o4_dezimal(z[idx["Tarifmonate in der Summe"]]) or 0.0

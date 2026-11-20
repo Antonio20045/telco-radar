@@ -128,10 +128,8 @@ def _leitzahl_spalten(tco24, leitzahl_monate):
 
     Zwei Koepfe, ein Wert: Zeitraum 24 Monate steht unter "Kosten über 24 Monate
     EUR", jeder andere unter "Kosten über Tarifmonate und Geräteraten EUR" (die
-    Tarifmonate nennt `SPALTE_TARIFMONATE`). Der Zeitraum wird gelesen
-    (`Tco.leitzahl_monate`, P0-B-h1), nicht bestimmt; fehlt er, ist er eine
-    Luecke und keine 24.
-    """
+    Tarifmonate nennt `SPALTE_TARIFMONATE`). Der Zeitraum ist `Kosten.monate`;
+    fehlt er, ist er eine Luecke und keine 24."""
     wert = _zahl(tco24)
     if not wert:
         return "", ""
@@ -149,7 +147,7 @@ SPALTEN_TCO = [
     "Tarif",
     "Band",
     "Zustand",
-    "Zuzahlung EUR",
+    "Anzahlung EUR",
     "Tarif/Monat EUR",
     "Geräterate EUR",
     "Bündel/Monat EUR",
@@ -165,6 +163,7 @@ SPALTEN_TCO = [
     "Status",
     "Lücke",
     "Versand EUR",
+    "Ablöse nach Monat 24 EUR",
 ]
 
 SPALTEN_RADAR = [
@@ -314,6 +313,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 z.get("status", ""),
                 z.get("luecke", ""),
                 _zahl(z.get("versand")),
+                _zahl(z.get("abloese")),
             ]
         )
     for z in (zeilen or {}).get("sim_only", []):
@@ -341,10 +341,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 ueber_laufzeit,
                 z.get("abgerufen_am", ""),
                 z.get("quelle_url", ""),
-                "",
-                "",
-                "",
-                "",
+                *([""] * 5),
             ]
         )
     return _schreibe(SPALTEN_TCO, ausgabe), len(ausgabe)

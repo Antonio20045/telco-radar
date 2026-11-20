@@ -26,6 +26,11 @@ FELD = "rechenweise"
 ERSTE = 1
 JE_ANBIETER = {"vodafone": 2}
 BRUCH = "Rechenweise geändert"
+LEITZAHL_FELD = "leitzahl_regel"
+LEITZAHL_REGEL = 2
+"""Welche Rechnung die eingefrorene `gesamt` einer Historienzeile ergab: 1 (ohne Feld)
+die alte `tco_24`, 2 seit 20.11.2026 `tco_kosten.kosten_ueber`
+(`docs/geraete/gesamtkosten.md`). Zwei Regeln sind kein Preissprung."""
 
 
 def fuer_anbieter(anbieter: str) -> int:
@@ -49,6 +54,17 @@ def der_zeile(zeile: object) -> int:
 def gleich(*zeilen: object) -> bool:
     """Tragen alle Zeilen dieselbe Rechenweise?"""
     return len({der_zeile(z) for z in zeilen}) <= 1
+
+
+def leitzahl(gesamt: float | None) -> dict:
+    """Die eingefrorene Leitzahl einer Historienzeile samt ihrer Regel."""
+    return {"gesamt": gesamt, LEITZAHL_FELD: LEITZAHL_REGEL}
+
+
+def gleiche_leitzahl(*zeilen: object) -> bool:
+    """Sind die eingefrorenen `gesamt` vergleichbar: gleiche Rechenweise UND Regel?"""
+    regeln = {z.get(LEITZAHL_FELD, ERSTE) for z in zeilen if isinstance(z, Mapping)}
+    return gleich(*zeilen) and len(regeln) <= 1
 
 
 def juengste(messungen: Mapping) -> dict:

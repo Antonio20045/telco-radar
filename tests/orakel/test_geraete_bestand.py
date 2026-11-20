@@ -1241,7 +1241,8 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
 
     abweich, geprueft = [], 0
     for r in zeilen:
-        zu, tarif = _n(r["Zuzahlung EUR"]), _n(r["Tarif/Monat EUR"])
+        zu = _n(r["Anzahlung EUR"] or r["Ablöse nach Monat 24 EUR"])
+        tarif = _n(r["Tarif/Monat EUR"])
         rate = _n(r["Geräterate EUR"])
         buendel = _n(r["Bündel/Monat EUR"])
         anschluss = _n(r["Anschlusspreis EUR"])
@@ -1338,7 +1339,7 @@ def _gw_csv_store_abgleich(zeilen: list, tco: dict, blaetter: dict, stand: str) 
             r["Speicher GB"],
             r["Laufzeit Monate"],
             r["Zustand"],
-            r["Zuzahlung EUR"],
+            r["Anzahlung EUR"] or r["Ablöse nach Monat 24 EUR"],
             r["Tarif/Monat EUR"],
             r["Geräterate EUR"],
             r["Bündel/Monat EUR"],
@@ -1403,13 +1404,12 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     """Der FACHLICHE Soll der SIM-only-Zeilen: 24 × Tarif PLUS
     Anschlusspreis, wo die Zeile ihn trägt (A4, 20.09.2026: die
     SIM-only-Leitzahl ist dieselbe Rechnung wie die der Bündel - Soll-
-    Definition der Leitzahl und Konsistenz zu geraeteanteil(), das
-    tco_24(als_buendel()) schon immer so rechnete; bis A4 rechnete der
-    Export ohne ihn, und der Orakel-Soll war der Bug). Eine LEERE Zelle
-    ist die Lücke des Modells (unbekannt ist nicht kostenlos), der
-    Orakel-Soll rechnet dann ohne ihn - dieselbe Konvention wie beim
-    Bündel-Zweig oben. Zuzahlung und Geräterate werden in SIM-only-Zeilen
-    nicht erhoben und stehen leer.
+    Definition der Leitzahl; bis A4 rechnete der Export ohne ihn, und der
+    Orakel-Soll war der Bug). Eine LEERE Anschlusszelle ist eine Lücke
+    (unbekannt ist nicht kostenlos): seit 20.11.2026 (docs/geraete/
+    gesamtkosten.md) trägt die Zeile dann auch keine Leitzahl - vorher
+    stand dort 24 × Tarif, als wäre der Anschluss 0 €. Zuzahlung und
+    Geräterate werden in SIM-only-Zeilen nicht erhoben und stehen leer.
 
     Auftrag P0.8: "Im SIM-only-Export fehlt der Anschlusspreis" - bis
     P0-A4 (2026-09-20) rechnete die Kennzahl ihn nicht ein; seither ist
@@ -1431,16 +1431,15 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     for r in zeilen:
         tarif, ist = _z(r["Tarif/Monat EUR"]), _z(_gw_leitzahl_aus_zeile(r))
         anschluss = _z(r["Anschlusspreis EUR"])
-        if tarif is None or ist is None:
+        if tarif is None:
             continue
-        soll = (
-            tarif * 24
-            + (anschluss if anschluss is not None else _gw_Dez(0))
-            + _gw_versand(r["Anbieter"])
-        )
-        if anschluss is not None:
-            mit_anschluss += 1
         geprueft += 1
+        if anschluss is None:
+            if ist is not None:
+                abweich.append((r["Anbieter"], r["Tarif"], float(ist), None))
+            continue
+        soll = tarif * 24 + anschluss + _gw_versand(r["Anbieter"])
+        mit_anschluss += 1
         if ist != soll:
             abweich.append((r["Anbieter"], r["Tarif"], float(ist), float(soll)))
     assert geprueft >= 40, (

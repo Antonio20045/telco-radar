@@ -33,7 +33,7 @@ schreibt ein Lauf hier ALLE Preisfelder eines Buendels gemeinsam - auch als `Non
 Grund ist die Kennzahl: TCO-24 ist eine SUMME. Ein Tarifpreis von gestern plus eine
 Geraeterate von heute ergibt einen Betrag, der an keinem Tag gegolten hat, und niemand
 koennte ihm ansehen, dass er aus zwei Messungen stammt. Lieber eine sichtbare Luecke
-(`tco_model.Tco.luecken`) als eine unsichtbare Mischung - und genau derselbe Befund hat
+(`Kosten.luecken`) als eine unsichtbare Mischung - und genau derselbe Befund hat
 am 03.09.2026 die Preisform an ihre Zahl gebunden. Ebenso gemeinsam: die Kennzeichen
 eines Klick-Buendels (`tco_buendel.KLICKFELDER`), die ein Adapterwert abraeumt.
 
@@ -53,9 +53,9 @@ Die Preishistorie steht hier sehr wohl - seit P2 (11.09.2026)
 -------------------------------------------------------------
 `geraete_tco.json` bleibt der AKTUELLE Stand je Buendel: die Seite liest weiter nur ihn.
 Daneben waechst `data/state/geraete_tco_historie.jsonl`, eine Zeile je (buendel_id,
-datum) mit den Messfeldern, der gerechneten Leitzahl `gesamt` (eingefroren aus
-`tco_model.tco_24`, damit P5 die Reihe zeichnen kann, ohne die Rechnung frueherer Laeufe
-nachzubauen), `abgerufen_am` und `rechenweise.FELD` (auch im Stand). Die Schreibregeln:
+datum) mit den Messfeldern, der Leitzahl `gesamt` (eingefroren aus `kosten_ueber` samt
+`rechenweise.LEITZAHL_FELD`, damit P5 die Reihe ohne die Rechnung frueherer Laeufe
+zeichnet), `abgerufen_am` und `rechenweise.FELD` (auch im Stand). Die Schreibregeln:
 
 * gleiches Datum je Buendel -> die Zeile wird ERSETZT. Ein wiederholter Lauf am selben
   Tag ist dieselbe Messung, kein zweiter Punkt (sonst luege die Reihe um die Zahl der
@@ -82,8 +82,8 @@ from ..tco_model import (
     SimOnlyReferenz,
     buendel_id_aktuell,
     buendel_id_ohne_laufzeit,
+    kosten_ueber,
     sim_only_id,
-    tco_24,
 )
 from .tco_beleg import beleg_widerspricht, beleglink_der_zeile
 from .tco_buendel import KLICKFELDER
@@ -435,13 +435,13 @@ class TcoDB:
         Die Messfelder kommen aus derselben Positivliste wie der Stand (`_MESSFELDER`):
         ein neues Messfeld muss in BEIDEN landen, sonst klaffe Stand und Historie
         auseinander. `gesamt` ist die Leitzahl der Messung, eingefroren aus
-        `tco_model.tco_24` - die Rechnung bleibt dort, hier steht nur ihr Ergebnis von
+        `kosten_ueber` - die Rechnung bleibt dort, hier steht nur ihr Ergebnis von
         damals. Sie kann `None` sein (Messung ohne jeden Posten); das ist eine ehrliche
         Luecke und kein Fehler.
         """
         zeile = {"id": satz.id, "datum": datum}
         TcoDB._schreibe_messung(zeile, satz, _MESSFELDER)
-        zeile["gesamt"] = tco_24(satz).gesamt
+        zeile.update(rechenweise.leitzahl(kosten_ueber(satz).gesamt))
         return zeile
 
     def save(self, today: str) -> bool:

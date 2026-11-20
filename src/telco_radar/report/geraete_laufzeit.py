@@ -72,7 +72,7 @@ def ist_24_plus_12(buendel_monatlich: float | None, raten_laufzeit: int | None) 
 
     Ein Betrag für Tarif und Gerät zusammen, belegt für mehr als 24 Monate: die Summe
     trägt 24 Beträge und die Einmalzahlung bei Kündigung, keine Geräteraten
-    (`tco_kosten._mit_abloese`). Jeder Leser fragt hier, nie am Anbieternamen.
+    (`Buendel.mit_abloese`). Jeder Leser fragt hier, nie am Anbieternamen.
     """
     return buendel_monatlich is not None and (raten_laufzeit or 0) > TCO_HORIZONT
 

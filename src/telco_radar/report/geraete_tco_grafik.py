@@ -16,7 +16,7 @@ Die drei Regeln, die dieses Modul tragen
    Zahlen (CLAUDE.md § 6).
 2. **Zwei Laufzeiten, zwei Nulllinien** (A5.4). Ein gemeinsamer Balkenrang
    ueber 24 und 36 Monate vergliche die Laufzeit und nennte es Preis.
-   Getrennt wird am ZEITRAUM DER LEITZAHL (`Tco.leitzahl_monate`), nicht
+   Getrennt wird am ZEITRAUM DER LEITZAHL (`Kosten.monate`), nicht
    an der Tariflaufzeit der Rechnung - die ist seit TCO24-1 auf jeder
    Karte 24, und die Trennung fiel damit still aus (P0-B-h3).
 3. **Jeder Balken traegt seine Aussage im `<title>`.** Eine Grafik ohne
@@ -90,7 +90,7 @@ def _gruppen(karten: list) -> list:
     Ueberschrift "24 Monate" ueber einer leeren Flaeche ist keine Auskunft.
 
     P0-B-h3 (Befund 2): gruppiert wird an `leitzahl_monate` - dem
-    Zeitraum, den die Summe WIRKLICH traegt (`tco_model.Tco`, P0-B-h1) -
+    Zeitraum, den die Summe WIRKLICH traegt (`Kosten.monate`, P0-B-h1) -
     und nicht mehr an `laufzeit`, der Tariflaufzeit der Rechnung. Die ist
     seit TCO24-1 die Konstante 24: alle Karten landeten damit in EINER
     Gruppe mit dem Kopf "gerechnet über 24 Monate", auch 1&1s
@@ -104,7 +104,7 @@ def _gruppen(karten: list) -> list:
     OHNE gemessenen Zeitraum gibt es keine Gruppe: eine Ueberschrift
     braucht eine Zahl, und eine geratene 24 waere die Ueberschrift, die
     dieser Befund ist. Am echten Bestand kann der Fall nicht auftreten
-    (`Tco.belastbar` verlangt die gemessene Ratenlaufzeit); der
+    (`kosten_ueber` verlangt die gemessene Ratenlaufzeit); der
     Leerzustand gehoert ohnehin in die Karte, wo sein Grund danebensteht
     (Modulkopf).
     """

@@ -2,9 +2,9 @@
 
 H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung. Der Tarif zählt nur
 seine Bindung (ohne Bindung 24 Monate): bei 36 Raten zählen Monat 1 bis 24 Tarif und
-Rate, Monat 25 bis 36 nur die Rate (Antonio, 10.10.2026; § 56 TKG). Für H = 24 ist es
-dieselbe Zahl wie `tco_24`,
-gegengeprüft an jedem Bündel des Schnappschusses. Die Tests importieren
+Rate, Monat 25 bis 36 nur die Rate (Antonio, 10.10.2026; § 56 TKG). Am Schnappschuss
+gegen eine Handrechnung aus den Rohfeldern geprüft (`_von_hand`); seit 20.11.2026 die
+einzige Rechnung (`docs/geraete/gesamtkosten.md`). Die Tests importieren
 `kosten_ueber` in der Testfunktion, damit ein fehlender Bau ein roter Test ist.
 """
 
@@ -24,7 +24,6 @@ from telco_radar.tco_model import (
     POSTEN_ANSCHLUSS,
     POSTEN_BUENDEL,
     POSTEN_LAUFZEIT,
-    POSTEN_RABATTE,
     POSTEN_RATE,
     POSTEN_TARIF,
     POSTEN_ZUZAHLUNG,
@@ -32,7 +31,6 @@ from telco_radar.tco_model import (
     Buendel,
     Rabatt,
     aktionen_aus,
-    tco_24,
 )
 
 TARIF_24 = "Tarif über 24 Monate"
@@ -95,13 +93,13 @@ def test_36_raten_bei_24_monaten_bindung_zaehlen_nur_24_tarifmonate():
         RATEN_36: 1314.00,
         POSTEN_ANSCHLUSS: 0.00,
     }
-    assert k.gesamt == 1794.76 == tco_24(b).gesamt
+    assert k.gesamt == 1794.76
     assert round(2034.64 - k.gesamt, 2) == round(12 * 19.99, 2)
     assert (k.monate, k.ratenlaufzeit, k.luecken) == (36, 36, [])
     assert k.monatlich == round(1794.76 / 36, 2)
 
     ausstieg = kosten_ueber(b, 24)
-    assert ausstieg.gesamt == tco_24(b).gesamt == 1794.76
+    assert ausstieg.gesamt == 1794.76
     assert ausstieg.posten[RATEN_36] == 1314.00, "alle 36 Raten bleiben geschuldet"
 
 
@@ -141,7 +139,7 @@ def test_der_tarif_zaehlt_seine_bindung_ohne_bindung_24_monate(
     vierundzwanzig = kosten_ueber(b, 24)
     assert vierundzwanzig.luecken == luecken_24
     assert vierundzwanzig.gesamt == (None if luecken_24 else 1794.76)
-    assert tco_24(b).gesamt == 1794.76
+    assert 1794.76
 
 
 def test_jeder_tarifmonat_zaehlt_zum_preis_seiner_phase():
@@ -179,18 +177,17 @@ def test_ohne_preis_ab_monat_25_hat_die_36er_zahl_eine_summe():
 
     vierundzwanzig = kosten_ueber(b, 24)
     assert vierundzwanzig.luecken == []
-    assert vierundzwanzig.gesamt == tco_24(b).gesamt == 1889.80
+    assert vierundzwanzig.gesamt == 1889.80
 
 
-def test_eine_phasenluecke_unter_24_monaten_weicht_bewusst_von_tco_24_ab():
-    """`tco_24` schreibt den letzten Preis fort (`phasensumme`), `kosten_ueber` nennt
-    die Lücke. Im Schnappschuss kommt keine solche Phasenlücke vor."""
+def test_eine_phasenluecke_unter_24_monaten_ist_eine_luecke():
+    """Der letzte Preis wird nie fortgeschrieben (die alte `tco_24` tat es über
+    `phasensumme`). Im Schnappschuss kommt keine solche Phasenlücke vor."""
     from telco_radar.tco_model import kosten_ueber
 
     b = _o2(laufzeit_monate=24, tarif_phasen=[Preisphase(1, 12, 19.99)])
     k = kosten_ueber(b, 24)
     assert (k.gesamt, k.luecken) == (None, [f"{POSTEN_TARIF} Monat 13–24"])
-    assert tco_24(b).gesamt == round(1 + 24 * 19.99 + 24 * 36.50, 2)
 
 
 def test_ein_monat_mit_zwei_preisen_ist_eine_luecke():
@@ -231,7 +228,7 @@ def test_ein_zeitraum_unter_der_bindung_laesst_keine_tarifmonate_weg(
     )
     k = kosten_ueber(b, 12)
     assert (k.gesamt, k.luecken) == (gesamt, luecken)
-    assert kosten_ueber(b, 24).gesamt == tco_24(b).gesamt == 1961.80
+    assert kosten_ueber(b, 24).gesamt == 1961.80
 
 
 def test_ein_vertrag_ueber_36_monate_zaehlt_24_betraege_und_die_abloese():
@@ -365,7 +362,7 @@ def test_boni_und_aktionen_gehen_nie_ein():
 
 
 def test_ohne_geraet_zaehlen_tarif_und_anschluss():
-    """SIM-only: 24 × 29,99 + 39,99 = 759,75 €, wie `tco_24`. Ohne Mindestlaufzeit
+    """SIM-only: 24 × 29,99 + 39,99 = 759,75 €. Ohne Mindestlaufzeit
     gibt es keinen Standardzeitraum; der Aufrufer nennt ihn."""
     from telco_radar.tco_kosten import POSTEN_ZEITRAUM
     from telco_radar.tco_model import kosten_ueber, zeitraum
@@ -379,7 +376,7 @@ def test_ohne_geraet_zaehlen_tarif_und_anschluss():
     b = Buendel(**felder)
     k = kosten_ueber(b)
     assert (k.gesamt, k.monate, k.ratenlaufzeit) == (759.75, 24, None)
-    assert k.gesamt == tco_24(b).gesamt
+    assert k.gesamt == round(24 * 29.99 + 39.99, 2)
 
     flex = Buendel(tarif_bindung_monate=0, **felder)
     assert zeitraum(flex) is None
@@ -430,6 +427,18 @@ def _gebunden_bis_24(b: Buendel) -> bool:
     return b.tarif_bindung_monate is None or b.tarif_bindung_monate <= 24
 
 
+def _von_hand(b: Buendel) -> float:
+    """Anzahlung + Tarif Monat 1-24 (Preis der Phase je Monat) + alle Raten + Anschluss,
+    ohne `kosten_ueber`, `phasensumme` oder `tarifschritte`."""
+    tarif = (
+        sum(_phasenpreis(b, m) for m in range(1, 25))
+        if b.tarif_phasen
+        else 24 * b.tarif_monatlich
+    )
+    raten = b.geraet_monatsrate * b.laufzeit_monate
+    return round(b.geraet_zuzahlung + tarif + raten + b.anschlusspreis, 2)
+
+
 def _phasenpreis(b: Buendel, monat: int) -> float:
     """Der Preis eines Monats aus der einen Phase, die ihn nennt, ohne `phasensumme`."""
     treffer = [
@@ -442,7 +451,7 @@ def _phasenpreis(b: Buendel, monat: int) -> float:
 
 
 @pytest.mark.parametrize(("raten", "anzahl", "phasen"), [(24, 2268, 408), (12, 863, 0)])
-def test_am_bestand_ist_es_bis_24_raten_dieselbe_zahl_wie_tco_24(raten, anzahl, phasen):
+def test_am_bestand_rechnet_es_bis_24_raten_wie_von_hand(raten, anzahl, phasen):
     """Datenkonzept 5.3: die 12er- und die 24er-Ansicht ändern keine Zahl. Preisphasen
     tragen im Schnappschuss nur congstar und Telekom."""
     from telco_radar.tco_model import kosten_ueber
@@ -452,12 +461,8 @@ def test_am_bestand_ist_es_bis_24_raten_dieselbe_zahl_wie_tco_24(raten, anzahl, 
     ]
     mit_phasen = 0
     for b in auswahl:
-        t = tco_24(b)
-        assert set(t.luecken) <= {POSTEN_RABATTE}, (b.id, t.luecken)
         for k in (kosten_ueber(b, 24), kosten_ueber(b)):
-            assert (k.gesamt, k.posten, k.luecken) == (t.gesamt, t.bestandteile, []), (
-                b.id
-            )
+            assert (k.gesamt, k.luecken) == (_von_hand(b), []), b.id
             assert (k.monate, k.ratenlaufzeit) == (24, raten), b.id
         mit_phasen += bool(b.tarif_phasen)
     assert (len(auswahl), mit_phasen) == (anzahl, phasen)
@@ -465,7 +470,7 @@ def test_am_bestand_ist_es_bis_24_raten_dieselbe_zahl_wie_tco_24(raten, anzahl, 
 
 def test_am_bestand_zaehlen_36_raten_nur_24_tarifmonate():
     """Jedes 36-Raten-Bündel mit höchstens 24 Monaten Bindung: Kosten über 36 Monate
-    sind dieselbe Zahl wie `tco_24` (24 Tarifmonate, alle 36 Raten), ob die Quelle den
+    sind die Handrechnung (24 Tarifmonate, alle 36 Raten), ob die Quelle den
     Preis ab Monat 25 nennt oder nicht. Gegenprobe: der Grundpreis als einzige Phase
     ohne Ende (congstar, Telekom) rechnet wie ein Bündel ohne Phasen."""
     from telco_radar.tco_model import kosten_ueber
@@ -479,12 +484,12 @@ def test_am_bestand_zaehlen_36_raten_nur_24_tarifmonate():
     ]
     grundpreis = 0
     for b in auswahl:
-        k, t = kosten_ueber(b, 36), tco_24(b)
+        k = kosten_ueber(b, 36)
         assert (k.monate, k.ratenlaufzeit) == (36, 36), b.id
         assert kosten_ueber(b).luecken == k.luecken, b.id
-        assert k.posten[RATEN_36] == t.bestandteile[RATEN_36], b.id
+        assert k.posten[RATEN_36] == round(36 * b.geraet_monatsrate, 2), b.id
         assert TARIF_36 not in k.posten, b.id
-        assert (k.gesamt, k.luecken) == (t.gesamt, []), b.id
+        assert (k.gesamt, k.luecken) == (_von_hand(b), []), b.id
         grundpreis += _nur_grundpreis(b)
     assert (len(auswahl), grundpreis) == (2354, 468)
     assert {b.anbieter for b in auswahl if b.tarif_phasen} == {"congstar", "Telekom"}
@@ -512,7 +517,7 @@ def test_eine_phase_ohne_ende_ist_der_grundpreis_der_bindung():
     assert kosten_ueber(_o2(tarif_phasen=_blatt(19.99)), 36).gesamt == 1794.76
 
 
-def test_am_bestand_rechnet_ein_vertrag_seine_laufzeit_wie_tco_24():
+def test_am_bestand_rechnet_ein_vertrag_bis_zur_abloese():
     """1&1 über 24 Monate (Manager, 05.11.2026): 24 × Bündelbetrag + Ablöse +
     Anschluss; ohne gemessene Ablöse eine Lücke."""
     from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG

@@ -2,12 +2,9 @@
 
 WAS DIESE TESTS FESTHALTEN
 ---------------------------
-Diese Tafel rechnet selbst nichts - sie ruft `tco_model.tco_24()` und
-`tco_model.geraeteanteil()` auf und FORMT das Ergebnis. Der ganze Sinn des
-Reiters ist eine einzige Unterscheidung: `Tco.gesamt` ist auch dann eine
-Zahl, wenn kein Tarifpreis bekannt ist (dann ist es der Geraetebetrag) -
-die Tafel zeigt `gesamt`/`monatlich` aber NUR bei `Tco.belastbar`. Jeder
-Test hier prueft genau EINE Zusicherung des Moduls.
+Diese Tafel rechnet selbst nichts - sie ruft `tco_kosten.kosten_ueber()` auf und
+FORMT das Ergebnis; fehlt ein Posten, zeigt sie keine Zahl, sondern die Lücke.
+Jeder Test hier prueft genau EINE Zusicherung des Moduls.
 
 Die Zahlen stammen, wie in `test_tco_model.py`, aus dem o2-Rechenbeispiel
 vom 03.09.2026 (1 EUR Anzahlung, 24 x 30 EUR Rate = 721 EUR).
@@ -22,10 +19,7 @@ from telco_radar.report.geraete_tco_view import (
     leer,
     ohne_zuordnung_satz,
 )
-from telco_radar.tco_model import (
-    Buendel,
-    tco_24,
-)
+from telco_radar.tco_model import Buendel, kosten_ueber
 
 _ANZAHLUNG, _RATE = 1.0, 30.0
 _SKU = "apple-iphone-14-128gb-mitternacht"
@@ -49,15 +43,13 @@ def _buendel(**kw) -> Buendel:
     return Buendel(**felder)
 
 
-def test_ohne_tarifpreis_zeigt_die_zeile_keine_zahl_obwohl_tco_24_eine_liefert():
-    """`tco_24` liefert fuer ein Buendel ohne Tarifgrundpreis sehr wohl ein
-    `gesamt` (den Geraetebetrag) - Regel 2 des Modulkopfs verlangt, dass die
-    Tafel es trotzdem NICHT zeigt. Ohne die erste Zusicherung wuerde dieser
-    Test nichts pruefen, deshalb steht sie hier explizit."""
+def test_ohne_tarifpreis_zeigt_die_zeile_keine_zahl():
+    """Ohne Tarifgrundpreis sind 721 € Geräteposten belegt, aber keine Gesamtkosten:
+    die Zeile nennt die Lücke statt einer Zahl."""
     b = _buendel(tarif_monatlich=None)
-    roh = tco_24(b)
-    assert roh.gesamt is not None, "sonst beweist der Test nur, dass es keine Zahl gab"
-    assert roh.belastbar is False
+    roh = kosten_ueber(b)
+    assert sum(roh.posten.values()) > 0, "sonst prueft der Test den falschen Fall"
+    assert roh.gesamt is None
 
     zeile = aufbereiten([b], [], [], katalog=None)["export"]["buendel"][0]
     assert zeile["tco24"] is None
@@ -67,8 +59,8 @@ def test_ohne_tarifpreis_zeigt_die_zeile_keine_zahl_obwohl_tco_24_eine_liefert()
 
 def test_ein_vollstaendiges_buendel_ergibt_leitzahl_und_monatsbetrag():
     b = _buendel()
-    roh = tco_24(b)
-    assert roh.belastbar is True, "sonst prueft der Test den falschen Fall"
+    roh = kosten_ueber(b)
+    assert roh.luecken == [], "sonst prueft der Test den falschen Fall"
 
     zeile = aufbereiten([b], [], [], katalog=None)["export"]["buendel"][0]
     assert zeile["tco24"] == roh.gesamt == 1480.75
@@ -97,7 +89,7 @@ def test_ein_store_woerterbuch_mit_betriebsfeldern_wird_gelesen():
     }
     ergebnis = aufbereiten([satz], [], [], katalog=None)
     assert len(ergebnis["export"]["buendel"]) == 1
-    assert ergebnis["export"]["buendel"][0]["tco24"] == tco_24(_buendel()).gesamt
+    assert ergebnis["export"]["buendel"][0]["tco24"] == kosten_ueber(_buendel()).gesamt
 
 
 def test_ein_kaputter_satz_kostet_keine_tafel():
@@ -160,7 +152,7 @@ def test_eine_sim_only_referenz_aus_dem_speicher_wird_gelesen():
 
     Fuer `Buendel` gibt es diesen Test schon. Ohne ihn hier liesse ein
     Feldnamen-Tippfehler in `_REFERENZ_FELDER` JEDE Referenz stumm wegfallen:
-    `geraeteanteil` waere dauerhaft `None`, und kein Test schluege an.
+    der SIM-only-Massstab waere dauerhaft leer, und kein Test schluege an.
     """
     b = _buendel(anbieter="o2", tarif_name="o2 M")
     referenz = {

@@ -108,7 +108,8 @@ def test_beide_varianten_erscheinen_bei_1und1_als_luecke_ohne_preis(
     assert SATZ in zeile["Lücke"]
     assert zeile["Status"] == "nicht im Sortiment"
     for spalte in (
-        "Zuzahlung EUR",
+        "Anzahlung EUR",
+        "Ablöse nach Monat 24 EUR",
         "Bündel/Monat EUR",
         "Anschlusspreis EUR",
         SPALTE_UEBER_24,

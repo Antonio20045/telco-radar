@@ -321,7 +321,7 @@ def _vergleiche_vortag(
             )
         spruenge = []
         for bid in sorted(set(alt) & set(neu)):
-            if not rechenweise.gleich(alt[bid], neu[bid]):
+            if not rechenweise.gleiche_leitzahl(alt[bid], neu[bid]):
                 continue
             a, n = alt[bid].get("gesamt"), neu[bid].get("gesamt")
             if not a or n is None:

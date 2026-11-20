@@ -19,7 +19,6 @@ src/telco_radar/analyze/highlight_topics.py arg-type 2
 src/telco_radar/analyze/highlight_topics.py assignment 1
 src/telco_radar/analyze/promo_analyst.py var-annotated 1
 src/telco_radar/analyze/promo_ranker.py arg-type 1
-src/telco_radar/analyze/tco_store.py assignment 1
 src/telco_radar/analyze/vorsortierung.py arg-type 1
 src/telco_radar/collect/__init__.py assignment 2
 src/telco_radar/collect/__init__.py union-attr 1
@@ -102,7 +101,6 @@ src/telco_radar/report/verlauf.py misc 1
 src/telco_radar/report/verlauf.py operator 1
 src/telco_radar/report/wettbewerb.py index 4
 src/telco_radar/report/wettbewerb.py union-attr 5
-src/telco_radar/tco_model.py operator 7
 src/telco_radar/uebersetzung/stufe.py index 2
 src/telco_radar/uebersetzung/stufe.py operator 3
 src/telco_radar/versand.py arg-type 4

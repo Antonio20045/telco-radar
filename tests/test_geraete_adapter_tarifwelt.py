@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 from telco_radar.collect.geraete import tarifwelt
-from telco_radar.tco_model import Buendel, tco_24
+from telco_radar.tco_model import Buendel, kosten_ueber
 
 _FIXTURES = Path(__file__).resolve().parent / "fixtures" / "geraete"
 _URL = "https://tarife-api2.mediamarkt.de/v1/productdetail/x/tariff"
@@ -127,7 +127,7 @@ def test_lies_produktdetail_centgenau_iphone17_telekom_magenta_m():
     assert satz["grundgebuehr"] == 49.95
     assert satz["laufzeit_monate"] == 24
     assert satz["doppelkarte"] is False
-    tco = tco_24(_buendel_aus(satz))
+    tco = kosten_ueber(_buendel_aus(satz))
     assert tco.gesamt == 1354.73
 
 
@@ -137,7 +137,7 @@ def test_lies_produktdetail_centgenau_galaxys26_standard():
     assert satz["geraet_zuzahlung"] == 29.0
     assert satz["anschlusspreis"] == 39.99
     assert satz["grundgebuehr"] == 29.99
-    tco = tco_24(_buendel_aus(satz))
+    tco = kosten_ueber(_buendel_aus(satz))
     assert tco.gesamt == 794.70
 
 
@@ -442,7 +442,7 @@ def test_lauf_zwei_geraete_zwei_tarife_centgenau_gegen_die_fixtures():
             gefunden[(modell, b.anbieter)] = (
                 b.geraet_zuzahlung,
                 b.tarif_monatlich,
-                tco_24(b).gesamt,
+                kosten_ueber(b).gesamt,
             )
     for schluessel, werte in erwartet.items():
         assert gefunden[schluessel] == werte, schluessel

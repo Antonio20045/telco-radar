@@ -92,7 +92,7 @@
             blendet nur). Ohne Attribut: unter jeder Wahl sichtbar. #}
          {% if k.laufzeit_sichtbar %}data-lz="{{ k.laufzeit_sichtbar }}"{% endif %}
          {# P0-B-z2: DER ZEITRAUM, DEN DIE SUMME DIESER ZEILE TRÄGT -
-            gelesen aus `leitzahl_monate` (`Tco.leitzahl_monate`, P0-B-h1),
+            gelesen aus `leitzahl_monate` (`Kosten.monate`, P0-B-h1),
             demselben Feld, aus dem `k.label` seinen Text baut. `data-
             laufzeit` daneben ist die TARIFlaufzeit der Rechnung und für
             jede Zeile 24, auch für die 36-Monats-Summe von 1&1 - als
@@ -220,7 +220,7 @@
     {% if k.herleitung_satz %}<span class="gr-bnd-herleitung">{{
       k.herleitung_satz }}</span>{% endif %}
     {% for h in k.versand_hinweise %}<span class="gr-bnd-herleitung gr-bnd-versand-luecke">{{
-      h }} – mit 0 € gerechnet</span>{% endfor %}
+      h }} – keine Gesamtkosten</span>{% endfor %}
     <span class="gr-bnd-chev" aria-hidden="true"></span>
   </summary>
   {# P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-

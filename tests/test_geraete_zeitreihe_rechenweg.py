@@ -300,7 +300,7 @@ def test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise(tm
     """`_gleichstand()`: sind BEIDE Ratenlaufzeiten `None` (keine
     gemessene Geraeterate, hier ueber `geraet_monatsrate=None` gebaut -
     ohne sie ist `laufzeit_monate` fuer die Leitzahl belanglos, siehe
-    `tco_model.tco_24`), verwirft die Auswahl die zweite, wertgleiche
+    `tco_model.kosten_ueber`), verwirft die Auswahl die zweite, wertgleiche
     Zeile still. Das ist KEIN Datenverlust: ohne eine gemessene Laufzeit
     gibt es keine zweite Zahlweise, die `weitere_laufzeiten` zeigen
     koennte - Gegenprobe zum congstar-24/36-Fall (`test_geraete_buendel_
