@@ -35,6 +35,7 @@ import random
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -59,6 +60,10 @@ RELEASE_PREFIX = "gegenprobe-"
 REPO = "Antonio20045/telco-radar"
 TEXT_HOECHSTENS = 4000
 """So viele Zeichen des gelesenen Seitentexts stehen im Ergebnis (Nachweis)."""
+
+ABSTAND_STUNDEN = 6
+"""Liegen Messung und Gegenprobe weiter auseinander, kann sich der Preis dazwischen
+geändert haben; eine Abweichung sagt das dazu (sie bleibt eine Abweichung)."""
 
 GRUND_ZEITBUDGET = "Zeitbudget des Laufs erschöpft, nicht geöffnet"
 GRUND_KEIN_LESER = "Für diesen Anbieter gibt es noch keinen Kundenweg"
@@ -120,6 +125,9 @@ class Ergebnis:
     status: str
     anlass: str
     geprueft_um: str | None = None
+    gemessen_um: str | None = None
+    """Ende des Messlaufs, der den geprüften Preis las (``geraete_tco.json``), oder
+    None, wenn der Lauf es nicht festhielt."""
     grund: str | None = None
     sku_id: str = ""
     tarif_name: str = ""
@@ -201,6 +209,26 @@ def vergleiche(
         grund = f"Bestätigt: {_namen(geprueft)}; nicht gelesen: {_namen(fehlt)}"
         return TEILWEISE, [], fehlt, grund
     return BESTAETIGT, [], [], None
+
+
+def messzeit(gemessen_um: str | None, satz: Mapping) -> str | None:
+    """Die Zeit des Messlaufs, wenn der Satz in diesem Lauf gelesen ist (sein
+    ``abgerufen_am`` ist der Tag des Laufs); sonst None."""
+    if not gemessen_um or satz.get("abgerufen_am") != gemessen_um[:10]:
+        return None
+    return gemessen_um
+
+
+def abstand_stunden(gemessen_um: str | None, geprueft_um: str | None) -> float | None:
+    """Stunden zwischen Messung und Gegenprobe; None, wenn eine Zeit fehlt."""
+    try:
+        a = datetime.fromisoformat(gemessen_um or "")
+        b = datetime.fromisoformat(geprueft_um or "")
+    except ValueError:
+        return None
+    if a.tzinfo is None or b.tzinfo is None:
+        return None
+    return abs((b - a).total_seconds()) / 3600
 
 
 def gespeicherte_werte(buendel: Mapping) -> dict:

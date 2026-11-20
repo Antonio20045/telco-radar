@@ -311,3 +311,18 @@ def test_bild_liegt_im_release_des_tages():
         "https://github.com/Antonio20045/telco-radar/releases/download/"
         "gegenprobe-2026-11-20/abc.webp"
     )
+
+
+def test_messzeit_nur_fuer_saetze_des_laufs():
+    lauf = "2026-11-20T02:48+00:00"
+    assert gp.messzeit(lauf, {"abgerufen_am": "2026-11-20"}) == lauf
+    assert gp.messzeit(lauf, {"abgerufen_am": "2026-11-19"}) is None
+    assert gp.messzeit(None, {"abgerufen_am": "2026-11-20"}) is None
+
+
+def test_abstand_zwischen_messung_und_gegenprobe():
+    assert gp.abstand_stunden(
+        "2026-11-20T02:48+00:00", "2026-11-20T17:43:00+00:00"
+    ) == pytest.approx(14.9167, abs=1e-3)
+    assert gp.abstand_stunden(None, "2026-11-20T17:43:00+00:00") is None
+    assert gp.abstand_stunden("2026-11-20T02:48", "2026-11-20T17:43:00+00:00") is None

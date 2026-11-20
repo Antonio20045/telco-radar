@@ -167,3 +167,11 @@ def test_kennungen_aus_den_quellen():
     ua = SKRIPT.kennungen(WURZEL)
     assert ua["Telekom"].startswith("TelcoRadar/")
     assert "Vodafone" not in ua
+
+
+def test_messzeit_steht_in_der_zeile():
+    lauf = "2026-11-20T02:48+00:00"
+    ergebnis, _ = SKRIPT.pruefe(
+        _lesen(), dict(SATZ), gp.ANLASS_STICHPROBE, "2026-11-20", lauf
+    )
+    assert ergebnis.gemessen_um == lauf
