@@ -444,13 +444,12 @@ class TcoDB:
         zeile["gesamt"] = kosten_ueber(satz).gesamt
         return zeile
 
-    def save(self, today: str) -> bool:
+    def save(self, today: str, gemessen_um: str = "") -> bool:
         """Schreibt die Datei - aber nur, wenn sie etwas zu sagen hat.
 
-        Ein leerer Bestand legt KEINE Datei an. Solange kein Sammellauf Buendel liefert
-        (Phase 6/7 des Strategiedokuments), soll dieser Zweig im naechtlichen Lauf
-        nichts hinterlassen: eine Datei mit zwei leeren Listen sieht im Repo aus wie ein
-        Ergebnis und ist keins.
+        Ein leerer Bestand legt KEINE Datei an: zwei leere Listen sehen im Repo aus
+        wie ein Ergebnis und sind keins. `gemessen_um` (ISO, Ende des Messlaufs) liest
+        die Gegenprobe, um Messung und Prüfung zeitlich nebeneinanderzustellen.
 
         Seit P2 schreibt `save` ZUSAETZLICH die vorgemerkten Historienzeilen dieses
         Laufs in `geraete_tco_historie.jsonl`. Die Stand-Datei wird ZUERST gesichert:
@@ -463,6 +462,7 @@ class TcoDB:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         daten = {
             "updated": today,
+            **({"gemessen_um": gemessen_um} if gemessen_um else {}),
             "buendel": self.buendel(),
             "sim_only": self.referenzen(),
             **({"pruefung": self.pruefung} if self.pruefung else {}),
