@@ -163,6 +163,34 @@ def test_erneuert_ist_nicht_dasselbe_angebot_wie_neu():
     assert proben.zum_preis(neu, 1.0) is None
 
 
+def test_andere_farbe_und_anderer_tag_stehen_am_beleg():
+    weiss = ID.replace("-schwarz--", "-weiss--")
+    e = _ergebnis(datum="2026-11-19")
+    anzeige = pb.gegenprobe_anzeige(e, weiss, "2026-11-20")
+    assert anzeige["hinweise"] == [
+        "andere Farbe (schwarz)",
+        "Prüfung vom 19.11.2026, Preis gelesen am 20.11.2026",
+    ]
+    assert pb.gegenprobe_anzeige(e, ID, "2026-11-19")["hinweise"] == []
+
+
+def test_teilweise_bestaetigt_heisst_so():
+    e = _ergebnis(status=gp.TEILWEISE, grund="Bestätigt: Tarif; nicht gelesen: x")
+    anzeige = pb.gegenprobe_anzeige(e)
+    assert anzeige["wort"] == "teilweise bestätigt"
+    assert anzeige["grund"].startswith("Bestätigt: ")
+
+
+def test_luecke_im_bestand_steht_als_fehlend():
+    e = _ergebnis(
+        status=gp.ABWEICHEND,
+        abweichungen=[{"feld": "anschlusspreis", "gespeichert": None, "gelesen": 39.9}],
+    )
+    assert pb.gegenprobe_anzeige(e)["abweichungen"] == [
+        "Anschlusspreis: gespeichert fehlt, Seite 39,90 €"
+    ]
+
+
 def test_abweichung_nennt_beide_werte_auf_der_seite():
     e = _ergebnis(
         status=gp.ABWEICHEND,

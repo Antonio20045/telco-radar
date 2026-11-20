@@ -4,6 +4,7 @@
    Aufbereitung, steht der Ausfall da. #}
 {% extends "base.html.j2" %}
 {% set active = 'geraete' %}
+{% from "_geraete_preisbeleg.html.j2" import gp_bilanz %}
 {% block title %}Vodafone Product and Services Insights · Preisänderungen{% endblock %}
 
 {% block content %}
@@ -19,7 +20,7 @@
   {% if ausfall %}<p class="ausfall-hinweis" role="status">{{ ausfall }}.</p>{% endif %}
   {% if not ausfall and not tage %}<p class="pa-leer">Keine Preisänderung in der Preishistorie.</p>{% endif %}
   {% if tage %}<ul class="pa-tage">{% for tag in tage %}{% set g = tag.gegenprobe %}
-    <li class="pa-tageszeile"><a class="pa-datum" href="{{ ordner }}/{{ tag.datum }}.html">{{ tag.datum_de }}</a><span class="pa-zahl">{{ tag.aenderungen | length }} {{ 'Preis' if tag.aenderungen | length == 1 else 'Preise' }} geändert</span><span class="pa-gp">{% if g.offen == tag.aenderungen | length %}nicht gegengeprüft{% else %}Gegenprobe: {% for teil in [(g.bestaetigt, 'bestätigt'), (g.abweichend, 'abweichend'), (g.nicht_pruefbar, 'nicht prüfbar'), (g.offen, 'offen')] if teil[0] %}{{ teil[0] }} {{ teil[1] }}{% if not loop.last %} · {% endif %}{% endfor %}{% endif %}</span><a class="pa-export" href="{{ ordner }}/{{ tag.datum }}.csv" download>CSV</a></li>{% endfor %}
+    <li class="pa-tageszeile"><a class="pa-datum" href="{{ ordner }}/{{ tag.datum }}.html">{{ tag.datum_de }}</a><span class="pa-zahl">{{ tag.aenderungen | length }} {{ 'Preis' if tag.aenderungen | length == 1 else 'Preise' }} geändert</span><span class="pa-gp">{{ gp_bilanz(g, tag.aenderungen | length) }}</span><a class="pa-export" href="{{ ordner }}/{{ tag.datum }}.csv" download>CSV</a></li>{% endfor %}
   </ul>{% endif %}
 </section>
 {% endblock %}

@@ -140,23 +140,23 @@ def aufbereiten(
     Tarif, Raten, Farbe und das Bild der heutigen Messung über ``zeilenbild``).
     """
     bestand = {b["id"]: b for b in lies_buendel(state_dir / BESTAND) if b.get("id")}
-    zuletzt: dict[str, dict] = {}
+    zuletzt: dict = {}
     tage: list[dict] = []
-    for _, saetze in tco_historie.tage(state_dir / HISTORIE):
-        aenderungen = []
-        for satz in saetze:
-            bid, datum = satz.get("id"), satz.get("datum")
-            if not bid or not datum or satz.get("abgerufen_am") != datum:
-                continue
-            vorher = zuletzt.get(bid)
-            zuletzt[bid] = satz
-            if vorher is None or not gp.geaendert(satz, vorher):
-                continue
-            aenderungen.append(
-                _aenderung(
-                    satz, vorher, bestand, karten, tarife, gegenproben, zeilenbild
-                )
+    for tag, saetze in tco_historie.tage(state_dir / HISTORIE):
+        gemessen = gp.gemessen(saetze, tag)
+        aenderungen = [
+            _aenderung(
+                dict(satz),
+                dict(vorher),
+                bestand,
+                karten,
+                tarife,
+                gegenproben,
+                zeilenbild,
             )
+            for satz, vorher in gp.aenderungen(gemessen, zuletzt)
+        ]
+        zuletzt.update(gemessen)
         if aenderungen:
             aenderungen.sort(key=lambda a: -abs(a["delta"] or 0.0))
             datum = aenderungen[0]["neu"]["datum"]
@@ -206,13 +206,22 @@ def _aenderung(satz, vorher, bestand, karten, tarife, gegenproben, zeilenbild) -
     }
 
 
+OFFEN = "offen"
+"""Bilanz: Änderungen ohne Gegenprobe, auch die, für die der Lauf keine Zeit hatte."""
+
+
 def _bilanz(aenderungen: list[dict]) -> dict[str, int]:
-    """Wie viele Änderungen des Tages die Gegenprobe bestätigt, verwirft, offenlässt."""
+    """Wie viele Änderungen des Tages die Gegenprobe bestätigt, nur teilweise
+    bestätigt, verwirft, nicht prüfen konnte und wie viele ungeprüft blieben
+    (``OFFEN``: ohne Gegenprobe oder mit „Zeitbudget erschöpft“)."""
     out = {status: 0 for status in gp.STATUS}
-    out["offen"] = 0
+    out[OFFEN] = 0
     for a in aenderungen:
         g = a["neu"]["beleg"]["gegenprobe"]
-        out[g["status"] if g else "offen"] += 1
+        if g is None or g["grund"] == gp.GRUND_ZEITBUDGET:
+            out[OFFEN] += 1
+        else:
+            out[g["status"]] += 1
     return out
 
 

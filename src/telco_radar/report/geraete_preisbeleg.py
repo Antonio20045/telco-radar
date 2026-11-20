@@ -38,6 +38,7 @@ SATZ_OHNE_BILD = "Kein Screenshot zu diesem Preis"
 SATZ_OHNE_RECHENWEG = "Kein vollständiger Rechenweg"
 STATUS_WORT = {
     gp.BESTAETIGT: "bestätigt",
+    gp.TEILWEISE: "teilweise bestätigt",
     gp.ABWEICHEND: "abweichend",
     gp.NICHT_PRUEFBAR: "nicht prüfbar",
 }
@@ -163,15 +164,42 @@ def _zaehlt(feld: str, gespeichert: dict) -> bool:
 def _abweichung(a: dict) -> str:
     """„Geräterate: gespeichert 5,00 €, Seite 9,50 €“."""
     feld = a["feld"]
-    alt, neu = _wert(feld, a["gespeichert"]), _wert(feld, a["gelesen"])
+    alt = "fehlt" if a["gespeichert"] is None else _wert(feld, a["gespeichert"])
+    neu = _wert(feld, a["gelesen"])
     return f"{gp.FELDNAMEN.get(feld, feld)}: gespeichert {alt}, Seite {neu}"
 
 
-def gegenprobe_anzeige(e: gp.Ergebnis | None) -> dict | None:
-    """Was die Seite von einer Gegenprobe zeigt; None ohne Gegenprobe."""
+def farbe(buendel_id: str) -> str:
+    """Die Farbe im Bündel-Schlüssel (Teil der SKU hinter dem Speicher), lesbar."""
+    teile = buendel_id.split("--")
+    treffer = _SPEICHER.match(teile[2]) if len(teile) == 5 else None
+    rest = teile[2][len(treffer.group(1)) :].strip("-") if treffer else ""
+    return rest.replace("-", " ")
+
+
+def hinweise(e: gp.Ergebnis, buendel_id: str, abgerufen_am: str) -> list[str]:
+    """Was an einer Gegenprobe anders ist als an der Zeile: andere Farbe desselben
+    Angebots oder ein anderer Tag als die Messung des Preises."""
+    out = []
+    if buendel_id and e.buendel_id != buendel_id:
+        name = farbe(e.buendel_id)
+        out.append(f"andere Farbe ({name})" if name else "andere Farbe")
+    if abgerufen_am and e.datum != abgerufen_am:
+        gelesen = datum_de(abgerufen_am)
+        out.append(f"Prüfung vom {datum_de(e.datum)}, Preis gelesen am {gelesen}")
+    return out
+
+
+def gegenprobe_anzeige(
+    e: gp.Ergebnis | None, buendel_id: str = "", abgerufen_am: str = ""
+) -> dict | None:
+    """Was die Seite von einer Gegenprobe zeigt; None ohne Gegenprobe. Mit
+    ``buendel_id`` und ``abgerufen_am`` der Zeile nennt ``hinweise`` eine andere Farbe
+    oder einen anderen Tag."""
     if e is None:
         return None
     return {
+        "hinweise": hinweise(e, buendel_id, abgerufen_am),
         "status": e.status,
         "wort": STATUS_WORT[e.status],
         "datum": datum_de(e.datum),
@@ -194,9 +222,10 @@ def beleg(
     gesamt: float | None,
     bild: dict | None,
     gegenprobe: gp.Ergebnis | None,
+    buendel_id: str = "",
 ) -> dict:
     """Ein Beleg: jede Angabe da oder als benannte Lücke."""
-    anzeige = gegenprobe_anzeige(gegenprobe)
+    anzeige = gegenprobe_anzeige(gegenprobe, buendel_id, abgerufen_am)
     if bild is None and gegenprobe is not None and gegenprobe.bild:
         bild = {"url": gegenprobe.bild, "datum": gegenprobe.datum, "art": "Gegenprobe"}
     return {
@@ -249,6 +278,7 @@ class Preisbelege:
             gegenprobe=self.gegenproben.zum_preis(
                 karte.get("buendel_id") or "", karte.get("gesamt")
             ),
+            buendel_id=karte.get("buendel_id") or "",
         )
 
 

@@ -20,6 +20,7 @@ import test_geraete_buendel_kopf_zeitraum as kopf
 from bs4 import BeautifulSoup
 
 from telco_radar import gegenprobe as gp
+from telco_radar import tco_historie
 from telco_radar.report import geraete_preisaenderungen as pa
 from telco_radar.report.geraete_preisbeleg import Gegenproben
 from telco_radar.report.html import render_site
@@ -159,10 +160,55 @@ def test_gegenprobe_des_tages_steht_am_beleg_und_in_der_bilanz(tmp_path):
     assert a["alt"]["beleg"]["gegenprobe"] is None
     assert tage[0]["gegenprobe"] == {
         gp.BESTAETIGT: 0,
+        gp.TEILWEISE: 0,
         gp.ABWEICHEND: 1,
         gp.NICHT_PRUEFBAR: 0,
         "offen": 0,
     }
+
+
+def test_nur_eingefrorenes_gesamt_anders_ist_keine_preisaenderung(tmp_path):
+    alt = _zeile(O2, VORTAG, 18.0, gesamt=900.0)
+    neu = _zeile(O2, TAG, 18.0, gesamt=950.0)
+    assert _tage(tmp_path, [alt], [neu]) == []
+
+
+def test_seite_und_auswahl_der_gegenprobe_zaehlen_dieselben_aenderungen(tmp_path):
+    """Lücke im Vortag: die Seite vergleicht mit der letzten Messung davor, die
+    Auswahl der Gegenprobe ebenso (eine Definition, ``gegenprobe.aenderungen``)."""
+    _bestand(tmp_path)
+    _historie(
+        tmp_path,
+        {
+            "2026-09-08": [
+                _zeile(O2, "2026-09-08", 18.0),
+                _zeile(CS, "2026-09-08", 9.0),
+            ],
+            VORTAG: [_zeile(CS, VORTAG, 10.0)],
+            TAG: [_zeile(O2, TAG, 20.0), _zeile(CS, TAG, 10.0)],
+        },
+    )
+    seite = pa.aufbereiten(tmp_path, {}, Gegenproben(), lambda k: None)
+    tage = tco_historie.tage(tmp_path / pa.HISTORIE)
+    vorher = gp.letzte_messungen([(d, s) for d, s in tage if d < TAG])
+    heute = next(s for d, s in tage if d == TAG)
+    wahl = [b for b, a in gp.auswahl(TAG, heute, vorher.values(), 0)]
+    neu = {a["id"] for t in seite if t["datum"] == TAG for a in t["aenderungen"]}
+    assert neu == set(wahl) == {O2}
+
+
+def test_zeitbudget_zaehlt_als_nicht_gegengeprueft(tmp_path):
+    probe = gp.Ergebnis(
+        datum=TAG,
+        buendel_id=O2,
+        anbieter="o2",
+        status=gp.NICHT_PRUEFBAR,
+        anlass=gp.ANLASS_AENDERUNG,
+        grund=gp.GRUND_ZEITBUDGET,
+    )
+    tage = _tage(tmp_path, [_zeile(O2, VORTAG, 18.0)], [_zeile(O2, TAG, 20.0)], [probe])
+    assert tage[0]["gegenprobe"][pa.OFFEN] == 1
+    assert tage[0]["gegenprobe"][gp.NICHT_PRUEFBAR] == 0
 
 
 def test_export_traegt_jede_aenderung_mit_belegangaben(tmp_path):
