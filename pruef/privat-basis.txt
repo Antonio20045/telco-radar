@@ -7,7 +7,6 @@ tests/test_eine_seite_querlinks.py PLC2701 1
 tests/test_geraete_abdeckung.py PLC2701 9
 tests/test_geraete_abdeckung_mail.py PLC2701 1
 tests/test_geraete_adapter_saturn.py PLC2701 3
-tests/test_geraete_adapter_telekom_1und1.py PLC2701 1
 tests/test_geraete_aktionen.py PLC2701 2
 tests/test_geraete_anbieterzaehlung.py PLC2701 1
 tests/test_geraete_bereinigung.py PLC2701 1

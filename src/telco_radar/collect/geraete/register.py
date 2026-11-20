@@ -1,6 +1,6 @@
 """Traegt die anbietereigenen Adapter ins Verzeichnis ein.
 
-Nur dieses Modul kennt alle sechs Adapter. Sie selbst importieren aus dem
+Nur dieses Modul kennt alle Adapter. Sie selbst importieren aus dem
 Paket nur `basis`, so bleiben sie voneinander unabhaengig (Vertrag
 `adapter-unabhaengig` in `.importlinter`).
 """
@@ -10,7 +10,6 @@ from __future__ import annotations
 from . import (
     congstar,
     coolblue,
-    einsundeins,
     mediamarkt,
     o2,
     saturn,
@@ -60,14 +59,6 @@ def registriere_anbieter_adapter() -> None:
             lies_buendel=telekom.lies_buendel,
             vertiefe_buendel=telekom_zusatz.vertiefe_buendel,
             direkt=True,
-        ),
-    )
-    registriere(
-        "einsundeins_buendel",
-        Adapter(
-            name="einsundeins_buendel",
-            lies=einsundeins.lies,
-            ernte=einsundeins.ernte,
         ),
     )
     registriere(

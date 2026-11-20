@@ -143,6 +143,41 @@ def einsundeins_lesung(speicher: str = "256") -> Antwortlesung:
     return lies_antwort(globale, EINSUNDEINS_KARTE.antwort, None, platz)
 
 
+EINSUNDEINS_ADAPTERSATZ = {
+    "titel": "Apple iPhone 17 Pro 256 GB cosmic orange",
+    "farbe": "cosmic orange",
+    "speicher_gb": 256,
+    "tarif_name": "1&1 All-Net-Flat S",
+    "tarif_slug": "tariff-anf-s-mvl",
+    "buendel_monatlich": 44.99,
+    "geraet_zuzahlung": 360.0,
+    "laufzeit_monate": 36,
+    "tarifdetails_url": (
+        "https://mobile.1und1.de/details-all-net-flat-preisliste"
+        "?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1"
+        "&chosenDevice=hw-apple-iphone-17-pro&color=COSMIC_ORANGE"
+        "&size=256&lightbox=true&bk=false"
+    ),
+    "url": "https://mobile.1und1.de/iphone-17-pro",
+    "quelle": "einsundeins_buendel",
+}
+"""Der 256-GB-Satz, den der 1&1-Adapter (bis 20.11.2026) aus
+``einsundeins_produktseite_iphone_17_pro.html.gz`` las, wörtlich; seitdem misst
+nur der Klick-Lauf 1&1. Er steht hier als Bestandssatz eines Adapters, den ein
+Klick-Satz ablöst."""
+
+
+def einsundeins_adaptersatz(**felder) -> dict:
+    """``EINSUNDEINS_ADAPTERSATZ`` als Rohsatz im Bestand (Anbieter, Zustand, SKU)."""
+    return {
+        **EINSUNDEINS_ADAPTERSATZ,
+        "anbieter": "1&1",
+        "zustand": "neu",
+        "sku_id": "apple-iphone-17-pro-256gb-cosmic-orange",
+        **felder,
+    }
+
+
 def einsundeins_kachel(stelle: int, seite: int = 3) -> tuple[str | None, Buendelwerte]:
     """Label und Bündelwerte der Kachel ``stelle`` der Folgeseite, wie die Erkundung
     sie las: Label aus ``data-linkid``, Werte aus den Preis-Kandidaten der Kachel, je

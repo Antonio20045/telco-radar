@@ -533,7 +533,7 @@ def test_die_haken_abrufe_tragen_den_absender_des_anbieters(monkeypatch):
     monkeypatch.setitem(
         P.ADAPTER,
         "ldjson",
-        Adapter(name="probe", lies=lambda text, url="": [], ergaenze_buendel=haken),
+        Adapter(name="probe", lies=lambda text, url="": [], loese_tarifnamen=haken),
     )
     anbieter = _anbieter(
         name="Vodafone",

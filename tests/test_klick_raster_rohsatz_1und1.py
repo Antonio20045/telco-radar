@@ -16,6 +16,7 @@ from bestand_pfad import lese_wurzel
 from klickergebnisse import (
     EINSUNDEINS_KARTE,
     EINSUNDEINS_SEITE,
+    einsundeins_adaptersatz,
     erfasst,
     ergebnisdatei,
     lauf,
@@ -24,10 +25,7 @@ from test_klick_anschluss_1und1 import DETAILS_M, DETAILS_S, HEUTE
 from test_klick_raster_1und1 import DATEIEN, RASTER, text
 
 from telco_radar.analyze.klick_zusammenfuehrung import zusammenfuehren
-from telco_radar.collect.geraete.einsundeins import (
-    ergaenze_bereitstellungsgebuehr,
-    lies_buendel,
-)
+from telco_radar.collect.geraete.einsundeins import bereitstellungsgebuehr
 from telco_radar.collect.geraete.klickantwort import lies_antwort
 from telco_radar.collect.geraete.klickergebnis import schreibe
 from telco_radar.collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
@@ -258,14 +256,9 @@ def _adapter(anschluss: str) -> list[dict]:
     5,00 aus den Rastern S/M vom 29.09.2026). Die Herleitung ist entfallen
     (`test_einsundeins_gemessen_2011.py`); hier steht der Satz wörtlich, weil
     es um die Ablöse eines solchen Bestandssatzes durch das Klick-Raster geht."""
-    html = text("einsundeins_produktseite_iphone_17_pro.html.gz")
-    (s_256,) = [
-        {**r, "anbieter": "1&1", "zustand": "neu"}
-        for r in lies_buendel(html, EINSUNDEINS_SEITE.adresse)
-        if r["speicher_gb"] == 256
-    ]
+    s_256 = einsundeins_adaptersatz()
     raster_m = RASTER[1]
-    saetze = [
+    return [
         {
             **s_256,
             "tarif_name": "1&1 All-Net-Flat M",
@@ -275,16 +268,8 @@ def _adapter(anschluss: str) -> list[dict]:
             "herleitung": "tarifaufschlag_aus_tarifraster",
             "url": raster_m,
             "quelle_url": raster_m,
+            "anschlusspreis": bereitstellungsgebuehr(anschluss),
         }
-    ]
-
-    def hole(url, kopfzeilen=None):
-        return (200, anschluss) if "details-" in url else (404, "")
-
-    ergaenze_bereitstellungsgebuehr(hole, {}, saetze)
-    return [
-        {**s, "sku_id": sku_id("apple-iphone-17-pro", s["speicher_gb"], s["farbe"])}
-        for s in saetze
     ]
 
 

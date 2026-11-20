@@ -15,7 +15,7 @@ Stufen:
      `tarif_monatlich` ist der Preis in Monat 1 (`collect/geraete/vodafone_aktion.py`)
   2  1&1 ab 20.11.2026: "24 Monate Fix"/"36 Monate Fix" der Preiskarte statt 24+12
      mit Schlusszahlung; 36 Monate tragen keine Schlusszahlung mehr
-     (`collect/geraete/einsundeins.py`)
+     (Klick-Karte `config/klickkarten/1und1.yaml`)
 """
 
 from __future__ import annotations

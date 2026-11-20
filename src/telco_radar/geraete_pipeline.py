@@ -199,19 +199,18 @@ def nachsammle_buendel(
     hole: Callable,
     uhr: Callable[[], datetime],
 ) -> None:
-    """Die Nachbearbeitungs-Haken der Adapter ueber die Buendel laufen
-    lassen. Wirft nie - ein Fehler hier darf den Bestand nicht kosten,
-    er ist an dieser Stelle laengst gespeichert.
+    """Den Nachbearbeitungs-Haken `loese_tarifnamen` der Adapter ueber die
+    Buendel laufen lassen. Wirft nie - ein Fehler hier darf den Bestand nicht
+    kosten, er ist an dieser Stelle laengst gespeichert.
 
-    ROBOTS GILT AUCH HIER (S2-3, 22.09.2026). Die Haken rufen selbst ab
-    (`vodafone.loese_tarifnamen`, `einsundeins.ergaenze_buendel`) und
-    bekamen bis hierher das ROHE `hole`: ohne Disallow, ohne Crawl-delay,
-    ohne Fensterpruefung - und das ausgerechnet nach der Sammelphase, also
-    an der spaetesten Stelle des Laufs, an der ein Besuchsfenster am
-    ehesten zu ist. Die Zusage "die Fensterpruefung gilt JE ABRUF"
-    (Collector-Modulkopf, `geraete.yml`) hielt fuer sie nicht. Jeder Haken
-    bekommt deshalb ein `hole`, das durch dieselbe `Abrufschleuse` geht
-    wie die Sammelphase - je Anbieter eine eigene, wie dort.
+    ROBOTS GILT AUCH HIER (S2-3, 22.09.2026). Der Haken ruft selbst ab
+    (`vodafone.loese_tarifnamen`) und bekam bis hierher das ROHE `hole`:
+    ohne Disallow, ohne Crawl-delay, ohne Fensterpruefung - und das
+    ausgerechnet nach der Sammelphase, also an der spaetesten Stelle des
+    Laufs, an der ein Besuchsfenster am ehesten zu ist. Die Zusage "die
+    Fensterpruefung gilt JE ABRUF" (Collector-Modulkopf, `geraete.yml`) hielt
+    fuer ihn nicht. Er bekommt deshalb ein `hole`, das durch dieselbe
+    `Abrufschleuse` geht wie die Sammelphase - je Anbieter eine eigene, wie dort.
 
     `uhr()` ist die Zeit des NAECHSTEN Abrufs: die Stufe laeuft in Echtzeit,
     ein eingefrorener Zeitstempel waere der Fehler, den die Fensterprobe sucht.
@@ -221,35 +220,25 @@ def nachsammle_buendel(
             continue
         anbieter = quellen.nach_name(bilanz.name)
         adapter = ADAPTER.get(anbieter.methode) if anbieter else None
-        if adapter is None:
+        if adapter is None or adapter.loese_tarifnamen is None:
             continue
         gebremst = hole_fuer_anbieter(hole, anbieter, uhr)
-        for haken, meldung in (
-            (
-                adapter.loese_tarifnamen,
-                "%s: %d von %d Buendel-Tarifnamen ueber die "
-                "Tarifschnittstelle aufgeloest",
-            ),
-            (
-                adapter.ergaenze_buendel,
-                "%s: %d Buendel-Saetze um die Bereitstellungsgebuehr "
-                "ergaenzt (%d Rohsaetze)",
-            ),
-        ):
-            if haken is None:
-                continue
-            try:
-                gesetzt = haken(
-                    gebremst,
-                    dict(getattr(anbieter, "kopfzeilen", None) or {}),
-                    bilanz.buendel,
+        try:
+            gesetzt = adapter.loese_tarifnamen(
+                gebremst,
+                dict(getattr(anbieter, "kopfzeilen", None) or {}),
+                bilanz.buendel,
+            )
+            if gesetzt:
+                log.info(
+                    "%s: %d von %d Buendel-Tarifnamen ueber die "
+                    "Tarifschnittstelle aufgeloest",
+                    bilanz.name,
+                    gesetzt,
+                    len(bilanz.buendel),
                 )
-                if gesetzt:
-                    log.info(meldung, bilanz.name, gesetzt, len(bilanz.buendel))
-            except Exception as exc:  # noqa: BLE001
-                log.warning(
-                    "%s: Buendel-Nachsammeln gescheitert (%s)", bilanz.name, exc
-                )
+        except Exception as exc:  # noqa: BLE001
+            log.warning("%s: Buendel-Nachsammeln gescheitert (%s)", bilanz.name, exc)
 
 
 def run_geraete_stage(

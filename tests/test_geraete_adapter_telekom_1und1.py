@@ -1,4 +1,7 @@
-"""Telekom und 1&1: die zwei Netzbetreiber-Adapter vom 04.09.2026.
+"""Telekom und 1&1: die zwei Netzbetreiber vom 04.09.2026.
+
+Seit 20.11.2026 misst 1&1 nur der Klick-Lauf (Methode `klick`, kein Adapter);
+hier stehen nur noch die Telekom-Tests und die Konfiguration beider.
 
 WARUM DIESE ZWEI NEBENEINANDER STEHEN
 -------------------------------------
@@ -39,8 +42,6 @@ from bestand_pfad import lese_wurzel
 from telco_radar.analyze.geraete_store import GeraeteDB
 from telco_radar.collect.geraete import (
     GeraeteAbrufFehler,
-    _preisfelder,
-    einsundeins,
     sammle_anbieter,
     telekom,
 )
@@ -58,8 +59,6 @@ _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _WURZEL = Path(__file__).parent.parent
 
 _TELEKOM_URL = "https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag"
-_EE_KATEGORIE = "https://mobile.1und1.de/smartphones"
-_EE_PRODUKT = "https://mobile.1und1.de/iphone-17-pro"
 
 
 def _gz(name: str) -> str:
@@ -70,16 +69,6 @@ def _gz(name: str) -> str:
 @pytest.fixture(scope="module")
 def telekom_html():
     return _gz("telekom_kategorie_smartphones_ohne_vertrag.html.gz")
-
-
-@pytest.fixture(scope="module")
-def ee_kategorie():
-    return _gz("1und1_kategorie_smartphones.html.gz")
-
-
-@pytest.fixture(scope="module")
-def ee_produkt():
-    return _gz("1und1_produkt_iphone17pro.html.gz")
 
 
 @pytest.fixture(scope="module")
@@ -595,165 +584,19 @@ def test_telekom_landet_als_listung_mit_preisform_im_bestand(
         assert listung.ratenzahlung is not None
 
 
-def test_einsundeins_erntet_nur_die_katalogkacheln(ee_kategorie):
-    """Die Seite fuehrt 167 Adressen der eigenen Domain, davon 42
-    Produktseiten. Geerntet wird, was die Seite selbst als Kachel
-    auszeichnet - ein Pfadmuster kann das nicht: /iphone-17-pro und
-    /handyvertrag-ohne-laufzeit sind pfadgleich."""
-    links = einsundeins.ernte(ee_kategorie, _EE_KATEGORIE)
-    assert len(links) == 42
-    assert len(set(links)) == 42
-    assert _EE_PRODUKT in links
-    assert all(l.startswith("https://mobile.1und1.de/") for l in links)
-    assert not [l for l in links if "/_catalog/images" in l]
-    assert "https://mobile.1und1.de/handyvertrag-ohne-laufzeit" not in links
-    assert "https://mobile.1und1.de/smartphone-neuheiten" not in links
-
-
-def test_einsundeins_ernte_ohne_kacheln_liefert_nichts_und_wirft_nicht():
-    """Ein leeres Raster ist ein anderer Zustand als eine nicht gelesene
-    Seite. Der Sammler unterscheidet die zwei - eine Ausnahme hier machte
-    sie ununterscheidbar."""
-    assert (
-        einsundeins.ernte("<html><body><a href='/x'>x</a></body></html>", _EE_KATEGORIE)
-        == []
-    )
-    assert einsundeins.ernte("", _EE_KATEGORIE) == []
-
-
-def test_einsundeins_liest_den_monatspreis_des_buendels(ee_produkt):
-    saetze = einsundeins.lies(ee_produkt, _EE_PRODUKT)
-    assert len(saetze) == 1
-    satz = saetze[0]
-    assert satz["monatspreis"] == 44.99
-    assert satz["tarif"] == "1&1 All-Net-Flat S"
-    assert satz["laufzeit_monate"] == 36
-    assert satz["speicher_gb"] == 256
-    assert satz["farbe"] == "cosmic orange"
-    assert satz["waehrung"] == "EUR"
-
-
-def test_einsundeins_traegt_keinen_barpreis(ee_produkt):
-    """44,99 EUR ist kein Preis fuer ein Telefon. Es gibt bei 1&1 keinen
-    Barpreis - und eine Zahl, die es nicht gibt, wird nicht gerechnet."""
-    assert einsundeins.lies(ee_produkt, _EE_PRODUKT)[0]["preis"] is None
-
-
-def test_einsundeins_genau_eine_variante_je_seite(ee_produkt):
-    """Die Seite bepreist die VORAUSGEWAEHLTE Variante. Drei Farben mal drei
-    Speicherstufen daraus zu vervielfaeltigen hiesse, acht von neun Saetzen
-    zu erfinden."""
-    assert len(einsundeins.lies(ee_produkt, _EE_PRODUKT)) == 1
-
-
-def test_einsundeins_ohne_tarif_in_der_beschreibung_faellt_der_satz():
-    html = (
-        '<script type="application/ld+json">{"@type": "Product", '
-        '"name": "iPhone 17 Pro", "description": "Das neue iPhone", '
-        '"offers": {"priceCurrency": "EUR", "price": "44.99"}}</script>'
-    )
-    assert einsundeins.lies(html, _EE_PRODUKT) == []
-
-
-def test_einsundeins_kaputter_ldjson_block_kippt_die_seite_nicht():
-    """Shops liefern regelmaessig einen kaputten Block neben heilen - bei
-    1&1 stehen FAQPage, WebSite und Organization daneben."""
-    html = (
-        '<script type="application/ld+json">{kaputt</script>'
-        '<script type="application/ld+json">{"@type": "Product", '
-        '"name": "iPhone 17 Pro", "description": "iPhone 17 Pro mit '
-        '1&amp;1 All-Net-Flat S", "offers": {"priceCurrency": "EUR", '
-        '"price": "44.99"}}</script>'
-    )
-    saetze = einsundeins.lies(html, _EE_PRODUKT)
-    assert len(saetze) == 1
-    assert saetze[0]["tarif"] == "1&1 All-Net-Flat S"
-
-
-def test_einsundeins_leere_seite_liefert_nichts():
-    assert einsundeins.lies("", _EE_PRODUKT) == []
-    assert einsundeins.lies("<html><body>nichts</body></html>", _EE_PRODUKT) == []
-
-
-def test_einsundeins_laufzeit_kommt_aus_der_seite_und_wird_nicht_gesetzt():
-    """Ohne `currentHardwareOfferDuration` bleibt die Laufzeit leer. 36 als
-    Vorgabe waere eine Bindungsdauer, die niemand gemessen hat."""
-    html = (
-        '<script type="application/ld+json">{"@type": "Product", '
-        '"name": "iPhone 17 Pro", "description": "iPhone 17 Pro mit '
-        '1&amp;1 All-Net-Flat S", "offers": {"price": "44.99"}}</script>'
-    )
-    assert einsundeins.lies(html, _EE_PRODUKT)[0]["laufzeit_monate"] is None
-
-
-def test_buendelpreis_ohne_zuzahlung_landet_nicht_in_der_barpreisspalte(ee_produkt):
-    """Die Weiche, die den ganzen Anbieter moeglich macht: ein Buendel
-    braucht seit dem 04.09.2026 keine Zuzahlung mehr, um gespeichert zu
-    werden - aber sein Monatspreis bleibt aus `preis_ohne_vertrag` heraus."""
-    satz = einsundeins.lies(ee_produkt, _EE_PRODUKT)[0]
-    felder = _preisfelder(None, satz)
-    assert felder["preis_ohne_vertrag"] is None
-    assert felder["preis_mit_vertrag_ab"] == 44.99
-    assert felder["tarif_referenz"] == "1&1 All-Net-Flat S"
-    assert felder["laufzeit_monate"] == 36
-
-
-def test_einsundeins_landet_als_buendellistung_im_bestand(
-    katalog, farben, ee_kategorie, ee_produkt
-):
-    """Der ganze Weg: Kachelernte, eine Produktseite, eine Buendellistung -
-    mit Tarif und Laufzeit, ohne Barpreis. Seit 20.11.2026 ohne Bündelweg (nur
-    der Klick-Lauf misst 1&1): keine Seite gilt mehr als „ohne lesbare Bündel“."""
-    anbieter = Anbieter(
-        name="1&1",
-        typ="netzbetreiber",
-        methode="einsundeins_buendel",
-        basis_url="https://mobile.1und1.de",
-        rate_limit_sekunden=0,
-        max_produkte=45,
-        einstiege=[Einstieg(url=_EE_KATEGORIE, kind="static")],
-    )
-
-    def hole(url, kopfzeilen=None):
-        if url.endswith("/robots.txt"):
-            return (200, "User-agent:*\nDisallow:/xml/\nDisallow:/static/\n")
-        if url == _EE_KATEGORIE:
-            return (200, ee_kategorie)
-        if url == _EE_PRODUKT:
-            return (200, ee_produkt)
-        return (200, "<html></html>")
-
-    bilanz = sammle_anbieter(
-        anbieter,
-        katalog,
-        farben,
-        hole,
-        "2026-09-04",
-        RobotsWaechter(hole=hole),
-        datetime(2026, 9, 4, 3, tzinfo=UTC),
-    )
-    assert bilanz.gedeckelt == []
-    assert bilanz.buendel == []
-    treffer = [l for l in bilanz.listungen if l.quelle_url == _EE_PRODUKT]
-    assert len(treffer) == 1
-    assert treffer[0].preis_ohne_vertrag is None
-    assert treffer[0].preis_mit_vertrag_ab == 44.99
-    assert treffer[0].tarif_referenz == "1&1 All-Net-Flat S"
-    assert treffer[0].laufzeit_monate == 36
-
-
 def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
-    """Beide Anbieter sind aktiv, tragen einen GEBAUTEN Adapter und
-    erklaeren sich weiterhin woertlich auf /geraete-quellen.html. 1&1 liest
-    seit 20.11.2026 nur der Klick-Lauf: kein Einstieg des Geraetelaufs."""
+    """Beide Anbieter sind aktiv und erklaeren sich woertlich auf
+    /geraete-quellen.html. Telekom liest der Adapter `telekom_kategorie`; 1&1
+    seit 20.11.2026 nur der Klick-Lauf (Methode `klick`, kein Einstieg des
+    Geraetelaufs)."""
     quellen = lade_quellen(_WURZEL)
     for name, methode in (
         ("Telekom", "telekom_kategorie"),
-        ("1&1", "einsundeins_buendel"),
+        ("1&1", "klick"),
     ):
         anbieter = quellen.nach_name(name)
         assert anbieter.aktiv is True, name
         assert anbieter.crawlbar is (name == "Telekom"), name
         assert anbieter.methode == methode, name
         assert anbieter.grund == "" or "Klick-Lauf" in anbieter.grund, name
-        assert "04.09.2026" in anbieter.hinweis, name
+        assert anbieter.hinweis, name

@@ -41,7 +41,7 @@ ROBOTS (09.09.2026 gelesen, Absender TelcoRadar/1.0)
 Tarifdetails-Pfad ist frei. Kein Crawl-delay auf einer der beiden
 Domains - `sammle()` haelt trotzdem einen Abstand von 2 Sekunden
 zwischen zwei Abrufen ein (dieselbe Zahl wie
-`einsundeins._GEBUEHR_ABSTAND` im Geraetezweig) und nimmt ein
+frueher `einsundeins._GEBUEHR_ABSTAND` im Geraetezweig) und nimmt ein
 Crawl-delay auf, sobald der Anbieter eines schreibt
 (`RobotsWaechter.abstand`, derselbe Waechter wie im Geraetezweig).
 

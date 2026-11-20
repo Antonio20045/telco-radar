@@ -29,8 +29,8 @@ einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzt
 Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
 
 Vorrang steht im Bestand: ``Zusammenfuehrung.buendel`` lässt ein Adapterbündel weg,
-dessen Bestandseintrag eine Klick-Messung von HEUTE ist (bei 1&1 nur dann,
-``klick_messtag.NUR_HEUTE``) - oder, bei congstar (``ANBIETER_PREISGRENZE``), eine
+dessen Bestandseintrag eine Klick-Messung von HEUTE ist - oder, bei congstar
+(``ANBIETER_PREISGRENZE``), eine
 ältere innerhalb von ``FRISCHEGRENZE_TAGE``, der das heutige Bündel WIDERSPRICHT
 (``klick_messtag``, ``klick_preisgrenze``; Bilanz ``klick_vorrang`` und
 ``klick_widerspruch``). Bei jedem anderen Anbieter weicht eine solche ältere Messung

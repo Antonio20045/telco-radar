@@ -1,9 +1,8 @@
 """1&1-Geräteraster je Tarif im Klick-Crawler: Lesart, Einstiege und Tarifname.
 
 Fixtures ``einsundeins_tarifraster_*_2026-09-29.html.gz`` sind die sieben Raster vom
-29.09.2026, gekürzt auf den Ausschnitt mit allen 43 Kacheln (Herkunft im Kopf von
-``test_geraete_tarifstufen_einsundeins.py``). Die Adressen stehen als ``targetpage``
-auf den Tarifübersichten vom selben Tag.
+29.09.2026, gekürzt auf den Ausschnitt mit allen 43 Kacheln (Herkunft in
+``tests/fixtures/geraete/_herkunft.json``).
 """
 
 from __future__ import annotations
@@ -16,7 +15,6 @@ from klickergebnisse import FIX
 from test_klick_anschluss_1und1 import DETAILS, DETAILS_S
 
 from telco_radar.collect.geraete.basis import GeraeteAbrufFehler
-from telco_radar.collect.geraete.einsundeins import tarifraster_adressen
 from telco_radar.collect.geraete.klickuebersicht import LESARTEN
 from telco_radar.collect.geraete.klickziele import TAGESDATEI, lade_ziele
 from telco_radar.geraete_config import lade_quellen
@@ -36,10 +34,6 @@ DATEIEN = {
     + "_2026-09-29.html.gz"
     for adresse in RASTER
 }
-UEBERSICHTEN = (
-    "einsundeins_tarifuebersicht_all_net_flat_2026-09-29.html.gz",
-    "einsundeins_tarifuebersicht_unlimited_2026-09-29.html.gz",
-)
 
 
 def text(name: str) -> str:
@@ -53,16 +47,6 @@ def raster(adresse: str) -> list[dict]:
 @pytest.fixture(scope="module")
 def unlimited_m() -> list[dict]:
     return raster(RASTER[4])
-
-
-def test_die_sieben_raster_stehen_auf_den_tarifuebersichten():
-    gefunden = {
-        adresse
-        for name in UEBERSICHTEN
-        for adresse in tarifraster_adressen(text(name), "https://mobile.1und1.de")
-    }
-
-    assert gefunden == set(RASTER)
 
 
 def test_raster_liest_jede_kachel(unlimited_m):

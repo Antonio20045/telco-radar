@@ -2,7 +2,7 @@
 
 Klick-Satz: Lesung der gespeicherten Produktseite (``tests/klickergebnisse.py``),
 Anschluss aus ``einsundeins_tarifdetails_anf_s.html.gz`` über die Lesart der Übersicht.
-Adaptersatz: ``einsundeins.lies_buendel`` samt ``ergaenze_bereitstellungsgebuehr``.
+Adaptersatz: ``klickergebnisse.einsundeins_adaptersatz`` samt Anschluss der Detailseite.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from bestand_pfad import ZUSTAND, lese_wurzel
 from klickergebnisse import (
     EINSUNDEINS_SEITE,
     FIX,
+    einsundeins_adaptersatz,
     einsundeins_lesung,
     erfasst,
     ergebnisdatei,
@@ -24,16 +25,12 @@ from test_klick_anschluss_1und1 import DETAILS_M, DETAILS_S, HEUTE
 
 from telco_radar.analyze.klick_zusammenfuehrung import zusammenfuehren
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
-from telco_radar.collect.geraete.einsundeins import (
-    ergaenze_bereitstellungsgebuehr,
-    lies_buendel,
-)
+from telco_radar.collect.geraete.einsundeins import bereitstellungsgebuehr
 from telco_radar.collect.geraete.klickergebnis import schreibe
 from telco_radar.collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
 from telco_radar.collect.geraete.klickrohsatz import ausbeute
 from telco_radar.collect.geraete.klickuebersicht import LESARTEN
 from telco_radar.geraete_config import lade_katalog
-from telco_radar.geraete_model import sku_id
 from telco_radar.report.geraete_tco_karten import geraet_aus_sku
 from telco_radar.tarif_bezug import Tarifbestand
 
@@ -90,18 +87,8 @@ def test_ohne_gelesene_detailseite_bleibt_anschluss_offen(
 
 
 def _adaptersatz(details: str) -> dict:
-    html = _text("einsundeins_produktseite_iphone_17_pro.html.gz")
-    (roh,) = [
-        r
-        for r in lies_buendel(html, EINSUNDEINS_SEITE.adresse)
-        if r["speicher_gb"] == 256
-    ]
-    gesetzt = ergaenze_bereitstellungsgebuehr(
-        lambda url, kopfzeilen=None: (200, details), {}, [roh]
-    )
-    assert gesetzt == 1 and roh["anschlusspreis"] == 39.9
-    farbe = sku_id("apple-iphone-17-pro", 256, roh["farbe"])
-    return {**roh, "anbieter": "1&1", "zustand": "neu", "sku_id": farbe}
+    """Der Adaptersatz samt Anschluss der Tarifdetail-Seite ``details``."""
+    return einsundeins_adaptersatz(anschlusspreis=bereitstellungsgebuehr(details))
 
 
 @pytest.mark.parametrize("gelesen", [True, False], ids=["mit-details", "ohne"])

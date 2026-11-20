@@ -25,7 +25,7 @@ Die Tarife stehen dort trotzdem - serverseitig, in zwoelf Kacheln
 Dieses Modul liest sie, und zwar aus der Auszeichnung, die o2 selbst
 vergibt: `<article class="teaser ... teaser-with-price">`, darin ein
 `<tef-price>` mit `slot="price"`. Das ist dieselbe Haltung wie bei der
-Kachelernte im Geraetezweig (`einsundeins.ernte`): geerntet wird, was die
+frueheren Kachelernte im Geraetezweig (1&1): geerntet wird, was die
 Seite selbst als Kachel auszeichnet, nicht was ein Pfadmuster errraet.
 
 DIE GEGENPROBE, DIE DIESEM MODUL SEIN VERTRAUEN GIBT

@@ -3,10 +3,11 @@
 Adaptersätze: die 48 echten o2-Rohsätze zum iPhone 17 Pro aus dem Sammler
 (``o2_vertiefung_iphone17pro.json.gz``, 29.09.2026, wie in
 ``test_tco_buendel_ohne_tarifblatt``), der Telekom-Satz aus ``/v2/details`` und der
-1&1-Satz der gespeicherten Produktseite (``einsundeins.lies_buendel``). Klick-Sätze:
-Lesungen derselben echten Antworten (``tests/klickergebnisse.py``). Ein Klick-Satz
-ersetzt den Adaptersatz mit gleichem Schlüssel nur, wenn er jedes Wertfeld nennt, und
-übernimmt dessen Bündel-ID; eine Klick-Messung von heute hat Vorrang vor dem
+1&1-Satz der gespeicherten Produktseite
+(``klickergebnisse.einsundeins_adaptersatz``). Klick-Sätze: Lesungen derselben
+echten Antworten (``tests/klickergebnisse.py``). Ein Klick-Satz ersetzt den
+Adaptersatz mit gleichem Schlüssel nur, wenn er jedes Wertfeld nennt, und übernimmt
+dessen Bündel-ID; eine Klick-Messung von heute hat Vorrang vor dem
 Adapterbündel, eine ältere nur, wenn die heutige Messung ihr widerspricht
 (``klick_preisgrenze``) - sonst behält die heutige Messung ihren Messtag. Ein
 gestörter, veralteter oder fehlender Anbieter ersetzt nichts und ist benannt.
@@ -29,6 +30,7 @@ from klickergebnisse import (
     FIX,
     O2_SEITE,
     TELEKOM_SEITE,
+    einsundeins_adaptersatz,
     einsundeins_lesung,
     erfasst,
     ergebnisdatei,
@@ -49,7 +51,6 @@ from telco_radar.analyze.klick_zusammenfuehrung import (
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.collect.geraete import sammle_anbieter
-from telco_radar.collect.geraete.einsundeins import lies_buendel
 from telco_radar.collect.geraete.klickergebnis import ORDNER, STAND_DATEI, schreibe
 from telco_radar.collect.geraete.klicklauf import LAUF_GESTOERT
 from telco_radar.collect.geraete.klickziele import TAGESDATEI, lade_ziele
@@ -239,17 +240,7 @@ def test_abweichung_wird_je_feld_gezaehlt(katalog):
 
 def _einsundeins_alt() -> dict:
     """Der Adaptersatz der gespeicherten 1&1-Produktseite: 44,99 € und 360,00 €."""
-    html = gzip.decompress(
-        (FIX / "einsundeins_produktseite_iphone_17_pro.html.gz").read_bytes()
-    ).decode("utf-8")
-    (roh,) = [
-        r
-        for r in lies_buendel(html, EINSUNDEINS_SEITE.adresse)
-        if r["speicher_gb"] == 256
-    ]
-    assert (roh["buendel_monatlich"], roh["geraet_zuzahlung"]) == (44.99, 360.0)
-    farbe = sku_id("apple-iphone-17-pro", 256, roh["farbe"])
-    return {**roh, "anbieter": "1&1", "zustand": "neu", "sku_id": farbe}
+    return einsundeins_adaptersatz()
 
 
 def _einsundeins(einmalzahlung: float | None) -> dict:

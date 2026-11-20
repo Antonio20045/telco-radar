@@ -3,17 +3,17 @@
 Die Kachel „Weiter mit HW24“ der Folgeseite (Erkundung 07.10.2026, Commit c8ce1f77,
 ``einsundeins_bestellweg_laufzeit_20261007.json``) nennt 59,99 €/Mon. und keine
 Einmalzahlung; seit dem 08.10.2026 bestätigt sie sich selbst (``klickkachel``). Der
-Adaptersatz der gespeicherten Produktseite (``einsundeins.lies_buendel``, 08.09.2026)
-nennt den Tarif „1&1 All-Net-Flat S“ mit dem Slug ``tariff-anf-s-mvl``, nur für 36
-Raten. Erwartet: ein 1&1-Bündel mit 24 Raten mit Gerät, Speicher und Tarif des
-Adapters, Bündelbetrag 59,99 € und der Einmalzahlung als Lücke, nie 360 €; daneben das
+Adaptersatz der gespeicherten Produktseite
+(``klickergebnisse.einsundeins_adaptersatz``, 08.09.2026) nennt den Tarif
+„1&1 All-Net-Flat S“ mit dem Slug ``tariff-anf-s-mvl``, nur für 36 Raten.
+Erwartet: ein 1&1-Bündel mit 24 Raten mit Gerät, Speicher und Tarif des Adapters,
+Bündelbetrag 59,99 € und der Einmalzahlung als Lücke, nie 360 €; daneben das
 Bündel mit 36 Raten wie bisher. Gegenproben: ohne Adaptersatz bleibt der Tarif offen;
 nennt der Klick den Tarif mit Namen, behält der Satz seine SKU.
 """
 
 from __future__ import annotations
 
-import gzip
 from dataclasses import replace
 
 import pytest
@@ -21,7 +21,7 @@ from bestand_pfad import ZUSTAND, lese_wurzel
 from klickergebnisse import (
     EINSUNDEINS_KARTE,
     EINSUNDEINS_SEITE,
-    FIX,
+    einsundeins_adaptersatz,
     einsundeins_kachel,
     einsundeins_lesung,
     erfasst,
@@ -32,7 +32,6 @@ from klickergebnisse import (
 from telco_radar.analyze.klick_zusammenfuehrung import fuehre_zusammen
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
-from telco_radar.collect.geraete.einsundeins import lies_buendel
 from telco_radar.collect.geraete.klickecho import variante_aus
 from telco_radar.collect.geraete.klickfarbe import sku_farbe
 from telco_radar.collect.geraete.klickkachel import QUELLE_KACHEL, kachel_echo
@@ -57,16 +56,7 @@ def bestand():
 
 
 def _adapter() -> dict:
-    html = gzip.decompress(
-        (FIX / "einsundeins_produktseite_iphone_17_pro.html.gz").read_bytes()
-    ).decode("utf-8")
-    (roh,) = [
-        r
-        for r in lies_buendel(html, EINSUNDEINS_SEITE.adresse)
-        if r["speicher_gb"] == 256
-    ]
-    farbe = sku_id("apple-iphone-17-pro", 256, roh["farbe"])
-    return {**roh, "anbieter": "1&1", "zustand": "neu", "sku_id": farbe}
+    return einsundeins_adaptersatz()
 
 
 def _kachel_24(tarif: str = TARIF) -> Kombiergebnis:

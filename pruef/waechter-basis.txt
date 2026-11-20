@@ -68,8 +68,6 @@ src/telco_radar/collect/ct_log.py breite-ausnahme 1
 src/telco_radar/collect/ct_log.py noqa:BLE001 1
 src/telco_radar/collect/geraete/__init__.py breite-ausnahme 3
 src/telco_radar/collect/geraete/__init__.py noqa:BLE001 3
-src/telco_radar/collect/geraete/einsundeins.py breite-ausnahme 2
-src/telco_radar/collect/geraete/einsundeins.py noqa:BLE001 2
 src/telco_radar/collect/geraete/o2.py breite-ausnahme 1
 src/telco_radar/collect/geraete/o2.py noqa:BLE001 1
 src/telco_radar/collect/geraete/robots.py breite-ausnahme 1

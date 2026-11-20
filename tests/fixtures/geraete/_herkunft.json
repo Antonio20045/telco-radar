@@ -2,30 +2,6 @@
   "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0. ERGAENZT AM 18.09.2026 (P5/E3) um die Titel-Zeilen von data/state/geraete_unbekannt.jsonl (Stand 17.09., Bot-Commit 1dd48d4): kein HTTP-Abruf, sondern ein Auszug aus dem Lauf-State - alle 145 art=titel-Zeilen unveraendert; Basis der Tarif-Rauschen-Regel und ihrer Tests. ERGAENZT AM 05.11.2026 um MediaMarkt (eine Produktseite, /de/product/_samsung-galaxy-a57-...-3039261.html, Samsung Galaxy A57): derselbe Ceconomy-Lesekern wie Saturn (ld+json UND window.__PRELOADED_STATE__), Cache-Praefix 'Media' statt 'Saturn', ehrlicher Absender TelcoRadar/1.0, Abruf aus arbeit/haendler-weg-0411/mm_product_samsung_a57.body.html (04.11.2026, Recherche haendler-weg-0411.md). Ebenfalls am 05.11.2026 ergaenzt: die MediaMarkt-Kampagnenseite /de/campaign/angebote-smartphones (mediamarkt_angebote_smartphones.html.gz, Abruf 04.11.2026) als der produktiv konfigurierte, direkte Einstieg - ebenfalls aus arbeit/haendler-weg-0411/mm_campaign.body.html. ERGAENZT AM 08.11.2026 (Recherche Tarifwelt, Brief brief-tarifwelt-0811.md): vier Belege der gemeinsamen MediaMarktSaturn-Tarifwelt tarife.mediamarkt.de, gelesen ueber ihre oeffentliche, nicht authentifizierte JSON-Schnittstelle tarife-api2.mediamarkt.de (keine robots.txt dort), ehrlicher Absender TelcoRadar/1.0, einzelne Playwright-Seitenaufrufe, nie /pks oder /checkout. Zwei Geraete-x-Tarif-Kombinationen (iPhone 17 x o2-Doppelkarte, iPhone 17 x freenet-Telekom Magenta Mobil M, dazu Samsung Galaxy S26 als zweites Geraet) plus die vollstaendige Tarifliste des iPhone 17 (25 Tarife mit Netz und Datenvolumen-Band). Noch ohne Adapter; Bericht arbeit/tarifwelt-0811.md.",
   "eintraege": [
     {
-      "datei": "1und1_produkt_iphone17.html.gz",
-      "url": "https://mobile.1und1.de/iphone-17",
-      "abgerufen_am": "2026-08-31",
-      "http_status": 200,
-      "content_type": "text/html; charset=UTF-8",
-      "bytes_roh": 328326,
-      "sha256_roh": "e442f9801f7be2ba7fde2a83cd957579e96f1eaf0217a7537e49d32d68e8d8bf",
-      "gzip": true,
-      "absender": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
-      "bytes_abgelegt": 55547
-    },
-    {
-      "datei": "1und1_sitemap.xml",
-      "url": "https://mobile.1und1.de/sitemap.xml",
-      "abgerufen_am": "2026-08-31",
-      "http_status": 200,
-      "content_type": "application/xml",
-      "bytes_roh": 15171,
-      "sha256_roh": "cf40bb1badbd788b6e4c939f5ad54d4584bde5faa7099fe69033a4a83a562c8e",
-      "gzip": false,
-      "absender": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
-      "bytes_abgelegt": 15171
-    },
-    {
       "datei": "otelo_kategorie_apple.html.gz",
       "url": "https://www.otelo.de/handy-mit-vertrag/apple",
       "abgerufen_am": "2026-08-31",
@@ -278,30 +254,6 @@
       "bytes_abgelegt": 485060
     },
     {
-      "datei": "1und1_kategorie_smartphones.html.gz",
-      "url": "https://mobile.1und1.de/smartphones",
-      "abgerufen_am": "2026-09-04",
-      "http_status": 200,
-      "content_type": "text/html; charset=UTF-8",
-      "bytes_roh": 680125,
-      "sha256_roh": "5863b7aa666d4a102b82c5d665fc7a0b7b01ddbb6e956b1f05c7b07745838468",
-      "gzip": true,
-      "absender": "TelcoRadar/1.0",
-      "bytes_abgelegt": 64840
-    },
-    {
-      "datei": "1und1_produkt_iphone17pro.html.gz",
-      "url": "https://mobile.1und1.de/iphone-17-pro",
-      "abgerufen_am": "2026-09-04",
-      "http_status": 200,
-      "content_type": "text/html; charset=UTF-8",
-      "bytes_roh": 324848,
-      "sha256_roh": "cc5ec4c5368fc2972b8247e668e971b0ac43b1e9db1d2830644f9cef74c39fbf",
-      "gzip": true,
-      "absender": "TelcoRadar/1.0",
-      "bytes_abgelegt": 53960
-    },
-    {
       "datei": "o2_katalog_buendel.json.gz",
       "url": "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__",
       "abgerufen_am": "2026-09-04",
@@ -455,17 +407,6 @@
       "gzip": true,
       "bytes_roh": 977377,
       "sha256_roh": "56d08043ec90c623d54c2f80dfc2707b2ce39ce0b824fffc91a74c44e36408a6",
-      "nachgetragen": "Paket 11: Herkunft aus Commit, Inhalt und Testdokumentation belegt, nicht neu abgerufen"
-    },
-    {
-      "datei": "einsundeins_produktseite_galaxy_a57.html.gz",
-      "url": "https://mobile.1und1.de/samsung-galaxy-a57",
-      "abgerufen_am": "2026-09-08",
-      "commit": "5ff6a1cf",
-      "beleg": "Commit 5ff6a1cf (b4, ohne Herkunftstext); Docstring test_geraete_buendel_einsundeins.py 'DIE FIXTURES SIND GESPEICHERTE ECHTE ABRUFE ... die A57-Seite (339 KB ...)'; canonical/og:url im Inhalt; 348 483 B vollstaendig. Datum 08.09. steht im Docstring nur beim iPhone-Geschwister desselben Commits.",
-      "gzip": true,
-      "bytes_roh": 348483,
-      "sha256_roh": "b34c276785068b73f83e8fc9a0c1f2cb6d5776422101e4e233b80064b7c93161",
       "nachgetragen": "Paket 11: Herkunft aus Commit, Inhalt und Testdokumentation belegt, nicht neu abgerufen"
     },
     {
@@ -1066,124 +1007,6 @@
       "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
       "bytes_abgelegt": 115173,
       "zweck": "Beleg der eingerechneten congstar-Aktion anschluss_erlassen (Fussnote 'bis zum 07.12.2026', 15,00 EUR) neben anschlusspreis 0,00 EUR - Grundlage von tests/test_klick_aktion_belegt.py"
-    },
-    {
-      "datei": "einsundeins_produktseite_iphone_17_pro_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/iphone-17-pro",
-      "abgerufen_am": "2026-11-20",
-      "beleg": "Auftrag A-72ZCSS (K1): HTTP 200, TelcoRadar/1.0, robots.txt erlaubt /iphone-17-pro; Markupwechsel von hwdVariantsPrices auf hwdVariantsHardwarePrices + Analytics-Datalayer, siehe Modulkopf einsundeins.py.",
-      "gzip": true,
-      "bytes_roh": 368426,
-      "sha256_roh": "9cae2613db4c230be1d08036bc6ca6943c79a78418196969daac5e5b8d017680"
-    },
-    {
-      "datei": "einsundeins_produktseite_galaxy_a57_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/samsung-galaxy-a57",
-      "abgerufen_am": "2026-11-20",
-      "beleg": "Auftrag A-72ZCSS (K1): HTTP 200, TelcoRadar/1.0, robots.txt erlaubt /samsung-galaxy-a57; zweites Geraet zur Gegenprobe derselben neuen Struktur.",
-      "gzip": true,
-      "bytes_roh": 379851,
-      "sha256_roh": "5474ff5ffc192b28463c904f07e984176ba445a63d0fe475396ea535087a1005"
-    },
-    {
-      "datei": "einsundeins_produktseite_iphone_17_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/iphone-17",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-17. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 390979 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
-      "gzip": true,
-      "bytes_roh": 278852,
-      "sha256_roh": "9e9e17ff24aab802dd95d26e3263280b0a1b520a9a068448b2f8d7aa9e561de5"
-    },
-    {
-      "datei": "einsundeins_produktseite_iphone_17e_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/iphone-17e",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-17e. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 361347 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
-      "gzip": true,
-      "bytes_roh": 283509,
-      "sha256_roh": "6b8efd90cfe2e66adae8187b7fcbea859a5bcc84425f50b22a8f1f045de34214"
-    },
-    {
-      "datei": "einsundeins_produktseite_iphone_17_pro_max_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/iphone-17-pro-max",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-17-pro-max. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 408831 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
-      "gzip": true,
-      "bytes_roh": 280981,
-      "sha256_roh": "4781fac274cc225ada69b65de0f58abc8b87e97079a460439a1655b7486b98b9"
-    },
-    {
-      "datei": "einsundeins_produktseite_iphone_18_pro_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/iphone-18-pro",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-18-pro. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 830617 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
-      "gzip": true,
-      "bytes_roh": 339229,
-      "sha256_roh": "43f8b809a87a7f2faac18763c9954f74b4d0b1c59760a4de42722c9f2de63bd7"
-    },
-    {
-      "datei": "einsundeins_produktseite_iphone_18_pro_max_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/iphone-18-pro-max",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-18-pro-max. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 780972 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
-      "gzip": true,
-      "bytes_roh": 289997,
-      "sha256_roh": "f76f4157b515c76ee678749406c65ded71ab763b00706177593a133de76ed253"
-    },
-    {
-      "datei": "einsundeins_produktseite_iphone_duo_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/iphone-duo",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /iphone-duo. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 600615 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
-      "gzip": true,
-      "bytes_roh": 273310,
-      "sha256_roh": "a0c8256d0275c5a41da36af75aacf793729ef71ee8ecd62f07c60278af5f52ed"
-    },
-    {
-      "datei": "einsundeins_produktseite_galaxy_s26_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/samsung-galaxy-s26",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /samsung-galaxy-s26. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt vom Seitenanfang bis zum Ende des 'const products'-Blocks (dahinter nur Fussbereich und Skripte); gemessene Vollantwort 409111 B, Ausschnitt unveraendert. Pflichtmodell des Buendelwaechters, Docstring tests/test_geraete_tarifstufen_einsundeins_2011.py.",
-      "gzip": true,
-      "bytes_roh": 296842,
-      "sha256_roh": "80b6d2fb3713a1ab59aa15cf884ad7e957f9625071a76c7d6dadd9350d3b40cf"
-    },
-    {
-      "datei": "einsundeins_tarifraster_all_net_flat_s_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/smartphones-all-net-flat-s",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt die Rasterseite. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt ab '<div class=\"hardware-container__items\" id=\"hardware-list\">' bis zum letzten '</form>' - dort stehen alle 41 Kacheln mit data-hardware-months=48; gemessene Vollantwort 593603 B, Ausschnitt unveraendert.",
-      "gzip": true,
-      "bytes_roh": 363921,
-      "sha256_roh": "e6688f9aab0bf0764c1e064eefd698c4893f00744c53c7e6f9aaf1e3f06be6de"
-    },
-    {
-      "datei": "einsundeins_tarifraster_all_net_flat_m_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/smartphones-all-net-flat-m",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt die Rasterseite. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt ab '<div class=\"hardware-container__items\" id=\"hardware-list\">' bis zum letzten '</form>' - dort stehen alle 41 Kacheln mit data-hardware-months=48; gemessene Vollantwort 592888 B, Ausschnitt unveraendert.",
-      "gzip": true,
-      "bytes_roh": 363921,
-      "sha256_roh": "6b875e478b707106dd17920b552d3b094252880104bbe89b0c2d0fc8edf90a44"
-    },
-    {
-      "datei": "einsundeins_tarifuebersicht_all_net_flat_2026-11-20.html.gz",
-      "url": "https://mobile.1und1.de/all-net-flat-vergleich",
-      "abgerufen_am": "2026-11-20",
-      "filter": "gekuerzt, siehe beleg",
-      "beleg": "Karte fcd018e3 (K2): HTTP 200, Absender TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), robots.txt erlaubt /all-net-flat-vergleich. Echter Abruf, aber GEKUERZT auf den zusammenhaengenden Ausschnitt, der alle 'targetpage'-Links der sieben Geraeteraster und die 'Tarifdetails'-Anker traegt; gemessene Vollantwort 479784 B, Ausschnitt unveraendert.",
-      "gzip": true,
-      "bytes_roh": 185757,
-      "sha256_roh": "30d273256800da5782db4836380d1f78b8523a95670a4189a97fd6286a24c083"
     },
     {
       "datei": "o2_iphone14_erneuert_tarifoptionen_20261120.json.gz",
