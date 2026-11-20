@@ -2771,7 +2771,7 @@ var TelcoFrage = (function () {
       if (knotenB) {
         var klon = document.importNode(knotenB, true);
         Array.prototype.forEach.call(
-          klon.querySelectorAll('.gr-anb-fehlliste, .gr-beleg-paare'),
+          klon.querySelectorAll('.gr-anb-fehlliste, .gr-beleg-paare, .gr-preisbelege'),
           function (f) { gruppe.appendChild(f); });
       } else if (fehler) {
         leerSatz(gruppe, 'Fehlende Anbieter nicht geladen.');
@@ -2995,13 +2995,30 @@ var TelcoFrage = (function () {
       });
   }
 
+  /* Beleg je Preis (`_geraete_buendel.html.j2`, `preisbelege`): Kopf und Zeilen
+     klappen per Knopf auf; das Bild einer Zeile lädt erst, wenn sie aufgeht. */
+  document.addEventListener('click', function (ev) {
+    var knopf = ev.target && ev.target.closest
+      ? ev.target.closest('#gr-bnd-gruppe .gr-pb-knopf') : null;
+    if (!knopf || !knopf.nextElementSibling) return;
+    var auf = knopf.getAttribute('aria-expanded') !== 'true';
+    knopf.setAttribute('aria-expanded', auf ? 'true' : 'false');
+    knopf.nextElementSibling.hidden = !auf;
+    if (!auf || !knopf.classList.contains('gr-pb-zeile')) return;
+    Array.prototype.forEach.call(
+      knopf.nextElementSibling.querySelectorAll('img[data-src]'), function (img) {
+        img.src = img.getAttribute('data-src');
+        img.removeAttribute('data-src');
+      });
+  });
+
   function stelleZeilen(band) {
     var lz = zustand.laufzeit;
     var alle = lz === 'alle';
     var sektion = element('gr-buendel');
     if (sektion) sektion.classList.toggle('gr-buendel--alle', alle);
     var zeilen = document.querySelectorAll(
-      '#gr-bnd-gruppe .gr-bnd, #gr-bnd-gruppe .gr-anb-fehlt');
+      '#gr-bnd-gruppe .gr-bnd, #gr-bnd-gruppe .gr-anb-fehlt, #gr-bnd-gruppe .gr-pb');
     Array.prototype.forEach.call(zeilen, function (z) {
       var bandAus = !!band && z.hasAttribute('data-band')
         && z.getAttribute('data-band') !== band;
@@ -3013,6 +3030,17 @@ var TelcoFrage = (function () {
       z.hidden = bandAus || lzAus;
     });
     stelleBelege(band, lz);
+    /* Beleg je Preis: der zugeklappte Kopf zählt die Zeilen der Wahl; ohne
+       Zeile tritt die Liste zurück (`_geraete_buendel.html.j2`, `preisbelege`). */
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-bnd-gruppe .gr-preisbelege'),
+      function (liste) {
+        var n = Array.prototype.filter.call(
+          liste.querySelectorAll('.gr-pb'), function (z) { return !z.hidden; }).length;
+        liste.hidden = n === 0;
+        var zahl = liste.querySelector('.gr-pb-zahl');
+        if (zahl) zahl.textContent = n === 1 ? '· 1 Preis' : '· ' + n + ' Preise';
+      });
     Array.prototype.forEach.call(
       document.querySelectorAll('#gr-bnd-gruppe .gr-bndliste'),
       function (liste) {
