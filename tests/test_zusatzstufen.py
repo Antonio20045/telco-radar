@@ -9,7 +9,6 @@ from types import SimpleNamespace
 import pytest
 
 from telco_radar import (
-    geraete_pipeline,
     promo_pipeline,
     veroeffentlichen,
     versand,
@@ -46,7 +45,6 @@ def _wirft(name: str):
 def test_jede_zusatzstufe_faellt_einzeln_aus(tmp_path, monkeypatch):
     monkeypatch.setattr(category_sweep, "run_sweep", _wirft("sweep"))
     monkeypatch.setattr(promo_pipeline, "run_promo_stage", _wirft("promo"))
-    monkeypatch.setattr(geraete_pipeline, "run_geraete_stage", _wirft("geraete"))
     monkeypatch.setattr(diff_bilder, "beschaffe", _wirft("diff-bilder"))
     gefangen: list[str] = []
     cfg = SimpleNamespace(settings={"promo_enabled": True})
@@ -57,55 +55,13 @@ def test_jede_zusatzstufe_faellt_einzeln_aus(tmp_path, monkeypatch):
         HEUTE,
         ("e", "m", "Deutsch"),
         False,
-        lambda: 60.0,
         _takt(gefangen),
     )
 
-    assert gefangen == ["sweep", "promo", "geraete", "diff-bilder"]
-    assert (zusatz.promo, zusatz.geraete) == ({}, {})
+    assert gefangen == ["sweep", "promo", "diff-bilder"]
+    assert zusatz.promo == {}
     bericht = tmp_path / "data" / "reports" / "differenzierung" / "2026-10-05.md"
     assert bericht.is_file()
-
-
-def test_geraete_ohne_restzeit_laufen_nicht(tmp_path, monkeypatch):
-    monkeypatch.setattr(category_sweep, "run_sweep", lambda *a: None)
-    monkeypatch.setattr(geraete_pipeline, "run_geraete_stage", _wirft("geraete"))
-    monkeypatch.setattr(diff_bilder, "beschaffe", lambda *a: {})
-    gefangen: list[str] = []
-    cfg = SimpleNamespace(settings={"promo_enabled": False, "geraete_enabled": True})
-
-    zusatz = zusatzstufen.ausfuehren(
-        cfg,
-        tmp_path,
-        HEUTE,
-        ("e", "m", "Deutsch"),
-        False,
-        lambda: None,
-        _takt(gefangen),
-    )
-
-    assert gefangen == []
-    assert zusatz.geraete == {}
-
-
-def test_geraete_bekommen_die_restzeit_als_frist(tmp_path, monkeypatch):
-    monkeypatch.setattr(category_sweep, "run_sweep", lambda *a: None)
-    monkeypatch.setattr(diff_bilder, "beschaffe", lambda *a: {})
-    fristen: list[float] = []
-
-    def _geraete(root, http, heute, frist_sekunden):
-        fristen.append(frist_sekunden)
-        return {"neu": 2}
-
-    monkeypatch.setattr(geraete_pipeline, "run_geraete_stage", _geraete)
-    cfg = SimpleNamespace(settings={"promo_enabled": False})
-
-    zusatz = zusatzstufen.ausfuehren(
-        cfg, tmp_path, HEUTE, ("e", "m", "Deutsch"), False, lambda: 75.0, _takt([])
-    )
-
-    assert fristen == [75.0]
-    assert zusatz.geraete == {"neu": 2}
 
 
 @pytest.fixture
@@ -148,7 +104,7 @@ def test_diff_bericht_faellt_auf_regelbericht_zurueck(tmp_path, monkeypatch):
     cfg = SimpleNamespace(settings={"promo_enabled": False})
 
     zusatzstufen.ausfuehren(
-        cfg, tmp_path, HEUTE, ("e", "m", "Deutsch"), True, lambda: None, _takt(gefangen)
+        cfg, tmp_path, HEUTE, ("e", "m", "Deutsch"), True, _takt(gefangen)
     )
 
     assert gefangen == ["synthese"]

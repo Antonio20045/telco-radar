@@ -161,8 +161,7 @@ vorsortierung_enabled: true
 # `veroeffentlichung_reserve_sekunden` (pipeline.vorsortierung_budget), und
 # unterhalb einer Minute Rest faengt die Stufe gar nicht erst an.
 #
-# Der Unterschied zu `uebersetzung_frist_sekunden` und
-# `geraete_frist_sekunden` ist die POSITION: die Vorsortierung steht VOR dem
+# Der Unterschied zu `uebersetzung_frist_sekunden` ist die POSITION: die Vorsortierung steht VOR dem
 # Analysten, also vor der laengsten Stufe des Laufs. Ueberzieht sie, kostet
 # das nicht ein paar Meldungen, sondern den Bericht. Was nach Ablauf der
 # Frist noch offen ist, geht UNGEFILTERT zum Analysten - teurer, aber
@@ -527,26 +526,10 @@ ki_ranglisten_aktiv: true
 # config/ki_videos.yaml. Fehlt der Schalter (goldener Lauf), bleibt sie aus.
 ki_videos_aktiv: true
 
-# Geraete- und Preisradar: im WOCHENLAUF AUS. Nicht, weil die Stufe etwas
-# taugt oder nicht - sie hat einen eigenen taeglichen Job
-# (.github/workflows/geraete.yml, 02:17 UTC), und der ist der bessere Ort:
-# er faellt in das Besuchsfenster von medimax.de und ep.de (02:00-08:00 UTC
-# laut deren robots.txt), er hat sein eigenes Zeitbudget, und er kann den
-# Wochenbericht nicht aufhalten.
-#
-# Lauf 31422689829 (10.08.2026) hat gezeigt, warum das keine Geschmacksfrage
-# ist: der Kernlauf war nach 44:39 fertig, die Stufe startete mit zehn
-# Minuten Budget, das Job-Timeout kam nach 50 Minuten - und weil die Stufe
-# VOR dem Rendern steht, wurde von 45 erfolgreichen Minuten NICHTS
-# veroeffentlicht. Wer sie hier wieder anschaltet, bekommt die zweite
-# Sicherung aus pipeline.py: sie laeuft nur mit der Restzeit des Jobs und
-# gar nicht, wenn dadurch das Rendern in Gefahr geriete.
-geraete_enabled: false
-geraete_frist_sekunden: 600
-
 # Wie lange der Job insgesamt darf (radar.yml: timeout-minutes: 180) und wie
 # viel davon fuer Rendern, Committen und Deploy reserviert bleibt. Beide
-# Zahlen sind die Rechengrundlage der Sicherung oben - wer `timeout-minutes`
+# Zahlen sind die Rechengrundlage der Zeitbudgets von Vorsortierung und
+# Uebersetzung - wer `timeout-minutes`
 # im Workflow aendert, aendert `job_frist_sekunden` mit.
 # 3000 -> 10800 am 14.08.2026, zusammen mit timeout-minutes 50 -> 180: die
 # Laeufe #88, #89 und #90 sind alle drei genau an der 50-Minuten-Marke

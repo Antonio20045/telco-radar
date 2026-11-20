@@ -1,7 +1,7 @@
 """Was alle Geraete-Adapter teilen: Bauform, Verzeichnis, Fehlerklasse, Preislesung.
 
-Die sechs anbietereigenen Adapter (vodafone, o2, telekom, congstar,
-einsundeins, saturn) importieren aus diesem Paket nur dieses Modul. Das
+Die anbietereigenen Adapter (vodafone, o2, telekom, congstar, saturn, ...)
+importieren aus diesem Paket nur dieses Modul. Das
 Paket-`__init__` reicht jeden Namen fuer Bestandsimporte weiter und haelt
 damit denselben Gegenstand: es gibt genau EINE Klasse `GeraeteAbrufFehler`,
 die `sammle_anbieter` faengt, und genau EIN Verzeichnis `ADAPTER`.
@@ -51,13 +51,6 @@ class Adapter:
     Sammelantwort selbst nicht nennt (Vodafone: nur ein `offerCoreHash`,
     keine Klarname - siehe `vodafone.py` Modulkopf, Abschnitt B1).
 
-    `ergaenze_buendel(hole, kopfzeilen, rohbuendel) -> int` ist dieselbe
-    Bauform fuer BETRAEGE statt Namen (S2-C, 09.09.2026): 1&1 nennt seine
-    Bereitstellungsgebuehr erst im Tarifdetails-Iframe, einer eigenen
-    Adresse, die die Geräteseite selbst verlinkt. Der Haken macht EIN GET
-    je Tarif-Slug und setzt `anschlusspreis` auf den Saetzen - siehe
-    `einsundeins.ergaenze_bereitstellungsgebuehr`.
-
     `buendel_auf_produktseite` (Voreinstellung True) sagt, ob die zweite
     Lesart auf den Produktseiten des ERNTE-Wegs ueberhaupt sinvoll ist.
     Vodafone traegt seine Buendel in derselben Detailantwort wie die
@@ -92,7 +85,6 @@ class Adapter:
     lies_buendel: Callable | None = None
     buendel_auf_produktseite: bool = True
     loese_tarifnamen: Callable | None = None
-    ergaenze_buendel: Callable | None = None
     vertiefe_buendel: Callable | None = None
     fuehre_zusammen: Callable | None = None
     confidence: str = "hoch"

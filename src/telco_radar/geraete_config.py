@@ -37,18 +37,18 @@ METHODEN = (
     "o2_katalog",
     "congstar_next",
     "telekom_kategorie",
-    "einsundeins_buendel",
     "saturn_brand",
     "mediamarkt_angebote",
     "coolblue_produkt",
     "mediamarkt_tarifwelt",
+    "klick",
     "kein_hardware",
     "deaktiviert",
 )
 
 _NICHT_CRAWLBAR = ("deaktiviert", "kein_hardware")
 
-_EIGENER_LAUF = ("mediamarkt_tarifwelt",)
+_EIGENER_LAUF = ("mediamarkt_tarifwelt", "klick")
 
 ANBIETER_TYPEN = ("handel", "netzbetreiber", "discount")
 

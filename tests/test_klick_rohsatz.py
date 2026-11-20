@@ -10,15 +10,14 @@ Regel wie jeder Adaptersatz draußen.
 
 from __future__ import annotations
 
-import gzip
 import json
 from dataclasses import replace
 
 import pytest
 from bestand_pfad import ZUSTAND, lese_wurzel
 from klickergebnisse import (
+    EINSUNDEINS_ADAPTERSATZ,
     EINSUNDEINS_SEITE,
-    FIX,
     O2_SEITE,
     TELEKOM_SEITE,
     einsundeins_lesung,
@@ -30,7 +29,6 @@ from klickergebnisse import (
 )
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
-from telco_radar.collect.geraete.einsundeins import lies_buendel
 from telco_radar.collect.geraete.klickbeleg import Beleg, Belegdatei, Belegpaket
 from telco_radar.collect.geraete.klickcrawler import GRUND_NICHT_BESUCHT, GRUND_ZEIT
 from telco_radar.collect.geraete.klickecho import pruefe_echo, variante_aus
@@ -231,14 +229,7 @@ def test_ein_vertrag_einmalzahlung_wird_zuzahlung(katalog):
     liest 44,99 € und 360,00 € aus derselben Seite). Ohne Anzahlung wird sie die
     Zuzahlung des Satzes; Gegenprobe: ohne Einmalzahlung bleibt die Zuzahlung eine
     Lücke, keine 0."""
-    html = gzip.decompress(
-        (FIX / "einsundeins_produktseite_iphone_17_pro.html.gz").read_bytes()
-    ).decode("utf-8")
-    (adapter,) = [
-        r
-        for r in lies_buendel(html, EINSUNDEINS_SEITE.adresse)
-        if r["speicher_gb"] == 256
-    ]
+    adapter = EINSUNDEINS_ADAPTERSATZ
     assert (adapter["buendel_monatlich"], adapter["geraet_zuzahlung"]) == (44.99, 360.0)
     lesung = einsundeins_lesung()
     einmal = replace(lesung.buendel, einmalzahlung=adapter["geraet_zuzahlung"])

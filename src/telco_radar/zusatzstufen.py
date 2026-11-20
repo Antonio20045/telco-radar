@@ -1,5 +1,5 @@
-"""Die Stufen nach der Bewertung: Kategorie-Sweep, Promo, Geräte, Differenzierung,
-KI-Ranglisten, KI-Videos."""
+"""Die Stufen nach der Bewertung: Kategorie-Sweep, Promo, Differenzierung,
+KI-Ranglisten, KI-Videos. Der Geräteradar läuft nur in `geraete.yml`."""
 
 from __future__ import annotations
 
@@ -26,7 +26,6 @@ class Zusatz:
     """Bilanzen der Zusatzstufen für die Kennzahlen des Berichts."""
 
     promo: dict
-    geraete: dict
 
 
 def ausfuehren(
@@ -35,10 +34,9 @@ def ausfuehren(
     heute: date,
     sprache: tuple[str, str, str],
     use_llm: bool,
-    geraete_frist: Callable[[], float | None],
     takt: Takt,
 ) -> Zusatz:
-    """Kategorie-Sweep, Promo-Übersicht, Geräteradar und Differenzierungsbericht."""
+    """Kategorie-Sweep, Promo-Übersicht und Differenzierungsbericht."""
     editor_model, mechanik_model, language = sprache
     state_dir = root / "data" / "state"
     takt.abgesichert(
@@ -53,11 +51,10 @@ def ausfuehren(
         protokoll("Kategorie-Sweep uebersprungen: %s", None),
     )
     promo = _promo(cfg, root, heute, sprache, use_llm, takt)
-    geraete = _geraete(cfg, root, heute, geraete_frist(), takt)
     _differenzierung(root, heute, (editor_model, language), use_llm, takt)
     _ki_ranglisten(cfg, root, heute, takt)
     _ki_videos(cfg, root, heute, takt)
-    return Zusatz(promo, geraete)
+    return Zusatz(promo)
 
 
 def _ki_ranglisten(cfg: Config, root: Path, heute: date, takt: Takt) -> None:
@@ -146,28 +143,6 @@ def _promo(
         return ergebnis
 
     return takt.abgesichert(_lauf, protokoll("Promo-Uebersicht uebersprungen: %s", {}))
-
-
-def _geraete(
-    cfg: Config, root: Path, heute: date, budget: float | None, takt: Takt
-) -> dict:
-    if budget is None:
-        if cfg.settings.get("geraete_enabled", False):
-            log.warning(
-                "Geraeteradar uebersprungen: zu wenig Jobzeit uebrig. "
-                "Der naechtliche Lauf holt es nach - die "
-                "Veroeffentlichung geht vor."
-            )
-        return {}
-
-    def _lauf() -> dict:
-        from .geraete_pipeline import run_geraete_stage
-
-        return run_geraete_stage(
-            root, cfg.settings.get("http", {}), heute.isoformat(), frist_sekunden=budget
-        )
-
-    return takt.abgesichert(_lauf, protokoll("Geraeteradar uebersprungen: %s", {}))
 
 
 def _differenzierung(

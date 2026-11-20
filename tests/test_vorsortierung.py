@@ -72,7 +72,7 @@ def vorsortier_projekt(tmp_path):
     settings += (
         "\ncrawl_newsrooms: false\nauto_operator_news: false\n"
         "focus_competitors: []\npromo_enabled: false\n"
-        "geraete_enabled: false\nuebersetzung_enabled: false\n"
+        "uebersetzung_enabled: false\n"
     )
     (tmp_path / "config" / "settings.yaml").write_text(settings, encoding="utf-8")
     (tmp_path / "config" / "watchlist.yaml").write_text(
@@ -558,7 +558,7 @@ def test_ein_fehler_der_stufe_kostet_keine_einzige_meldung(monkeypatch, tmp_path
 
 
 def test_bei_knapper_restzeit_wird_gar_nicht_erst_vorsortiert(monkeypatch, tmp_path):
-    """Dieselbe Rechnung wie `geraete_budget()`: gegen die RESTZEIT DES JOBS,
+    """Dieselbe Rechnung wie `uebersetzung.stufe.budget()`: gegen die RESTZEIT DES JOBS,
     nicht gegen das eigene Budget. Die Stufe spart Geld, keine Zeit - ein
     halber Durchlauf spart einen halben Anteil, waehrend der Analyst dahinter
     auf seine Minuten wartet."""

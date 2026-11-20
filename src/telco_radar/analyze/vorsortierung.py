@@ -36,8 +36,8 @@ eine duenne Nachrichtenwoche - genau das Bild, das die degenerierten
    Uebersetzungsdeckel: ein Deckel, der den SCAN abbricht, ist keine
    Begrenzung, sondern eine Auswahl nach Listenposition.
 4. **FRIST-DURCHLASS.** Die Stufe rechnet gegen die RESTZEIT DES JOBS, nicht
-   gegen sich selbst - dieselbe Lehre wie `pipeline.geraete_budget()` und
-   Lauf 31422689829. Ist die Frist erreicht, gehen die uebrigen Stapel
+   gegen sich selbst - dieselbe Lehre wie Lauf 31422689829 (Geraetestufe
+   im Wochenlauf). Ist die Frist erreicht, gehen die uebrigen Stapel
    ungefiltert weiter. Sie steht VOR dem Analysten, also vor der laengsten
    Stufe und weit vor dem Rendern: eine Vorsortierung, die ihre Zeit
    ueberzieht, kostet nicht ein paar Meldungen, sondern den Bericht.

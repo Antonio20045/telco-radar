@@ -42,7 +42,9 @@
 #                 GEBAUT (Stand 05.09.2026): `ldjson` (inklusive der
 #                 schema.org-Microdata-Stufe), `shopify`, `vodafone_api`,
 #                 `o2_katalog`, `congstar_next`, `telekom_kategorie`,
-#                 `einsundeins_buendel`, `saturn_brand`.
+#                 `saturn_brand`.
+#                 EIGENER LAUF OHNE ADAPTER: `klick` (nur der Klick-Tageslauf,
+#                 1&1 seit 20.11.2026), `mediamarkt_tarifwelt` (Tarifwelt-Stufe).
 #                 DIAGNOSE OHNE ADAPTER: `json_endpunkt`, `html`, `js`, `api`
 #                 - gemessen und dokumentiert, aber nichts liest sie. Sie sind
 #                 bewusst keine gemeinsame Methode: fünf Anbieter tragen
@@ -60,6 +62,24 @@
 #                 tests/test_wegeverzeichnis.py prüft das Feld gegen die
 #                 Adapter-Registry und die Klick-Tagesdatei; wer einen Weg
 #                 hinzufügt oder abschaltet, pflegt es hier mit.
+#
+# -----------------------------------------------------------------------------
+# EIN PREISWEG JE ANBIETER (Stand 20.11.2026, docs/geraete/ist-zustand-preise.md)
+# -----------------------------------------------------------------------------
+#   Anbieter           Preisweg                 zweiter Weg            Zeilen 20.11.
+#   Vodafone           Adapter vodafone_api     Klick nur Beleg        2385 Adapter
+#   Telekom            Klick (12 Jobs)          HTTP-Adapter: Barpreis  264 Klick
+#                                               und einzelne Bündel       7 Adapter
+#   o2                 offen: Adapter + Klick   –                      1402 Adapter
+#                                                                       973 Klick
+#   congstar           offen: Klick-Werte,      –                       624 Klick
+#                      Adapter deckt jeden                              181 Adapter
+#                      Schlüssel
+#   1&1                Klick (methode klick)    keiner                    4
+#   Saturn/MediaMarkt  Tarifwelt-Stufe          keiner                  159
+# Ein Weg fällt nur weg, wenn dadurch keine Zeile des Messtags verloren geht;
+# bei o2 und congstar liefert jeder Weg heute Zeilen, die der andere nicht hat
+# (o2) oder die Belege und Werte trägt (congstar).
 #   aktiv         false = wird nicht abgefragt. Dann ist `grund` PFLICHT; er
 #                 steht wörtlich auf /geraete-quellen.html. Kein Anbieter
 #                 verschwindet stillschweigend.
@@ -241,7 +261,7 @@ anbieter:
       dagegen eine tote, im Sitemap-Index nicht mehr gefuehrte Adresse
       (HTTP 200, aber 0 Artikel) und wird NICHT verwendet.
       GRENZE, gemessen im Produktivlauf mit der ehrlichen Kennung
-      (05.09.2026, R2, scripts/lokallauf_saturn.py): NUR 6 der 17
+      (05.09.2026, R2, Lokallauf): NUR 6 der 17
       Markenseiten liefern Saturn-eigene Listungen (iPhone
       16/16e/17/17 Pro/Air/17e, 22 Listungen). Die uebrigen ELF liefern
       strukturell einwandfrei, aber
@@ -858,15 +878,10 @@ anbieter:
       1&1 nicht ab.
     gruppe: United Internet
     rang: 4
-    methode: einsundeins_buendel
+    methode: klick
     aktiv: true
     basis_url: https://mobile.1und1.de
     rate_limit_sekunden: 2
-    # 42 Kacheln plus Luft. Der Deckel bleibt kleiner als die 167 Adressen
-    # der Seite - fiele die Kachelernte je aus und griffe eine allgemeine
-    # Linkernte, liefe der Sammler in den Deckel und die Seite gälte als
-    # unvollständig gelesen, statt still hundert Themenseiten abzurufen.
-    max_produkte: 45
     # Per-Anbieter-Override des Absenders (BRIEF_B4_BUENDEL_EINSUNDEINS,
     # 08.09.2026) - dasselbe Muster wie bei Telekom, Saturn und congstar:
     # die globale Kennung in settings.yaml ist eine Chrome-Vortaeuschung,
@@ -876,75 +891,17 @@ anbieter:
     # Wächter-Sicht in `sammle_anbieter`).
     user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     hinweis: >-
-      ANGEBUNDEN SEIT 04.09.2026 — als BÜNDEL, nicht als Barpreis. Der
-      alte Grund bleibt in seinem Kern richtig: offers.price im ld+json
-      ist der MONATSPREIS des Bündels aus Gerät und Tarif, nicht der
-      Gerätepreis (gemessen 04.09.2026 an mobile.1und1.de/iphone-17-pro:
-      HTTP 200, 325 KB, "iPhone 17 Pro mit 1&1 All-Net-Flat S",
-      price 44.99). Als Barpreis gespeichert wäre die Zahl plausibel
-      falsch. Falsch war nur die Folgerung, dass man deshalb warten müsse:
-      1&1 verkauft Geräte ausschließlich im Tarifbund, einen Barpreis gibt
-      es dort nicht — und unter TCO-first ist der Monatspreis ohnehin die
-      Leitgröße.
-      Der Betrag landet deshalb in preis_mit_vertrag_ab, zusammen mit
-      tarif_referenz (aus der description der Seite) und laufzeit_monate
-      (36, aus window.currentHardwareOfferDuration).
-      preis_ohne_vertrag bleibt LEER; ihn aus 44,99 × 36 minus Tarifpreis
-      zu rechnen wäre eine Rechnung dieses Projekts und keine Angabe des
-      Anbieters. Ohne Tarifnamen in der Beschreibung wird der Satz
-      verworfen — eine Bündelzahl ohne ihren Vertrag ist bedeutungslos.
-      Gelesen wird je Produktseite genau die VORAUSGEWÄHLTE Variante
-      (window.currentProductVariants: cosmic orange, 256 GB). Die
-      Preismatrix über Tarif × Speicher lädt die Seite erst im Browser
-      nach; sie braucht einen eigenen Spike und wird hier nicht aus einer
-      einzigen Zahl vervielfältigt.
-      LINKERNTE: die Kategorieseite /smartphones führt 167 Adressen der
-      eigenen Domain, davon 42 Produktseiten. Geerntet wird ausschließlich,
-      was die Seite selbst als Katalogkachel auszeichnet
-      (a.hardware-box__heading). Ein Pfadmuster kann das nicht leisten -
-      /iphone-17-pro und /handyvertrag-ohne-laufzeit sind pfadgleich.
-      BUENDEL SEIT B4 (08.09.2026): Die Kombinatorik über ALLE Tarife trägt
-      die Geräteseite NICHT serverseitig - ?chosenTariff= liefert
-      byte-identische Antworten, der Tarifdetails-Iframe ist eine
-      JS-Hülle ohne Preis (Messgrenze). Was serverseitig da ist, ist die
-      Preiskarte hwdVariantsPrices: der DEFAULT-Tarif (gemessen an zehn
-      Seiten: überall 1&1 All-Net-Flat S) über ALLE Farben und
-      Speichergrößen, Cent-Beträge; die -bundle-…-Schlüssel darin sind
-      Zubehör (AirPods), kein Tarifbund. lies_buendel liest dieselbe
-      Antwort, die der Ernte-Weg für die Listung ohnehin holt - kein
-      zweiter Abruf, kein eigener Bündel-Einstieg nötig. Der Satz trägt
-      NUR den kombinierten Monatsbetrag (§ 13.2 der Strategie): die
-      Aufteilung der Seite (Datalayer Hardware 45,00 + Tarif 14,99)
-      widerspricht dem Bündelpreis (44,99) - ein Betrag ohne Beleg wird
-      nicht aufgespalten.
-      ROBOTS (04.09.2026 gelesen): mobile.1und1.de sperrt für User-agent *
-      /xml/, /static/, /modules/ sowie einzelne Aktions- und
-      Bestellstrecken. /smartphones und die Produktseiten sind frei, der
-      Parameter ?chosenTariff= ist ausdrücklich erlaubt.
-      SEIT 20.11.2026 NUR NOCH KLICK (zweiter Shop-Umbau desselben Tages):
-      der Klick-Lauf wählt je Gerät Speicher und Laufzeit ("24/36 Monate
-      Fix") auf der Produktseite, klickt einmal "Weiter zur Tarifauswahl"
-      und liest auf der Tarifauswahl je Tarif Geräterate und Tarifpreis
-      (data-tariff-price-hint, gegen den sichtbaren Text geprüft). Alle
-      sieben Tarife, kein Kundendatum, keine Bestellung. Der Abschnitt
-      darunter beschreibt den Adapterweg bis dahin.
-      BIS 20.11.2026 NUR GEMESSEN: die Geräteseite trägt je Variante
-      "24 Monate Fix" und "36 Monate Fix" (hwdVariantsHardwarePrices), beide
-      werden je Speichergröße gelesen. Sie trägt nur EINEN Tarif
-      (All-Net-Flat S); die übrigen Tarife wählt der Kunde erst im
-      Bestellweg (Warenkorb). Die bis dahin aus den Geräterastern
-      hergeleiteten Tarifstufen (tarifaufschlag_aus_tarifraster) entfallen:
-      der Tarifnachlass hängt an Speicher und Laufzeit (iPhone 17 Pro Max
-      fix 24: 9,99 bei 256 GB, 13,99 bei 512 GB), ein übertragener
-      Aufschlag wäre unbelegt. Andere Tarife sind eine benannte Lücke.
+      SEIT 20.11.2026 NUR KLICK: der Klick-Lauf wählt je Gerät Speicher und
+      Laufzeit ("24/36 Monate Fix") auf der Produktseite, klickt einmal
+      "Weiter zur Tarifauswahl" und liest auf der Tarifauswahl je Tarif
+      Geräterate und Tarifpreis (data-tariff-price-hint, gegen den sichtbaren
+      Text geprüft). Alle sieben Tarife, kein Kundendatum, keine Bestellung.
+      1&1 verkauft Geräte nur im Tarifbund; einen Barpreis gibt es dort nicht.
       Die Tarife desselben Anbieters kommen NICHT von hier, sondern aus
-      config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson) -
-      dort trägt derselbe Anbieter seine eigene Marke, hier trägt das
-      Gerät die des Herstellers.
-    # Kein Einstieg des Gerätelaufs mehr (seit 20.11.2026): Preise misst nur der
+      config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson).
+    # Kein Einstieg des Gerätelaufs (seit 20.11.2026): Preise misst nur der
     # Klick-Lauf (config/klickkarten/1und1.yaml, Tarifauswahl im Bestellweg), je Gerät
-    # alle Tarife × Speicher × 24/36 Monate Fix. Der Adapter las nur noch All-Net-Flat
-    # S; sein Bündelweg ist entfernt (ein Weg je Anbieter).
+    # alle Tarife × Speicher × 24/36 Monate Fix. Es gibt keinen 1&1-Adapter mehr.
     einstiege:
       # Tarifdetail-Seiten (kind klick: nur der Klick-Tageslauf liest sie, als
       # `uebersichten` in config/klick_tageslauf.yaml; der Gerätelauf ruft sie

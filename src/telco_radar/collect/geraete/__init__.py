@@ -390,8 +390,8 @@ def hole_mit_robots(
 ) -> Callable:
     """`hole` MIT robots-Pruefung - fuer Abrufe AUSSERHALB von `sammle()`.
 
-    Die Nachbearbeitungs-Haken der Adapter (`loese_tarifnamen`,
-    `ergaenze_buendel`) rufen nach der Sammelphase selbst ab. Bis zum
+    Der Nachbearbeitungs-Haken der Adapter (`loese_tarifnamen`) ruft nach
+    der Sammelphase selbst ab. Bis zum
     22.09.2026 bekamen sie das rohe `hole` - ohne Disallow, ohne
     Crawl-delay, ohne Fensterpruefung, und das an der Stelle, an der der
     Lauf am weitesten fortgeschritten ist (die Zusage "JE ABRUF" oben im

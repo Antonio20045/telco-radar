@@ -22,10 +22,8 @@ import telco_radar.collect.geraete as geraete
 METHODEN_HEUTE = (
     "congstar_next",
     "coolblue_produkt",
-    "einsundeins_buendel",
     "ldjson",
     "mediamarkt_angebote",
-    "mediamarkt_tarifwelt",
     "o2_katalog",
     "saturn_brand",
     "shopify",
@@ -291,18 +289,6 @@ def test_jeder_adapter_wirft_dieselbe_klasse(ohne_netz, methode, lesart, text):
     lesen = getattr(geraete.ADAPTER[methode], lesart)
     with pytest.raises(geraete.GeraeteAbrufFehler) as fehler:
         lesen(text, "https://beispiel.invalid/")
-    assert type(fehler.value) is geraete.GeraeteAbrufFehler
-    assert fehler.value.status is None
-
-
-def test_einsundeins_testleser_wirft_dieselbe_klasse(ohne_netz):
-    """Seit 20.11.2026 ohne Bündelhaken in der Registry; der Leser selbst wirft
-    weiter dieselbe Klasse."""
-    from telco_radar.collect.geraete import einsundeins
-
-    assert geraete.ADAPTER["einsundeins_buendel"].lies_buendel is None
-    with pytest.raises(geraete.GeraeteAbrufFehler) as fehler:
-        einsundeins.lies_buendel("<html></html>", "https://beispiel.invalid/")
     assert type(fehler.value) is geraete.GeraeteAbrufFehler
     assert fehler.value.status is None
 
