@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-auto",
- "datum": "2026-11-19",
- "dauer_sekunden": 1136.3,
+ "datum": "2026-11-20",
+ "dauer_sekunden": 1745.6,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -11,6 +11,849 @@
  "name": "Telekom",
  "seiten": [
   {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+   "geraet": "apple-iphone-duo",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [
+      {
+       "feld": "variante.laufzeit",
+       "grund": "Seite zeigt 36 statt 0"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt 36 statt 0",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "627f77878dafc58e1072428a5d644e1fa3464e23898204034ed545757ba7ea30",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 105,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+      "zeitpunkt": "2026-11-20T02:08:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 45.5,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für laufzeit nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 98,
+    "beendet": 87,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "embed.binkies3d.com": 1,
+     "www.telekom.de": 6
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 149.5,
+    "takte_ms": 800,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
+   },
+   "verworfen": 101
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+   "geraet": "apple-iphone-duo",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "variante.laufzeit",
+       "grund": "Seite zeigt 36 statt 0"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt 36 statt 0",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c704a0cc9e6d75cfa553a42b159467b92c69a5abd0ed05d5855b93c9c0ba080c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 130,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
+      "zeitpunkt": "2026-11-20T02:14:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 45.5,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für laufzeit nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 99,
+    "beendet": 95,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 143.8,
+    "takte_ms": 1200,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
+   },
+   "verworfen": 12
+  },
+  {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
    "geraet": "apple-iphone-duo",
    "gescheitert": 0,
@@ -18,7 +861,41 @@
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [
+      {
+       "feld": "variante.laufzeit",
+       "grund": "Seite zeigt 36 statt 0"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt 36 statt 0",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51&instalmentId=36",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -26,7 +903,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4ab1cf44b2d9e5b6b0fc96af80bb824e882eef2ce91d889f308e6f54dd58be91",
+      "beleg_id": "e6315c4e600b224e692c8d13955f07fa7e4b4eeeb29fbf303000b017a5102c46",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -46,8 +923,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
-      "zeitpunkt": "2026-11-19T07:17:05Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51&instalmentId=36",
+      "zeitpunkt": "2026-11-20T02:20:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -78,680 +955,309 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "3a3bb4f86ba6d77b541fd3e8a052a67da51c18fdb5a6d74a3be37656dee926d8",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 106,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
-      "zeitpunkt": "2026-11-19T07:17:07Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für laufzeit nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "256 GB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 76.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "256 GB",
+      "laufzeit": "0",
+      "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "3ad94de983ee8a6a1bdf5a00c03f50dae371e7364420d6d62072f57e78b72b81",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 182,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
-      "zeitpunkt": "2026-11-19T07:17:10Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "256 GB",
+      "laufzeit": 0,
+      "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 153.0,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "af3f1a6f3af1f6d5dc19dfdba4497104f9480d4ad1a9eee7fb312d3114fd89a8",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 86,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-19T07:17:13Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 57.0,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "e6fc022c6cc216a2c9e735ff7c79adc38df921fb568f2a4c39da082a3351be47",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 115,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=85.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:17:17Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 85.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
+      "laufzeit": "0",
+      "speicher": "1 TB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "144e735c98eda6fe5de5eef24315c78289fda3969f82d264d32763655369bb59",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 201,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:17:19Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
+      "laufzeit": 0,
+      "speicher": "1 TB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 171.5,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "1 TB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "9595ca38dbe7315a347c404f25cb11757c7241ff629d944d80fdc6b0aba75e6e",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 99,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-19T07:17:22Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "1 TB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 70.0,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "1 TB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "d394db2b637610594cd544289a2ec48320e4575c500ca3d56ee82c620b4006f0",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 134,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=105&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:17:24Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "1 TB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 105.0,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "1 TB",
+      "laufzeit": "0",
+      "speicher": "2 TB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "b00af0d318526c7c13f09a7b6d7e2243663e09a05e4a533c64cae53b6d9bc795",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 240,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:17:27Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "1 TB",
+      "laufzeit": 0,
+      "speicher": "2 TB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 210.5,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "2 TB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "9814603fa4d00c785b94673fc290ec6cdfb82de716a4a089c2c2f02f25b51985",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 119,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-19T07:17:30Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "2 TB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 89.5,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "2 TB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "e0c36a0b0f48e7c20cbd06e097919298346e6dba58711f64a86c2060424bf2a3",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 164,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=134.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:17:32Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "2 TB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 134.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XS"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "52ef3c6041d6eca0b438fe2cf91c867123404a5eba8e986c1edeba086e61ed67",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XS"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 298,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=269&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:17:34Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XS"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 269.0,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        29.95
-       ]
-      ],
-      "volumen_gb": 60.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     }
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 106,
-    "beendet": 98,
+    "anfragen": 99,
+    "beendet": 96,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
-     "binkiesproductionweu.servicebus.windows.net": 2,
-     "www.telekom.de": 5
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 147.0,
-    "takte_ms": 850,
+    "sekunden": 143.6,
+    "takte_ms": 1200,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -761,12 +1267,12 @@
    "struktur": {
     "anteil_felder": 0.8571428571428571,
     "anteil_knoepfe": 1.0,
-    "felder_gefunden": 72,
-    "felder_gesucht": 84,
-    "knoepfe_gefunden": 72,
-    "knoepfe_gesucht": 72
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
    },
-   "verworfen": 102
+   "verworfen": 12
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
@@ -776,7 +1282,41 @@
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [
+      {
+       "feld": "variante.laufzeit",
+       "grund": "Seite zeigt 36 statt 0"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt 36 statt 0",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51&instalmentId=36",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -784,7 +1324,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "de46af541a40af34f27a6e7fd84e5b59119951d525e9e6a03e48e6819a7ba41b",
+      "beleg_id": "e7b20db72ea3a4998ec4888350b48abf78e92582928d253e5c0500a94d9f56ce",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -804,8 +1344,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51.1&instalmentId=36",
-      "zeitpunkt": "2026-11-19T07:21:03Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=51&instalmentId=36",
+      "zeitpunkt": "2026-11-20T02:26:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -836,680 +1376,309 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "27038b7a450c52ef335a5f5d5cd0b8d989d27bbed3ddf9c77eb587bcf88ccf7d",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 116,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=76.5&instalmentId=24",
-      "zeitpunkt": "2026-11-19T07:21:05Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für laufzeit nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "256 GB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 76.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "256 GB",
+      "laufzeit": "0",
+      "speicher": "512 GB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "996e260a87ba23b7cf7a13a52b0d3c8cbe06dde97ce47e3d26e8e8ecd32d8ff4",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 192,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12",
-      "zeitpunkt": "2026-11-19T07:21:07Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "256 GB",
+      "laufzeit": 0,
+      "speicher": "512 GB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 153.0,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "512 GB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "79b0919cb2eaa511fbb8f54c707d7d21cccc56b14483605b30aa416ec80615c7",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 96,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=153&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-19T07:21:11Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "512 GB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 57.0,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "89d19ddf84e01918b8fba720914144795b8e4c067d28bb6be4078d48d29e5bbb",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 125,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=85.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:21:13Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 85.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
+      "laufzeit": "0",
+      "speicher": "1 TB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "840c01dec77a4574a3af92f081e88c6fd76ec77dc38284aff9c664ee26234bf8",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 211,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:21:15Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
+      "laufzeit": 0,
+      "speicher": "1 TB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 171.5,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "1 TB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "345eb86871d5abd3c79fc6e7a2387655547ea83f7906c945c0ded2684603e3c0",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 109,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=171.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-19T07:21:18Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "1 TB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 70.0,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "1 TB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "98544d77062085be508ca001d40f879de00e6344a835ce8b16f32970ef982c49",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 144,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=105&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:21:21Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "1 TB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 105.0,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "1 TB",
+      "laufzeit": "0",
+      "speicher": "2 TB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "e4c6714ee787e16cee50a1901b606cf0f4baf853426c49cb2098c3af8dc116c2",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 250,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:21:23Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "1 TB",
+      "laufzeit": 0,
+      "speicher": "2 TB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 210.5,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "2 TB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "7e4f2fed4e1207e12c7af1c744edaccc3dd77f46ec5a2a3a07a782d1dbed703f",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 129,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=210.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-19T07:21:26Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "2 TB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 89.5,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "2 TB",
       "tarif": "MagentaMobil S"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "1010e39527b000b9e1635a8eb85f478ef47970b2d369e9993904bdf567d5d13b",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 174,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=134.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:21:28Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "2 TB",
       "tarif": "MagentaMobil S"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 134.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil S"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "1d9cd79c2133d716a33f2cba597dca060c08382f2275ff0ee329a99e26327718",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil S"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 308,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=269&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:21:31Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil S"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 269.0,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        39.95
-       ]
-      ],
-      "volumen_gb": 90.0
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     }
    ],
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 99,
-    "beendet": 97,
+    "beendet": 96,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "bf72977jfz.bf.dynatrace.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 143.7,
-    "takte_ms": 1650,
+    "sekunden": 143.8,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1519,12 +1688,12 @@
    "struktur": {
     "anteil_felder": 0.8571428571428571,
     "anteil_knoepfe": 1.0,
-    "felder_gefunden": 72,
-    "felder_gesucht": 84,
-    "knoepfe_gefunden": 72,
-    "knoepfe_gesucht": 72
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
    },
-   "verworfen": 93
+   "verworfen": 12
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48.3&instalmentId=36",
@@ -1534,7 +1703,41 @@
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48.3&instalmentId=36",
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "0",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [
+      {
+       "feld": "variante.laufzeit",
+       "grund": "Seite zeigt 36 statt 0"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite zeigt 36 statt 0",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 0,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48&instalmentId=36",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
@@ -1542,7 +1745,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a5129cfffd751d1f471aa8b1afe0b3ebd3293d4a9b8a12f0efe30a60e663b526",
+      "beleg_id": "aa53b9f914dc8fc5f117bb1d4cd1ec1842ecebb6a171372ec60aafb008163ce4",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1562,8 +1765,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48.3&instalmentId=36",
-      "zeitpunkt": "2026-11-19T07:24:59Z"
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48&instalmentId=36",
+      "zeitpunkt": "2026-11-20T02:32:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1594,2194 +1797,310 @@
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.5&instalmentId=24",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "100223bc952e1cb645cb23fb8ce0b5062e5a3e2891c934a7914688f30f6c64c1",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 122,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.5&instalmentId=24",
-      "zeitpunkt": "2026-11-19T07:25:01Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für laufzeit nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "256 GB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 72.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=145&instalmentId=12",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "256 GB",
+      "laufzeit": "0",
+      "speicher": "512 GB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "ac54ce56b11cac1e14c31ca89729c3f11fe44e980693bb66b6b3c6480a4791cb",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 194,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=145&instalmentId=12",
-      "zeitpunkt": "2026-11-19T07:25:03Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "256 GB",
+      "laufzeit": 0,
+      "speicher": "512 GB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 145.0,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "512 GB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "26ede05b576eba8675ed11659c6e3fc2136e94fc2215031b358b32c25d85af36",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 103,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=145&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-19T07:25:08Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "512 GB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 54.0,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "0aee79289c22bf4b8275e8d3d7c9f3f13d3093b3292759660d2d611b6f2584b5",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 131,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=81.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:25:10Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 81.5,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
+      "laufzeit": "0",
+      "speicher": "1 TB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "d1fb23fb178a8f6e13ff84239b202214b3b5dd2f6cd97657a41a39ba10b7dd7b",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 212,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=163&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:25:13Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
+      "laufzeit": 0,
+      "speicher": "1 TB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 163.0,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "1 TB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "1267564277b1d2fa67005d7e64f65283150f85baf2818ae9aa20f9bdf5092679",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 117,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=163&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-19T07:25:16Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "1 TB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 67.5,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "1 TB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "9f9128c29aa606959e1b336ece75e83c0c75714af558e4ee9f22f3a335f044fa",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 150,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=101&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:25:18Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "1 TB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 101.0,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
-      "laufzeit": "12",
-      "speicher": "1 TB",
+      "laufzeit": "0",
+      "speicher": "2 TB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "179d335a9f84b8ac500c2f7c0e8f0b40e87e0e043ba4f3471529e92e02d7e4d9",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 252,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=202.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:25:21Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
-      "laufzeit": 12,
-      "speicher": "1 TB",
+      "laufzeit": 0,
+      "speicher": "2 TB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 202.5,
-      "ratenzahl": 12,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "2 TB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "6b7cea6e0127e61321a4bf713ddde1b121954d383fd595860bd41872ea119eb4",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 136,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=202.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-19T07:25:24Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "2 TB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 86.5,
-      "ratenzahl": 36,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "2 TB",
       "tarif": "MagentaMobil M"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "a003d7bc86a14801f8d6fa82fb95372f8377f1f6d922e150b2a10c372f5a44ae",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 179,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=130&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:25:26Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
+     "grund": "Knopf für speicher nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "luecken": [],
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "2 TB",
       "tarif": "MagentaMobil M"
      },
      "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 130.0,
-      "ratenzahl": 24,
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
       "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil M"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "05866bc64795f5f9971a6960e253851f75702da228d203fda120c419d6b79ada",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil M"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 310,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=260.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:25:28Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil M"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 260.5,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        49.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     }
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 104,
-    "beendet": 101,
+    "anfragen": 98,
+    "beendet": 95,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 143.4,
-    "takte_ms": 1500,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "gelesen",
-   "stoerung": null,
-   "struktur": {
-    "anteil_felder": 0.8571428571428571,
-    "anteil_knoepfe": 1.0,
-    "felder_gefunden": 72,
-    "felder_gesucht": 84,
-    "knoepfe_gefunden": 72,
-    "knoepfe_gesucht": 72
-   },
-   "verworfen": 98
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
-   "geraet": "apple-iphone-duo",
-   "gescheitert": 0,
-   "grund": null,
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "249c049d416a4647342704d66bd4a89128ea3defdf47fd19a867a4a5cf201c07",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 105,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
-      "zeitpunkt": "2026-11-19T07:29:00Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 45.5,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "504f8923e6438a0b03673985ee306403e1f6bc1d44cfabf6d9e4648bbb9e78f7",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 127,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
-      "zeitpunkt": "2026-11-19T07:29:02Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 68.0,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "fa90d3e26b9f8e4ded162a234e52499af2824663b834ce4714fee598d4c837e8",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 196,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
-      "zeitpunkt": "2026-11-19T07:29:04Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 136.5,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "df4b4615607e11f46024b534635b7fa51cc54afad9492fe44f66991b8b7921f5",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 111,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-19T07:29:07Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 51.5,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "11ab26b28b7fd83a6a823944a853b7da1ba47da9c1c145e28b9c16a428756e3b",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 137,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=77.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:29:10Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 77.5,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "ab2e15a8b10d64977c70f2b6c865a13aec5e66140161ff501ff8026117b33a90",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 214,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=155&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:29:12Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 155.0,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "94fea86ffedc7cda8a80f5d8b7e13cfdd0aec0a268b8df7c64c4da218f1ed378",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 124,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=155&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-19T07:29:15Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 64.5,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "77da59f1206784606a8b2f360a3e2382579e8442213712e26ddc12baa6b4b297",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 156,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=97&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:29:18Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 97.0,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "91eace385db9965112ac3d41a870797834e0d47c547f048f2b01c652b8c7fe31",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 253,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=194&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:29:20Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 194.0,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "dd30969ef1a4c64ec21d75f8317c07f0af58aef24bb2e36f0899bb13a9eb8439",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 143,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=194&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-19T07:29:23Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 84.0,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "c35767ad1a4a674d0b49612c7d8b37f37eb7956ea586e539cfd4ea66b54f996a",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 185,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=126&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:29:25Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 126.0,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "92eb504c1b2c4086a0a19285fa89a2533c7c6f2c2b4854e2133b91fc3eada196",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil L"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 312,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=252.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:29:28Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil L"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 252.5,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        59.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 10.0,
-    "anfragen": 103,
-    "beendet": 101,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 143.8,
-    "takte_ms": 1750,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "gelesen",
-   "stoerung": null,
-   "struktur": {
-    "anteil_felder": 0.8571428571428571,
-    "anteil_knoepfe": 1.0,
-    "felder_gefunden": 72,
-    "felder_gesucht": 84,
-    "knoepfe_gefunden": 75,
-    "knoepfe_gesucht": 75
-   },
-   "verworfen": 101
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
-   "geraet": "apple-iphone-duo",
-   "gescheitert": 0,
-   "grund": null,
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "e721e37047e563344b639a46eeb7ae4f86d66a525b479e8e29a82172ecd0634b",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 338,95 € · monatlich 130,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=45.5&instalmentId=36",
-      "zeitpunkt": "2026-11-19T07:33:00Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 299.0,
-      "rate": 45.5,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "8cbcf7eeb42e0eecb0b03744c559f67dcb2d3191fec6e414f8294f88f9bbc9d0",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 338,95 € · monatlich 152,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=68&instalmentId=24",
-      "zeitpunkt": "2026-11-19T07:33:03Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 299.0,
-      "rate": 68.0,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "a0ffb3ffb4e3ece520939279fe57afcdd9d24f94beeebee463ed10a29c8bf2f2",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 256 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 338,95 € · monatlich 221,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12",
-      "zeitpunkt": "2026-11-19T07:33:06Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "256 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 299.0,
-      "rate": 136.5,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "97150b100dc6486ebd4e748a934751722f82e39bfb26ebdc70747e547cc49092",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 133,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=136.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-19T07:33:09Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 48.5,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "9b4dd9ed334404572f0ee3da046afd51b23f11ab91b9d37d078fd97f983957c1",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 157,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=73&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:33:11Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 73.0,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "fc2df16c49855f68d5988588b5051dde5bfe7d992b25f15a9113118d6e59c5f3",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 231,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=146.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-19T07:33:13Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "512 GB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 146.5,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "00a9a4b3f698e45986048ab1156676024ca49338daa0b9816096d63826e23aa2",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 146,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=146.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-19T07:33:16Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 61.5,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "af0387f948ec89695ccc6cff08ab64cd29be27e915dfa6d586afae4e13bb87c1",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 177,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:33:18Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 92.5,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "12d29c9550e7c02cc5d42ae577a798e2bb115cac30573961bba9a9b9d50ca75c",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 1 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 270,45 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=185.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-19T07:33:20Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "1 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 185.5,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "5ea80fb99de89973a582167fafce7f0506e3252c0484cd235c98da923262db7c",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 165,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=185.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-19T07:33:23Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 81.0,
-      "ratenzahl": 36,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "cf0c1b6c7e6ffe3b888e63f78a7a739494ebb41a796a070b7e8710ba65418b91",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 206,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=122&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:33:25Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 122.0,
-      "ratenzahl": 24,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    },
-    {
-     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
-     "auswahl": {
-      "laufzeit": "12",
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "a21ef82c4e2471dd7bf984d9248fd26bdc180c234719b59941d2db54b12a2c04",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: MagentaMobil XL"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 12 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig 438,95 € · monatlich 328,95 € (Gerät und Tarif zusammen)"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=244&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-19T07:33:28Z"
-     },
-     "beleg_status": "offen",
-     "buendel": null,
-     "grund": null,
-     "luecken": [
-      "tarifbindung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 12,
-      "speicher": "2 TB",
-      "tarif": "MagentaMobil XL"
-     },
-     "werte": {
-      "anschluss": 39.95,
-      "anzahlung": 399.0,
-      "rate": 244.0,
-      "ratenzahl": 12,
-      "tarifbindung": null,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        84.95
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 10.0,
-    "anfragen": 100,
-    "beendet": 99,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "bf72977jfz.bf.dynatrace.com": 2,
      "binkiesproductionweu.servicebus.windows.net": 1,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
     },
-    "ohne_antwort_ms": 50,
+    "ohne_antwort_ms": 0,
     "sekunden": 143.6,
-    "takte_ms": 1750,
+    "takte_ms": 1200,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3791,16 +2110,16 @@
    "struktur": {
     "anteil_felder": 0.8571428571428571,
     "anteil_knoepfe": 1.0,
-    "felder_gefunden": 72,
-    "felder_gesucht": 84,
-    "knoepfe_gefunden": 75,
-    "knoepfe_gesucht": 75
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
    },
-   "verworfen": 99
+   "verworfen": 12
   }
  ],
  "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10025
+ "zeitbudget_sekunden": 10228
 }
