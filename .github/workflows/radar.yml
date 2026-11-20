@@ -68,13 +68,12 @@ jobs:
     # What it costs: a hung stage now burns up to three hours before anyone
     # finds out, and still publishes nothing - the report is written after the
     # optional stages, not before them. The pipeline should learn to skip
-    # those when the clock runs down; `geraete_budget()` in pipeline.py does
-    # it for one stage, the others do not have it yet. Until then, a long
-    # timeout is headroom, not a safety net.
+    # those when the clock runs down; the stages do not have that yet. Until
+    # then, a long timeout is headroom, not a safety net.
     #
     # WER DIESE ZAHL AENDERT, AENDERT `job_frist_sekunden` IN
-    # config/settings.yaml MIT (= minuten * 60). Ein Test haelt beide
-    # gegeneinander: tests/test_geraete_jobbudget.py.
+    # config/settings.yaml MIT (= minuten * 60). Stufe 0 haelt beide
+    # gegeneinander: scripts/waechter_vertraege.py.
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4

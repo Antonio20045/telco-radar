@@ -1,0 +1,106 @@
+name: Gegenprobe Gerätepreise
+
+# Liest gespeicherte Bündelpreise ein zweites Mal, unabhängig vom Sammler: ein
+# echter Browser öffnet die Produktseite, wählt wie ein Kunde und liest den
+# SICHTBAREN Preis (scripts/gegenprobe.py). Geprüft wird jede Preisänderung des
+# Tages und je Anbieter eine feste Stichprobe (gegenprobe.STICHPROBE_JE_ANBIETER).
+# Ergebnis: data/state/gegenprobe/<datum>.jsonl, Bilder im Release
+# gegenprobe-<datum>.
+#
+# Läuft nach dem Gerätelauf (workflow_run, nur bei grünem Lauf) und von Hand.
+# Eigene concurrency-Gruppe ohne Abbruch (Harte Regel 9). Zeitbudget (Regel 8):
+# timeout-minutes 60 = JOB_MINUTEN in scripts/gegenprobe.py; das Skript rechnet
+# --job-frist-sekunden ab --job-start und hört PUFFER_S vor dem Timeout auf.
+
+on:
+  workflow_run:
+    workflows: ["Geraete- und Preisradar"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gegenprobe
+  cancel-in-progress: false
+
+jobs:
+  gegenprobe:
+    # Auch nach rotem Geraetelauf: rot meldet meist nur der Abdeckungswaechter am
+    # Ende, Bestand und Seite sind dann schon committet. Nur ein abgebrochener
+    # Lauf (cancelled) hat keinen sicheren Bestand.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Jobstart merken
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Ein zweiter Anstoß am selben Tag (Gerätelauf ohne neue Messung) prüft
+      # nicht noch einmal; von Hand wird immer geprüft.
+      - name: Heute schon geprüft?
+        id: heute
+        run: |
+          stand=$(python3 -c "import json; print(json.load(open('data/state/geraete_tco.json')).get('updated',''))")
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ -f "data/state/gegenprobe/${stand}.jsonl" ]; then
+            echo "Gegenprobe für $stand liegt schon vor."
+            echo "fertig=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "fertig=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.heute.outputs.fertig != 'true'
+        with:
+          python-version-file: .python-version
+
+      - name: Abhängigkeiten
+        if: steps.heute.outputs.fertig != 'true'
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Gegenprobe
+        if: steps.heute.outputs.fertig != 'true'
+        env:
+          PYTHONPATH: src
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          python scripts/gegenprobe.py --root . --hochladen \
+            --job-start "$JOB_START" --job-frist-sekunden 3000 \
+            2>&1 | tee gegenprobe.log
+
+      - name: Log sichern
+        if: always() && steps.heute.outputs.fertig != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gegenprobe-log-${{ github.run_id }}
+          path: gegenprobe.log
+          if-no-files-found: warn
+
+      - name: Commit Ergebnis
+        if: steps.heute.outputs.fertig != 'true'
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git add data/state/gegenprobe
+          python scripts/waechter_leck.py
+          if git diff --cached --quiet; then
+            echo "Keine neue Gegenprobe."
+            exit 0
+          fi
+          git commit -m "gegenprobe: Stand $(date -u +%Y-%m-%d)"
+          BRANCH="${GITHUB_REF_NAME}"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "$BRANCH" && git push origin "HEAD:$BRANCH" && exit 0
+            echo "Push fehlgeschlagen, Versuch $i"
+            sleep $((2 ** i))
+          done
+          exit 1
