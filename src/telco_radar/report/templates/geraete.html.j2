@@ -69,7 +69,7 @@
    .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
    E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist GEFALLEN
    (Doppel-Darstellung zur eigenen Geräteauswahl, §4.6/§4.8). #}
-{% from "_geraete_buendel.html.j2" import belegpaare, fehlzeile, echte24luecke, haendlername %}
+{% from "_geraete_buendel.html.j2" import belegpaare, preisbelege, fehlzeile, echte24luecke, haendlername %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
 {# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
    `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
@@ -335,7 +335,7 @@
     {% set echte24_zeilen = echte24_fehlzeilen(m) if m else [] %}
     <div id="gr-bnd-gruppe">{% if m and (m.fehlzeilen or echte24_zeilen) %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
       %}{{ fehlzeile(f) }}{% endfor %}{% for k in echte24_zeilen %}{{
-      echte24luecke(k) }}{% endfor %}</div>{% endif %}{% if m %}{{ belegpaare(m) }}{% endif %}</div>
+      echte24luecke(k) }}{% endfor %}</div>{% endif %}{% if m %}{{ belegpaare(m) }}{{ preisbelege(m) }}{% endif %}</div>
   {# Ziel 1b: warum ein Anbieter nicht jede Tarifstufe füllt (`geraete_stufen`). #}
   <p class="gr-belegquote" id="gr-tarifstufen-regel">{{
   geraete.tco.tarifstufen_regel }}</p>
@@ -1060,7 +1060,8 @@
    Zahlen standen, sind hierher gezogen (geraete-quellen.html#methodik),
    nicht gestrichen. #}
 <p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Quellen</a>
-· <a href="{{ prefix }}geraete-quellen.html#methodik">Methodik</a></p>
+· <a href="{{ prefix }}geraete-quellen.html#methodik">Methodik</a>
+· <a href="{{ prefix }}geraete-preisaenderungen.html">Preisänderungen</a></p>
 
 
 {% else %}

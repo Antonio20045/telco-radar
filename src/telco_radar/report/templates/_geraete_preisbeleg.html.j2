@@ -1,0 +1,18 @@
+{# Beleg je Preis (geraete_preisbeleg.beleg): Quelle, gelesen am, Rechenweg,
+   Screenshot, Gegenprobe. Jede Angabe steht da oder als benannte Lücke
+   (`gr-t-luecke`), nie leer. Der Rechenweg sind die Summanden aus
+   `kosten_ueber`; ihre Summe ist die Zahl der Zeile. Das Bild lädt erst beim
+   Aufklappen: `loading=lazy` im geschlossenen details, auf der Geräteseite
+   `data-src`, das app.js beim Öffnen der Zeile setzt (`bildattr`). #}
+{% macro gp_marke(g) %}<span class="gr-pb-gp gr-pb-gp--{{ g.status if g else 'offen' }}">{{
+  ('Gegenprobe ' ~ g.wort) if g else 'nicht gegengeprüft' }}</span>{% endmacro %}
+
+{% macro gp_bilanz(g, n) %}{% if g.offen == n %}nicht gegengeprüft{% else %}Gegenprobe: {% for teil in [(g.bestaetigt, 'bestätigt'), (g.teilweise, 'teilweise bestätigt'), (g.abweichend, 'abweichend'), (g.nicht_pruefbar, 'nicht prüfbar'), (g.offen, 'nicht gegengeprüft')] if teil[0] %}{{ teil[0] }} {{ teil[1] }}{% if not loop.last %} · {% endif %}{% endfor %}{% endif %}{% endmacro %}
+
+{% macro beleg_inhalt(b, alt='', bildattr='src') %}<dl class="gr-pb-daten">
+  <dt>Quelle</dt><dd>{% if b.quelle_url %}<a href="{{ b.quelle_url }}" rel="nofollow noopener" target="_blank">{{ b.quelle }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>{% else %}<span class="gr-t-luecke">keine Quelle</span>{% endif %}</dd>
+  <dt>Gelesen</dt><dd>{{ b.gelesen_am or '–' }}</dd>
+  <dt>Rechenweg</dt><dd class="gr-pb-rw">{% if b.rechenweg %}{% for t in b.rechenweg.terme %}<span class="gr-pb-term">{{ t }}</span>{% if not loop.last %} + {% endif %}{% endfor %} = <b class="gr-pb-ergebnis">{{ b.rechenweg.gesamt | euro }}</b>{% else %}<span class="gr-t-luecke">{{ b.rechenweg_fehlt }}</span>{% endif %}</dd>
+  <dt>Screenshot</dt><dd>{% if b.bild %}<a class="gr-pb-bildlink" href="{{ b.bild.url }}" rel="noopener" target="_blank"><img class="gr-pb-bild" {{ bildattr }}="{{ b.bild.url }}" loading="lazy" alt="Screenshot {{ alt }} vom {{ b.bild.datum }}" width="240" height="150"></a><span class="gr-pb-bildzeile">{{ b.bild.art }} vom {{ b.bild.datum }}</span>{% else %}<span class="gr-t-luecke">{{ b.bild_fehlt }}</span>{% endif %}</dd>
+  <dt>Gegenprobe</dt><dd>{% set g = b.gegenprobe %}{% if g %}{{ gp_marke(g) }} <span class="gr-pb-zeiten">{% if g.messung %}Messung {{ g.messung }} · {% endif %}Gegenprobe {{ g.datum }}{% if g.uhrzeit %}, {{ g.uhrzeit }}{% endif %}</span>{% for h in g.hinweise %}<span class="gr-pb-hinweis">{{ h }}</span>{% endfor %}{% for a in g.abweichungen %}<span class="gr-pb-abw">{{ a }}</span>{% endfor %}{% if g.grund %}<span class="gr-pb-grund">{{ g.grund }}</span>{% endif %}{% if g.nicht_gelesen and g.status == 'bestaetigt' %}<span class="gr-pb-grund">Nicht auf der Seite: {{ g.nicht_gelesen | join(', ') }}</span>{% endif %}{% else %}<span class="gr-t-luecke">{{ b.gegenprobe_fehlt }}</span>{% endif %}</dd>
+</dl>{% endmacro %}

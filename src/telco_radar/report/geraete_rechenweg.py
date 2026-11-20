@@ -129,6 +129,11 @@ def _buendel_aus_messung(messung: dict, tarife: dict | None = None) -> Buendel |
     return b
 
 
+def buendel_der_messung(satz: dict, stand: dict, tarife: dict | None) -> Buendel | None:
+    """Öffentlicher Zugang zu `_buendel_aus_messung` (Seite „Preisänderungen“)."""
+    return _buendel_aus_messung({"satz": satz, "stand": stand}, tarife)
+
+
 def _messwert(
     messung: dict, tarife: dict | None = None
 ) -> tuple[float | None, int | None]:

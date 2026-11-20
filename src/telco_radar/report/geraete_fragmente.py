@@ -14,6 +14,8 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+from . import geraete_preisaenderungen
+
 ZR_ORDNER = "zr"
 BND_ORDNER = "bnd"
 
@@ -41,7 +43,7 @@ def vorbereiten(
     """
     daten = site_dir / "data"
     daten.mkdir(exist_ok=True)
-    dateien: dict[Path, str] = {}
+    dateien = geraete_preisaenderungen.seiten(env, geraete, site_dir)
     if radar:
         radar_vorlage = env.get_template("geraete_radar_fragment.html.j2")
         dateien[daten / "geraete-radar.html"] = radar_vorlage.render(

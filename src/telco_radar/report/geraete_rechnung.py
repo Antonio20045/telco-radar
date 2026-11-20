@@ -92,9 +92,11 @@ def luecken_zum_lesen(luecken: list[str]) -> list[str]:
 def felder(kosten: Kosten, rabattiert: bool = False) -> dict:
     """Die Felder der Bündelkarte: Summanden und, ohne Kernzahl, was fehlt. Gerät
     und Tarif über gleich viele Monate stehen als Monatspreis wie beim Anbieter
-    (Antonio, 07.10.2026)."""
+    (Antonio, 07.10.2026). `rechnung_einzeln` sind dieselben Summanden ungebündelt
+    (Tarif und Gerät je für sich) für den Beleg."""
     return {
         "rechnung": zum_lesen(monatsschritte(kosten.rechnung), rabattiert),
+        "rechnung_einzeln": zum_lesen(kosten.rechnung, rabattiert),
         "rechnung_luecken": luecken_zum_lesen(kosten.luecken),
         "versand_hinweise": list(kosten.hinweise),
     }

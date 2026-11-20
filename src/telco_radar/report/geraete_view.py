@@ -1326,6 +1326,7 @@ def leer(fehler: str = "") -> dict:
         "speicherstufen": [],
         "verlauf": geraete_verlauf.leer(),
         "tco": geraete_tco_view.leer(),
+        "tarife": {},
         "zeitreihe": geraete_zeitreihe.leer(),
         "hersteller": {"fehler": "", "leer": True},
         "ausfaelle": [],
@@ -1445,13 +1446,11 @@ def bestand_und_belastbar(sichtbar: list, katalog) -> tuple[dict, list, list]:
     `zustand_veraltet` steht in dieser Reihenfolge auf 2, vertauscht auf 0. `pruefe()`
     erkennt die falsch gespeicherte Zustandsangabe an genau dem Wort, das `bereinige()`
     aus der Farbe raeumt - laeuft die Bereinigung zuerst, findet die Pruefung nichts
-    mehr zu melden. Ein Befund, den niemand mehr meldet, ist der Fehler, den beim
-    naechsten Mal niemand findet.
+    mehr zu melden. Ein Befund, den niemand meldet, findet beim naechsten Mal niemand.
 
-    Und die Reihenfolge traegt ueber den heutigen Bestand hinaus: eine
-    Giftzeile OHNE Zwilling faellt nur so heraus. Genau die bauen die zwei
-    Tests in `tests/test_geraete_export.py` - ein Fall, den der echte
-    Bestand heute nicht enthaelt.
+    Und die Reihenfolge traegt ueber den heutigen Bestand hinaus: eine Giftzeile
+    OHNE Zwilling faellt nur so heraus. Genau die bauen die zwei Tests in
+    `tests/test_geraete_export.py` - ein Fall, den der Bestand nicht enthaelt.
     """
     pruefung = geraete_pruefung.pruefe(sichtbar, katalog)
     return (
@@ -1636,6 +1635,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         zeitreihe["daten"]["katalog_neu"] = katalog_neu
     return {
         "tco": tco,
+        "tarife": tarife_je_id,
         "zeitreihe": zeitreihe,
         "hersteller": hm,
         "ausfaelle": ausfaelle,

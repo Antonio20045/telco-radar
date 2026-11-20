@@ -1,3 +1,4 @@
+{% from "_geraete_preisbeleg.html.j2" import beleg_inhalt, gp_marke %}
 {# Die Bündel-ZEILEN als Teilvorlage (O3, STRATEGIE_GERAETE_OPTIK §3,
    15.09.2026) - EIN Makro, ZWEI Verwender: die Vergleichsansicht der
    Geräteseite (rendert das Vorgabemodell serverseitig) und das
@@ -61,6 +62,26 @@
   </li>{% endfor %}
   <li class="gr-beleg-keins" role="status"{% if etwas_da %} hidden{% endif %}>Für diese Auswahl gibt es noch keinen Screenshot.</li>
 </ul>{% endif %}{% endif %}{% endmacro %}
+
+{# Beleg je Preiszeile (Gegenprobe-Auftrag, 20.11.2026): jede belastbare Zeile des
+   Modells mit Quelle, Lesedatum, Rechenweg, Screenshot und Gegenprobe
+   (`_geraete_preisbeleg.html.j2`, Daten aus `geraete_preisbeleg`). `data-band`
+   und `data-lz` wie an der Bündelzeile: app.js blendet in `stelleZeilen` nur die
+   Zeilen der gewählten Kombination ein und zählt sie im zugeklappten Kopf; ohne
+   Zeile tritt die Liste zurück (die Seitenhöhe wächst nur um eine Zeile). Knöpfe
+   statt details: die Vergleichsansicht hält ihre Zahl der Aufklapper (A2), und
+   ein Bild lädt erst beim Aufklappen seiner Zeile (`data-src`, app.js). #}
+{% macro preisbelege(m) %}{% if preisbeleg is defined %}{% set zeilen = (m.zeilen_band or []) + (m.zeilen_ohne_band or []) %}
+<div class="gr-preisbelege">
+  <button type="button" class="gr-pb-knopf gr-pb-kopf" aria-expanded="false">Belege zu dieser Auswahl <span class="gr-pb-zahl"></span></button>
+  <div class="gr-pb-liste" hidden>{% for k0 in zeilen %}{% set k = preis_anzeige(k0) %}{% if k.belastbar %}{% set b = preisbeleg(k0) %}
+    <div class="gr-pb" data-anbieter="{{ k.anbieter }}"{% if k.band %} data-band="{{ k.band }}"{% endif %}{% if k.laufzeit_sichtbar %} data-lz="{{ k.laufzeit_sichtbar }}"{% endif %} style="--anb:{{ k.anb_farbe }}">
+      <button type="button" class="gr-pb-knopf gr-pb-zeile" aria-expanded="false"><span class="gr-pb-anb">{{ haendlername(k.anbieter) }}</span><span class="gr-pb-tarif">{{ k.tarif }}{% if k.raten_text %} · {{ k.raten_text }}{% endif %}</span><span class="gr-pb-summe">{{ k.gesamt | euro }}</span>{{ gp_marke(b.gegenprobe) }}</button>
+      <div class="gr-pb-inhalt" hidden>{{ beleg_inhalt(b, haendlername(k.anbieter) ~ ', ' ~ k.tarif, 'data-src') }}</div>
+    </div>{% endif %}{% endfor %}
+    <p class="gr-pb-mehr"><a href="geraete-preisaenderungen.html">Alle Preisänderungen mit Beleg</a></p>
+  </div>
+</div>{% endif %}{% endmacro %}
 
 {# UI-1717 Aufgabe 4: mobilcom-debitel.de leitet vollstaendig auf freenet.de -
    derselbe Laden (siehe `shop` in config/geraete_quellen.yaml). Alarmtabelle,
@@ -534,6 +555,7 @@
         %}{{ fehlzeile(f) }}{% endfor %}{% for k in echte24_zeilen %}{{
         echte24luecke(k) }}{% endfor %}</div>{% endif %}
       {{ belegpaare(m) }}
+      {{ preisbelege(m) }}
 
       {# OHNE TARIFBAND (§ 7): Tarife ohne erhobenes Datenvolumen und Tarife mit
          am Original widersprüchlichem Preis gehören zu keiner Stufe der Vodafone-Tarifleiter - sie stehen als
