@@ -444,7 +444,7 @@ def run_geraete_stage(
             )
             seite = Seite(ist_frisch, geraet_aus_sku, katalog)
             pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)
-            tco.save(heute)
+            tco.save(heute, uhr().isoformat(timespec="minutes"))
             geschrieben = True
     except Exception as exc:  # noqa: BLE001
         log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)

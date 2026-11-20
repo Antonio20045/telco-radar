@@ -126,7 +126,7 @@ Lesen = Callable[[str, dict], Lesung]
 
 
 def pruefe(
-    lesen: Lesen, satz: dict, anlass: str, datum: str
+    lesen: Lesen, satz: dict, anlass: str, datum: str, gemessen_um: str | None = None
 ) -> tuple[gp.Ergebnis, Lesung | None]:
     """Eine Gegenprobe: Kundenweg, Leser, Vergleich. Nie eine Ausnahme nach außen."""
     schluessel = gp.anbieter_aus_id(satz["id"])
@@ -141,6 +141,7 @@ def pruefe(
         "gespeichert": gp.gespeicherte_werte(satz),
         "gesamt_gespeichert": gesamt(satz),
         "geprueft_um": datetime.now(UTC).isoformat(timespec="seconds"),
+        "gemessen_um": gemessen_um,
     }
     leser = LESER.get(schluessel)
     if leser is None:
@@ -209,6 +210,7 @@ def main(argumente: list[str] | None = None) -> int:
         )
         date.fromisoformat(datum)
         saetze = {b["id"]: b for b in bestand["buendel"]}
+        args.gemessen_um = bestand.get("gemessen_um")
         heute, vortag, vortag_datum = lies_historie(args.root / HISTORIE, datum)
         ua = kennungen(args.root)
     except (OSError, ValueError, KeyError) as fehler:
@@ -279,6 +281,7 @@ def laufe(args, wahl, saetze, datum, ua, ende):
                     satz,
                     anlass,
                     datum,
+                    gp.messzeit(args.gemessen_um, satz),
                 )
                 if lesung is not None and lesung.bild is not None:
                     bilder[bid] = lesung.bild
