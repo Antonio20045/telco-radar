@@ -62,6 +62,24 @@
 #                 tests/test_wegeverzeichnis.py prüft das Feld gegen die
 #                 Adapter-Registry und die Klick-Tagesdatei; wer einen Weg
 #                 hinzufügt oder abschaltet, pflegt es hier mit.
+#
+# -----------------------------------------------------------------------------
+# EIN PREISWEG JE ANBIETER (Stand 20.11.2026, docs/geraete/ist-zustand-preise.md)
+# -----------------------------------------------------------------------------
+#   Anbieter           Preisweg                 zweiter Weg            Zeilen 20.11.
+#   Vodafone           Adapter vodafone_api     Klick nur Beleg        2385 Adapter
+#   Telekom            Klick (12 Jobs)          HTTP-Adapter: Barpreis  264 Klick
+#                                               und einzelne Bündel       7 Adapter
+#   o2                 offen: Adapter + Klick   –                      1402 Adapter
+#                                                                       973 Klick
+#   congstar           offen: Klick-Werte,      –                       624 Klick
+#                      Adapter deckt jeden                              181 Adapter
+#                      Schlüssel
+#   1&1                Klick (methode klick)    keiner                    4
+#   Saturn/MediaMarkt  Tarifwelt-Stufe          keiner                  159
+# Ein Weg fällt nur weg, wenn dadurch keine Zeile des Messtags verloren geht;
+# bei o2 und congstar liefert jeder Weg heute Zeilen, die der andere nicht hat
+# (o2) oder die Belege und Werte trägt (congstar).
 #   aktiv         false = wird nicht abgefragt. Dann ist `grund` PFLICHT; er
 #                 steht wörtlich auf /geraete-quellen.html. Kein Anbieter
 #                 verschwindet stillschweigend.

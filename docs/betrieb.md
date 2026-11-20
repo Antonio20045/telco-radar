@@ -36,7 +36,7 @@
 - Abrufe gehen mit der Kennung `TelcoRadar/1.0`; ein Anbieter-Override gilt auch für robots.txt. Aus Actions antwortet die Telekom-Tarifseite mit einer 202-Challenge. Nach 403/406, 429 oder einer 503-Challenge wechselt `fetch` weder Kennung noch Kopfzeilen (eine Anfrage, danach Abbruch; 429 nur einmal bei `Retry-After` ≤ 60 s). Achtung: `http.user_agent` in `config/settings.yaml` ist derzeit eine Browser-Kennung, nicht `TelcoRadar/1.0`.
 
 ## Radar-Lauf (`radar.yml`)
-- Job-Timeout 50 min, Kernlauf rund 27 min. Geräte-Stufe im Wochenlauf aus (`geraete_enabled: false`). Stufen nach dem Kernlauf (Übersetzung) rechnen ihr Budget gegen die Restzeit des Jobs abzüglich der Reserve fürs Veröffentlichen; eine angebrochene Reserve heißt: nicht anfangen.
+- Job-Timeout 50 min, Kernlauf rund 27 min. Der Geräteradar läuft nur im eigenen Job `geraete.yml`, nicht im Wochenlauf. Stufen nach dem Kernlauf (Übersetzung) rechnen ihr Budget gegen die Restzeit des Jobs abzüglich der Reserve fürs Veröffentlichen; eine angebrochene Reserve heißt: nicht anfangen.
 - Sammelphase: harte Frist je Quelle 75 s (eine tote Quelle kostete ohne Frist über 300 s), höchstens 4 Headless-Browser gleichzeitig (Runner mit zwei Kernen), Host-Drosselung je Host.
 - Zertifikate kommen aus dem `certifi`-Bündel, weil sich der Speicher des Runner-Images ohne Projektänderung ändert.
 - Leeres LLM-Guthaben (402) darf ungelesene Meldungen nicht in den Seen-Store schreiben. Der Kostenzähler warnt nur; harte Grenze ist das Guthaben beim Anbieter. `LLM_API_KEY` gilt für alle OpenAI-kompatiblen Anbieter, der Anthropic-Schlüssel bleibt als Rückfall gesetzt.
