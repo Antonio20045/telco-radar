@@ -25,7 +25,6 @@ from dataclasses import dataclass, field
 from . import tarifwelt_bestand, tarifwelt_lieferbar
 from .collect.geraete import tarifwelt_lauf
 from .collect.geraete.basis import GeraeteAbrufFehler
-from .collect.geraete.buendel_prioritaet import pflicht_modelle
 from .geraete_abruf import hole_fuer_anbieter
 from .report.geraete_tco_band import tarifleiter
 from .tco_model import Buendel
@@ -34,10 +33,28 @@ log = logging.getLogger(__name__)
 
 METHODE = tarifwelt_bestand.METHODE
 
+JOB_FRIST_SEKUNDEN = 70 * 60.0
+"""`timeout-minutes: 70` von `.github/workflows/geraete.yml` (Test: gleicher Wert)."""
+RESERVE_NACH_STUFE_SEKUNDEN = 600.0
+"""Was nach der Stufe noch laeuft (Speichern, Seite bauen, Commit) und was vor dem
+Lauf an Einrichtung (checkout, pip) schon verbraucht ist: nie in die Stufe."""
+MAX_STUFE_SEKUNDEN = 1500.0
+"""Obergrenze der Stufe, auch wenn die Restzeit des Jobs mehr hergibt."""
+
+
+def stufen_frist(vergangen_sekunden: float) -> float:
+    """Das Zeitbudget der Stufe: die Restzeit des Jobs (`JOB_FRIST_SEKUNDEN` minus
+    schon vergangene Zeit minus `RESERVE_NACH_STUFE_SEKUNDEN`), hoechstens
+    `MAX_STUFE_SEKUNDEN`, nie unter null."""
+    rest = JOB_FRIST_SEKUNDEN - vergangen_sekunden - RESERVE_NACH_STUFE_SEKUNDEN
+    return max(0.0, min(MAX_STUFE_SEKUNDEN, rest))
+
 
 @dataclass
 class Ergebnis:
-    """Was die Stufe liefert; `status`: "aus", "ok", "keine_leiter", "abgebrochen"."""
+    """Was die Stufe liefert; `status`: "aus", "ok", "keine_leiter", "abgebrochen",
+    "frist" (Zeitbudget aufgebraucht, `ungelesen` nennt die Modelle, die nicht
+    mehr drankamen)."""
 
     status: str = "aus"
     buendel: list[Buendel] = field(default_factory=list)
@@ -46,6 +63,7 @@ class Ergebnis:
     nicht_lieferbar: list[tuple[str, int]] = field(default_factory=list)
     abrufe: int = 0
     modelle: int = 0
+    ungelesen: list[str] = field(default_factory=list)
     grund: str = ""
 
     def als_dict(self) -> dict:
@@ -58,8 +76,17 @@ class Ergebnis:
             "nicht_lieferbar": len(self.nicht_lieferbar),
             "abrufe": self.abrufe,
             "modelle": self.modelle,
+            "ungelesen": list(self.ungelesen),
             "grund": self.grund,
         }
+
+
+def modelle_der_stufe() -> list[str]:
+    """Die Modelle, die die Stufe liest: ALLE Katalogmodelle mit Tarifwelt-Seite
+    (`tarifwelt_modelle.MODELL_SLUGS`), Pflichtmodelle zuerst. Frueher gefiltert
+    auf die Pflichtmodelle des Waechters - dann blieben die 20 weiteren,
+    sitemap-bestaetigten Modelle (Baupaket P6) fuer immer ungelesen."""
+    return list(tarifwelt_lauf.MODELL_SLUGS)
 
 
 def quelle_aktiv(quellen) -> bool:
@@ -75,10 +102,15 @@ def lauf(
     hole: Callable,
     abgerufen_am: str,
     warte: Callable[[float], None] | None = None,
+    frist_sekunden: float | None = None,
+    monoton: Callable[[], float] = time.monotonic,
 ) -> Ergebnis:
-    """Alle Pflichtmodelle der Tarifwelt, wenn die Quelle aktiv ist. Bricht eine
+    """ALLE Modelle der Tarifwelt (`MODELL_SLUGS`, Pflichtmodelle zuerst), wenn die
+    Quelle aktiv ist - nicht nur die Pflichtmodelle des Waechters. Bricht eine
     Schutzantwort ein Modell ab, bleiben davon nur die schon gelesenen nicht
-    lieferbaren Stufen, nie halbe Preise."""
+    lieferbaren Stufen, nie halbe Preise. `frist_sekunden`: das Zeitbudget der
+    Stufe; vor jedem Modell geprueft, ein laufendes Modell wird zu Ende gelesen.
+    Ist es aufgebraucht, steht der Rest in `ungelesen` (Status "frist")."""
     warte = warte or time.sleep
     ergebnis = Ergebnis()
     if not quelle_aktiv(quellen):
@@ -88,9 +120,19 @@ def lauf(
         ergebnis.status = "keine_leiter"
         ergebnis.grund = "keine Vodafone-Tarifleiter im Tarifbestand - kein Abruf"
         return ergebnis
-    modelle = [m for m in tarifwelt_lauf.MODELL_SLUGS if m in pflicht_modelle()]
+    modelle = modelle_der_stufe()
     ergebnis.status = "ok"
-    for modell in modelle:
+    beginn = monoton()
+    for stelle, modell in enumerate(modelle):
+        if frist_sekunden is not None and monoton() - beginn >= frist_sekunden:
+            ergebnis.status = "frist"
+            ergebnis.ungelesen = modelle[stelle:]
+            ergebnis.grund = (
+                f"Zeitbudget {frist_sekunden:.0f} s aufgebraucht, "
+                f"{len(ergebnis.ungelesen)} Modelle nicht gelesen"
+            )
+            log.warning("Tarifwelt: %s", ergebnis.grund)
+            break
         teil = tarifwelt_lauf.Lauf()
         try:
             tarifwelt_lauf.lies_modell(
@@ -112,12 +154,21 @@ def lauf(
 
 
 def stufe(
-    quellen, bestand, hole: Callable, uhr: Callable, heute: str, zustand, tco
+    quellen,
+    bestand,
+    hole: Callable,
+    uhr: Callable,
+    heute: str,
+    zustand,
+    tco,
+    beginn: float | None = None,
 ) -> dict:
     """Die Stufe im Tageslauf (`geraete_pipeline.run_geraete_stage`): lesen,
     Buendel und Stammdaten der Tarife (`TcoDB.haendler_tarife`) in den TCO-Store,
     aeltere Buendel nicht lieferbarer Stufen markiert (`tarifwelt_lieferbar`);
-    `tco.save` sichert alles in `geraete_tco.json`.
+    `tco.save` sichert alles in `geraete_tco.json`. `beginn` ist `time.monotonic()`
+    beim Start des Tageslaufs; daraus rechnet `stufen_frist` das Zeitbudget der
+    Stufe gegen die Restzeit des Jobs (ohne `beginn` gibt es keins).
     Die Abrufe gehen durch dieselbe `Abrufschleuse` (robots.txt, Besuchsfenster)
     wie die uebrigen Quellen. Wirft nie: ein Fehler kostet nur diese Stufe."""
     if not quelle_aktiv(quellen):
@@ -129,6 +180,9 @@ def stufe(
             bestand.je_id_aktuell,
             hole_fuer_anbieter(hole, anbieter, uhr),
             heute,
+            frist_sekunden=(
+                None if beginn is None else stufen_frist(time.monotonic() - beginn)
+            ),
         )
         if ergebnis.buendel:
             tco.upsert_buendel(ergebnis.buendel, heute)

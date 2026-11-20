@@ -34,14 +34,22 @@ Wiederholen, kein weiterer Abruf. Alles andere (404, kein JSON, ein anderer
 Tarif als verlangt, ein anderer Speicher) macht nur DIESE Variante zur
 benannten Luecke, nie zu einem Preis.
 
-Je Variante genau eine Anfrage, dazu je Modell eine Uebersicht und je
-Speicher eine Tarifliste. Zwischen zwei Anfragen liegt `PAUSE_SEKUNDEN`.
+ALLE VERGLEICHBAREN TARIFE (20.11.2026): je Modell, Speicher und Tarif genau
+eine Anfrage, dazu je Modell eine Uebersicht und je Speicher eine Tarifliste.
+Frueher kam je Netz und Band nur EIN Tarif dran (vier bis acht Tarife je Netz
+und Speicher blieben ungemessen). Vergleichbar heisst: keiner der Gruende aus
+`tarifwelt_merkmale.unvergleichbar_grund` (Doppelkarte, Aktion, Young, Kids,
+Senioren, Cashback, Preiswechsel vor Monat 25), ein bekanntes Netz und ein Band
+der Vodafone-Leiter. Welcher Tarif eines Bandes der Seite gehoert, entscheidet
+der Bericht, nicht das Sammeln. Zwischen zwei Anfragen liegt `PAUSE_SEKUNDEN`;
+die Laufzeit waechst damit mit der Zahl der Tarife, das Zeitbudget der Stufe
+steht in `geraete_tarifwelt` (`stufen_frist`).
 Nie `/pks`, nie `/checkout`, keine Konten, kein Warenkorb.
 
 Welches Katalogmodell zu welcher Tarifwelt-Seite gehoert, steht in
 `tarifwelt_modelle.MODELL_SLUGS` (ausgelagert, weil die Zuordnungstabelle
 allein schon lang ist - dort auch die Erfassungslücke von Baupaket P6).
-Tarifwahl: unbegrenzt (`dataVolume: 0`) ist `inf`, wie im Tarifbestand.
+Datenvolumen: unbegrenzt (`dataVolume: 0`) ist `inf`, wie im Tarifbestand.
 Speicher: die Tarifwelt nennt 1 TB "1000 GB" (`KATALOG_SPEICHER`), der Katalog
 und die Speicherprüfung des Wächters 1024; in der SKU steht die Katalogstufe,
 in den Abrufen der Wert der Schnittstelle.
@@ -54,7 +62,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from ...geraete_model import device_id, sku_id
+from ...geraete_model import device_id, normalisiere, sku_id
 from ...tco_model import Buendel
 from . import tarifwelt
 from .basis import GeraeteAbrufFehler, antwort_text
@@ -69,7 +77,6 @@ API = "https://tarife-api2.mediamarkt.de/v1/productdetail"
 SEITE = "https://tarife.mediamarkt.de/smartphones"
 KENNUNG = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 PAUSE_SEKUNDEN = 2.0
-MAX_KANDIDATEN = 3
 KATALOG_SPEICHER = {1000: 1024, 2000: 2048}
 
 
@@ -89,7 +96,7 @@ def shop_url(pfad: str, slug: str, speicher: int, tarif_id: str, ids: dict) -> s
 
 @dataclass
 class Lauf:
-    """Ergebnis eines Modells: Buendel, benannte Luecken (Variante -> Grund) und
+    """Ergebnis eines Modells: Buendel, benannte Luecken (Zeile -> Grund) und
     `tarife` (tarif_id "mediamarkt_tarifwelt:<id>" -> Anbieterzeile, Name,
     Datenvolumen, Grundgebuehr) fuer die Band-Zuordnung im Bericht
     (`tarifwelt_bestand`). `nicht_lieferbar`: (device_id, Katalogspeicher) jeder
@@ -122,30 +129,61 @@ def _abruf(hole: Callable, url: str, lauf: Lauf, warte: Callable[[float], None])
         raise
 
 
-def rangliste_tarife(liste: list[dict], leiter_gb) -> dict[tuple[str, str], list[dict]]:
-    """(Netz, Band) -> Tarife in Reihenfolge der Eignung. Unvergleichbare Tarife
-    fallen weg (`tarifwelt_merkmale.unvergleichbar_grund`: Doppelkarte, Aktion,
-    Young, Kids, Senioren, Cashback, Preiswechsel vor Monat 25), ebenso
-    unbekannte Netze."""
+def vergleichbare_tarife(liste: list[dict], leiter_gb) -> list[dict]:
+    """ALLE Tarife einer Tarifliste, die fuer den Vergleich taugen - je Netz
+    und Speicher nicht mehr nur einer je Band. Es fallen nur weg (Regel,
+    unveraendert aus der Zeit der Bandauswahl): unvergleichbare Tarife
+    (`tarifwelt_merkmale.unvergleichbar_grund`: Doppelkarte, Aktion, Young,
+    Kids, Senioren, Cashback, Preiswechsel vor Monat 25), unbekannte Netze
+    und Tarife ohne Band der Leiter (`tarifwelt.tarife_mit_band`). Reihenfolge:
+    Netz, dann Datenvolumen, Monatspreis, ID."""
     brauchbar = [
         s
         for s in liste
         if unvergleichbar_grund(s) is None
         and tarifwelt.anbieter_zeile(s.get("netz")) is not None
     ]
-    je_netz: dict[str, list[dict]] = {}
-    for satz in brauchbar:
-        je_netz.setdefault(satz["netz"], []).append(satz)
-    out: dict[tuple[str, str], list[dict]] = {}
-    for netz, saetze in je_netz.items():
-        for band, rang in tarifwelt.rangliste_je_band(saetze, leiter_gb).items():
-            out[(netz, band)] = rang
+    return sorted(
+        tarifwelt.tarife_mit_band(brauchbar, leiter_gb),
+        key=lambda s: s["netz"],
+    )
+
+
+def namenszusaetze(tarife: list[dict]) -> dict[str, str]:
+    """tarif_id -> Zusatz hinter dem Tarifnamen ("" oder " (29,99 €)").
+
+    Die Buendel-ID entsteht aus dem Tarifnamen (`tco_model.buendel_id`), nicht
+    aus der Tarif-ID. Fuehrt ein Netz mehrere Tarife unter demselben Namen
+    (Telekom "Allnet Flat 50GB" zu 29,99 und 39,99 EUR, o2 "Mobile Unlimited L
+    Promo" in fuenf Preisstufen), wuerde das spaetere Buendel das fruehere
+    ueberschreiben - bei "alle Tarife" ginge still ein Tarif verloren. Gleicher
+    Name im selben Netz bekommt deshalb den Monatspreis angehaengt; bleibt er
+    auch dann gleich, zusaetzlich die letzten vier Zeichen der Tarif-ID."""
+    gruppen: dict[tuple[str, str], list[dict]] = {}
+    for tarif in tarife:
+        name = tarif.get("name") or tarif.get("tarif_name") or tarif["tarif_id"]
+        gruppen.setdefault((tarif["netz"], normalisiere(name)), []).append(tarif)
+    out: dict[str, str] = {}
+    for gruppe in gruppen.values():
+        if len(gruppe) == 1:
+            out[gruppe[0]["tarif_id"]] = ""
+            continue
+        je_preis: dict[object, int] = {}
+        for tarif in gruppe:
+            je_preis[tarif.get("grundgebuehr")] = (
+                je_preis.get(tarif.get("grundgebuehr"), 0) + 1
+            )
+        for tarif in gruppe:
+            preis = tarif.get("grundgebuehr")
+            zusatz = (
+                f" ({preis:.2f}".replace(".", ",") + " €"
+                if isinstance(preis, (int, float))
+                else " (Preis unbekannt"
+            )
+            if je_preis[preis] > 1:
+                zusatz += f", {tarif['tarif_id'][-4:]}"
+            out[tarif["tarif_id"]] = zusatz + ")"
     return out
-
-
-def waehle_tarife(liste: list[dict], leiter_gb) -> dict[tuple[str, str], dict]:
-    """(Netz, Band) -> genau ein Tarif, der erste der Rangliste."""
-    return {k: v[0] for k, v in rangliste_tarife(liste, leiter_gb).items()}
 
 
 def lies_modell(
@@ -156,8 +194,8 @@ def lies_modell(
     warte: Callable[[float], None] = time.sleep,
     lauf: Lauf | None = None,
 ) -> Lauf:
-    """Alle Speicher x Netz x Band eines Pflichtmodells (oder eines der
-    zusaetzlichen, nicht ueberwachten Modelle, siehe Moduldoku). Ein mitgegebener
+    """Alle Speicher x vergleichbaren Tarife eines Modells (Pflichtmodell oder
+    zusaetzliches, nicht ueberwachtes Modell, siehe Moduldoku). Ein mitgegebener
     `lauf` wird gefuellt: was vor einer Schutzantwort gelesen war, bleibt dort."""
     eintrag = MODELL_SLUGS[modell_id]
     hersteller, name, pfad, slug = eintrag[:4]
@@ -183,32 +221,38 @@ def lies_modell(
                 raise
             lauf.luecken.append((f"{modell_id} {speicher} GB", f"Tarifliste: {fehler}"))
             continue
-        raenge = rangliste_tarife(liste, leiter_gb)
-        if not raenge:
+        tarife = vergleichbare_tarife(liste, leiter_gb)
+        if not tarife:
             lauf.luecken.append((f"{modell_id} {speicher} GB", "keine Tarife"))
             continue
-        for (netz, band), kandidaten in sorted(raenge.items()):
-            variante = f"{modell_id} {speicher} GB {netz} {band}"
-            gefunden = _lies_variante(
-                (slug, speicher, variante, ids, api_name), kandidaten, hole, lauf, warte
+        zusaetze = namenszusaetze(tarife)
+        for kandidat in tarife:
+            variante = (
+                f"{modell_id} {speicher} GB {kandidat['netz']} "
+                f"{kandidat['tarif_name'] or kandidat['tarif_id']}"
             )
-            if gefunden is None:
+            satz = _lies_tarif(
+                (slug, speicher, variante, ids, api_name), kandidat, hole, lauf, warte
+            )
+            if satz is None:
                 continue
-            satz, tarif = gefunden
+            tarif_name = (satz["tarif_name"] or satz["tarif_id"]) + zusaetze[
+                kandidat["tarif_id"]
+            ]
             lauf.tarife[f"mediamarkt_tarifwelt:{satz['tarif_id']}"] = {
                 "anbieter": tarifwelt.anbieter_zeile(satz["netz"]) or "",
-                "name": satz["tarif_name"] or satz["tarif_id"],
-                "datenvolumen_gb": tarif["datenvolumen_gb"],
+                "name": tarif_name,
+                "datenvolumen_gb": kandidat["datenvolumen_gb"],
                 "grundgebuehr": satz["grundgebuehr"],
             }
-            quelle_url = shop_url(pfad, slug, speicher, tarif["tarif_id"], ids)
+            quelle_url = shop_url(pfad, slug, speicher, kandidat["tarif_id"], ids)
             lauf.buendel.append(
                 Buendel(
                     sku_id=sku_id(
                         geraet, KATALOG_SPEICHER.get(speicher, speicher), None
                     ),
                     anbieter=tarifwelt.anbieter_zeile(satz["netz"]) or "",
-                    tarif_name=satz["tarif_name"] or satz["tarif_id"],
+                    tarif_name=tarif_name,
                     tarif_id=f"mediamarkt_tarifwelt:{satz['tarif_id']}",
                     tarif_id_guete="niedrig",
                     tarif_monatlich=satz["grundgebuehr"],
@@ -226,39 +270,36 @@ def lies_modell(
     return lauf
 
 
-def _lies_variante(
+def _lies_tarif(
     wo: tuple[str, int, str, dict, str],
-    kandidaten: list[dict],
+    tarif: dict,
     hole: Callable,
     lauf: Lauf,
     warte: Callable[[float], None],
-) -> tuple[dict, dict] | None:
-    """Der erste WAEHLBARE Tarif der Rangliste, hoechstens `MAX_KANDIDATEN`
-    Abrufe. Die Schnittstelle fuehrt Tarife auf, die fuer ein Geraet eine
-    leere Huelle liefern (Tarif-ID leer) oder einen anderen Speicher
-    antworten - das ist "nicht waehlbar", der naechste Platz der Rangliste
-    kommt dran. Jeder andere Mangel (Abruffehler, Laufzeit, Doppelkarte,
-    fehlender Betrag) ist sofort die Luecke dieser Variante, nie ein Preis."""
+) -> dict | None:
+    """EIN Tarif, EINE Anfrage: der gelesene Satz oder `None` mit einer
+    benannten Luecke. Die Schnittstelle fuehrt Tarife auf, die fuer ein Geraet
+    eine leere Huelle liefern (Tarif-ID leer) oder einen anderen Speicher
+    antworten - das ist "nicht waehlbar" und steht als Luecke mit diesem
+    Grund. Jeder andere Mangel (Abruffehler, Laufzeit, Doppelkarte,
+    fehlender Betrag) ist die Luecke dieser Zeile, nie ein Preis. Ein
+    Tarif kommt je Speicher genau einmal dran (die Liste ist je `tarif_id`
+    eindeutig, `tarifwelt.tarife_mit_band`)."""
     slug, speicher, variante, ids, name = wo
-    gruende: list[str] = []
-    for tarif in kandidaten[:MAX_KANDIDATEN]:
-        url = (
-            f"{API}/{slug}?storage={speicher}&ogi={ids['ogi']}&ofi={ids['ofi']}"
-            f"&tfi={tarif['tarif_id']}&hwi={ids['hwi']}"
-        )
-        try:
-            satz = tarifwelt.lies_produktdetail(_abruf(hole, url, lauf, warte), url)
-        except GeraeteAbrufFehler as fehler:
-            if fehler.schutz:
-                raise
-            lauf.luecken.append((variante, str(fehler)))
-            return None
-        grund, nicht_waehlbar = pruefe(satz, tarif, speicher, name, ids["hwi"])
-        if grund is None:
-            assert satz is not None
-            return satz, tarif
-        gruende.append(grund)
-        if not nicht_waehlbar:
-            break
-    lauf.luecken.append((variante, "; ".join(gruende)))
+    url = (
+        f"{API}/{slug}?storage={speicher}&ogi={ids['ogi']}&ofi={ids['ofi']}"
+        f"&tfi={tarif['tarif_id']}&hwi={ids['hwi']}"
+    )
+    try:
+        satz = tarifwelt.lies_produktdetail(_abruf(hole, url, lauf, warte), url)
+    except GeraeteAbrufFehler as fehler:
+        if fehler.schutz:
+            raise
+        lauf.luecken.append((variante, str(fehler)))
+        return None
+    grund, _ = pruefe(satz, tarif, speicher, name, ids["hwi"])
+    if grund is None:
+        assert satz is not None
+        return satz
+    lauf.luecken.append((variante, grund))
     return None

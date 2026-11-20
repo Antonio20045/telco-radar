@@ -440,7 +440,7 @@ def run_geraete_stage(
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
             klickbilanz, tco.erfassung = klickzug.bilanz, klickzug.erfassung
             tarifwelt = geraete_tarifwelt.stufe(
-                quellen, bestand, hole, uhr, heute, zustand, tco
+                quellen, bestand, hole, uhr, heute, zustand, tco, beginn
             )
             seite = Seite(ist_frisch, geraet_aus_sku, katalog)
             pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)
