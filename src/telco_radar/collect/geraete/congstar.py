@@ -232,6 +232,8 @@ import re
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _preis
+from .congstar_pib import PIB_NR_RE as _PIB_NR_RE
+from .congstar_pib import ergaenze_pib_slug as ergaenze_pib_slug
 from .ratenlaufzeit import congstar_phasen
 from ...geraete_model import probe_geht_auf
 from ...tco_model import (
@@ -427,8 +429,6 @@ def lies(text: str, url: str = "") -> list[dict]:
 
 
 _PLAN_START_RE = re.compile(r'\{"id":\d+,"type":"POSTPAID","title":"')
-
-_PIB_NR_RE = re.compile(r"Produktinformationsblatt_(\d+)\.pdf")
 
 _RATENLAUFZEITEN = (24, 36)
 
@@ -871,41 +871,3 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
                     }
                 )
     return congstar_phasen(out, preise.get("recurring"))
-
-
-def ergaenze_pib_slug(bestand) -> int:
-    """Am congstar-Tarifbestand die Nummern-Bruecke setzen (Modulkopf,
-    "DER SLUG IST DIE NUMMER DES PFLICHTBLATTS").
-
-    Ergaenzt congstar-Saetzen OHNE `buendel_slug` die Nummer aus ihrer
-    Pflichtblatt-Adresse - nur wo die Nummer unter den congstar-Saetzen
-    EINDEUTIG ist; zwei Blatter derselben Nummer waeren keine Bruecke,
-    sondern eine Mehrdeutigkeit (dieselbe Regel wie `ueber_slug`). Schon
-    gesetzte Werte bleiben unberuehrt. Gibt die Zahl der ergaenzten
-    Saetze zurueck.
-
-    Aufgerufen von der Pipeline, direkt nach dem Laden des Bestands. Das
-    ist bewusst KEINE dauerhafte Aenderung an `tarife.jsonl`: die Zeitreihe
-    bleibt unberuehrt, und die Bruecke entsteht bei jedem Lauf neu aus der
-    Blattnummer, die der Anbieter in beide Adressen schreibt.
-    """
-    saetze = [
-        s
-        for s in bestand.je_id.values()
-        if str(s.get("anbieter") or "").lower() == "congstar"
-    ]
-    nummern: dict[str, list] = {}
-    for satz in saetze:
-        treffer = _PIB_NR_RE.search(str(satz.get("dokument_url") or ""))
-        if treffer:
-            nummern.setdefault(treffer.group(1), []).append(satz)
-    gesetzt = 0
-    for nummer, gruppe in nummern.items():
-        if len(gruppe) != 1:
-            continue
-        satz = gruppe[0]
-        if str(satz.get("buendel_slug") or "").strip():
-            continue
-        satz["buendel_slug"] = nummer
-        gesetzt += 1
-    return gesetzt
