@@ -38,16 +38,15 @@ JOB_FRIST_SEKUNDEN = 70 * 60.0
 RESERVE_NACH_STUFE_SEKUNDEN = 600.0
 """Was nach der Stufe noch laeuft (Speichern, Seite bauen, Commit) und was vor dem
 Lauf an Einrichtung (checkout, pip) schon verbraucht ist: nie in die Stufe."""
-MAX_STUFE_SEKUNDEN = 1500.0
-"""Obergrenze der Stufe, auch wenn die Restzeit des Jobs mehr hergibt."""
 
 
 def stufen_frist(vergangen_sekunden: float) -> float:
     """Das Zeitbudget der Stufe: die Restzeit des Jobs (`JOB_FRIST_SEKUNDEN` minus
-    schon vergangene Zeit minus `RESERVE_NACH_STUFE_SEKUNDEN`), hoechstens
-    `MAX_STUFE_SEKUNDEN`, nie unter null."""
+    schon vergangene Zeit minus `RESERVE_NACH_STUFE_SEKUNDEN`), nie unter null.
+    Keine feste Zahl und keine Obergrenze: wird die Sammelphase kuerzer, fliesst
+    die frei gewordene Zeit sofort in die Tarifwelt."""
     rest = JOB_FRIST_SEKUNDEN - vergangen_sekunden - RESERVE_NACH_STUFE_SEKUNDEN
-    return max(0.0, min(MAX_STUFE_SEKUNDEN, rest))
+    return max(0.0, rest)
 
 
 @dataclass
@@ -104,6 +103,7 @@ def lauf(
     warte: Callable[[float], None] | None = None,
     frist_sekunden: float | None = None,
     monoton: Callable[[], float] = time.monotonic,
+    bekannt: dict | None = None,
 ) -> Ergebnis:
     """ALLE Modelle der Tarifwelt (`MODELL_SLUGS`, Pflichtmodelle zuerst), wenn die
     Quelle aktiv ist - nicht nur die Pflichtmodelle des Waechters. Bricht eine
@@ -151,6 +151,7 @@ def lauf(
                 lauf=teil,
                 nur_kern=True,
                 weiter=weiter,
+                bekannt=bekannt,
             )
         for _, teil in teile:
             aktuell[0] = teil
@@ -211,6 +212,7 @@ def stufe(
             frist_sekunden=(
                 None if beginn is None else stufen_frist(time.monotonic() - beginn)
             ),
+            bekannt=tarifwelt_lauf.plain_halter(tco.buendel()),
         )
         if ergebnis.buendel:
             tco.upsert_buendel(ergebnis.buendel, heute)

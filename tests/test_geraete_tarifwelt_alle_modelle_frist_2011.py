@@ -122,7 +122,12 @@ def test_ohne_zeitbudget_werden_alle_modelle_gelesen_gegenprobe():
 
 
 def test_stufen_frist_rechnet_gegen_die_restzeit_des_jobs():
-    assert geraete_tarifwelt.stufen_frist(0.0) == geraete_tarifwelt.MAX_STUFE_SEKUNDEN
+    voll = (
+        geraete_tarifwelt.JOB_FRIST_SEKUNDEN
+        - geraete_tarifwelt.RESERVE_NACH_STUFE_SEKUNDEN
+    )
+    assert geraete_tarifwelt.stufen_frist(0.0) == voll
+    assert geraete_tarifwelt.stufen_frist(1000.0) == voll - 1000.0
     spaet = geraete_tarifwelt.JOB_FRIST_SEKUNDEN - 600.0 - 120.0
     assert geraete_tarifwelt.stufen_frist(spaet) == pytest.approx(120.0)
     assert geraete_tarifwelt.stufen_frist(geraete_tarifwelt.JOB_FRIST_SEKUNDEN) == 0.0
@@ -165,6 +170,7 @@ def test_stufe_reicht_die_restzeit_als_frist_an_den_lauf_weiter(
     stufe(time.monotonic() - vergangen)
     erwartet = geraete_tarifwelt.stufen_frist(vergangen)
     assert gesehen["frist_sekunden"] == pytest.approx(erwartet, abs=5.0)
+    assert gesehen["bekannt"] == {}
     stufe(None)
     assert gesehen["frist_sekunden"] is None
 

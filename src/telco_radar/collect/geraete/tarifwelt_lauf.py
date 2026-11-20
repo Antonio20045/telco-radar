@@ -62,6 +62,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from ... import tarifwelt_bestand
 from ...geraete_model import device_id, normalisiere, sku_id
 from ...tco_model import Buendel
 from . import tarifwelt
@@ -76,7 +77,11 @@ log = logging.getLogger(__name__)
 API = "https://tarife-api2.mediamarkt.de/v1/productdetail"
 SEITE = "https://tarife.mediamarkt.de/smartphones"
 KENNUNG = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
-PAUSE_SEKUNDEN = 2.0
+PAUSE_SEKUNDEN = 1.0
+"""Pause zwischen zwei Anfragen. 1 s statt 2 s seit dem 20.11.2026: `robots.txt` von
+tarife.mediamarkt.de nennt keinen Crawl-delay (nur Disallow fuer /*/pks und
+/*/checkout, die der Leser nie anfasst), `tarife-api2.mediamarkt.de` hat keine
+(404)."""
 KATALOG_SPEICHER = {1000: 1024, 2000: 2048}
 
 
@@ -166,40 +171,57 @@ def vergleichbare_tarife(liste: list[dict], leiter_gb) -> list[dict]:
     )
 
 
-def namenszusaetze(tarife: list[dict]) -> dict[str, str]:
-    """tarif_id -> Zusatz hinter dem Tarifnamen ("" oder " (29,99 €)").
+def plain_halter(buendel: list[dict]) -> dict[tuple[str, str, str], set[str]]:
+    """(Anbieterzeile, SKU, normierter Tarifname) -> Tarif-IDs, die diesen Namen im
+    Bestand (`TcoDB.buendel()`) schon OHNE Zusatz tragen. Daran haengt die
+    Kontinuitaet: ein frueher gesammelter Tarif behaelt seine Buendel-ID."""
+    out: dict[tuple[str, str, str], set[str]] = {}
+    for b in buendel:
+        tid = str(b.get("tarif_id") or "")
+        if tid.startswith(tarifwelt_bestand.PRAEFIX):
+            schluessel = (
+                str(b.get("anbieter") or ""),
+                str(b.get("sku_id") or ""),
+                normalisiere(str(b.get("tarif_name") or "")),
+            )
+            out.setdefault(schluessel, set()).add(tid[len(tarifwelt_bestand.PRAEFIX) :])
+    return out
+
+
+def namenszusaetze(
+    tarife: list[dict], sku: str = "", bekannt: dict | None = None
+) -> dict[str, str]:
+    """tarif_id -> Zusatz hinter dem Tarifnamen ("" oder " (3f7a1c)").
 
     Die Buendel-ID entsteht aus dem Tarifnamen (`tco_model.buendel_id`), nicht
     aus der Tarif-ID. Fuehrt ein Netz mehrere Tarife unter demselben Namen
     (Telekom "Allnet Flat 50GB" zu 29,99 und 39,99 EUR, o2 "Mobile Unlimited L
     Promo" in fuenf Preisstufen), wuerde das spaetere Buendel das fruehere
-    ueberschreiben - bei "alle Tarife" ginge still ein Tarif verloren. Gleicher
-    Name im selben Netz bekommt deshalb den Monatspreis angehaengt; bleibt er
-    auch dann gleich, zusaetzlich die letzten vier Zeichen der Tarif-ID."""
+    ueberschreiben. Der Zusatz kommt aus der Tarif-ID der Schnittstelle (stabil,
+    bei o2 und Telekom ueber Wochen gleich), nie aus dem Preis: ein Preiswechsel
+    aendert keine ID. Den Namen ohne Zusatz behaelt, wer ihn im Bestand fuer
+    diese SKU schon traegt (`bekannt`, `plain_halter`; bei mehreren der mit der
+    kleinsten ID) - so bleiben die IDs frueher gesammelter Tarife gleich. Ohne
+    Halter bekommen alle einer Namensgruppe den Zusatz."""
     gruppen: dict[tuple[str, str], list[dict]] = {}
     for tarif in tarife:
         name = tarif.get("name") or tarif.get("tarif_name") or tarif["tarif_id"]
         gruppen.setdefault((tarif["netz"], normalisiere(name)), []).append(tarif)
     out: dict[str, str] = {}
-    for gruppe in gruppen.values():
+    for (netz, norm), gruppe in gruppen.items():
+        ids = [t["tarif_id"] for t in gruppe]
         if len(gruppe) == 1:
-            out[gruppe[0]["tarif_id"]] = ""
+            out[ids[0]] = ""
             continue
-        je_preis: dict[object, int] = {}
-        for tarif in gruppe:
-            je_preis[tarif.get("grundgebuehr")] = (
-                je_preis.get(tarif.get("grundgebuehr"), 0) + 1
-            )
-        for tarif in gruppe:
-            preis = tarif.get("grundgebuehr")
-            zusatz = (
-                f" ({preis:.2f}".replace(".", ",") + " €"
-                if isinstance(preis, (int, float))
-                else " (Preis unbekannt"
-            )
-            if je_preis[preis] > 1:
-                zusatz += f", {tarif['tarif_id'][-4:]}"
-            out[tarif["tarif_id"]] = zusatz + ")"
+        anbieter = tarifwelt.anbieter_zeile(netz) or ""
+        halter = set(ids) & (bekannt or {}).get((anbieter, sku, norm), set())
+        plain = min(halter) if halter else None
+        rest = [i for i in ids if i != plain]
+        laenge = 6
+        while len({i[-laenge:] for i in rest}) < len(rest) and laenge < 64:
+            laenge += 2
+        for i in ids:
+            out[i] = "" if i == plain else f" ({i[-laenge:]})"
     return out
 
 
@@ -212,6 +234,7 @@ def lies_modell(
     lauf: Lauf | None = None,
     nur_kern: bool = False,
     weiter: Callable[[], bool] = lambda: True,
+    bekannt: dict | None = None,
 ) -> Lauf:
     """Alle Speicher x vergleichbaren Tarife eines Modells (Pflichtmodell oder
     zusaetzliches, nicht ueberwachtes Modell, siehe Moduldoku). Ein mitgegebener
@@ -219,7 +242,7 @@ def lies_modell(
     Uebersicht und Tarifliste je Speicher werden immer gelesen; die Tarife
     danach (`lies_offene`): mit `nur_kern` zuerst nur der Kern je Netz und Band,
     der Rest bleibt in `lauf.offen`. `weiter()` wird vor jedem Tarif gefragt;
-    sagt es nein, bleibt der Tarif offen."""
+    sagt es nein, bleibt der Tarif offen. `bekannt`: `plain_halter` des Bestands."""
     eintrag = MODELL_SLUGS[modell_id]
     hersteller, name, pfad, slug = eintrag[:4]
     api_name = eintrag[4] if len(eintrag) > 4 else name
@@ -248,7 +271,8 @@ def lies_modell(
         if not tarife:
             lauf.luecken.append((f"{modell_id} {speicher} GB", "keine Tarife"))
             continue
-        zusaetze = namenszusaetze(tarife)
+        sku = sku_id(geraet, KATALOG_SPEICHER.get(speicher, speicher), None)
+        zusaetze = namenszusaetze(tarife, sku, bekannt)
         kern = tarifwelt.kern_je_netz_und_band(tarife, leiter_gb)
         for kandidat in tarife:
             variante = (
