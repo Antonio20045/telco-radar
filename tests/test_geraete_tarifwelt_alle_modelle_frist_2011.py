@@ -259,15 +259,23 @@ def test_reserve_ist_nachschritte_plus_pipelinearbeit_und_gross_genug():
     assert stufe.RESERVE_NACH_STUFE_SEKUNDEN == (
         stufe.NACH_SCHRITTE_SEKUNDEN + stufe.IN_PIPELINE_NACH_STUFE_SEKUNDEN
     )
-    assert stufe.RESERVE_NACH_STUFE_SEKUNDEN > 440.0 + 15.0
+    assert stufe.RESERVE_NACH_STUFE_SEKUNDEN > 475.0 + 15.0
+    assert stufe.VORLAUF_SEKUNDEN > 96.0
 
 
 def test_restzeit_ist_job_minus_vorlauf_minus_vergangen_minus_reserve():
     stufe = geraete_tarifwelt
-    assert stufe.stufen_frist(0.0) == 4200.0 - 120.0 - 1380.0 - 60.0
-    assert stufe.stufen_frist(1000.0) == 4200.0 - 120.0 - 1000.0 - 1380.0 - 60.0
+    assert stufe.stufen_frist(0.0) == 4200.0 - 144.0 - 720.0 - 60.0
+    assert stufe.stufen_frist(1000.0) == 4200.0 - 144.0 - 1000.0 - 720.0 - 60.0
     ende = stufe.JOB_FRIST_SEKUNDEN - stufe.VORLAUF_SEKUNDEN
     ende -= stufe.RESERVE_NACH_STUFE_SEKUNDEN
     assert stufe.stufen_frist(ende) == 0.0
     assert stufe.stufen_frist(ende - 100.0) == pytest.approx(100.0)
     assert stufe.stufen_frist(10**9) == 0.0
+
+
+def test_erwartetes_budget_bei_sammelphase_2000_und_3000_s():
+    stufe = geraete_tarifwelt
+    assert stufe.stufen_frist(2000.0) == pytest.approx(1276.0)
+    assert stufe.stufen_frist(3000.0) == pytest.approx(276.0)
+    assert stufe.stufen_frist(2000.0) > stufe.stufen_frist(3000.0) > 0.0

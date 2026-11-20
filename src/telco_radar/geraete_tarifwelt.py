@@ -35,13 +35,19 @@ METHODE = tarifwelt_bestand.METHODE
 
 JOB_FRIST_SEKUNDEN = 70 * 60.0
 """`timeout-minutes: 70` von `.github/workflows/geraete.yml` (Test: gleicher Wert)."""
-VORLAUF_SEKUNDEN = 120.0
-"""Zeit im Job VOR der Pipeline (checkout, pip; gemessen 70 s im Lauf 44728882384)."""
-NACH_SCHRITTE_SEKUNDEN = 23 * 60.0
-"""Schlimmster Fall aller Schritte NACH "Run geraete stage" in
-`.github/workflows/geraete.yml` (Upload log, Belege-Manifest mit 5 min Limit,
-Commit state, Render site, Commit site, Render-Hook mit bis zu 340 s, Alarme,
-Buendelwaechter). Gemessen im Lauf 44728882384: rund 440 s."""
+VORLAUF_SEKUNDEN = 144.0
+"""Zeit im Job VOR der Pipeline (checkout, pip): groesster gemessener Wert 96 s mal
+1,5. Gemessen in elf Laeufen des Geraete-Workflows (Lauf-ID: Sekunden vor der
+Pipeline / Sekunden nach der Pipeline, Stand 20.11.2026): 44728882384: 71/433,
+44693241299: 90/439, 44677895584: 96/475, 44503990162: 75/174, 44502114989: 65/385,
+44223298480: 80/395, 44129470685: 73/390, 44101475128: 59/309, 44066902790: 46/312,
+43840950648: 77/300, 43698541511: 43/305."""
+NACH_SCHRITTE_SEKUNDEN = 720.0
+"""Alle Schritte NACH "Run geraete stage" in `.github/workflows/geraete.yml`
+(Belege-Manifest, Commit state, Render site, Commit site, Render-Hook, Alarme,
+Buendelwaechter): groesster gemessener Wert 475 s mal 1,5, aufgerundet (Tabelle
+bei `VORLAUF_SEKUNDEN`; die Schritte selbst tragen ausser dem Belege-Manifest
+mit 5 min kein eigenes Limit, der Render-Hook braucht gemessen bis 168 s)."""
 IN_PIPELINE_NACH_STUFE_SEKUNDEN = 60.0
 """Arbeit der Pipeline nach der Tarifwelt-Stufe (Pruefstelle, Speichern, Bilanz);
 gemessen 15 s im Lauf 44728882384."""
