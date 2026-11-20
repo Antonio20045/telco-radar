@@ -30,7 +30,7 @@ import shutil
 
 from telco_radar import tco_historie
 from telco_radar.analyze.tco_store import TcoDB
-from telco_radar.tco_model import Buendel, tco_24
+from telco_radar.tco_model import Buendel, kosten_ueber
 
 TAG0 = "2026-09-04"
 TAG1 = "2026-09-11"
@@ -132,7 +132,7 @@ def test_erster_lauf_schreibt_je_buendel_eine_zeile(tmp_path):
         zeile = nach_id[satz.id]
         assert zeile["datum"] == TAG1
         assert zeile["abgerufen_am"] == TAG1
-        assert zeile["gesamt"] == tco_24(satz).gesamt
+        assert zeile["gesamt"] == kosten_ueber(satz).gesamt
 
     o2 = nach_id[_o2(TAG1).id]
     assert o2["tarif_monatlich"] == 14.99
@@ -161,11 +161,11 @@ def test_zweiter_lauf_am_selben_tag_ersetzt_statt_zu_duplizieren(tmp_path):
     assert len(zeilen) == 2
     nach_id = {z["id"]: z for z in zeilen}
     assert nach_id[_o2(TAG1).id]["geraet_monatsrate"] == 18.0
-    assert nach_id[_o2(TAG1).id]["gesamt"] == tco_24(_o2(TAG1, rate=18.0)).gesamt
+    assert nach_id[_o2(TAG1).id]["gesamt"] == kosten_ueber(_o2(TAG1, rate=18.0)).gesamt
     assert nach_id[_vodafone(TAG1).id]["tarif_monatlich"] == 27.95
     assert (
         nach_id[_vodafone(TAG1, tarif=27.95).id]["gesamt"]
-        == tco_24(_vodafone(TAG1, tarif=27.95)).gesamt
+        == kosten_ueber(_vodafone(TAG1, tarif=27.95)).gesamt
     )
 
 

@@ -92,7 +92,7 @@
             blendet nur). Ohne Attribut: unter jeder Wahl sichtbar. #}
          {% if k.laufzeit_sichtbar %}data-lz="{{ k.laufzeit_sichtbar }}"{% endif %}
          {# P0-B-z2: DER ZEITRAUM, DEN DIE SUMME DIESER ZEILE TRÄGT -
-            gelesen aus `leitzahl_monate` (`Tco.leitzahl_monate`, P0-B-h1),
+            gelesen aus `leitzahl_monate` (`Kosten.monate`, P0-B-h1),
             demselben Feld, aus dem `k.label` seinen Text baut. `data-
             laufzeit` daneben ist die TARIFlaufzeit der Rechnung und für
             jede Zeile 24, auch für die 36-Monats-Summe von 1&1 - als
@@ -148,7 +148,7 @@
     <span class="gr-bnd-tarif">{{ k.tarif }}{% if k.band_gb_text %} ·
       {{ k.band_gb_text }}{% endif %}{% if k.raten_laufzeit %} · <span
       class="gr-bnd-raten">{{ k.raten_text }}{% if k.tarif_bindung
-      and not k.raten_24_plus_12 %} · Tarif {{ k.tarif_bindung }} Monate{% endif %}</span>{% endif %}</span>
+      %} · Tarif {{ k.tarif_bindung }} Monate{% endif %}</span>{% endif %}</span>
     {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine unbeschriftete
        Gesamtsumme ist ueber zwei Bindungsdauern nicht lesbar. #}
     {# P3-E3: der UEBERHANG - die groesste nicht eingerechnete Aktion
@@ -220,7 +220,7 @@
     {% if k.herleitung_satz %}<span class="gr-bnd-herleitung">{{
       k.herleitung_satz }}</span>{% endif %}
     {% for h in k.versand_hinweise %}<span class="gr-bnd-herleitung gr-bnd-versand-luecke">{{
-      h }} – mit 0 € gerechnet</span>{% endfor %}
+      h }} – keine Gesamtkosten</span>{% endfor %}
     <span class="gr-bnd-chev" aria-hidden="true"></span>
   </summary>
   {# P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-
@@ -317,9 +317,7 @@
       k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {% if
       k.raten_laufzeit %}{{ k.raten_laufzeit }} Monate{% else %}<span
       class="gr-t-luecke">Laufzeit nicht gemessen</span>{% endif %}{% if
-      k.zuzahlung is not none and k.laufzeit and k.raten_laufzeit
-      and k.raten_laufzeit and k.laufzeit < k.raten_laufzeit %} · gerechnet {{ k.laufzeit }} Monate,
-      dann Ablöse {{ k.zuzahlung | euro }}{% elif k.zuzahlung is not none %} · Gerät
+      k.zuzahlung is not none %} · Gerät
       einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.anschlusspreis is not
       none %} · Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% else
       %}monatlich {{ k.monatlich | euro }}{% if k.zuzahlung is not none %} ·
@@ -439,10 +437,8 @@
       k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
       k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
       {{ raten_wort }} laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind
-      alle fest anfallenden Kosten, {% if k.buendel_monatlich is not none
-      and k.laufzeit and k.raten_laufzeit and k.laufzeit < k.raten_laufzeit %}auch die Ablöse nach
-      Monat {{ k.laufzeit }}{% else %}auch alle {{ raten_wort }} der eigenen
-      Laufzeit{% endif %}. Nicht enthalten sind Versand,
+      alle fest anfallenden Kosten, auch alle {{ raten_wort }} der eigenen
+      Laufzeit. Nicht enthalten sind Versand,
       Nutzungsentgelte über den Tarif hinaus und jeder Bonus, der hier nicht
       beim Namen steht.</p>
     {% endif %}

@@ -388,7 +388,7 @@ def test_die_tco_view_liefert_keine_leserlosen_felder_mehr():
 
     `zeilen` und `delta` BLEIBEN bewusst: Kein Template liest sie, aber
     die Rechen-Testreihe (tests/test_geraete_tco_view.py) hält an ihnen
-    die Zusicherungen von `tco_24()` fest, und `_offene_posten` rechnet
+    die Zusicherungen von `kosten_ueber()` fest, und `_offene_posten` rechnet
     aus `zeilen` — der Auftragswortlaut sagt „entfernen ODER verbrauchen",
     und das ist das Verbrauchen."""
     from telco_radar.report import geraete_tco_view

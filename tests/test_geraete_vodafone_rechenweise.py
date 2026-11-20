@@ -25,7 +25,7 @@ from telco_radar.report import geraete_bewegung, geraete_tco_karten, geraete_vie
 from telco_radar.report.geraete_rechnung import WORT_TARIF_NACH_RABATT
 from telco_radar.tarif_model import buendelphasen_aus
 from telco_radar.tco_kosten import kosten_ueber, tarifpreis_im_monat
-from telco_radar.tco_model import Buendel, sim_only_id, tco_24
+from telco_radar.tco_model import Buendel, sim_only_id
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _PIXEL_0509 = "vodafone_tarif_hardware.json"
@@ -266,7 +266,7 @@ def test_der_preissprung_der_abdeckung_vergleicht_nicht_ueber_den_bruch():
     neu = _satz(_PIXEL_2909, "Mobil L", 24)
     alt = _alte_lesart(neu)
     zeilen = [
-        {**z, "gesamt": tco_24(_buendel(z)).gesamt, "datum": d}
+        {**z, "gesamt": kosten_ueber(_buendel(z)).gesamt, "datum": d}
         for z, d in ((alt, _VORTAG), (neu, _HEUTE))
     ]
     tco = {"updated": _HEUTE, "buendel": []}

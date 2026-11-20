@@ -144,13 +144,15 @@ def test_zwei_preisanstiege_nacheinander_sind_kein_wechsel(verlauf, stand, altda
 
 
 def test_jede_exportzeile_rechnet_aus_den_feldern_ihres_satzes(stand, tarife, altdatei):
-    """24 x Bündelbetrag + Anschluss + Ablöse, aus dem Satz gelesen, nie eingetippt."""
+    """Laufzeit x Bündelbetrag + Anschluss + Einmalzahlung, aus dem Satz gelesen, nie
+    eingetippt. Die Sätze stammen aus der Zeit vor dem 20.11.2026 („24+12“); die
+    Rechnung kennt seitdem keine Ablöse mehr (docs/geraete/gesamtkosten.md)."""
     zeilen = _zeilen_je_sku(_mit_verlauf(stand, tarife, altdatei))
     saetze = [b for b in stand["buendel"] if b["tarif_name"] == TARIF]
     assert len(zeilen) == len(saetze) >= 40
     for satz in saetze:
         erwartet = (
-            24 * satz["buendel_monatlich"]
+            satz["laufzeit_monate"] * satz["buendel_monatlich"]
             + satz["anschlusspreis"]
             + satz["geraet_zuzahlung"]
         )
@@ -230,10 +232,10 @@ def test_eine_andere_herleitung_ist_nicht_sache_dieser_regel(stand, tarife):
     assert band_fuer(baender, b.tarif_id, b.id) == "xl"
 
 
-def test_das_etikett_ist_24_monate_plus_abloese(stand):
+def test_das_etikett_nennt_die_monatsraten_des_vertrags(stand):
     satz = next(b for b in stand["buendel"] if b["tarif_name"] == TARIF)
     karte = {
         "raten_laufzeit": satz["laufzeit_monate"],
         "buendel_monatlich": satz["buendel_monatlich"],
     }
-    assert raten_text(karte) == "24 Monate + Ablöse"
+    assert raten_text(karte) == f"{satz['laufzeit_monate']} Monatsraten"

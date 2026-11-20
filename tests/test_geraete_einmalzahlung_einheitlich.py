@@ -21,8 +21,7 @@ from telco_radar.analyze.geraete_widerspruch import (
 )
 from telco_radar.report import geraete_notbremse as notbremse
 from telco_radar.report.geraete_tco_view import aufbereiten
-from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG
-from telco_radar.tco_model import Buendel, kosten_ueber
+from telco_radar.tco_model import POSTEN_ZUZAHLUNG, Buendel, kosten_ueber
 
 HEUTE = "2026-11-05"
 SKU = "samsung-galaxy-s26-256gb-schwarz"
@@ -94,14 +93,14 @@ def test_gleichstand_hat_keinen_geraetewert_beide_werden_luecke():
 def test_die_tafel_zeigt_fuer_s_die_luecke_statt_1051_66():
     """24 × 32,99 + 220 € + 39,90 = 1.051,66 € - genau der Wert, den die Prüfung
     an PR #45 noch auf der Zeitreihen-Seite fand, obwohl die Tafel ihn für S
-    schon als widersprüchlich führt. M rechnet unverändert: 24 × 37,99 + 280 +
-    39,90 = 1.231,66 €."""
+    schon als widersprüchlich führt. M rechnet seit 20.11.2026 (Ablöse entfallen)
+    alle Beträge: 36 × 37,99 + 280 + 39,90 = 1.687,54 €."""
     ergebnis = aufbereiten(_s26(), [], EINTRAEGE, katalog=None, heute=HEUTE)
     zeilen = {z["tarif"]: z for z in ergebnis["export"]["buendel"]}
     s = zeilen["1&1 All-Net-Flat S"]
     assert s["zuzahlung"] is None and s["tco24"] is None
-    assert s["luecke"] == POSTEN_EINMALZAHLUNG
-    assert zeilen["1&1 All-Net-Flat M"]["tco24"] == 1231.66
+    assert s["luecke"] == POSTEN_ZUZAHLUNG
+    assert zeilen["1&1 All-Net-Flat M"]["tco24"] == 1687.54
     assert 1051.66 not in {z["tco24"] for z in zeilen.values() if z["tco24"]}
 
 
@@ -110,10 +109,10 @@ def test_die_notbremse_nennt_den_grund_beim_namen():
     assert "1&1-Wert widersprüchlich, neu messen" in satz
 
 
-def test_kosten_ueber_ohne_widerspruch_rechnet_24_monate_plus_abloese():
+def test_kosten_ueber_ohne_widerspruch_rechnet_alle_36_betraege():
     """Gegenprobe der Kernzahl selbst (ohne die Widerspruchsregel): ein
-    einzelnes 1&1-Bündel über 36 Monate zählt 24 Beträge plus Ablöse."""
+    einzelnes 1&1-Bündel über 36 Monate zählt alle Beträge und die Einmalzahlung."""
     b = _eins_und_eins("1&1 All-Net-Flat M", 37.99, 280.0)
     k = kosten_ueber(b)
-    assert k.gesamt == round(24 * 37.99 + 280.0 + 39.9, 2) == 1231.66
-    assert k.monate == 24
+    assert k.gesamt == round(36 * 37.99 + 280.0 + 39.9, 2) == 1687.54
+    assert k.monate == 36

@@ -23,7 +23,6 @@ from ..tco_model import (
     SimOnlyReferenz,
     kosten_ueber,
 )
-from ..versandkosten import POSTEN_VERSAND
 from . import (
     geraete_laufzeit,
     geraete_notbremse,
@@ -158,8 +157,7 @@ def _export_zeilen(
     ihm) und `versand` (P5). Ein veralteter Preis trägt keinen Betrag.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
-    (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
-    `als_buendel()` samt Anschlusspreis, dieselbe Stelle wie bei den Bündeln)."""
+    (`_referenztabelle`), `ueber_horizont` aus `kosten_ueber(als_buendel())`."""
     geraet_je_sku: dict = {}
     for e in eintraege:
         if e.get("sku_id"):
@@ -194,7 +192,7 @@ def _export_zeilen(
                 "laufzeit": b.laufzeit_monate,
                 "raten_laufzeit": geraete_laufzeit.raten_laufzeit(b),
                 "anschlusspreis": None if veraltet else b.anschlusspreis,
-                "versand": None if veraltet else kosten.posten.get(POSTEN_VERSAND, 0.0),
+                "versand": None if veraltet else kosten.versand,
                 "tco24": None if veraltet else kosten.gesamt,
                 "leitzahl_monate": kosten.monate,
                 "tarif_monate": kosten.tarifmonate,

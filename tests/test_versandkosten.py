@@ -28,7 +28,7 @@ from telco_radar.report import geraete_rechenweg as rechenweg
 from telco_radar.report.geraete_rechnung import felder
 from telco_radar.report.html import render_site
 from telco_radar.tco_kosten import SCHRITT_VERSAND
-from telco_radar.tco_model import Buendel, kosten_ueber, tco_24, tco_bindung
+from telco_radar.tco_model import Buendel, kosten_ueber
 from telco_radar.versandkosten import POSTEN_VERSAND, versand_fuer
 
 SOLL = {
@@ -90,7 +90,8 @@ def test_versand_zaehlt_bei_jedem_anbieter_einmal_in_die_kosten(anbieter, betrag
     """Dieselbe Regel für alle: der Betrag aus der Datei kommt einmal dazu."""
     mit = kosten_ueber(_buendel(anbieter))
     ohne = kosten_ueber(_buendel("Fantasie-Anbieter"))
-    assert mit.gesamt == pytest.approx(ohne.gesamt + betrag, abs=0.001)
+    assert ohne.gesamt is None
+    assert mit.gesamt == pytest.approx(sum(ohne.posten.values()) + betrag, abs=0.001)
     assert (POSTEN_VERSAND in mit.posten) == (betrag > 0)
     assert (SCHRITT_VERSAND in {s.art for s in mit.rechnung}) == (betrag > 0)
     assert round(sum(s.summe for s in mit.rechnung), 2) == mit.gesamt
@@ -109,11 +110,14 @@ def test_beispiel_o2_vorher_nachher():
     assert kosten_ueber(_buendel("Telekom")).gesamt == 1714.75, "0 € Versand"
 
 
-def test_unbelegter_anbieter_zaehlt_nichts_dazu_und_sagt_es():
-    """Nicht 0 erfinden: der Anbieter fehlt in der Datei, die Zahl bleibt, die
-    Lücke steht in den Hinweisen."""
+def test_unbelegter_versand_ist_eine_luecke_keine_null():
+    """Nicht 0 erfinden (20.11.2026, docs/geraete/gesamtkosten.md): der Anbieter
+    fehlt in der Datei, also gibt es keine Gesamtkosten; die Lücke heißt „Versand“
+    und steht in den Hinweisen. Rot gegen den Stand „zählt 0 €“ (1.714,75 €)."""
     k = kosten_ueber(_buendel("Fantasie-Anbieter"))
-    assert k.gesamt == 1714.75
+    assert k.gesamt is None
+    assert k.luecken == [POSTEN_VERSAND]
+    assert k.versand is None
     assert POSTEN_VERSAND not in k.posten
     assert k.hinweise == ["Versand bei Fantasie-Anbieter nicht belegt"]
     assert felder(k)["versand_hinweise"] == k.hinweise
@@ -136,15 +140,13 @@ def test_betrag_null_in_der_datei_ist_eine_luecke_kein_nullbetrag(tmp_path):
         versandkosten.laden(pfad)
 
 
-def test_andere_rechnungen_derselben_zahl_zaehlen_denselben_versand():
-    """Klappkarte (`tco_24`) und Bindungsrechnung (`tco_bindung`) rechnen wie
-    `kosten_ueber`: eine Zahl, eine Regel."""
-    b = _buendel("congstar")
-    assert tco_24(b).bestandteile[POSTEN_VERSAND] == 4.99
-    assert tco_24(b).gesamt == kosten_ueber(b).gesamt
-    posten = [p for p in tco_bindung(b).bestandteile if p["name"] == POSTEN_VERSAND]
-    assert posten == [{"name": POSTEN_VERSAND, "betrag": 4.99, "kategorie": "einmalig"}]
-    assert POSTEN_VERSAND not in tco_24(_buendel("1&1")).bestandteile
+def test_versand_steht_als_feld_belegt_null_oder_luecke():
+    """`Kosten.versand` ist, was Export und Rechenweg lesen: 4,99 € belegt, 0,0 belegt
+    kostenlos (1&1, kein Posten), None nicht belegt."""
+    assert kosten_ueber(_buendel("congstar")).versand == 4.99
+    eins = kosten_ueber(_buendel("1&1"))
+    assert eins.versand == 0.0 and POSTEN_VERSAND not in eins.posten
+    assert kosten_ueber(_buendel("Fantasie-Anbieter")).versand is None
 
 
 def test_rechenweg_zeigt_den_versandposten():
@@ -210,13 +212,13 @@ def test_gerenderte_zeile_nennt_den_unbelegten_versand(tmp_path, monkeypatch):
     for zeile in zeilen:
         satz = zeile.select_one(".gr-bnd-versand-luecke")
         assert satz is not None, "der Hinweis fehlt auf der gerenderten Zeile"
-        assert vorlage_text(satz) == "Versand bei o2 nicht belegt – mit 0 € gerechnet"
+        assert vorlage_text(satz) == "Versand bei o2 nicht belegt – keine Gesamtkosten"
 
     monkeypatch.setattr(versandkosten, "_TABELLE", belegt)
     _baue(tmp_path / "belegt")
     seite = lager(tmp_path / "belegt")
     assert not seite.select(".gr-bnd-versand-luecke")
-    assert "nicht belegt – mit 0 €" not in vorlage_text(seite)
+    assert "nicht belegt – keine Gesamtkosten" not in vorlage_text(seite)
 
 
 def test_versand_vodafone_netz_ist_belegt_gegen_die_fixture():
