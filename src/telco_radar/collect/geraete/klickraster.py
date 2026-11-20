@@ -2,12 +2,14 @@
 
 Lesart der ``uebersichten`` von 1&1 (``klickuebersicht.LESARTEN``): eine Adresse mit
 ``/details-`` ist eine Tarifdetail-Seite (``klickanschluss``), eine mit
-``/smartphones-`` ein Geräteraster. Jede Kachel ``form.hardware-box`` des Rasters wird
-ein Satz mit ``art`` ``ART_RASTER``: Titel aus ``data-title``, Produktlink
-``a.hardware-box__heading``, Monatspreis „€/Monat*“ als ``buendel_monatlich``,
-``data-hardware-months`` als Laufzeit und der Tarif aus „Inkl. …“ ohne Klammerzusatz.
-Ohne Kachel, mit unvollständiger Kachel oder mit Kacheln verschiedener Tarife ist das
-Raster gestört (``GeraeteAbrufFehler``).
+``/smartphones-`` ein Geräteraster, ``/smartphones`` selbst die Geräteübersicht: je
+Kachel ein Satz ``ART_LISTE`` mit Titel und Produktlink, ohne Preis (seit 20.11.2026
+die Quelle der Produktseiten, ``klickliste_kacheln``). Jede Kachel
+``form.hardware-box`` eines Rasters wird ein Satz mit ``art`` ``ART_RASTER``: Titel
+aus ``data-title``, Produktlink ``a.hardware-box__heading``, Monatspreis „€/Monat*“
+als ``buendel_monatlich``, ``data-hardware-months`` als Laufzeit und der Tarif aus
+„Inkl. …“ ohne Klammerzusatz. Ohne Kachel, mit unvollständiger Kachel oder mit
+Kacheln verschiedener Tarife ist das Raster gestört (``GeraeteAbrufFehler``).
 
 Das Raster nennt keine Speichergröße; ``raster_roh`` misst sie: Es gilt die Größe,
 deren heute gelesener Produktseiten-Satz (``PRODUKTSEITE_SLUG``, gleiche Laufzeit)
@@ -46,13 +48,15 @@ from .klickergebnis import GELESENE_SEITEN
 from .klickkarte import EIN_VERTRAG
 
 ART_RASTER = "raster"
+ART_LISTE = "liste"
+UEBERSICHT_PFAD = "/smartphones"
 PRODUKTSEITE_SLUG = "tariff-anf-s-mvl"
 PRODUKTSEITE_TARIF = "1&1 All-Net-Flat S"
 CENT = 0.005
 HERLEITUNG_SCHLUSSZAHLUNG = "schlusszahlung_aus_grundtarif"
 BEREIT_JS = (
     "() => document.readyState === 'complete' || ("
-    "location.pathname.startsWith('/smartphones-') && "
+    "location.pathname.startsWith('/smartphones') && "
     "document.readyState === 'interactive' && "
     "document.querySelector('form.hardware-box') !== null)"
 )
@@ -76,9 +80,31 @@ def einsundeins_saetze(text: str, adresse: str) -> list[dict]:
     pfad = urlsplit(adresse).path
     if pfad.startswith("/details-"):
         return anschluss_saetze(text, adresse)
+    if pfad.rstrip("/") == UEBERSICHT_PFAD:
+        return liste_saetze(text)
     if pfad.startswith("/smartphones-"):
         return raster_saetze(text)
     raise GeraeteAbrufFehler(f"1&1-Übersicht ohne bekannte Seitenart: {pfad}")
+
+
+def liste_saetze(text: str) -> list[dict]:
+    """Je Kachel der Geräteübersicht Titel und Produktlink; gestört ohne Kachel oder
+    mit einer Kachel ohne beides (nie eine stille Lücke)."""
+    saetze = []
+    for kachel in _KACHEL.findall(text):
+        titel, link = _TITEL.search(kachel), _LINK.search(kachel)
+        if not (titel and link):
+            raise GeraeteAbrufFehler("1&1-Geräteübersicht mit Kachel ohne Titel/Link")
+        saetze.append(
+            {
+                "art": ART_LISTE,
+                "titel": " ".join(html.unescape(titel[1]).split()),
+                "url": html.unescape(link[1]),
+            }
+        )
+    if not saetze:
+        raise GeraeteAbrufFehler("1&1-Geräteübersicht ohne hardware-box-Kachel")
+    return saetze
 
 
 def raster_saetze(text: str) -> list[dict]:

@@ -1,4 +1,7 @@
-"""1&1: der Monatspreis des BUENDELS, und nichts anderes.
+"""1&1: der Monatspreis des BUENDELS (seit 20.11.2026 nur noch Leser der Tests).
+
+Preise misst nur der Klick-Lauf (config/klickkarten/1und1.yaml, alle Tarife der
+Tarifauswahl); `register.py` verdrahtet `lies_buendel` nicht mehr (Testleser).
 
 1&1 verkauft Geraete nur im Tarifbund - es gibt keinen Barpreis zu
 verschweigen. Jeder Satz traegt deshalb NUR `buendel_monatlich`
@@ -48,9 +51,6 @@ mehr, bleiben aber als Rueckfallstufe im Code. `hwdVariantsOneOffPayment
 Fees` (Einmalzahlung) und der `data-iframe`-Link zur Bereitstellungs-
 gebuehr fehlen ebenfalls; beide degradieren ohne ihren Textmarker auf
 `None`/`""` (E1) statt eine falsche Zahl anzunehmen.
-
-Keine zusaetzlichen Abrufe: `lies_buendel` liest dieselbe Antwort, die
-der Ernte-Weg fuer die Listung ohnehin holt.
 """
 
 from __future__ import annotations

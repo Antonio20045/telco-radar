@@ -114,7 +114,9 @@ def test_tagesdatei_1und1_hat_sieben_uebersichten():
     assert tuple(klick[:7]) == DETAILS
 
 
-def test_alter_geraetelauf_ruft_kind_klick_nicht_ab():
+def test_geraetelauf_ruft_fuer_1und1_nichts_mehr_ab():
+    """Seit 20.11.2026 misst nur der Klick-Lauf 1&1 (Tarifauswahl): der Gerätelauf
+    hat keinen Einstieg mehr und ruft weder Kategorie- noch Tarifdetail-Seiten ab."""
     wurzel = lese_wurzel()
     quelle = lade_quellen(wurzel).nach_name("1&1")
     anbieter = replace(quelle, rate_limit_sekunden=0)
@@ -125,7 +127,8 @@ def test_alter_geraetelauf_ruft_kind_klick_nicht_ab():
         return (200, "") if url.endswith("/robots.txt") else (404, "")
 
     assert [e.url for e in anbieter.klick_einstiege][:7] == list(DETAILS)
-    assert [e.kind for e in anbieter.einstiege] == ["static"]
+    assert [e.kind for e in anbieter.einstiege] == []
+    assert not anbieter.crawlbar
     bilanz = sammle_anbieter(
         anbieter,
         lade_katalog(wurzel),
@@ -136,6 +139,5 @@ def test_alter_geraetelauf_ruft_kind_klick_nicht_ab():
         datetime(2026, 9, 29, 3, tzinfo=UTC),
     )
 
-    assert "https://mobile.1und1.de/smartphones" in geholt
-    assert not any("details-all-net-flat-preisliste" in url for url in geholt)
-    assert bilanz.seiten_versucht == 1
+    assert not [url for url in geholt if not url.endswith("/robots.txt")]
+    assert bilanz.seiten_versucht == 0

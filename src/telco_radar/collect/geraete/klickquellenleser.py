@@ -53,9 +53,11 @@ from .klickpfad import pfadfehler, platzhalter
 if TYPE_CHECKING:
     from .klickkartenleser import Kartenleser
 
-QUELLENARTEN = ("url_muster", "skript", "global", "seitenwerte")
+QUELLENARTEN = ("url_muster", "skript", "global", "seitenwerte", "kachel")
 QUELLENTEILE = (
     *QUELLENARTEN,
+    "attribut",
+    "gleich",
     "laden",
     "start",
     "erkennung",
@@ -65,10 +67,12 @@ QUELLENTEILE = (
     "parameter",
     "platzhalter",
 )
-WERTPFADTEILE = ("pfad", "muster", "einheit")
+WERTPFADTEILE = ("pfad", "muster", "einheit", "summe", "abzug")
 PARAMETERTEILE = ("name", "muster")
 SEITENTEILE = ("selektor", "attribut", "parameter", "muster")
-MUSTERTEILE = ("muster", "selektor", "attribut")
+MUSTERTEILE = ("muster", "selektor", "attribut", "summe", "abzug")
+GRUND_ZWEI_FAKTOREN = "abzug braucht genau zwei Teile"
+GRUND_NUR_KACHEL = "nur mit kachel"
 GRUND_PFAD = "kein gültiger Pfad"
 GRUND_GLOBAL = "kein Bezeichner einer globalen Variable"
 GRUND_KEIN_SEITENWERT = "kein Seitenwert dieses Namens"
@@ -149,18 +153,32 @@ def lies_textmuster(leser: Kartenleser, roh: object) -> dict[str, Textmuster]:
     daten = leser.zuordnung(roh, ort, FELDER)
     muster = {}
     for feld in daten:
-        if not isinstance(daten[feld], Mapping):
-            muster[feld] = Textmuster(leser.muster(daten, feld, ort))
-            continue
-        teile = leser.zuordnung(daten[feld], f"{ort}.{feld}", MUSTERTEILE)
-        selektor = leser.wahlweise_text(teile, "selektor", f"{ort}.{feld}")
-        attribut = leser.wahlweise_text(teile, "attribut", f"{ort}.{feld}")
-        if attribut is not None and selektor is None:
-            raise leser.fehler(f"{ort}.{feld}", GRUND_ATTRIBUT_OHNE_SELEKTOR)
-        muster[feld] = Textmuster(
-            leser.muster(teile, "muster", f"{ort}.{feld}"), selektor, attribut
-        )
+        muster[feld] = _textmuster(leser, daten, feld, ort)
     return muster
+
+
+def _textmuster(leser: Kartenleser, daten: Mapping, feld: str, ort: str) -> Textmuster:
+    """Ein Textmuster; ``summe`` ist eine Liste weiterer Textmuster derselben Form."""
+    if not isinstance(daten[feld], Mapping):
+        return Textmuster(leser.muster(daten, feld, ort))
+    stelle = f"{ort}.{feld}"
+    teile = leser.zuordnung(daten[feld], stelle, MUSTERTEILE)
+    selektor = leser.wahlweise_text(teile, "selektor", stelle)
+    attribut = leser.wahlweise_text(teile, "attribut", stelle)
+    if attribut is not None and selektor is None:
+        raise leser.fehler(stelle, GRUND_ATTRIBUT_OHNE_SELEKTOR)
+    teile_je = {}
+    for art in ("summe", "abzug"):
+        roh = teile.get(art)
+        eintraege = [] if roh is None else leser.liste(roh, stelle)
+        liste = {str(n): e for n, e in enumerate(eintraege)}
+        teile_je[art] = tuple(
+            _textmuster(leser, liste, n, f"{stelle}.{art}") for n in liste
+        )
+    if teile_je["abzug"] and len(teile_je["abzug"]) != 2:
+        raise leser.fehler(f"{stelle}.abzug", GRUND_ZWEI_FAKTOREN)
+    muster = leser.muster(teile, "muster", stelle)
+    return Textmuster(muster, selektor, attribut, teile_je["summe"], teile_je["abzug"])
 
 
 def texte(
@@ -211,6 +229,17 @@ def _quelle(
     if len(arten) > 1:
         raise leser.fehler(f"{feld}.{arten[1]}", GRUND_EINE_QUELLE)
     url = leser.wahlweise_muster(daten, "url_muster", feld)
+    kachel = leser.wahlweise_text(daten, "kachel", feld)
+    attribut = leser.wahlweise_text(daten, "attribut", feld)
+    if (kachel is None) != (attribut is None):
+        raise leser.fehler(f"{feld}.attribut", GRUND_NUR_KACHEL)
+    roh_gleich = daten.get("gleich") or {}
+    namen_gleich = tuple(roh_gleich) if isinstance(roh_gleich, Mapping) else ()
+    gleich = leser.zuordnung(roh_gleich, f"{feld}.gleich", namen_gleich)
+    if gleich and kachel is None:
+        raise leser.fehler(f"{feld}.gleich", GRUND_NUR_KACHEL)
+    for pfad in gleich:
+        _pruefe_pfad(leser, str(pfad), f"{feld}.gleich", namen)
     for nur in ("laden", "segment"):
         if url is None and daten.get(nur) is not None:
             raise leser.fehler(f"{feld}.{nur}", GRUND_NUR_URL)
@@ -235,6 +264,9 @@ def _quelle(
         erkennung=erkennung,
         segment=leser.wahlweise_muster(daten, "segment", feld),
         platzhalter=platzhalter,
+        kachel=kachel,
+        attribut=attribut,
+        gleich=dict(gleich),
     )
 
 
@@ -339,7 +371,15 @@ def _wertpfad(
     if einheit is not None and einheit not in EINHEITEN:
         raise leser.fehler(f"{stelle}.einheit", f"{GRUND_EINHEIT} {einheit}")
     muster = leser.wahlweise_muster(eintrag, "muster", stelle)
-    return Wertpfad(pfad=pfad, muster=muster, einheit=einheit)
+    je: dict[str, tuple[str, ...]] = {}
+    for art in ("summe", "abzug"):
+        liste = [] if eintrag.get(art) is None else leser.liste(eintrag[art], stelle)
+        je[art] = tuple(leser.text({"0": e}, "0", f"{stelle}.{art}") for e in liste)
+        for teil in je[art]:
+            _pruefe_pfad(leser, teil, f"{stelle}.{art}", namen)
+    if je["abzug"] and len(je["abzug"]) != 2:
+        raise leser.fehler(f"{stelle}.abzug", GRUND_ZWEI_FAKTOREN)
+    return Wertpfad(pfad, muster, einheit, je["summe"], je["abzug"])
 
 
 def _pruefe_pfad(leser: Kartenleser, pfad: str, ort: str, namen: set[str]) -> None:

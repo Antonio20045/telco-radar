@@ -10,7 +10,9 @@ offen, ist der Lauf gestört. ``textwerte`` liest die Werte mit
 ``klicktext.lies_zusammenfassung`` und ersetzt jedes Feld mit Textmuster der Karte
 durch die erste Gruppe des Musters ohne Leerraum, im Text der Zusammenfassung oder
 am eigenen Fundort (o2 „Gerät mtl. (36 Raten)“, 1&1 „44 , 99 €/Monat“, Vodafone
-Ratenzahl im gewählten Label). Jeder Text kommt vorher durch
+Ratenzahl im gewählten Label). Ein Muster mit ``summe`` addiert die Beträge seiner Teile
+(1&1: Tarifpreis der Kachel plus Geräterate der Preisleiste); fehlt einer, ist das Feld
+``None``. Jeder Text kommt vorher durch
 ``klicktext.zahlen_ohne_leerraum``, auch der der Zusammenfassung im Beleg. Nennt die
 Gruppe für ``tarifphasen`` Beträge mit €, liest sie die Phasen wie eine Tarifzeile
 (o2 „19,99 € ab dem 25. Monat: 29,99 €“); ohne € ist sie ein Betrag ab Monat 1
@@ -25,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickantwort import abzug
 from .klickecho import feldwert
 from .klickkartentypen import BUENDELFELDER, PHASENFELD
 from .klicklauf import LAUF_GESTOERT
@@ -43,6 +46,7 @@ if TYPE_CHECKING:
     from playwright.sync_api import Locator, Page
 
     from .klickkarte import Klickkarte
+    from .klickkartentypen import Textmuster
 
 _ERSTER_JS = """(treffer, attribut) => treffer.length === 0 ? null
   : attribut === null ? treffer[0].innerText : treffer[0].getAttribute(attribut)"""
@@ -94,22 +98,36 @@ class Textleser:
         gemustert: dict[str, Any] = {}
         fundorte: dict[str, tuple[str, str]] = {}
         for feld, muster in self.karte.textlesung.muster.items():
-            ort = self.karte.zusammenfassung
-            quelle = text
-            if muster.selektor is not None:
-                ort, quelle = (
-                    muster.selektor,
-                    self._text(self.seite.locator(muster.selektor), muster.attribut),
+            funde = [self._fund(feld, m, text) for m in (muster, *muster.summe)]
+            gemustert[feld] = funde[0][0] if not muster.summe else summe(funde)
+            if muster.abzug:
+                weg = [self._fund(feld, m, text) for m in muster.abzug]
+                gemustert[feld] = abzug(gemustert[feld], weg[0][0], weg[1][0])
+                funde += weg
+            if gemustert[feld] is not None:
+                orte = [o for _, o in funde if o is not None]
+                fundorte[feld] = (
+                    " + ".join(o[0] for o in orte),
+                    " + ".join(o[1] for o in orte),
                 )
-            treffer = muster.muster.search(zahlen_ohne_leerraum(quelle))
-            roh = None
-            if treffer is not None:
-                roh = treffer[1] if muster.muster.groups else treffer[0]
-            gemustert[feld] = None if roh is None else musterwert(feld, roh)
-            if gemustert[feld] is not None and treffer is not None:
-                fundorte[feld] = (ort, treffer[0])
         buendel = {f: gemustert.pop(f) for f in BUENDELFELDER if f in gemustert}
         return replace(werte, **gemustert), Buendelwerte(**buendel), fundorte
+
+    def _fund(
+        self, feld: str, muster: Textmuster, text: str
+    ) -> tuple[object, tuple[str, str] | None]:
+        """Wert eines Textmusters und sein Fundort (Ort, Ausschnitt), sonst ``None``."""
+        ort, quelle = self.karte.zusammenfassung, text
+        if muster.selektor is not None:
+            ort, quelle = (
+                muster.selektor,
+                self._text(self.seite.locator(muster.selektor), muster.attribut),
+            )
+        treffer = muster.muster.search(zahlen_ohne_leerraum(quelle))
+        if treffer is None:
+            return None, None
+        wert = musterwert(feld, treffer[1] if muster.muster.groups else treffer[0])
+        return wert, None if wert is None else (ort, treffer[0])
 
     def oeffne_dialog(self, bereich: Locator) -> str | None:
         """Öffnet den Dialog der Zusammenfassung; der Grund, wenn er nicht aufgeht."""
@@ -164,6 +182,15 @@ class Textleser:
                 return True
             self.seite.wait_for_timeout(WARTE_TAKT_MS)
         return bedingung()
+
+
+def summe(funde: list[tuple[object, tuple[str, str] | None]]) -> float | None:
+    """Die Summe der Beträge eines Textmusters mit ``summe`` auf den Cent; fehlt ein
+    Teil, ``None`` (nie eine Teilsumme)."""
+    zahlen = [w for w, _ in funde if isinstance(w, float | int)]
+    if len(zahlen) != len(funde) or any(isinstance(w, bool) for w in zahlen):
+        return None
+    return round(sum(zahlen), 2)
 
 
 def musterwert(feld: str, roh: str) -> object:
