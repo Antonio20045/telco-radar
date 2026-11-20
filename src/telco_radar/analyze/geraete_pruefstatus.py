@@ -242,10 +242,10 @@ def ist_schaetzung(herleitung: str) -> bool:
 
     Nicht für eine Herkunftsmarke ohne Rechenweg (``HERLEITUNG_DIREKT``) und nicht für
     Rechenwege, die eine Preisliste exakt nachrechnen (``HERLEITUNG_PREISLISTE``):
-    1&1 bepreist jede Tarifstufe als Grundangebot plus festen Tarifaufschlag
-    (Gegenprobe in ``einsundeins.ergaenze_tarifstufen``), die Ablöse hängt nur an
-    der Gerätevariante. Die Preisprüfung vom 26.10.2026 fand diese
-    Preise beim Anbieter wieder (A17, All-Net-Flat M, 22,99 €).
+    1&1 bepreiste jede Tarifstufe bis 20.11.2026 als Grundangebot plus festen
+    Tarifaufschlag (Herleitung seitdem entfallen, Kopf von ``einsundeins.py``),
+    die Ablöse hängt nur an der Gerätevariante. Die Preisprüfung vom 26.10.2026
+    fand diese Preise beim Anbieter wieder (A17, All-Net-Flat M, 22,99 €).
     """
     weg = herleitung.strip()
     return bool(weg) and weg not in HERLEITUNG_PREISLISTE | HERLEITUNG_DIREKT

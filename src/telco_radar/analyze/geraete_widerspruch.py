@@ -1,7 +1,8 @@
 """Ein abgeleiteter Preis, den eine gelesene Zeile widerlegt, zählt nicht.
 
-1&1 leitet die Tarifstufen aus einem Grundangebot und dem Tarifaufschlag ab
-(`einsundeins.ergaenze_tarifstufen`); die Ablöse hängt nur an der Gerätevariante.
+1&1 leitete die Tarifstufen bis 20.11.2026 aus einem Grundangebot und dem
+Tarifaufschlag ab (Bestandszeilen mit dieser Herleitung altern seitdem aus); die
+Ablöse hängt nur an der Gerätevariante.
 Steht für dieselbe Variante (`sku_id`) und Ratenlaufzeit eine gelesene Zeile
 (`quelle_art == QUELLE_KLICK`) mit anderer Zuzahlung, stammt die Ableitung aus dem
 falschen Grundangebot. Ohne gelesene Gegenzeile ist nichts zu widerlegen; andere

@@ -28,9 +28,9 @@ Nennen zwei Klick-Sätze denselben Schlüssel (ein Zustand außer neu zählt mit
 einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzte
 Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
 
-Vorrang steht im Bestand, nicht im Lesestand: ``Zusammenfuehrung.buendel`` lässt ein
-Adapterbündel weg, dessen Bestandseintrag eine Klick-Messung von HEUTE ist - oder,
-nur bei congstar (``klick_messtag.ANBIETER_PREISGRENZE``, Befund 13.11.2026), eine
+Vorrang steht im Bestand: ``Zusammenfuehrung.buendel`` lässt ein Adapterbündel weg,
+dessen Bestandseintrag eine Klick-Messung von HEUTE ist (bei 1&1 nur dann,
+``klick_messtag.NUR_HEUTE``) - oder, bei congstar (``ANBIETER_PREISGRENZE``), eine
 ältere innerhalb von ``FRISCHEGRENZE_TAGE``, der das heutige Bündel WIDERSPRICHT
 (``klick_messtag``, ``klick_preisgrenze``; Bilanz ``klick_vorrang`` und
 ``klick_widerspruch``). Bei jedem anderen Anbieter weicht eine solche ältere Messung

@@ -26,7 +26,6 @@ from test_klick_raster_1und1 import DATEIEN, RASTER, text
 from telco_radar.analyze.klick_zusammenfuehrung import zusammenfuehren
 from telco_radar.collect.geraete.einsundeins import (
     ergaenze_bereitstellungsgebuehr,
-    ergaenze_tarifstufen,
     lies_buendel,
 )
 from telco_radar.collect.geraete.klickantwort import lies_antwort
@@ -254,32 +253,38 @@ def test_anschluss_einer_gestoerten_detailseite_gilt_nicht(katalog):
 
 
 def _adapter(anschluss: str) -> list[dict]:
+    """Der hergeleitete M-Satz, wie ihn der Adapter bis 20.11.2026 lieferte
+    (`tarifaufschlag_aus_tarifraster`: S-Satz der Geräteseite plus Aufschlag
+    5,00 aus den Rastern S/M vom 29.09.2026). Die Herleitung ist entfallen
+    (`test_einsundeins_gemessen_2011.py`); hier steht der Satz wörtlich, weil
+    es um die Ablöse eines solchen Bestandssatzes durch das Klick-Raster geht."""
     html = text("einsundeins_produktseite_iphone_17_pro.html.gz")
-    saetze = [
+    (s_256,) = [
         {**r, "anbieter": "1&1", "zustand": "neu"}
         for r in lies_buendel(html, EINSUNDEINS_SEITE.adresse)
+        if r["speicher_gb"] == 256
     ]
-    netz = {
-        "https://mobile.1und1.de/all-net-flat-vergleich": text(
-            "einsundeins_tarifuebersicht_all_net_flat_2026-09-29.html.gz"
-        ),
-        "https://mobile.1und1.de/unbegrenztes-datenvolumen": text(
-            "einsundeins_tarifuebersicht_unlimited_2026-09-29.html.gz"
-        ),
-        **{a: text(DATEIEN[a]) for a in RASTER[:2]},
-    }
+    raster_m = RASTER[1]
+    saetze = [
+        {
+            **s_256,
+            "tarif_name": "1&1 All-Net-Flat M",
+            "tarif_slug": "tariff-anf-m-mvl",
+            "tarifdetails_url": DETAILS_M,
+            "buendel_monatlich": round(s_256["buendel_monatlich"] + 5.0, 2),
+            "herleitung": "tarifaufschlag_aus_tarifraster",
+            "url": raster_m,
+            "quelle_url": raster_m,
+        }
+    ]
 
     def hole(url, kopfzeilen=None):
-        if "details-" in url:
-            return 200, anschluss
-        return (200, netz[url]) if url in netz else (404, "")
+        return (200, anschluss) if "details-" in url else (404, "")
 
-    assert ergaenze_tarifstufen(hole, {}, saetze) > 0
     ergaenze_bereitstellungsgebuehr(hole, {}, saetze)
     return [
         {**s, "sku_id": sku_id("apple-iphone-17-pro", s["speicher_gb"], s["farbe"])}
         for s in saetze
-        if s["tarif_name"] == "1&1 All-Net-Flat M" and s["speicher_gb"] == 256
     ]
 
 

@@ -917,16 +917,15 @@ anbieter:
       /xml/, /static/, /modules/ sowie einzelne Aktions- und
       Bestellstrecken. /smartphones und die Produktseiten sind frei, der
       Parameter ?chosenTariff= ist ausdrücklich erlaubt.
-      TARIFSTUFEN SEIT 29.09.2026: Die Tarifübersichten
-      /all-net-flat-vergleich und /unbegrenztes-datenvolumen verlinken je
-      Tarif ein Geräteraster (/smartphones-all-net-flat-s|m|l,
-      /smartphones-unlimited-s|m|l|xl) mit einem Monatspreis je Gerät.
-      Der Aufschlag gegen All-Net-Flat S ist je Gerät gemessen und kommt
-      auf die Preiskarte jeder Speichergröße, wenn er für alle Geräte
-      gleich ist (sechs Tarife); sonst (Unlimited XL: Apple +25, andere +30)
-      nur auf die vorausgewählte Größe. Neun Abrufe mehr je Lauf im
-      `ergaenze_buendel`-Haken, siehe `einsundeins.ergaenze_tarifstufen`.
-      Die 24-Monats-Finanzierung steht nur im Warenkorb und bleibt offen.
+      SEIT 20.11.2026 NUR GEMESSEN: die Geräteseite trägt je Variante
+      "24 Monate Fix" und "36 Monate Fix" (hwdVariantsHardwarePrices), beide
+      werden je Speichergröße gelesen. Sie trägt nur EINEN Tarif
+      (All-Net-Flat S); die übrigen Tarife wählt der Kunde erst im
+      Bestellweg (Warenkorb). Die bis dahin aus den Geräterastern
+      hergeleiteten Tarifstufen (tarifaufschlag_aus_tarifraster) entfallen:
+      der Tarifnachlass hängt an Speicher und Laufzeit (iPhone 17 Pro Max
+      fix 24: 9,99 bei 256 GB, 13,99 bei 512 GB), ein übertragener
+      Aufschlag wäre unbelegt. Andere Tarife sind eine benannte Lücke.
       Die Tarife desselben Anbieters kommen NICHT von hier, sondern aus
       config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson) -
       dort trägt derselbe Anbieter seine eigene Marke, hier trägt das
@@ -966,8 +965,8 @@ anbieter:
       # Geräteraster je Tarif (kind klick, Pitch 2 Schnitt 4): je Gerät eine Kachel mit
       # Monatspreis inklusive Tarif (36 Monate), gelesen von `klickraster`. Adressen
       # wörtlich als targetpage der Tarifübersichten vom 29.09.2026 (Fixtures
-      # einsundeins_tarifuebersicht_*); der Gerätelauf ruft sie seit 29.09.2026
-      # robots-geprüft ab (`einsundeins.ergaenze_tarifstufen`).
+      # einsundeins_tarifuebersicht_*); der Gerätelauf ruft sie seit 20.11.2026
+      # nicht mehr ab (Tarifstufen werden nicht mehr hergeleitet).
       - url: https://mobile.1und1.de/smartphones-all-net-flat-s
         label: Geräteraster All-Net-Flat S
         kind: klick
