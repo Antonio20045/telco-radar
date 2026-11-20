@@ -60,8 +60,9 @@ from bs4 import BeautifulSoup
 
 from ...tarif_model import zahl
 from ..tarif_ldjson import ld_json_bloecke
+from . import einsundeins_raten as ER
 from .basis import GeraeteAbrufFehler
-from .einsundeins_raten import flache_tarifrate, gegenwert, geraeteraten_preise
+from .einsundeins_raten import geraeteraten_preise
 
 log = logging.getLogger(__name__)
 
@@ -272,7 +273,7 @@ def _fixpreis(karteneintrag: dict, dauer: int) -> tuple[float, float] | None:
     if not isinstance(stufe, dict):
         return None
     hardwarerate = zahl(str(stufe.get("hardwarePricePerMonth")))
-    tarifrate = flache_tarifrate(stufe, dauer)
+    tarifrate = ER.flache_tarifrate(stufe, dauer)
     if hardwarerate is None or tarifrate is None:
         return None
     return hardwarerate, tarifrate
@@ -751,9 +752,10 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
 
     GEGENPROBE (K2, Modulkopf): ein Gerät zählt nur, wenn beide Raster
     dieselbe Ratenzahl nennen und das Raster des Default-Tarifs denselben
-    Preis nennt wie die Geräteseite (`_gegenwert`). Die Mindestbindung des
-    hergeleiteten Satzes ist die des Default-Satzes, nicht die Ratenzahl
-    des Rasters.
+    Preis nennt wie die Geräteseite (`gegenwert`); dazu WÄCHTER (E1) gegen
+    die Listenpreisdifferenz - Annahme und Grenzen im Kopf von
+    `einsundeins_raten.py`. Die Mindestbindung des hergeleiteten Satzes
+    ist die des Default-Satzes, nicht die Ratenzahl des Rasters.
     """
     basis = [
         s
@@ -778,17 +780,14 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
     for satz in basis:
         je_geraet.setdefault(satz["hw_id"], []).append(satz)
 
-    raster_adressen: list[str] = []
-    details: dict = {}
-    for uebersicht in TARIFUEBERSICHTEN:
-        text = _hole_text(hole, kopfzeilen, uebersicht)
-        if text is None:
-            continue
-        for adresse in tarifraster_adressen(text, uebersicht):
-            if adresse not in raster_adressen:
-                raster_adressen.append(adresse)
-        for name, wert in tarifdetails_je_tarif(text, uebersicht).items():
-            details.setdefault(name, wert)
+    raster_adressen, details, listenpreise = ER.lies_uebersichten(
+        hole,
+        kopfzeilen,
+        TARIFUEBERSICHTEN,
+        _hole_text,
+        tarifraster_adressen,
+        tarifdetails_je_tarif,
+    )
 
     raster: dict = {}
     for adresse in raster_adressen:
@@ -826,6 +825,8 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
             for hw, preis in gelesen["preise"].items()
             if hw in basisraster["preise"]
         }
+        if ER.waechter_verwirft(log, listenpreise, basistarif, tarif, aufschlaege):
+            continue
         einheitlich = (
             len(aufschlaege) >= _MINDEST_GERAETE_EINHEITLICH
             and len(set(aufschlaege.values())) == 1
@@ -838,7 +839,7 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
             vorher = next((s for s in saetze if s.get("vorausgewaehlt")), None)
             basis_cent, basis_monate = basisraster["preise"][hw]
             monate = gelesen["preise"][hw][1]
-            gegen = gegenwert(vorher, basis_monate)
+            gegen = ER.gegenwert(vorher, basis_monate)
             if (
                 gegen is None
                 or monate is None
