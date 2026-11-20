@@ -51,7 +51,6 @@ EINSTELLUNGEN = {
     "ki_ranglisten_aktiv": False,
     "ki_videos_aktiv": False,
     "promo_enabled": False,
-    "geraete_enabled": False,
     "lookback_days": 3,
     "collect_max_workers": 1,
     "llm_max_workers": 1,

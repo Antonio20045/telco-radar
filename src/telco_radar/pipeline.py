@@ -44,8 +44,6 @@ Gesammelt = tuple[list[Item], dict]
 
 LANGUAGES = {"de": "Deutsch", "en": "English"}
 
-_GERAETE_MINDESTBUDGET = 240.0
-
 _STATUS_SCHLUESSEL = {
     "ok": "ok",
     "empty": "empty",
@@ -53,20 +51,6 @@ _STATUS_SCHLUESSEL = {
     "quarantaene": "quarantaene",
 }
 _STATUS_RANG = {"fail": 0, "ok": 1, "empty": 2}
-
-
-def geraete_budget(settings: dict, verstrichen: float):
-    """Restzeit des Jobs für die Gerätestufe; ``None`` heißt nicht anfangen."""
-    if not settings.get("geraete_enabled", False):
-        return None
-    rest = (
-        float(settings.get("job_frist_sekunden", 3000))
-        - verstrichen
-        - float(settings.get("veroeffentlichung_reserve_sekunden", 420))
-    )
-    if rest < _GERAETE_MINDESTBUDGET:
-        return None
-    return min(float(settings.get("geraete_frist_sekunden", 600)), rest)
 
 
 OPENAI_KOMPATIBEL = {
@@ -810,11 +794,7 @@ def _kennzahlen(
     zusatz: zusatzstufen.Zusatz,
 ) -> dict:
     sammlung, neuheit, buendel = stufen
-    ctm_bilanz, beleg_bilanz, geraete_bilanz = (
-        einordnung.ctm,
-        einordnung.beleg,
-        zusatz.geraete,
-    )
+    ctm_bilanz, beleg_bilanz = einordnung.ctm, einordnung.beleg
     stats = {
         **sammlung.kennzahlen(cfg),
         "new": len(neuheit.new_items),
@@ -828,12 +808,6 @@ def _kennzahlen(
             ctm_bilanz.get("saetze_verworfen", 0) + beleg_bilanz.get("verworfen", 0)
         ),
         **sammlung.zusatz_kennzahlen(),
-        "geraete_anbieter": geraete_bilanz.get("abgefragt", 0),
-        "geraete_listungen": geraete_bilanz.get("listungen", 0),
-        "geraete_neu": geraete_bilanz.get("neu", 0),
-        "geraete_gealtert": geraete_bilanz.get("gealtert", 0),
-        "geraete_preispunkte": geraete_bilanz.get("preispunkte", 0),
-        "geraete_bestand": geraete_bilanz.get("bestand", 0),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),
@@ -930,7 +904,6 @@ def run(
         today,
         (modelle.editor, modelle.mechanik, language),
         bool(use_llm),
-        lambda: geraete_budget(cfg.settings, stoppuhr() - t0),
         takt,
     )
     stats = _kennzahlen(cfg, stufen, analyse.einordnung, zusatz)

@@ -40,8 +40,8 @@ DECKEL_VORGABE = 60
 def budget(settings: dict, verstrichen: float) -> float | None:
     """Wie viel Zeit die Uebersetzungsstufe noch bekommt, oder None.
 
-    Dieselbe Rechnung wie `pipeline.geraete_budget()` und aus demselben
-    Grund: die Reserve gehoert dem Rendern, Committen und Deployen - dem
+    Dieselbe Rechnung wie `pipeline.vorsortierung_budget()` und aus
+    demselben Grund: die Reserve gehoert dem Rendern, Committen und Deployen - dem
     Teil also, den ein Leser zu sehen bekommt.
     """
     if not settings.get("uebersetzung_enabled", True):

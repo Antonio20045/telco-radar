@@ -306,7 +306,7 @@ def leeres_projekt(tmp_path, monkeypatch):
     settings = (tmp_path / "config" / "settings.yaml").read_text(encoding="utf-8")
     settings += (
         "\nfocus_competitors: []\npromo_enabled: false\n"
-        "geraete_enabled: false\ncrawl_newsrooms: false\n"
+        "crawl_newsrooms: false\n"
         "lieferzeit_radar_aktiv: false\naenderungsradar_aktiv: false\n"
         "tarif_radar_aktiv: false\nct_radar_aktiv: false\n"
         "ki_ranglisten_aktiv: false\nki_videos_aktiv: false\n"
