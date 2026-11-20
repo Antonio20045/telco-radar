@@ -451,8 +451,7 @@ def _gemessen(pv: dict) -> Optional[dict]:
     if option is None or zahlung is None:
         return None
     angebot = str(hw.get("offerName") or "").strip()
-    m_raten = _RATEN_RE.search(angebot)
-    raten = ratenzahl_im_knopf(zahlung)
+    m_raten, raten = _RATEN_RE.search(angebot), ratenzahl_im_knopf(zahlung)
     if raten is None or not m_raten or int(m_raten.group("raten")) != raten:
         return None
     zeilen = _zusammenfassung(pv)
@@ -612,7 +611,8 @@ def _hole_seite(hole, url: str, z: dict) -> Optional[dict]:
 def _folgeseiten(hole, weiter, z: dict, seite: dict, art: str) -> list:
     """(Antwort, Adresse) je nicht gewählter Option ``art`` mit Ratenzahl."""
     optionen = (seite.get("hardware") or {}).get(art) or []
-    bar = [o for o in optionen if art != "paymentOptions" or ratenzahl_im_knopf(o)]
+    nur_raten = art == "paymentOptions"
+    bar = [o for o in optionen if not nur_raten or ratenzahl_im_knopf(o) is not None]
     links = [_link(o) for o in bar if not o.get("selected") and _link(o)]
     paare = ((_hole_seite(hole, u, z), u) for u in links if weiter())
     return [(pv, u) for pv, u in paare if pv is not None]

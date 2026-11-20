@@ -86,6 +86,7 @@ def test_ein_ratenknopf_ohne_merker_wird_weiter_abgerufen():
     nicht; entscheidend ist die Ratenzahl im Knopf, wie in `_gemessen`."""
     assert o2.ratenzahl_im_knopf({"displayValue": "24 Monate"}) == 24
     assert o2.ratenzahl_im_knopf({"displayValue": "Einmalzahlung Gerät"}) is None
+    assert o2.ratenzahl_im_knopf({"displayValue": "0 Monate"}) is None
     assert (
         o2.ratenzahl_im_knopf({"displayValue": "36 Monate", "rateplanOption": False})
         is None
