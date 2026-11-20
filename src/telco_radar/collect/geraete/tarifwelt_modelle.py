@@ -31,6 +31,18 @@ Netzbetreiber ueber `pflicht_modelle`). Acht weitere Modelle lieferte die
 Sitemap zwar, aber jede Variante war `available: false` ("nicht lieferbar",
 keine Sortimentsaussage) - sie bleiben hier draussen und stehen nur als
 belegte Luecke in `config/geraete_abdeckung.yaml`.
+
+Nachmessung 20.11.2026 (Sitemap und ein GET je Slug, ehrliche Kennung): vier
+weitere Katalogmodelle haben eine Tarifwelt-Seite MIT lieferbarer Variante und
+standen nicht hier - `google-pixel-9-pro` (128 GB), `honor-magic7-pro` (512),
+`xiaomi-15` (512) und `motorola-edge-70` (512, am 13.11. noch ohne lieferbare
+Variante). Der Name der Antwort belegt das Geraet (`hardware.name`: "Pixel 9
+Pro", "Magic 7 Pro", "15", "Edge 70"). Nicht aufgenommen: Xiaomi 18 Pro und 18
+Pro Max (Seite lieferbar, aber nur Auto-Eintraege des Katalogs, keine
+Handeintraege in `config/geraete_katalog.yaml`), `Redmi Note 14 Pro` (Seiten 4G
+und 5G getrennt), `Redmi 17` und `Redmi Note 17` (je eine Seite mit und ohne
+"5G"). Weiter ohne lieferbare Variante: Flip7, Flip7 FE, A17, A26, Magic V6,
+Pixel 10 Pro, Redmi Note 15, Redmi Note 15 Pro.
 """
 
 from __future__ import annotations
@@ -182,5 +194,21 @@ MODELL_SLUGS: dict[str, ModellEintrag] = {
         "xiaomi",
         "redmi-note-17-pro-max-5g",
         "Redmi Note 17 Pro Max 5G",
+    ),
+    "google-pixel-9-pro": ("Google", "Pixel 9 Pro", "google", "pixel-9-pro"),
+    "honor-magic7-pro": (
+        "HONOR",
+        "HONOR Magic7 Pro",
+        "honor",
+        "magic-7-pro",
+        "Magic 7 Pro",
+    ),
+    "xiaomi-15": ("Xiaomi", "Xiaomi 15", "xiaomi", "15", "15"),
+    "motorola-edge-70": (
+        "Motorola",
+        "Motorola edge 70",
+        "motorola",
+        "edge-70",
+        "Edge 70",
     ),
 }

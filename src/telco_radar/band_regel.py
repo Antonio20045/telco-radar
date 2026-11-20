@@ -1,7 +1,7 @@
 """Die eine Regel: welches Datenvolumen ist einem Zielwert am naechsten.
 
 Report (`report/geraete_tco_band.band_von_gb`, Vodafone-Tarifleiter) und
-Sammeln (`collect/geraete/tarifwelt.waehle_je_band`, Tarifwelt-Netzauswahl)
+Sammeln (`collect/geraete/tarifwelt.tarife_mit_band`, Tarifwelt-Bandzuordnung)
 brauchen dieselbe Regel - "naechstes Volumen, bei Gleichstand das groessere"
 - duerfen sich aber nicht gegenseitig importieren (`.importlinter`:
 Schichten-Vertrag, Sammeln zitiert nie Berichten). Dieses Wurzelmodul ist

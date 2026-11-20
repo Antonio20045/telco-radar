@@ -10,3 +10,4 @@
 - „Nicht gelesen“ ist nicht „leer“: Altern (`mark_stale`) und Ersetzen nur für wirklich gelesene Seiten, auch bei einem wegen Visit-time übersprungenen Anbieter. Ein Deckel schneidet nach der Vorprüfung ab, nie den Scan.
 - Die Extraktionslogik arbeitet auf Text, nicht auf PDF; `pdftotext` ist ein externes Binary und gehört nicht in die Tests.
 - Ist ein Wert bei allen Anbietern gleich (etwa nur 36-Monats-Raten), ist das zuerst eine Erfassungslücke.
+- Tarifwelt (Saturn/MediaMarkt): jeder vergleichbare Tarif ist eine Zeile, kein Bandsieger; die Stufe liest alle `MODELL_SLUGS` und hält ihr Zeitbudget gegen die Restzeit des Jobs (`geraete_tarifwelt.stufen_frist`).

@@ -47,10 +47,12 @@ GERAETE = ".github/workflows/geraete.yml"
 SETTINGS = "config/settings.yaml"
 DEPLOY = "scripts/render_deploy.sh"
 GERAETE_PIPELINE = "src/telco_radar/geraete_pipeline.py"
+TARIFWELT_STUFE = "src/telco_radar/geraete_tarifwelt.py"
 BELEG_ABLAGE = waechter_belegvertraege.BELEG_ABLAGE
 BELEG_SKRIPT = waechter_belegvertraege.BELEG_SKRIPT
 BELEG_MANIFEST = waechter_belegvertraege.BELEG_MANIFEST
 FRIST_NAME = "FRIST_TAGESLAUF"
+JOB_FRIST_NAME = "JOB_FRIST_SEKUNDEN"
 ZUSTANDSDATEIEN = (
     "geraete_db.json",
     "geraete_preise.jsonl",
@@ -250,6 +252,18 @@ def jobfrist_passt_zu_radar(wurzel: Path) -> list[str]:
     return [f"{SETTINGS}: job_frist_sekunden {frist} ≠ {RADAR} timeout {minuten} min"]
 
 
+def tarifwelt_frist_ist_das_job_timeout(wurzel: Path) -> list[str]:
+    """Das Zeitbudget der Tarifwelt-Stufe rechnet gegen die Restzeit des Jobs:
+    ``JOB_FRIST_SEKUNDEN`` ist ``timeout-minutes`` des Geräte-Jobs."""
+    minuten = _yaml(wurzel, GERAETE)["jobs"]["geraete"]["timeout-minutes"]
+    soll = waechter_belegvertraege.konstante(wurzel / TARIFWELT_STUFE, JOB_FRIST_NAME)
+    if soll == minuten * 60:
+        return []
+    return [
+        f"{TARIFWELT_STUFE}: {JOB_FRIST_NAME} {soll} ≠ {GERAETE} timeout {minuten} min"
+    ]
+
+
 def nachtlauf_committet_zustand(wurzel: Path) -> list[str]:
     text = (wurzel / GERAETE).read_text(encoding="utf-8")
     zeilen = [z for z in text.splitlines() if "git add data/state" in z]
@@ -375,6 +389,7 @@ def ein_crawl_je_tag(wurzel: Path) -> list[str]:
 
 REGELN: tuple[Callable[[Path], list[str]], ...] = (
     jobfrist_passt_zu_radar,
+    tarifwelt_frist_ist_das_job_timeout,
     nachtlauf_committet_zustand,
     seitenbau_schluckt_nichts,
     render_hook_prueft_live,

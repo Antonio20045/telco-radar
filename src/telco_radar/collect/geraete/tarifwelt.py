@@ -243,44 +243,63 @@ def ohne_doppelkarte(saetze: list[dict]) -> list[dict]:
     return [s for s in saetze if not s.get("doppelkarte")]
 
 
-def rangliste_je_band(saetze: list[dict], leiter_gb) -> dict[str, list[dict]]:
-    """Je Sprosse der uebergebenen Baender-Leiter (Folge von `(key, gb)`) die
-    Tarife in Reihenfolge der Eignung - der erste ist DER Tarif des Bandes.
-    Zuerst bekommt jeder Tarif sein Band nach DERSELBEN Regel wie im
-    Bericht (`band_regel.stufe_fuer`, der Baustein hinter
+def tarife_mit_band(saetze: list[dict], leiter_gb) -> list[dict]:
+    """ALLE Tarife, die der Bericht in ein Band der uebergebenen Leiter (Folge
+    von `(key, gb)`) legt - je Tarif (`tarif_id`) einmal, nach Datenvolumen,
+    Monatspreis und ID sortiert (feste Reihenfolge). Das Band bestimmt
+    DIESELBE Regel wie im Bericht (`band_regel.stufe_fuer`, der Baustein hinter
     `report.geraete_tco_band.band_von_gb`; Sammeln importiert die
     Berichtsschicht nicht, `.importlinter`): naechstes Volumen, Gleichstand
-    das groessere, unbegrenzt in die oberste Stufe. Ein Tarif ohne
-    Band faellt weg. Je Band gewinnt das Volumen mit dem kleinsten Abstand
-    zum Bandwert (Gleichstand: das groessere), danach der niedrigere
-    Monatspreis. So steht kein Tarif in einem Band, in das der Bericht ihn
-    gar nicht legen wuerde. Die Folgeplaetze brauchen nur Geraete, fuer die
-    der erste Tarif nicht waehlbar ist (die Schnittstelle fuehrt Tarife auf,
-    die fuer ein Geraet eine leere Antwort geben)."""
+    das groessere, unbegrenzt in die oberste Stufe. Ein Tarif ohne Band
+    (Volumen fehlt oder keine passende Stufe) faellt weg: der Bericht wuerde
+    ihn in kein Band legen, ein Abruf dafuer waere vertan. Mehrere Tarife
+    desselben Bandes bleiben ALLE erhalten - gemessen wird jeder Tarif, welcher
+    davon im Bericht gezeigt wird, entscheidet nicht das Sammeln."""
+    leiter = tuple(leiter_gb)
+    gesehen: set[str] = set()
+    out: list[dict] = []
+    for satz in saetze:
+        tarif_id = satz["tarif_id"]
+        if tarif_id in gesehen:
+            continue
+        if stufe_fuer(satz.get("datenvolumen_gb"), leiter) is None:
+            continue
+        gesehen.add(tarif_id)
+        out.append(satz)
+
+    def rang(s: dict) -> tuple:
+        preis = s.get("grundgebuehr")
+        return (
+            s["datenvolumen_gb"],
+            float("inf") if preis is None else preis,
+            str(s.get("tarif_id")),
+        )
+
+    return sorted(out, key=rang)
+
+
+def kern_je_netz_und_band(saetze: list[dict], leiter_gb) -> set[str]:
+    """Die `tarif_id`s, die ZUERST gelesen werden: je (Netz, Band) der Tarif, dessen
+    Volumen dem Bandwert am naechsten liegt (Gleichstand: das groessere, dann der
+    niedrigere Monatspreis) - der Tarif, den die Auswahl vor dem 20.11.2026
+    allein las. Er ist nur noch eine Reihenfolge, keine Auswahl: reicht das
+    Zeitbudget der Stufe nicht fuer alle Tarife, bleibt so mindestens der alte
+    Stand. Band und Abstand wie in `tarife_mit_band` (`band_regel`)."""
     leiter = tuple(leiter_gb)
     gb_je_band = dict(leiter)
-    je_band: dict[str, list[dict]] = {}
+    je_gruppe: dict[tuple[str, str], list[dict]] = {}
     for satz in saetze:
         band = stufe_fuer(satz.get("datenvolumen_gb"), leiter)
         if band is not None:
-            je_band.setdefault(band, []).append(satz)
-    out: dict[str, list[dict]] = {}
-    for key, kandidaten in je_band.items():
-        ziel = gb_je_band[key]
+            je_gruppe.setdefault((str(satz.get("netz")), band), []).append(satz)
 
-        def rang(s: dict, ziel=ziel) -> tuple:
-            gb = s["datenvolumen_gb"]
-            unbegrenzt = gb == float("inf")
-            abstand = (
-                0.0 if unbegrenzt or gb == ziel else abstand_schluessel(gb, ziel)[0]
-            )
-            preis = s.get("grundgebuehr")
-            return (abstand, -gb, float("inf") if preis is None else preis)
+    def rang(satz: dict, ziel: float) -> tuple:
+        gb = satz["datenvolumen_gb"]
+        abstand = 0.0 if gb in (float("inf"), ziel) else abstand_schluessel(gb, ziel)[0]
+        preis = satz.get("grundgebuehr")
+        return (abstand, -gb, float("inf") if preis is None else preis)
 
-        out[key] = sorted(kandidaten, key=rang)
-    return out
-
-
-def waehle_je_band(saetze: list[dict], leiter_gb) -> dict[str, dict]:
-    """Je Band genau EIN Tarif: der erste der `rangliste_je_band`."""
-    return {k: v[0] for k, v in rangliste_je_band(saetze, leiter_gb).items()}
+    return {
+        min(gruppe, key=lambda s: rang(s, gb_je_band[band]))["tarif_id"]
+        for (_, band), gruppe in je_gruppe.items()
+    }
