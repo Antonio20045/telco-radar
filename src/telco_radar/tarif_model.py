@@ -84,9 +84,8 @@ def zeitreihen_basis(tid: str) -> str:
     gleichnamige, verschiedene Produkte wie o2-home-l-flex und
     -175-flex) bleibt stehen und trennt weiterhin zwei echte Tarife.
 
-    EINE STELLE FUER ZWEI VERWENDER (B3, 21.09.2026): `tco_model.
-    geraeteanteil()` vergleicht darueber Buendel und SIM-only-Referenz,
-    `tarif_bezug.Tarifbestand` darueber, welcher der zwei Saetze zu
+    EINE STELLE (B3, 21.09.2026; der Verwender `geraeteanteil` entfiel am
+    20.11.2026): `tarif_bezug.Tarifbestand` darueber, welcher der zwei Saetze zu
     welchem Vertrag gehoert, wenn er entscheidet, welche Lesart als
     AKTUELL gilt. Vorher stand dieselbe Kuerzung zweimal im Code (einmal
     hier, einmal privat in `tco_model.py`) - zwei Kopien einer

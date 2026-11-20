@@ -24,7 +24,6 @@ from .geraete_laufzeit import (
     LAUFZEITEN,
     NICHT_ERFASST,
     ansicht,
-    nur_ueber_24,
 )
 from .geraete_luecken_alternativen import (
     _alt_zeitraum,
@@ -102,10 +101,6 @@ def _luecken(
         )
         if not alle:
             grund = "gar-kein-buendel"
-        elif not eigene and any(
-            nur_ueber_24(k) and k.get("raten_laufzeit") == laufzeit for k in alle
-        ):
-            grund = "nur-24"
         elif not eigene:
             grund = "nicht-erfasst"
         elif not any(k.get("band") == band for k in eigene):
@@ -167,7 +162,6 @@ _KURZ = {
     "zaehlt-nicht": "Nicht im Vergleich",
     "kein-belastbares": "Kein vollständiger Preis",
     "nur-alte": "Kein aktueller Stand",
-    "nur-24": "Nur über 24 Monate verglichen",
 }
 
 
@@ -211,7 +205,7 @@ def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
             raten = " und ".join(str(a) for a in lu["andere_laufzeiten"])
             kurz += f" ({raten} Raten erfasst)"
         return _zeile(lu, kurz, kurz + ".")
-    if ohne_tarif and grund in ("anderes-band", "nur-24"):
+    if ohne_tarif and grund == "anderes-band":
         return _ohne_tarif_zeile(lu, band_labels, h)
     kurz = _KURZ.get(grund, _KURZ["anderes-band"])
     if grund == "anderer-zeitraum" and lu.get("monate") is not None:

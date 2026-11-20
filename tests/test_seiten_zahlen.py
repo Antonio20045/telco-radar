@@ -1188,14 +1188,20 @@ def test_die_band_spalte_nennt_die_stufe_der_zeile(tmp_path):
     assert gezeigt.get("Google Pixel 11 128 GB") == "–", gezeigt
 
 
-def test_die_delta_spalte_benennt_ihren_leergrund(tmp_path):
+def test_die_delta_spalte_benennt_ihren_leergrund(tmp_path, monkeypatch):
     """Sicht-Pruefung Wesentliches 3: 38 von 111 Zeilen der Live-Seite
     zeigten ein stummes "–" in der Delta-Spalte - TCO da, aber keine
     Vodafone-Referenz (Vodafone listet das Modell nicht). Das "–" ist
     seit dem Fix BENANNT ("keine Referenz", Grund im title); ein Modell
     OHNE Bündel behält das "–", weil seine TCO-Zelle den Grund schon
     nennt ("kein Bündel gemessen") - zwei verschiedene Stummen, nur eine
-    braucht das Etikett."""
+    braucht das Etikett. Der erfundene „A-Laden“ bekommt einen belegten Versand von
+    0 €: ohne Beleg hätte er seit 20.11.2026 keine Gesamtkosten (Lücke „Versand“)."""
+    from telco_radar import versandkosten
+
+    tabelle = dict(versandkosten.tabelle())
+    tabelle["a-laden"] = versandkosten.Versandangabe("A-Laden", 0.0)
+    monkeypatch.setattr(versandkosten, "_TABELLE", tabelle)
     site, g = _geraete_katalog_site(tmp_path)
     suppe = _katalog_suppe(site)
     zeilen = suppe.select("#gr-katalogtabelle .gr-k-zeile")

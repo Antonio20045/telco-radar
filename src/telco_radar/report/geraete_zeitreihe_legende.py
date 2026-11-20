@@ -37,7 +37,7 @@ def _mon_kurz(monate: list) -> str:
 
     Kurz, weil es im Bild neben dem Anbieternamen steht (Antonios Stil:
     wenig Text, keine Erklaerzeile). Die Zahlen sind GELESEN
-    (`_zeitraeume_aus` -> `Tco.leitzahl_monate`), nicht gerechnet; ohne
+    (`_zeitraeume_aus` -> `Kosten.monate`), nicht gerechnet; ohne
     lesbaren Zeitraum steht hier nichts - eine Annahme waere schlimmer
     als die Luecke (Clean Code 4).
     """

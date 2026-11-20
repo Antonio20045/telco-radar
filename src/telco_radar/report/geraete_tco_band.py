@@ -18,7 +18,7 @@ Die drei Regeln, die dieses Modul traegt
 -----------------------------------------
 1. **Gerechnet wird ausschliesslich in `tco_model`.** Dieses Modul liest
    die schon fertigen Karten aus `geraete_tco_karten.modelle()` (`gesamt`
-   ist bereits `tco_24().gesamt`) und gruppiert sie nach Band - es addiert
+   ist bereits `kosten_ueber().gesamt`) und gruppiert sie nach Band - es addiert
    keinen Euro.
 2. **Nur ECHTE Buendel, keine Naeherung.** Die Vodafone-Referenzkarte
    (`karte["naeherung"]`) ist kein Angebot, sondern ein Massstab - sie
@@ -398,7 +398,7 @@ def _balken(
     O1 (STRATEGIE_GERAETE_OPTIK §2): sortierte horizontale Balken
     "TCO-24 je Anbieter", der Wert GEDRUCKT, Δ zur Vodafone-Referenz
     DESSELBEN Bandes, Vodafone als Emphasis. Gerechnet wird nichts: jede
-    Zeile liest `gesamt` aus der Karte, die `tco_24()` schon gerechnet
+    Zeile liest `gesamt` aus der Karte, die `kosten_ueber()` schon gerechnet
     hat (Regel 1 des Modulkopfs); Δ ist Differenzbildung wie in
     `geraete_tco_karten._delta`.
 

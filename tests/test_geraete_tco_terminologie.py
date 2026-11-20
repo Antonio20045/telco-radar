@@ -135,9 +135,8 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     Monatsraten aus Tarif und Geraet zusammen; die aufgeteilt erhobene
     o2-Karte daneben sagt weiterhin Geräteraten.
 
-    Antonio 10.10.2026: 1&1 wird nur über 24 Monate verglichen. Die Bau-Zeile
-    nennt weiter die 36 Monate der Monatszahlung, gerechnet sind 24 Beträge
-    und die Ablöse danach.
+    Seit 20.11.2026 (1&1 „36 Monate Fix“, die Ablöse „24 + 12“ vom 10.10.2026 ist
+    entfallen) rechnet die Zahl alle 36 Beträge und die Einmalzahlung des Geräts.
 
     Datenkonzept Geräte Schritt 2: die Zahl rechnet über H = 36 Monate, einen
     offenen Rest gibt es nicht mehr. Ohne gemessene Gerätezuzahlung und
@@ -154,10 +153,9 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     bau = vorlage_text(eins.select_one(".gr-kk-bau"))
     assert bau.startswith("monatlich 44,99 € für Tarif und Gerät zusammen · 36 Monate")
     eins_text = vorlage_text(eins)
-    assert "gerechnet 24 Monate, dann Ablöse 360,00 €" in bau
-    assert "Gerechnet über 24 Monate" in eins_text
-    assert "auch die Ablöse nach Monat 24" in eins_text
-    assert "auch alle Monatsraten der eigenen Laufzeit" not in eins_text
+    assert "Gerät einmalig 360,00 €" in bau and "Ablöse" not in eins_text
+    assert "Gerechnet über 36 Monate" in eins_text
+    assert "auch alle Monatsraten der eigenen Laufzeit" in eins_text
     assert "danach noch offen" not in eins_text
     assert "Geräteraten" not in eins_text
     assert "davon in der" not in eins_text, "die Kappungsklammer ist tot"
@@ -170,9 +168,7 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     ohne = lager(tmp_path / "ohne-einmal")
     luecke = ohne.select_one('.gr-bnd[data-anbieter="1&1"]')
     assert "gr-bnd--leer" in luecke["class"] and not luecke.get("data-gesamt")
-    assert "Einmalzahlung bei Kündigung" in vorlage_text(
-        luecke.select_one(".gr-kk-luecke")
-    )
+    assert "Gerätezuzahlung" in vorlage_text(luecke.select_one(".gr-kk-luecke"))
 
 
 def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
@@ -184,8 +180,8 @@ def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
 
     Die Leitzahl rechnet BEIDE mit - sonst wäre die Zahl neben der Zeile
     eine zweite Rechnung für dieselbe Karte: 36 x 44,99 + 360 + 39,90
-    = 2.019,54 € (alle 36 Monate, A1). Seit 10.10.2026 (Antonio: 1&1 nur über
-    24 Monate) 24 x 44,99 + 360 Ablöse + 39,90 = 1.479,66 €.
+    = 2.019,54 € (alle 36 Monate, A1; vom 10.10. bis 20.11.2026 galten 24 Beträge
+    plus Ablöse, seit „36 Monate Fix“ wieder alle 36).
 
     Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
     wird das Fragment.
@@ -197,11 +193,11 @@ def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
     assert bau == (
         "monatlich 44,99 € für Tarif und Gerät zusammen · "
         "36 Monate · "
-        "gerechnet 24 Monate, dann Ablöse 360,00 € · Anschlusspreis 39,90 €"
+        "Gerät einmalig 360,00 € · Anschlusspreis 39,90 €"
     )
     text = vorlage_text(eins)
-    assert "1.479,66 € Kosten über 24 Monate" in text
-    assert "Kosten über 36 Monate" not in text
+    assert "2.019,54 € Kosten über 36 Monate" in text
+    assert "Kosten über 24 Monate" not in text
 
 
 def test_nur_der_barpreis_traegt_das_ohne_vertrag_etikett(tmp_path):
