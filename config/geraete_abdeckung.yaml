@@ -243,17 +243,6 @@ belegte_luecken:
     bis: "2026-12-03"
   - anbieter: o2
     modelle:
-      - samsung-galaxy-s26-ultra
-    speicher:
-      - 512gb
-    grund: Speicherstufe bei o2 nicht im Sortiment (geprüft 19.11.2026) - der Speicher-Wähler der Produktseite zeigt nur noch 256 GB, keine weitere Stufe und keine weitere Farbe; auch der eigene Katalog (/e-shop/rest/catalog/...) führt nur noch die 256gb-black-bw-SKU für dieses Modell
-    art: nicht_im_portfolio
-    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-1119/1-galaxys26ultra-512gb-nicht-waehlbar.png
-    original: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-black-bw-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
-    geprueft: "2026-11-19"
-    bis: "2026-12-03"
-  - anbieter: o2
-    modelle:
       - google-pixel-11
     speicher:
       - 512gb

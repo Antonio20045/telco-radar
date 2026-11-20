@@ -839,10 +839,10 @@
              aus derselben Karte, die die TCO-Spalte fuellt); ohne Band
              waehlt der Graph selbst sein erstes erlaubtes. `m.zr` siehe
              Kommentar oben - kein Link, wo der Sprung nicht trifft. #}
-          {% if m.zr %}<a class="gr-sprung"
+          {% if m.zr %}<a class="gr-sprung gr-sprung--klein"
             href="geraete.html?modell={{ m.schluessel }}{% if m.tco_band %}&amp;band={{ m.tco_band }}{% endif %}"
             data-modell="{{ m.schluessel }}"{% if m.tco_band %} data-band="{{ m.tco_band }}"{% endif %}
-            >Mit Tarif&nbsp;→</a>
+            title="Mit Tarif ansehen" aria-label="Mit Tarif ansehen">→</a>
           {# P5-Auftrag 1 (18.09.): ein Modell MIT Bündel, das (noch) nicht
              waehlbar ist - Auto-Eintrag unter der Messtag-Schwelle der Wahl
              (`AUTO_SICHTBAR_AB_MESTAGEN`, gegen Bündel-Messtage gerechnet).
@@ -930,6 +930,7 @@
           {%- set sv = stand_vom(m.tco_beleg.abgerufen_am, geraete.messdatum.juengster) -%}
           {%- if sv -%}{%- set _ = tco_titel.append(sv) -%}{%- endif -%}
         {%- endif -%}
+        {%- if m.tco_band_label -%}{%- set _ = tco_titel.append('Tarif ' ~ m.tco_band_label) -%}{%- endif -%}
         <td class="num gr-sp--tco" data-k="{{ spalten.tco }}"{% if tco_titel %} title="{{ tco_titel | join(', ') }}"{% endif %}>
           {%- if m.tco_ab is not none %}
           <span class="gr-k-ab">ab {{ m.tco_ab | euro }}</span>
@@ -938,7 +939,6 @@
             rel="noopener" title="Quelle bei {{ haendlername(m.tco_anbieter) }} öffnen">bei
             {{ haendlername(m.tco_anbieter) }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
           {% else %}<span class="gr-a-klein">bei {{ haendlername(m.tco_anbieter) }}</span>{% endif %}
-          {% if m.tco_band_label %}<span class="gr-a-klein gr-k-tarif">Tarif {{ m.tco_band_label }}</span>{% endif %}
           {%- else %}<span class="gr-a-klein">{{ m.tco_leer }}</span>{%- endif %}</td>
         <td class="num gr-sp--tco" data-k="{{ spalten.monat }}">{% if m.tco_monat is not none %}{{
           m.tco_monat | euro }}{% else %}–{% endif %}</td>

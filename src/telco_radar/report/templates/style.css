@@ -2504,6 +2504,20 @@ b,strong{font-weight:700}
   .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k]::before{content:attr(data-k) " ";
     font-family:var(--sans);font-size:12px;color:var(--ink-4)}
   .gr-katalog-mod>tbody>tr.gr-a-zeile>td .gr-a-klein{display:inline}
+  /* RUHIG-RUNDE3-1119: am Telefon bleibt die Karte bei Gerät, bestem
+     Preis, Händler und Unterschied - Ø/Monat und Stufe/Tarif stehen im
+     title der Preis-Zelle, keine eigene Kartenzeile mehr.
+     RUHIG-RUNDE3-1119-R4 (20.11.2026): in der TCO-Ansicht (Standard beim
+     Laden, Klasse `gr-katalog--tco`) gewann bisher die spezifischere
+     Block-Regel oben (0-4-3 gegen 0-3-3 dieser Regel), die zwei Zeilen
+     blieben sichtbar. Die zweite Zeile je Eigenschaft gilt nur fuer die
+     TCO-Klasse und ist dadurch selbst spezifischer (0-5-3), unabhaengig
+     von der Reihenfolge im Blatt - kein `!important` noetig. */
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k="Ø €/Monat"],
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k="Stufe"],
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td[data-k="Ø €/Monat"]:not(.gr-sp--barpreis),
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td[data-k="Stufe"]:not(.gr-sp--barpreis){
+    display:none}
   /* Die Leitzahl der Karte ist ihre groesste Schrift, nicht das Δ. */
   .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-k-ab{font-size:18px}
   .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-a-prozent{font-size:15px}
@@ -3653,6 +3667,11 @@ b,strong{font-weight:700}
 .wr-status--kein_buendel .wr-prozent,
 .wr-status--nicht_vergleichbar .wr-prozent{color:var(--ink-4);font-weight:400;
   font-style:italic}
+/* RUHIG-RUNDE3-1119: der Unterschied in "Alle Geräte" (gr-katalogtabelle)
+   ist die Nebenzeile einer Reihe, deren Leitzahl der Einzel-/TCO-Preis
+   bleibt - hier normal statt fett, anders als die Leitzahl-Prozente der
+   Radar-Abweichungsliste und der Detailzeilen (dort unveraendert). */
+#gr-katalogtabelle .wr-prozent{font-weight:400}
 /* E3 (17.09.2026): die DREI Sektionen der Radar-Tafel im Radar-Reiter von
    geraete.html - gleichwertig, jede mit derselben Trennlinie wie die
    Gruppen der Schwesterseite (S3: der Händler-Abschnitt ist kein "komischer
@@ -3736,6 +3755,11 @@ b,strong{font-weight:700}
    Katalog-Zeile; `.gr-a-modell`/`.gr-a-klein` sind bereits block) - der
    Link ist ein Weg der Zeile, kein Bestandteil des Titels. */
 td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
+/* RUHIG-RUNDE3-1119: der Katalog-Sprung "Alle Geräte" steht NICHT mehr
+   als eigene Zeile unter dem Modell ("Mit Tarif →" war die zweite
+   Textzeile jeder Reihe) - er bleibt ein stiller Pfeil direkt hinter dem
+   Titel; sein Ziel steht im title-Attribut, nicht mehr im sichtbaren Text. */
+td .gr-sprung--klein{display:inline;margin:0 0 0 7px;font-size:13px}
 /* P4 Schritt 2c: die MARKIERTE Katalog-Zeile nach einem Radar-Sprung -
    Rot als Akzent (Design-Regel 4): genau EINE Zeile markiert, solange
    bis ein anderer Sprung sie loest. */
@@ -4286,7 +4310,7 @@ body:not(.mit-buehne) main{padding-top:112px}
              color var(--t-hover) var(--ease-standard);
 }
 .kopf.kopf--gerollt .brand,.kopf.kopf--gerollt .navi,
-.kopf.kopf--gerollt .gsearch,.kopf.kopf--gerollt .kopf-newsletter{background:var(--glas-stark)}
+.kopf.kopf--gerollt .gsearch,.kopf.kopf--gerollt .kopf-newsletter{background:var(--paper-2)}
 .kopf .brand{grid-column:auto;display:flex;align-items:center;gap:10px;height:46px;
   padding:0 16px 0 12px;border-radius:var(--radius-pille);justify-content:flex-start}
 .kopf .brand-logo{width:22px;height:22px}
@@ -4313,7 +4337,7 @@ body:not(.mit-buehne) main{padding-top:112px}
 .kopf .gsearch{position:relative;display:flex;align-items:center;gap:8px;height:46px;
   width:190px;padding:0 10px 0 14px;border-radius:var(--radius-pille);margin:0;
   transition:width var(--t-hover) var(--ease-aus),background-color var(--t-hover) var(--ease-standard)}
-.kopf .gsearch:focus-within{width:270px;background:var(--glas-stark)}
+.kopf .gsearch:focus-within{width:270px;background:var(--paper-2)}
 .kopf .gsearch-lupe{flex:none;color:var(--glas-text-2)}
 .kopf .gsearch-input{flex:1;min-width:0;height:auto;padding:0;border:0;background:transparent;
   font-family:var(--schrift);font-size:14px;color:var(--glas-text);outline:none;box-shadow:none}
@@ -4324,7 +4348,7 @@ body:not(.mit-buehne) main{padding-top:112px}
   clip:rect(0 0 0 0);border:0}
 .kopf .kopf-newsletter{display:inline-flex;align-items:center;height:46px;padding:0 18px;
   border-radius:var(--radius-pille);font-size:14px;font-weight:500}
-.kopf .kopf-newsletter:hover,.kopf .kopf-newsletter.on{background:var(--glas-stark)}
+.kopf .kopf-newsletter:hover,.kopf .kopf-newsletter.on{background:var(--paper-2)}
 .uc-promo .subbar.subnav:not(.navi){display:none}
 
 /* ------------------------------------------------------------- BUEHNE -- */
