@@ -5848,7 +5848,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-mehr[open] summary{display:none}
 .gx-leer{color:var(--ink-3);font-size:18px;margin:18px 0}
 #gr-buendel{margin:14px 0 0;padding:0;border:0;background:none}
-#gr-bnd-gruppe > :not(.gr-anb-fehlliste):not(.gr-beleg-paare):not(.gr-beleg-laedt){display:none}
+#gr-bnd-gruppe > :not(.gr-anb-fehlliste):not(.gr-beleg-paare):not(.gr-beleg-laedt):not(.gr-preisbelege){display:none}
 #gr-bnd-gruppe .gr-beleg-laedt{margin:0;font-size:14px;color:var(--ink-3)}
 #gr-bnd-gruppe .gr-anb-fehlliste{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;padding:0;border:0}
 #gr-bnd-gruppe .gr-anb-fehlt{display:inline-flex;align-items:center;gap:8px;margin:0;padding:0;border:0;background:none;font-size:14px;color:var(--ink-3)}
@@ -6560,3 +6560,82 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   /* Am Handy immer zwei Spalten: schmaler, aber nie eine Kachel je Zeile. */
   .gr-pf-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* Beleg je Preis (Gegenprobe-Auftrag 20.11.2026): eine Zeile je Preis der Wahl,
+   aufgeklappt Quelle, Lesedatum, Rechenweg, Screenshot, Gegenprobe. Die Marke der
+   Gegenprobe bewertet keinen Anbieter, sie sagt nur, ob die Seite den Preis zeigt. */
+.gr-preisbelege{margin:14px 0 0;font-family:var(--sans);font-size:13px;color:var(--ink-3)}
+.gr-pb-knopf{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;width:100%;
+  margin:0;padding:6px 0;border:0;background:none;font:inherit;color:inherit;
+  text-align:left;cursor:pointer}
+.gr-pb-knopf::after{content:"+";margin-left:auto;color:var(--ink-4);font-weight:400}
+.gr-pb-knopf[aria-expanded="true"]::after{content:"–"}
+.gr-pb-kopf{font-size:13px;font-weight:600;color:var(--ink-2)}
+.gr-pb-kopf::after{margin-left:6px}
+.gr-pb-zahl{font-weight:400;color:var(--ink-3)}
+.gr-preisbelege[hidden],.gr-pb[hidden]{display:none}
+.gr-pb{border-top:1px solid var(--rule-2)}
+.gr-pb>summary{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;
+  padding:6px 0;cursor:pointer}
+.gr-pb-anb{font-weight:600;color:var(--ink-2);border-left:3px solid var(--anb,var(--anb-ersatz));
+  padding-left:6px}
+.gr-pb-tarif{flex:1 1 12em;min-width:0;overflow-wrap:anywhere}
+.gr-pb-summe{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.gr-pb-gp{font-size:12px;padding:1px 7px;border-radius:999px;border:1px solid var(--rule);
+  white-space:nowrap}
+.gr-pb-gp--bestaetigt{color:var(--gruen-tief);border-color:var(--gruen-tief)}
+.gr-pb-gp--bestaetigt::before{content:"✓ "}
+.gr-pb-gp--abweichend{color:var(--red-text);border-color:var(--red-text)}
+.gr-pb-gp--abweichend::before{content:"≠ "}
+.gr-pb-gp--nicht_pruefbar,.gr-pb-gp--offen{color:var(--ink-4)}
+.gr-pb-daten{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;
+  margin:2px 0 10px}
+.gr-pb-daten dt{color:var(--ink-4)}
+.gr-pb-daten dd{margin:0;min-width:0;overflow-wrap:anywhere;color:var(--ink-2)}
+.gr-pb-term{white-space:nowrap}
+.gr-pb-ergebnis{color:var(--ink)}
+.gr-pb-bild{display:block;width:240px;max-width:100%;height:auto;min-height:40px;
+  background:var(--rule-2);border:1px solid var(--rule)}
+.gr-pb-bildzeile,.gr-pb-abw,.gr-pb-grund{display:block;font-size:12px;color:var(--ink-3)}
+.gr-pb-abw{color:var(--red-text)}
+@media (max-width:600px){
+  .gr-pb>summary,.gr-pb-zeile{display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+  .gr-pb-zeile::after{grid-column:2;grid-row:3}
+  .gr-pb-anb{grid-column:1/-1}
+  .gr-pb .gr-pb-gp{justify-self:start}
+  .gr-pb-daten{grid-template-columns:1fr;gap:0 0;margin-left:0}
+  .gr-pb-daten dt{margin-top:6px}
+  .gr-pb-term{white-space:normal}
+}
+.gr-pb-mehr{margin:8px 0 0;font-size:12.5px}
+/* Seite Preisänderungen: je Tag ein Aufklapper, je Änderung alt → neu und die
+   Belege beider Tage (dieselben Belege wie an der Preiszeile). */
+.pa{margin:8px auto 40px;font-family:var(--sans)}
+.pa-leer{color:var(--ink-3)}
+.pa-tag{border-top:1px solid var(--rule);padding:6px 0}
+.pa-tag>summary{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;cursor:pointer;
+  padding:8px 0;font-size:15px}
+.pa-datum{font-size:18px;color:var(--ink)}
+.pa-zahl{color:var(--ink-2)}
+.pa-gp{font-size:12.5px;color:var(--ink-3)}
+.pa-liste{list-style:none;margin:0;padding:0}
+.pa-zeile{border-top:1px solid var(--rule-2);padding:10px 0}
+.pa-zeile p{margin:0 0 3px}
+.pa-kopf{font-size:14px;color:var(--ink-2);overflow-wrap:anywhere}
+.pa-preis{font-size:15px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.pa-preis b{color:var(--ink);font-size:17px}
+.pa-delta{font-size:13px;color:var(--ink-3);margin-left:4px}
+.pa-posten{font-size:12.5px;color:var(--ink-3)}
+.pa-belege{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;font-size:13px}
+.pa-belege .gr-pb{border-top:0}
+@media (max-width:700px){.pa-belege{grid-template-columns:1fr}}
+.pa-tage{list-style:none;margin:0;padding:0}
+.pa-tageszeile{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;
+  border-top:1px solid var(--rule-2);padding:10px 0}
+.pa-tageszeile .pa-datum{font-size:18px;font-weight:600}
+.pa-export{margin-left:auto;font-size:12.5px}
+.pa-hinweis{font-size:13px;color:var(--ink-3)}
+.gr-pb>summary{list-style:none}
+.gr-pb>summary::-webkit-details-marker{display:none}
+.gr-pb>summary::after{content:"+";margin-left:auto;color:var(--ink-4)}
+.gr-pb[open]>summary::after{content:"–"}

@@ -186,8 +186,14 @@ def gespeicherte_werte(buendel: Mapping) -> dict:
 
 
 def geaendert(heute: Mapping, vortag: Mapping) -> bool:
-    """Ob sich Gesamtkosten oder ein Posten zwischen zwei Messungen geändert haben."""
-    for f in AENDERUNGSFELDER:
+    """Ob sich Gesamtkosten oder ein Posten zwischen zwei Messungen geändert haben.
+
+    Wechselt nur die Rechenweise (``rechenweise``, etwa 1&1 am 20.11.2026), zählen nur
+    die Posten: eine andere Formel ist keine Preisänderung."""
+    felder: tuple[str, ...] = AENDERUNGSFELDER
+    if heute.get("rechenweise") != vortag.get("rechenweise"):
+        felder = FELDER
+    for f in felder:
         a, b = heute.get(f), vortag.get(f)
         if (a is None) != (b is None):
             return True

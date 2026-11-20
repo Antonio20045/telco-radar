@@ -1,0 +1,35 @@
+{# Preisänderungen eines Messtags (geraete_preisaenderungen.seiten): je geändertem
+   Bündel alt → neu und der Beleg beider Tage (Quelle, gelesen am, Rechenweg,
+   Screenshot, Gegenprobe). Die größten `zeilen_je_tag` stehen hier, alle im
+   Export des Tages. #}
+{% extends "base.html.j2" %}
+{% set active = 'geraete' %}
+{% from "_geraete_preisbeleg.html.j2" import beleg_inhalt, gp_marke %}
+{% block title %}Vodafone Product and Services Insights · Preisänderungen {{ tag.datum_de }}{% endblock %}
+
+{% macro tagesbeleg(t, a) %}<details class="gr-pb pa-beleg">
+  <summary><span class="gr-pb-tarif">Beleg {{ t.datum_de }}</span><span class="gr-pb-summe">{{ t.gesamt | euro }}</span>{{ gp_marke(t.beleg.gegenprobe) }}</summary>
+  {{ beleg_inhalt(t.beleg, a.anbieter ~ ', ' ~ a.tarif) }}
+</details>{% endmacro %}
+
+{% block content %}
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker"><a href="{{ prefix }}geraete-preisaenderungen.html">Preisänderungen</a></p>
+      <h1>{{ tag.datum_de }}: {{ tag.aenderungen | length }} {{ 'Preis' if tag.aenderungen | length == 1 else 'Preise' }} geändert</h1>
+    </div>
+  </div>
+</section>
+<section class="pa wide">
+  {% if tag.aenderungen | length > zeilen | length %}<p class="pa-hinweis">Die {{ zeilen | length }} größten Änderungen; alle {{ tag.aenderungen | length }} mit denselben Angaben im <a href="{{ tag.datum }}.csv" download>Export</a>.</p>{% endif %}
+  <ul class="pa-liste">{% for a in zeilen %}
+    <li class="pa-zeile" style="--anb:{{ a.anb_farbe }}">
+      <p class="pa-kopf"><b class="gr-pb-anb">{{ a.anbieter }}</b> {{ a.geraet }} · {{ a.tarif }}{% if a.raten %} · {{ a.raten }} Raten{% endif %}</p>
+      <p class="pa-preis">{{ a.alt.gesamt | euro }} → <b>{{ a.neu.gesamt | euro }}</b>{% if a.delta is not none %} <span class="pa-delta">{{ '+' if a.delta > 0 else '−' }}{{ (a.delta | abs) | euro }}</span>{% endif %}</p>
+      {% if a.posten %}<p class="pa-posten">{{ a.posten | join(' · ') }}</p>{% endif %}
+      <div class="pa-belege">{{ tagesbeleg(a.alt, a) }}{{ tagesbeleg(a.neu, a) }}</div>
+    </li>{% endfor %}
+  </ul>
+</section>
+{% endblock %}

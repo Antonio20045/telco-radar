@@ -41,7 +41,7 @@ from ..beleg_regeln import (
     anbieter_schluessel,
     ist_anzeige_neu,
 )
-from . import geraete_zeilenbelege
+from . import geraete_preisbeleg, geraete_zeilenbelege
 from .ausfall import Ausfall
 from .geraete_preisstand import anzeige as preis_anzeige
 
@@ -178,7 +178,7 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
         )
 
     env.globals["paarbelege"] = paare_fuer
-    return ausfaelle
+    return ausfaelle + geraete_preisbeleg.installiere(env, state_dir, zeilen)
 
 
 def zeilenbelege(env: Any, state_dir: Path, katalog: Any) -> list[Ausfall]:

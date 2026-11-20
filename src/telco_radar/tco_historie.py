@@ -54,6 +54,23 @@ def zeilen(altdatei: Path) -> list[str]:
     return out
 
 
+def tage(altdatei: Path) -> list[tuple[str, list[dict]]]:
+    """Die Tagesdateien in Datumsfolge als (Datum, Zeilen); eine unlesbare Zeile fällt
+    mit Log weg, die Altdatei zählt nicht."""
+    out: list[tuple[str, list[dict]]] = []
+    for pfad in sorted(ordner(altdatei).glob("*.jsonl")):
+        saetze = []
+        for zeile in pfad.read_text(encoding="utf-8").splitlines():
+            if not zeile.strip():
+                continue
+            try:
+                saetze.append(json.loads(zeile))
+            except json.JSONDecodeError:
+                log.warning("%s: unlesbare Zeile übersprungen", pfad.name)
+        out.append((pfad.stem, saetze))
+    return out
+
+
 def schreibe_tag(altdatei: Path, datum: str, saetze: list[dict]) -> bool:
     """Fügt ``saetze`` in die Tagesdatei ein; (id, datum) ersetzt, nie doppelt.
 
