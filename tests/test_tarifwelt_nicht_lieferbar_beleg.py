@@ -99,9 +99,7 @@ def _hole(uebersichten: dict[str, str]):
 
 
 def _stufe(monkeypatch, tco, hole, modelle):
-    monkeypatch.setattr(
-        geraete_tarifwelt, "pflicht_modelle", lambda: frozenset(modelle)
-    )
+    monkeypatch.setattr(geraete_tarifwelt, "modelle_der_stufe", lambda: sorted(modelle))
     monkeypatch.setattr(geraete_tarifwelt.time, "sleep", lambda s: None)
     return geraete_tarifwelt.stufe(
         _Quellen([_Quelle(tarifwelt_bestand.METHODE, True)]),

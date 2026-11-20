@@ -25,7 +25,6 @@ from dataclasses import dataclass, field
 from . import tarifwelt_bestand, tarifwelt_lieferbar
 from .collect.geraete import tarifwelt_lauf
 from .collect.geraete.basis import GeraeteAbrufFehler
-from .collect.geraete.buendel_prioritaet import pflicht_modelle
 from .geraete_abruf import hole_fuer_anbieter
 from .report.geraete_tco_band import tarifleiter
 from .tco_model import Buendel
@@ -34,10 +33,47 @@ log = logging.getLogger(__name__)
 
 METHODE = tarifwelt_bestand.METHODE
 
+JOB_FRIST_SEKUNDEN = 70 * 60.0
+"""`timeout-minutes: 70` von `.github/workflows/geraete.yml` (Test: gleicher Wert)."""
+VORLAUF_SEKUNDEN = 144.0
+"""Zeit im Job VOR der Pipeline (checkout, pip): groesster gemessener Wert 96 s mal
+1,5. Gemessen in elf Laeufen des Geraete-Workflows (Lauf-ID: Sekunden vor der
+Pipeline / Sekunden nach der Pipeline, Stand 20.11.2026): 44728882384: 71/433,
+44693241299: 90/439, 44677895584: 96/475, 44503990162: 75/174, 44502114989: 65/385,
+44223298480: 80/395, 44129470685: 73/390, 44101475128: 59/309, 44066902790: 46/312,
+43840950648: 77/300, 43698541511: 43/305."""
+NACH_SCHRITTE_SEKUNDEN = 720.0
+"""Alle Schritte NACH "Run geraete stage" in `.github/workflows/geraete.yml`
+(Belege-Manifest, Commit state, Render site, Commit site, Render-Hook, Alarme,
+Buendelwaechter): groesster gemessener Wert 475 s mal 1,5, aufgerundet (Tabelle
+bei `VORLAUF_SEKUNDEN`; die Schritte selbst tragen ausser dem Belege-Manifest
+mit 5 min kein eigenes Limit, der Render-Hook braucht gemessen bis 168 s)."""
+IN_PIPELINE_NACH_STUFE_SEKUNDEN = 60.0
+"""Arbeit der Pipeline nach der Tarifwelt-Stufe (Pruefstelle, Speichern, Bilanz);
+gemessen 15 s im Lauf 44728882384."""
+RESERVE_NACH_STUFE_SEKUNDEN = NACH_SCHRITTE_SEKUNDEN + IN_PIPELINE_NACH_STUFE_SEKUNDEN
+
+
+def stufen_frist(vergangen_sekunden: float) -> float:
+    """Das Zeitbudget der Stufe: die Restzeit des Jobs, gerechnet ab dem Start der
+    Pipeline: `JOB_FRIST_SEKUNDEN` minus `VORLAUF_SEKUNDEN` minus die seither
+    vergangene Zeit minus `RESERVE_NACH_STUFE_SEKUNDEN`, nie unter null. Keine
+    feste Zahl und keine Obergrenze: wird die Sammelphase kuerzer, fliesst die
+    frei gewordene Zeit sofort in die Tarifwelt."""
+    rest = (
+        JOB_FRIST_SEKUNDEN
+        - VORLAUF_SEKUNDEN
+        - vergangen_sekunden
+        - RESERVE_NACH_STUFE_SEKUNDEN
+    )
+    return max(0.0, rest)
+
 
 @dataclass
 class Ergebnis:
-    """Was die Stufe liefert; `status`: "aus", "ok", "keine_leiter", "abgebrochen"."""
+    """Was die Stufe liefert; `status`: "aus", "ok", "keine_leiter", "abgebrochen",
+    "frist" (Zeitbudget aufgebraucht, `ungelesen` nennt die Modelle, die nicht
+    mehr drankamen)."""
 
     status: str = "aus"
     buendel: list[Buendel] = field(default_factory=list)
@@ -46,6 +82,7 @@ class Ergebnis:
     nicht_lieferbar: list[tuple[str, int]] = field(default_factory=list)
     abrufe: int = 0
     modelle: int = 0
+    ungelesen: list[str] = field(default_factory=list)
     grund: str = ""
 
     def als_dict(self) -> dict:
@@ -58,8 +95,17 @@ class Ergebnis:
             "nicht_lieferbar": len(self.nicht_lieferbar),
             "abrufe": self.abrufe,
             "modelle": self.modelle,
+            "ungelesen": list(self.ungelesen),
             "grund": self.grund,
         }
+
+
+def modelle_der_stufe() -> list[str]:
+    """Die Modelle, die die Stufe liest: ALLE Katalogmodelle mit Tarifwelt-Seite
+    (`tarifwelt_modelle.MODELL_SLUGS`), Pflichtmodelle zuerst. Frueher gefiltert
+    auf die Pflichtmodelle des Waechters - dann blieben die 20 weiteren,
+    sitemap-bestaetigten Modelle (Baupaket P6) fuer immer ungelesen."""
+    return list(tarifwelt_lauf.MODELL_SLUGS)
 
 
 def quelle_aktiv(quellen) -> bool:
@@ -75,10 +121,20 @@ def lauf(
     hole: Callable,
     abgerufen_am: str,
     warte: Callable[[float], None] | None = None,
+    frist_sekunden: float | None = None,
+    monoton: Callable[[], float] = time.monotonic,
+    bekannt: dict | None = None,
 ) -> Ergebnis:
-    """Alle Pflichtmodelle der Tarifwelt, wenn die Quelle aktiv ist. Bricht eine
+    """ALLE Modelle der Tarifwelt (`MODELL_SLUGS`, Pflichtmodelle zuerst), wenn die
+    Quelle aktiv ist - nicht nur die Pflichtmodelle des Waechters. Bricht eine
     Schutzantwort ein Modell ab, bleiben davon nur die schon gelesenen nicht
-    lieferbaren Stufen, nie halbe Preise."""
+    lieferbaren Stufen, nie halbe Preise. Zwei Runden: erst je Modell der Kern
+    (je Netz und Band der Tarif der frueheren Auswahl,
+    `tarifwelt.kern_je_netz_und_band`), dann alle uebrigen Tarife; Uebersicht und
+    Tarifliste werden nur einmal gelesen. `frist_sekunden`: das Zeitbudget der
+    Stufe, vor jedem Tarif geprueft. Ist es aufgebraucht, haben alle Modelle,
+    die drankamen, mindestens den Stand vor dem 20.11.2026; der Rest steht in
+    `ungelesen` (Status "frist")."""
     warte = warte or time.sleep
     ergebnis = Ergebnis()
     if not quelle_aktiv(quellen):
@@ -88,36 +144,81 @@ def lauf(
         ergebnis.status = "keine_leiter"
         ergebnis.grund = "keine Vodafone-Tarifleiter im Tarifbestand - kein Abruf"
         return ergebnis
-    modelle = [m for m in tarifwelt_lauf.MODELL_SLUGS if m in pflicht_modelle()]
+    modelle = modelle_der_stufe()
     ergebnis.status = "ok"
-    for modell in modelle:
-        teil = tarifwelt_lauf.Lauf()
-        try:
+    beginn = monoton()
+
+    def weiter() -> bool:
+        return frist_sekunden is None or monoton() - beginn < frist_sekunden
+
+    teile: list[tuple[str, tarifwelt_lauf.Lauf]] = []
+    unberuehrt: list[str] = []
+    aktuell = [tarifwelt_lauf.Lauf()]
+    try:
+        for modell in modelle:
+            if not weiter():
+                unberuehrt.append(modell)
+                continue
+            teil = tarifwelt_lauf.Lauf()
+            teile.append((modell, teil))
+            aktuell[0] = teil
             tarifwelt_lauf.lies_modell(
-                modell, leiter, hole, abgerufen_am, warte=warte, lauf=teil
+                modell,
+                leiter,
+                hole,
+                abgerufen_am,
+                warte=warte,
+                lauf=teil,
+                nur_kern=True,
+                weiter=weiter,
+                bekannt=bekannt,
             )
-        except GeraeteAbrufFehler as fehler:
-            ergebnis.nicht_lieferbar.extend(teil.nicht_lieferbar)
-            ergebnis.status = "abgebrochen"
-            ergebnis.grund = str(fehler)
-            log.warning("Tarifwelt: Lauf abgebrochen bei %s: %s", modell, fehler)
-            break
+        for _, teil in teile:
+            aktuell[0] = teil
+            tarifwelt_lauf.lies_offene(teil, hole, abgerufen_am, warte, weiter=weiter)
+    except GeraeteAbrufFehler as fehler:
+        schuldig = aktuell[0]
+        ergebnis.nicht_lieferbar.extend(schuldig.nicht_lieferbar)
+        teile = [(m, t) for m, t in teile if t is not schuldig]
+        ergebnis.status = "abgebrochen"
+        ergebnis.grund = str(fehler)
+        log.warning("Tarifwelt: Lauf abgebrochen: %s", fehler)
+    for _, teil in teile:
         ergebnis.modelle += 1
         ergebnis.buendel.extend(teil.buendel)
         ergebnis.tarife.update(teil.tarife)
         ergebnis.luecken.extend(teil.luecken)
         ergebnis.nicht_lieferbar.extend(teil.nicht_lieferbar)
         ergebnis.abrufe += teil.abrufe
+    if ergebnis.status == "ok":
+        ergebnis.ungelesen = unberuehrt + [m for m, t in teile if t.offen]
+        if ergebnis.ungelesen:
+            ergebnis.status = "frist"
+            ergebnis.grund = (
+                f"Zeitbudget {frist_sekunden:.0f} s aufgebraucht, "
+                f"{len(ergebnis.ungelesen)} Modelle nicht vollstaendig gelesen"
+            )
+            log.warning("Tarifwelt: %s", ergebnis.grund)
     return ergebnis
 
 
 def stufe(
-    quellen, bestand, hole: Callable, uhr: Callable, heute: str, zustand, tco
+    quellen,
+    bestand,
+    hole: Callable,
+    uhr: Callable,
+    heute: str,
+    zustand,
+    tco,
+    beginn: float | None = None,
 ) -> dict:
     """Die Stufe im Tageslauf (`geraete_pipeline.run_geraete_stage`): lesen,
     Buendel und Stammdaten der Tarife (`TcoDB.haendler_tarife`) in den TCO-Store,
     aeltere Buendel nicht lieferbarer Stufen markiert (`tarifwelt_lieferbar`);
-    `tco.save` sichert alles in `geraete_tco.json`.
+    `tco.save` sichert alles in `geraete_tco.json`. `beginn` ist `time.monotonic()`
+    beim Start des Tageslaufs; daraus rechnet
+    `stufen_frist` das Zeitbudget der Stufe gegen die Restzeit
+    des Jobs (ohne `beginn` gibt es keins).
     Die Abrufe gehen durch dieselbe `Abrufschleuse` (robots.txt, Besuchsfenster)
     wie die uebrigen Quellen. Wirft nie: ein Fehler kostet nur diese Stufe."""
     if not quelle_aktiv(quellen):
@@ -129,6 +230,10 @@ def stufe(
             bestand.je_id_aktuell,
             hole_fuer_anbieter(hole, anbieter, uhr),
             heute,
+            frist_sekunden=(
+                None if beginn is None else stufen_frist(time.monotonic() - beginn)
+            ),
+            bekannt=tarifwelt_lauf.plain_halter(tco.buendel()),
         )
         if ergebnis.buendel:
             tco.upsert_buendel(ergebnis.buendel, heute)
