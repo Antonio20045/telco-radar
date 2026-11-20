@@ -1673,8 +1673,10 @@ anbieter:
     # Tarifdetail-Seiten je Tarif mit Smartphone (Einstiege `kind: klick` in
     # config/geraete_quellen.yaml, wörtlich die data-iframe-Adressen der
     # Tarifübersichten vom 29.09.2026, ohne Unlimited XS „Ohne Handy“). Gelesen
-    # wird nur der Anschlusspreis je Tarif-Slug (`einsundeins.anschluss_saetze`);
-    # er kommt auf jeden Produktseiten-Satz mit demselben Tarif (Pitch 2, Schnitt 3).
+    # wird nur der Anschlusspreis je Tarif-Slug und Tarifname
+    # (`klickanschluss.anschluss_saetze`); er kommt auf jeden Produktseiten-Satz mit
+    # demselben Tarif (Pitch 2, Schnitt 3; seit 20.11.2026 über den Namen der Kachel,
+    # Unlimited XL heißt dort `…-xl-mvl`, hier `…-xl-ovl`).
     uebersichten:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
@@ -1683,18 +1685,10 @@ anbieter:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
-      # Danach die sieben Geräteraster (Pitch 2, Schnitt 4; `klickraster`): je Tarif
-      # alle Geräte an der vorausgewählten Speichergröße. Nach den Detailseiten: deren
-      # Anschluss tragen seit Schnitt 3 auch die Produktseiten-Sätze, er bleibt vorn. Das
-      # Raster All-Net-Flat S zuerst, denn ohne es ist keine Größe gemessen und kein
-      # anderes Raster wird Rohsatz. Seine Sätze selbst werden keine Rohsätze.
-      - https://mobile.1und1.de/smartphones-all-net-flat-s
-      - https://mobile.1und1.de/smartphones-all-net-flat-m
-      - https://mobile.1und1.de/smartphones-all-net-flat-l
-      - https://mobile.1und1.de/smartphones-unlimited-s
-      - https://mobile.1und1.de/smartphones-unlimited-m
-      - https://mobile.1und1.de/smartphones-unlimited-l
-      - https://mobile.1und1.de/smartphones-unlimited-xl
+      # Die sieben Geräteraster (smartphones-all-net-flat-s … -unlimited-xl) stehen
+      # seit 20.11.2026 nicht mehr hier: ihre Kacheln lesen sich seit dem Shop-Umbau
+      # nicht mehr („ohne €/Monat*“), und jede Produktseite liest jetzt alle sieben
+      # Tarife je Speicher und Laufzeit selbst (Karte, Tarifauswahl im Bestellweg).
     seiten:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256

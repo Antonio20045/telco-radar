@@ -561,12 +561,11 @@ def test_aus_rohsaetzen_reicht_buendel_monatlich_durch():
     assert tco_24(bilanz.buendel[0]).gesamt == pytest.approx(1619.64)
 
 
-def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
-    """1&1 nennt keinen strukturierten Zustand; die Sätze laufen durch
-    denselben `lies_listung`-Weg wie jede Listung und erben dessen
-    Erkennung (kein Kennzeichen in Titel/Farbe/Hinweis -> neu). Ein
-    Bündel ohne belegten Zustand wäre in der Tafel nicht vergleichbar
-    (QA-Befund B1)."""
+def test_der_zustand_kommt_aus_dem_titelweg_ohne_buendel(katalog, farben):
+    """1&1 nennt keinen strukturierten Zustand; die Listung läuft durch denselben
+    `lies_listung`-Weg wie jede Listung und erbt dessen Erkennung (QA-Befund B1).
+    Seit 20.11.2026 entsteht dabei kein Bündel mehr (nur der Klick-Lauf misst
+    1&1)."""
     seite = _fixture("einsundeins_produktseite_galaxy_a57.html.gz").replace(
         "AWESOME_GRAY-128", "GRAU_ERNEUERT-128"
     )
@@ -588,9 +587,8 @@ def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
         jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
-    assert [b["zustand"] for b in bilanz.buendel] == ["refurbished", "neu"]
-    assert "refurbished" in bilanz.buendel[0]["sku_id"]
-    assert "refurbished" not in bilanz.buendel[1]["sku_id"]
+    assert bilanz.buendel == []
+    assert [x.zustand for x in bilanz.listungen] == ["neu"]
 
 
 def _anbieter():
@@ -617,11 +615,10 @@ def _katalogseite(ziel: str) -> str:
     return f'<a class="hardware-box__heading" href="{ziel}">Gerät</a>'
 
 
-def test_sammle_liefert_listung_und_buendel_aus_einer_antwort(katalog, farben):
-    """B1-Muster für 1&1: dieselbe Produktseiten-Antwort liefert die
-    LISTUNG (ld+json) und die BÜNDEL je Speichergröße (Preiskarte). Die
-    Produktseite wird GENAU EINMAL abgerufen - kein zweiter Request für
-    die zweite Lesart."""
+def test_sammle_liefert_nur_noch_die_listung(katalog, farben):
+    """Seit 20.11.2026 ohne Bündelweg: dieselbe Produktseiten-Antwort liefert nur
+    noch die LISTUNG (ld+json); die Bündel misst der Klick-Lauf. Die Produktseite
+    wird genau einmal abgerufen."""
     abrufe: list[str] = []
 
     def hole(url, kopfzeilen=None, user_agent=None):
@@ -644,36 +641,28 @@ def test_sammle_liefert_listung_und_buendel_aus_einer_antwort(katalog, farben):
     assert bilanz.status == "ok"
     assert abrufe == [_A57_URL]
     assert len(bilanz.listungen) == 1
-    assert len(bilanz.buendel) == 2
-    b = bilanz.buendel[0]
-    assert b["anbieter"] == "1&1"
-    assert b["tarif_name"] == "1&1 All-Net-Flat S"
-    assert b["buendel_monatlich"] == 25.99
-    assert b["zustand"] == "neu"
-    assert b["quelle_url"] == _A57_URL
+    assert bilanz.buendel == []
 
 
-def test_adapter_registry_traegt_den_buendelhaken():
+def test_adapter_registry_traegt_keinen_buendelweg_mehr():
+    """Seit 20.11.2026 misst nur der Klick-Lauf 1&1-Bündel (ein Weg je Anbieter);
+    der Adapter behält Ernte und Listung, ohne Bündelhaken."""
     adapter = ADAPTER["einsundeins_buendel"]
-    assert adapter.lies_buendel is not None
-    assert adapter.buendel_auf_produktseite is True
-    assert adapter.loese_tarifnamen is None
-    from telco_radar.collect.geraete.einsundeins import ergaenze_buendel
-
-    assert adapter.ergaenze_buendel is ergaenze_buendel
+    assert adapter.lies_buendel is None
+    assert adapter.ergaenze_buendel is None
+    assert adapter.ernte is not None
 
 
-def test_die_konfiguration_braucht_keinen_buendel_einstieg():
-    """1&1 braucht anders als Telekom (tariffId) und congstar (Tarifseiten)
-    KEINE eigenen Bündel-Einstiege: die Kategorieseite des Bestands ern-
-    tet die Produktseiten, und auf jeder steht die Karte. Ein Eintrag
-    `kind: buendel` auf einer Produktadresse wäre ein zweiter Abruf
-    derselben Antwort."""
+def test_die_konfiguration_hat_keinen_einstieg_des_geraetelaufs():
+    """Seit 20.11.2026 kein Einstieg des Gerätelaufs für 1&1: die Kategorieseite
+    wird nicht mehr geerntet, Preise kommen nur aus dem Klick-Lauf
+    (`erfassung: klick`)."""
     from telco_radar.geraete_config import lade_quellen
 
     quellen = lade_quellen(_WURZEL)
     anbieter = next(a for a in quellen.anbieter if a.name == "1&1")
-    assert [e.kind for e in anbieter.einstiege] == ["static"]
+    assert [e.kind for e in anbieter.einstiege] == []
+    assert (anbieter.crawlbar, anbieter.erfassung) == (False, "klick")
 
 
 def _neue_seite(

@@ -160,12 +160,14 @@ class Textmuster:
 
     Ohne ``selektor`` im Text der Zusammenfassung, sonst im Text des ersten Treffers,
     mit ``attribut`` in dessen Attribut (congstar „Mindestlaufzeit von 0 Monaten“ am
-    Input, das Label „Ohne Laufzeit“ nennt keine Zahl).
+    Input, das Label „Ohne Laufzeit“ nennt keine Zahl). ``summe``: weitere Muster, deren
+    Werte dazukommen (1&1: Tarifpreis der Kachel plus Geräterate der Preisleiste).
     """
 
     muster: re.Pattern[str]
     selektor: str | None = None
     attribut: str | None = None
+    summe: tuple[Textmuster, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -200,12 +202,13 @@ class Wertpfad:
     """Ein Pfad (oder Parametername) mit Muster und Einheit.
 
     ``muster`` nimmt aus dem Wert als Text die erste Gruppe; ``einheit`` rechnet um
-    (``cent`` in Euro, ``mb`` in GB zu 1024 MB).
+    (``cent`` in Euro, ``mb`` in GB zu 1024 MB); ``summe``: Pfade weiterer Beträge.
     """
 
     pfad: str
     muster: re.Pattern[str] | None = None
     einheit: str | None = None
+    summe: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -214,7 +217,8 @@ class Antwortmuster:
 
     Genau eines von ``url_muster`` (mitgeschnittene Antwort), ``skript`` (JSON im
     ersten Treffer des CSS-Selektors), ``globale`` (globale Variablen der Seite) und
-    ``seitenwerte`` (die benannten Seitenwerte, Pfad ist ihr Name).
+    ``seitenwerte`` (die benannten Seitenwerte, Pfad ist ihr Name) und ``kachel`` (JSON
+    im Attribut ``attribut`` des ersten Treffers in der gelesenen Kachel).
     ``laden``: die Antwort gilt für jede Kombination, nicht nur für den Klick, nach dem
     sie kam; ``start``: die Quelle gilt nur, bis die Seite zum ersten Mal geklickt
     wurde. ``erkennung`` wählt unter Antworten derselben Adresse die mit einem Wert an
@@ -236,6 +240,8 @@ class Antwortmuster:
     erkennung: str | None = None
     segment: re.Pattern[str] | None = None
     platzhalter: Mapping[str, str] = field(default_factory=dict)
+    kachel: str | None = None
+    attribut: str | None = None
 
     def passt(self, url: str) -> bool:
         """Wahr, wenn ``url`` die mitzuschneidende Antwort ist."""
@@ -255,6 +261,8 @@ class Antwortmuster:
             return f"global {', '.join(self.globale)}"
         if self.seitenwerte:
             return "seitenwerte"
+        if self.kachel is not None:
+            return f"kachel {self.kachel} @{self.attribut}"
         return "" if self.url_muster is None else self.url_muster.pattern
 
 

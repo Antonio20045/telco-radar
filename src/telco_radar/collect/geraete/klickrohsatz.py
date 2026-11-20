@@ -208,17 +208,27 @@ def _nimm(ergebnis: Klickausbeute, satz: dict | str) -> None:
 
 
 def _anschluesse(daten: dict) -> dict[str, float]:
-    """Anschlusspreis je Tarif-Slug aus heute gelesenen Tarifdetail-Seiten (1&1,
-    ``klickanschluss.anschluss_saetze``), nur bei ``ein_vertrag``."""
+    """Anschlusspreis je Tarif-Slug und je Tarifname aus heute gelesenen
+    Tarifdetail-Seiten (1&1, ``klickanschluss.anschluss_saetze``), nur bei
+    ``ein_vertrag``. Der Name trägt, wo die Kachel den Tarif mit Namen nennt (Nachweis
+    ``tarifname``, 1&1 seit 20.11.2026) und ihr Slug von dem der Detailseite abweicht
+    (Unlimited XL: ``…-xl-mvl`` gegen ``…-xl-ovl``)."""
     if daten.get("vertragsform") != EIN_VERTRAG:
         return {}
-    return {
-        str(roh.get("tarif_slug")): roh["anschlusspreis"]
+    saetze = [
+        roh
         for u in daten.get("uebersichten") or []
         if u.get("status") in GELESENE_SEITEN
         for roh in u.get("saetze") or []
         if roh.get("art") == ART_ANSCHLUSS
+    ]
+    je_slug = {str(roh.get("tarif_slug")): roh["anschlusspreis"] for roh in saetze}
+    je_name = {
+        str(roh["tarif_name"]): roh["anschlusspreis"]
+        for roh in saetze
+        if roh.get("tarif_name")
     }
+    return {**je_name, **je_slug}
 
 
 def uebersicht_rohsatz(

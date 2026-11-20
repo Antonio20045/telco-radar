@@ -309,11 +309,12 @@ def bild_fuer_beleg(png: bytes, webp: bool = True) -> tuple[bytes, str]:
 
 
 def pfadtext(pfad: str | Wertpfad | Phasenpfad) -> str:
-    """Der JSON-Pfad einer Fundstelle; eine Phasenliste mit ihren Feldnamen."""
+    """Der JSON-Pfad einer Fundstelle; eine Phasenliste mit ihren Feldnamen, eine
+    Summe mit „ + “ zwischen ihren Pfaden."""
     if isinstance(pfad, Phasenpfad):
         return f"{pfad.liste}[*].{{{pfad.von},{pfad.bis},{pfad.betrag}}}"
     if isinstance(pfad, Wertpfad):
-        return pfad.pfad
+        return " + ".join((pfad.pfad, *pfad.summe))
     return pfad
 
 

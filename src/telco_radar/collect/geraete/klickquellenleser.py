@@ -53,9 +53,10 @@ from .klickpfad import pfadfehler, platzhalter
 if TYPE_CHECKING:
     from .klickkartenleser import Kartenleser
 
-QUELLENARTEN = ("url_muster", "skript", "global", "seitenwerte")
+QUELLENARTEN = ("url_muster", "skript", "global", "seitenwerte", "kachel")
 QUELLENTEILE = (
     *QUELLENARTEN,
+    "attribut",
     "laden",
     "start",
     "erkennung",
@@ -65,10 +66,11 @@ QUELLENTEILE = (
     "parameter",
     "platzhalter",
 )
-WERTPFADTEILE = ("pfad", "muster", "einheit")
+WERTPFADTEILE = ("pfad", "muster", "einheit", "summe")
 PARAMETERTEILE = ("name", "muster")
 SEITENTEILE = ("selektor", "attribut", "parameter", "muster")
-MUSTERTEILE = ("muster", "selektor", "attribut")
+MUSTERTEILE = ("muster", "selektor", "attribut", "summe")
+GRUND_NUR_KACHEL = "nur mit kachel"
 GRUND_PFAD = "kein gültiger Pfad"
 GRUND_GLOBAL = "kein Bezeichner einer globalen Variable"
 GRUND_KEIN_SEITENWERT = "kein Seitenwert dieses Namens"
@@ -149,18 +151,26 @@ def lies_textmuster(leser: Kartenleser, roh: object) -> dict[str, Textmuster]:
     daten = leser.zuordnung(roh, ort, FELDER)
     muster = {}
     for feld in daten:
-        if not isinstance(daten[feld], Mapping):
-            muster[feld] = Textmuster(leser.muster(daten, feld, ort))
-            continue
-        teile = leser.zuordnung(daten[feld], f"{ort}.{feld}", MUSTERTEILE)
-        selektor = leser.wahlweise_text(teile, "selektor", f"{ort}.{feld}")
-        attribut = leser.wahlweise_text(teile, "attribut", f"{ort}.{feld}")
-        if attribut is not None and selektor is None:
-            raise leser.fehler(f"{ort}.{feld}", GRUND_ATTRIBUT_OHNE_SELEKTOR)
-        muster[feld] = Textmuster(
-            leser.muster(teile, "muster", f"{ort}.{feld}"), selektor, attribut
-        )
+        muster[feld] = _textmuster(leser, daten, feld, ort)
     return muster
+
+
+def _textmuster(leser: Kartenleser, daten: Mapping, feld: str, ort: str) -> Textmuster:
+    """Ein Textmuster; ``summe`` ist eine Liste weiterer Textmuster derselben Form."""
+    if not isinstance(daten[feld], Mapping):
+        return Textmuster(leser.muster(daten, feld, ort))
+    stelle = f"{ort}.{feld}"
+    teile = leser.zuordnung(daten[feld], stelle, MUSTERTEILE)
+    selektor = leser.wahlweise_text(teile, "selektor", stelle)
+    attribut = leser.wahlweise_text(teile, "attribut", stelle)
+    if attribut is not None and selektor is None:
+        raise leser.fehler(stelle, GRUND_ATTRIBUT_OHNE_SELEKTOR)
+    summe: tuple[Textmuster, ...] = ()
+    if teile.get("summe") is not None:
+        liste = {str(n): e for n, e in enumerate(leser.liste(teile["summe"], stelle))}
+        summe = tuple(_textmuster(leser, liste, n, f"{stelle}.summe") for n in liste)
+    muster = leser.muster(teile, "muster", stelle)
+    return Textmuster(muster, selektor, attribut, summe)
 
 
 def texte(
@@ -211,6 +221,10 @@ def _quelle(
     if len(arten) > 1:
         raise leser.fehler(f"{feld}.{arten[1]}", GRUND_EINE_QUELLE)
     url = leser.wahlweise_muster(daten, "url_muster", feld)
+    kachel = leser.wahlweise_text(daten, "kachel", feld)
+    attribut = leser.wahlweise_text(daten, "attribut", feld)
+    if (kachel is None) != (attribut is None):
+        raise leser.fehler(f"{feld}.attribut", GRUND_NUR_KACHEL)
     for nur in ("laden", "segment"):
         if url is None and daten.get(nur) is not None:
             raise leser.fehler(f"{feld}.{nur}", GRUND_NUR_URL)
@@ -235,6 +249,8 @@ def _quelle(
         erkennung=erkennung,
         segment=leser.wahlweise_muster(daten, "segment", feld),
         platzhalter=platzhalter,
+        kachel=kachel,
+        attribut=attribut,
     )
 
 
@@ -339,7 +355,13 @@ def _wertpfad(
     if einheit is not None and einheit not in EINHEITEN:
         raise leser.fehler(f"{stelle}.einheit", f"{GRUND_EINHEIT} {einheit}")
     muster = leser.wahlweise_muster(eintrag, "muster", stelle)
-    return Wertpfad(pfad=pfad, muster=muster, einheit=einheit)
+    summe: tuple[str, ...] = ()
+    if eintrag.get("summe") is not None:
+        liste = leser.liste(eintrag["summe"], f"{stelle}.summe")
+        summe = tuple(leser.text({"0": e}, "0", f"{stelle}.summe") for e in liste)
+        for teil in summe:
+            _pruefe_pfad(leser, teil, f"{stelle}.summe", namen)
+    return Wertpfad(pfad=pfad, muster=muster, einheit=einheit, summe=summe)
 
 
 def _pruefe_pfad(leser: Kartenleser, pfad: str, ort: str, namen: set[str]) -> None:

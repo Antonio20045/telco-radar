@@ -11,9 +11,10 @@ Beträge in ``Antwortlesung.buendel``, Nachweise Wortlaute in
 ``Antwortlesung.nachweise``; ``einheit`` rechnet Cent in Euro
 (1&1) und MB in GB (o2). Eine Laufzeit gilt nur als Monatsangabe („24 Monate“, „24 x“
 oder reine Zahl), sonst ist sie ``None``; ``muster`` eines Pfads nimmt sie aus anderem
-Text (o2 „24xhigh“). Markup in Varianten fällt weg (o2 „O<sub>2</sub>“). Fehlt ein
-Wert, ist er ``None``, nie 0. Deutsche Zahlen liest ``tarif_model.zahl``. Dieses
-Modul ruft kein Netz.
+Text (o2 „24xhigh“). ``summe`` eines Pfads addiert Beträge weiterer Pfade (1&1:
+Geräterate plus Tarifpreis der Kachel). Markup in Varianten fällt weg (o2
+„O<sub>2</sub>“). Fehlt ein Wert, ist er ``None``, nie 0. Deutsche Zahlen liest
+``tarif_model.zahl``. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -176,7 +177,20 @@ def _feldwert(
     if isinstance(pfad, Phasenpfad):
         return _phasen_aus_liste(am_pfad(nutzlast, pfad.liste, platz), pfad, platz)
     roh = _gemustert(am_pfad(nutzlast, _pfad(pfad), platz), pfad)
-    return feldwert(feld, roh, pfad.einheit if isinstance(pfad, Wertpfad) else None)
+    wert = feldwert(feld, roh, pfad.einheit if isinstance(pfad, Wertpfad) else None)
+    if not isinstance(pfad, Wertpfad) or not pfad.summe:
+        return wert
+    return _summe(feld, wert, [am_pfad(nutzlast, t, platz) for t in pfad.summe], pfad)
+
+
+def _summe(feld: str, erster: object, weitere: list, pfad: Wertpfad) -> float | None:
+    """Der Betrag am Pfad plus die Beträge an ``summe`` auf den Cent; fehlt einer,
+    ``None`` (nie eine Teilsumme)."""
+    teile = [erster, *(feldwert(feld, w, pfad.einheit) for w in weitere)]
+    zahlen = [t for t in teile if isinstance(t, float | int)]
+    if len(zahlen) != len(teile) or any(isinstance(t, bool) for t in zahlen):
+        return None
+    return round(sum(zahlen), 2)
 
 
 def _pfad(pfad: str | Wertpfad) -> str:

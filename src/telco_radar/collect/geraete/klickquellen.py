@@ -5,8 +5,10 @@ letzte passende Antwort seit dem Klick (``je_klick``) oder seit dem Laden (``lad
 congstar und Vodafone laden die Preise einmal), unter Antworten derselben Adresse die
 mit einem Wert an ``erkennung`` (congstar: drei GraphQL-Antworten, Vodafone: dieselbe
 Antwort als xhr und fetch); JSON in einem Skript der Seite (o2 ``script#pageValue``)
-oder globale Variablen (1&1 ``hwdVariantsPrices``) oder die benannten Seitenwerte
-(Telekom: ``aria-label`` des gewählten Laufzeitknopfs, wenn ``/v2/details`` fehlt).
+oder globale Variablen (1&1 ``hwdVariantsPrices``), JSON im Attribut eines Elements der
+gelesenen Kachel (1&1 ``data-tariff-price-hint`` der Tarifauswahl) oder die benannten
+Seitenwerte (Telekom: ``aria-label`` des gewählten Laufzeitknopfs, wenn
+``/v2/details`` fehlt).
 Eine ``start``-Quelle gilt nur, solange niemand geklickt hat. Die Werte liest
 ``klickecho.lies_antwort`` mit den Platzhaltern der Kombination; je Wertfeld und je
 Nachweis zählt die erste Quelle mit einem Wert, je Dimension müssen alle Quellen
@@ -53,7 +55,7 @@ from .klicktext import Buendelwerte, Preiswerte
 from .klicktor import kurz
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Page, Response
+    from playwright.sync_api import Locator, Page, Response
 
     from .klickmitschnitt import Mitschnitt
 
@@ -117,18 +119,19 @@ class Quellenleser:
         unberuehrt: bool,
         platz: Mapping[str, str | None],
         geladen: int = 0,
+        kachel: Locator | None = None,
     ) -> Quellenlesung:
         """Liest jede gültige Quelle und vereint ihre Werte.
 
         ``laden``-Quellen lesen die Antworten seit ``geladen``, dem Stand des
-        Mitschnitts vor dem Laden der Seite.
+        Mitschnitts vor dem Laden der Seite; ``kachel``-Quellen nur in ``kachel``.
         """
         lasten: list[Nutzlast] = []
         for stelle, quelle in enumerate(self.karte.lesequellen):
             if quelle.start and not unberuehrt:
                 continue
             ab = geladen if quelle.laden else seit
-            last, befund = self._nutzlast(stelle, quelle, ab, platz)
+            last, befund = self._nutzlast(stelle, quelle, ab, platz, kachel)
             if befund is not None:
                 return Quellenlesung(None, befund)
             if last is not None:
@@ -152,7 +155,10 @@ class Quellenleser:
         quelle: Antwortmuster,
         seit: int,
         platz: Mapping[str, str | None],
+        kachel: Locator | None = None,
     ) -> tuple[Nutzlast | None, Befund | None]:
+        if quelle.kachel is not None:
+            return self._kachel(stelle, quelle, kachel)
         if quelle.skript is not None:
             return self._skript(stelle, quelle.skript)
         if quelle.globale:
@@ -190,6 +196,22 @@ class Quellenleser:
             return None, Befund(
                 "antwort", f"Skript {selektor} nicht lesbar: {kurz(fehler)}"
             )
+        return Nutzlast(stelle, daten), None
+
+    def _kachel(
+        self, stelle: int, quelle: Antwortmuster, kachel: Locator | None
+    ) -> tuple[Nutzlast | None, Befund | None]:
+        """JSON im Attribut des ersten Treffers in der Kachel; ohne Kachel nichts."""
+        if kachel is None or quelle.kachel is None:
+            return None, None
+        ort = kachel.locator(quelle.kachel)
+        try:
+            if ort.count() == 0:
+                return None, None
+            daten = json.loads(ort.first.get_attribute(str(quelle.attribut)) or "")
+        except (PlaywrightFehler, ValueError) as fehler:
+            grund = f"Kachel {quelle.ort} nicht lesbar: {kurz(fehler)}"
+            return None, Befund("antwort", grund)
         return Nutzlast(stelle, daten), None
 
     def _globale(

@@ -49,6 +49,27 @@
       "abgerufen_am": "2026-11-20",
       "bytes_roh": 1959,
       "sha256_roh": "fe5d9a57f6ab4407d66b3e53e7944d9e136b8577216f113a503190f8c182a465"
+    },
+    {
+      "datei": "einsundeins_produktseite_20261120.html",
+      "quelle": "Ausschnitt (#hwd-configuration-section und der Weiter-Knopf der Preisleiste, ohne Bilder und Skripte) von https://mobile.1und1.de/iphone-17, gerendert mit Playwright-Chromium ohne Tarnung, Kennung TelcoRadar/1.0, kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-20",
+      "bytes_roh": 23971,
+      "sha256_roh": "20c50177e1fc341ae6ff834dd041858788ed06f312ff2c305faf7c295e068e08"
+    },
+    {
+      "datei": "einsundeins_tarifauswahl_20261120.html",
+      "quelle": "Ausschnitt (Tarifboxen ohne Bilder und Leistungstexte, von fünf verborgenen Tarifboxen nur die erste, dazu die Preisleiste #pso) der Folgeseite /flow2/mobile/ssc-private/tariffselect nach „Weiter zur Tarifauswahl“ auf https://mobile.1und1.de/iphone-17 mit 512 GB und „24 Monate Fix“, gerendert mit Playwright-Chromium ohne Tarnung, Kennung TelcoRadar/1.0; Warenkorb ohne Kundendaten, kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-20",
+      "bytes_roh": 49745,
+      "sha256_roh": "2287cfd5b853c82a4a16199a544c340e4b27780d674416886b86078c88433b04"
+    },
+    {
+      "datei": "einsundeins_karte_20261009.yaml",
+      "quelle": "Klick-Karte 1&1 aus config/klickkarten/1und1.yaml bis zum Shop-Umbau vom 20.11.2026 (Stand 82f01eca), wörtlich; Grundlage der Tests, die das Format von Stufe 4 (Laufzeit-Kacheln) prüfen",
+      "abgerufen_am": null,
+      "bytes_roh": 8262,
+      "sha256_roh": "51fa442a896d05fc6c0b89f9f168bade34a8877ca5f63b6173dcb9d90f018395"
     }
   ]
 }

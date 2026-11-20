@@ -69,8 +69,6 @@ def registriere_anbieter_adapter() -> None:
             name="einsundeins_buendel",
             lies=einsundeins.lies,
             ernte=einsundeins.ernte,
-            lies_buendel=einsundeins.lies_buendel,
-            ergaenze_buendel=einsundeins.ergaenze_buendel,
         ),
     )
     registriere(

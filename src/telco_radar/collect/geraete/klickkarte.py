@@ -161,6 +161,12 @@ Schritt mit Grund. Ein Schritt, dessen Bild die Seite nicht hergibt (Gerät und 
 stehen auf einer früheren Seite des Bestellwegs), heißt ``{ohne: <Grund>}``: der Beleg
 nennt den Grund als Lücke, es entsteht kein Bild.
 
+Stufe 6 (1&1, Tarifauswahl seit 20.11.2026, ``klickkachel``): eine Quelle ``kachel`` mit
+``attribut`` liest JSON im Attribut des ersten Treffers in der gelesenen Kachel (nur mit
+``weiter.kacheln``); ein Pfad ``{pfad, summe: [...]}`` und ein Textmuster ``{muster,
+summe: [{muster, selektor}]}`` addieren Beträge (Geräterate plus Tarifpreis). Ein Teil
+der Summe darf einen eigenen Selektor außerhalb der Kachel tragen.
+
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
 """
@@ -209,6 +215,8 @@ from .klickkartentypen import (
     Wertpfad,
 )
 from .klickquellenleser import lies_quellen, lies_seite, pruefe_felder
+
+GRUND_KACHELQUELLE = "eine kachel-Quelle braucht weiter.kacheln"
 
 __all__ = [
     "Adressen",
@@ -303,6 +311,9 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
     for stelle, antwort in enumerate(quellen):
         ort = f"antwort.{stelle}.pfade" if liste else "antwort.pfade"
         pruefe_felder(leser, antwort.pfade, ort, ein_vertrag, summe)
+    weiter = leser.weiter(roh_weiter, knoepfe, textlesung)
+    if any(q.kachel for q in quellen) and (weiter is None or weiter.kacheln is None):
+        raise leser.fehler("antwort.kachel", GRUND_KACHELQUELLE)
     return Klickkarte(
         anbieter=leser.text(daten, "anbieter", ""),
         knoepfe=knoepfe,
@@ -315,7 +326,7 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         quellen=quellen,
         seite=seite,
         vertragsform=vertragsform,
-        weiter=leser.weiter(roh_weiter, knoepfe, textlesung),
+        weiter=weiter,
         ratenplan=leser.ratenplan(daten.get("ratenplan")),
         tarifslug=leser.tarifslug(daten.get("tarifslug")),
         bildfolge=bildfolge,
