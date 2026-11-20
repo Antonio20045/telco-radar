@@ -89,10 +89,6 @@ def test_lies_tarifliste_unlesbarer_text_ist_leer_statt_fehler():
     assert tarifwelt.lies_tarifliste('{"keine": "liste"}', _URL) == []
 
 
-def test_lies_liefert_keine_geraeteliste():
-    assert tarifwelt.lies("irrelevant", _URL) == []
-
-
 def test_tarife_mit_band_behaelt_alle_tarife_eines_bandes_nach_volumen_und_preis():
     saetze = [
         {"tarif_id": "a", "datenvolumen_gb": 40.0, "grundgebuehr": 30.0},

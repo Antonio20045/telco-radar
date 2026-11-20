@@ -38,13 +38,6 @@ from .tarifwelt_merkmale import preiswechsel
 log = logging.getLogger(__name__)
 
 
-def lies(text: str, url: str = "") -> list[dict]:
-    """Diese Quelle liefert keine reine Geraeteliste, nur Tarifbuendel
-    (`lies_tarifliste`) - der Geraete-Barpreis steht schon unter
-    `mediamarkt_angebote` bzw. `saturn_brand`."""
-    return []
-
-
 def _json_liste(text: str) -> list:
     try:
         daten = json.loads(text or "")
