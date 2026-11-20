@@ -32,7 +32,7 @@ from __future__ import annotations
 import json
 import logging
 
-from ...band_regel import stufe_fuer
+from ...band_regel import abstand_schluessel, stufe_fuer
 from .tarifwelt_merkmale import preiswechsel
 
 log = logging.getLogger(__name__)
@@ -276,3 +276,30 @@ def tarife_mit_band(saetze: list[dict], leiter_gb) -> list[dict]:
         )
 
     return sorted(out, key=rang)
+
+
+def kern_je_netz_und_band(saetze: list[dict], leiter_gb) -> set[str]:
+    """Die `tarif_id`s, die ZUERST gelesen werden: je (Netz, Band) der Tarif, dessen
+    Volumen dem Bandwert am naechsten liegt (Gleichstand: das groessere, dann der
+    niedrigere Monatspreis) - der Tarif, den die Auswahl vor dem 20.11.2026
+    allein las. Er ist nur noch eine Reihenfolge, keine Auswahl: reicht das
+    Zeitbudget der Stufe nicht fuer alle Tarife, bleibt so mindestens der alte
+    Stand. Band und Abstand wie in `tarife_mit_band` (`band_regel`)."""
+    leiter = tuple(leiter_gb)
+    gb_je_band = dict(leiter)
+    je_gruppe: dict[tuple[str, str], list[dict]] = {}
+    for satz in saetze:
+        band = stufe_fuer(satz.get("datenvolumen_gb"), leiter)
+        if band is not None:
+            je_gruppe.setdefault((str(satz.get("netz")), band), []).append(satz)
+
+    def rang(satz: dict, ziel: float) -> tuple:
+        gb = satz["datenvolumen_gb"]
+        abstand = 0.0 if gb in (float("inf"), ziel) else abstand_schluessel(gb, ziel)[0]
+        preis = satz.get("grundgebuehr")
+        return (abstand, -gb, float("inf") if preis is None else preis)
+
+    return {
+        min(gruppe, key=lambda s: rang(s, gb_je_band[band]))["tarif_id"]
+        for (_, band), gruppe in je_gruppe.items()
+    }

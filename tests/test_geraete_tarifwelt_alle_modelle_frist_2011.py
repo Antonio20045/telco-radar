@@ -9,13 +9,15 @@ Kein Netz, kein Zugriff auf data/, kein heutiges Datum.
 
 from __future__ import annotations
 
+import pathlib
 from dataclasses import dataclass
 
 import pytest
-from test_geraete_adapter_tarifwelt import LEITER
+from test_geraete_adapter_tarifwelt import LEITER, fixture_hole
 
 from telco_radar import geraete_tarifwelt
-from telco_radar.collect.geraete import tarifwelt_lauf
+from telco_radar.band_regel import stufe_fuer
+from telco_radar.collect.geraete import tarifwelt, tarifwelt_lauf
 from telco_radar.collect.geraete.buendel_prioritaet import pflicht_modelle
 
 
@@ -107,7 +109,7 @@ def test_zeitbudget_aufgebraucht_stoppt_vor_dem_naechsten_modell():
     assert e.modelle == 3 and len(slugs) == 3
     namen = list(tarifwelt_lauf.MODELL_SLUGS)
     assert e.ungelesen == namen[3:]
-    assert "nicht gelesen" in e.grund
+    assert "nicht vollstaendig gelesen" in e.grund
     assert e.als_dict()["ungelesen"] == namen[3:]
 
 
@@ -165,3 +167,95 @@ def test_stufe_reicht_die_restzeit_als_frist_an_den_lauf_weiter(
     assert gesehen["frist_sekunden"] == pytest.approx(erwartet, abs=5.0)
     stufe(None)
     assert gesehen["frist_sekunden"] is None
+
+
+FIXTURES = pathlib.Path(__file__).resolve().parent / "fixtures" / "geraete"
+MODELLE = ["apple-iphone-17", "samsung-galaxy-s26"]
+
+
+def _uhr_je_abruf(hole):
+    stand = {"t": 0.0}
+
+    def mit_zeit(url, **kw):
+        stand["t"] += 1.0
+        return hole(url, **kw)
+
+    return mit_zeit, lambda: stand["t"]
+
+
+def test_kern_kommt_zuerst_der_rest_ohne_neue_uebersicht_oder_liste():
+    hole, aufrufe = fixture_hole()
+    lauf = tarifwelt_lauf.lies_modell(
+        "samsung-galaxy-s26",
+        LEITER,
+        hole,
+        "2026-11-20",
+        warte=lambda s: None,
+        nur_kern=True,
+    )
+    assert lauf.offen and not [z for z in lauf.offen if z.kern]
+    nach_kern = len(aufrufe)
+    rest = len(lauf.offen)
+    tarifwelt_lauf.lies_offene(lauf, hole, "2026-11-20", warte=lambda s: None)
+    assert lauf.offen == []
+    assert len(aufrufe) == nach_kern + rest
+    listen = [u for u in aufrufe if "/tariff?" in u]
+    assert len(listen) == len(set(listen))
+    uebersichten = [u for u in aufrufe if "?" not in u]
+    assert len(uebersichten) == 1
+
+
+def test_kern_ist_je_netz_und_band_genau_ein_tarif():
+    text = (FIXTURES / "tarifwelt_mm_tarifliste_iphone17_20261108.json").read_text()
+    tarife = tarifwelt_lauf.vergleichbare_tarife(
+        tarifwelt.lies_tarifliste(text), LEITER
+    )
+    kern = tarifwelt.kern_je_netz_und_band(tarife, LEITER)
+
+    def gruppe(t):
+        return (t["netz"], stufe_fuer(t["datenvolumen_gb"], LEITER))
+
+    gruppen = {gruppe(t) for t in tarife}
+    assert len(kern) == len(gruppen) < len(tarife)
+    for g in gruppen:
+        assert sum(t["tarif_id"] in kern for t in tarife if gruppe(t) == g) == 1
+    assert tarifwelt.kern_je_netz_und_band([], LEITER) == set()
+
+
+def _stufe(monkeypatch, frist):
+    monkeypatch.setattr(geraete_tarifwelt, "modelle_der_stufe", lambda: MODELLE)
+    api, _ = fixture_hole()
+    hole, uhr = _uhr_je_abruf(api)
+    return geraete_tarifwelt.lauf(
+        QUELLEN,
+        _vodafone_tarife(),
+        hole,
+        "2026-11-20",
+        warte=lambda s: None,
+        frist_sekunden=frist,
+        monoton=uhr,
+    )
+
+
+def test_zeitbudget_nur_fuer_den_kern_liest_den_kern_aller_modelle_zuerst(monkeypatch):
+    voll = _stufe(monkeypatch, 10_000.0)
+    assert voll.status == "ok" and voll.ungelesen == []
+    kern_abrufe = 0
+    api, aufrufe = fixture_hole()
+    for modell in MODELLE:
+        kern_abrufe += tarifwelt_lauf.lies_modell(
+            modell,
+            LEITER,
+            api,
+            "2026-11-20",
+            warte=lambda s: None,
+            nur_kern=True,
+        ).abrufe
+    assert kern_abrufe < voll.abrufe
+    knapp = _stufe(monkeypatch, float(kern_abrufe))
+    assert knapp.status == "frist"
+    assert knapp.abrufe == kern_abrufe
+    assert knapp.modelle == len(MODELLE)
+    assert knapp.ungelesen == MODELLE
+    assert {b.id for b in knapp.buendel} <= {b.id for b in voll.buendel}
+    assert {b.id for b in knapp.buendel}

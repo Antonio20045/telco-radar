@@ -94,6 +94,21 @@ def shop_url(pfad: str, slug: str, speicher: int, tarif_id: str, ids: dict) -> s
     )
 
 
+@dataclass(frozen=True)
+class Zeile:
+    """Eine Zeile, die noch zu lesen ist: ein Tarif eines Speichers. `kern`: der
+    Tarif, den die Auswahl vor dem 20.11.2026 allein las (siehe
+    `tarifwelt.kern_je_netz_und_band`) - er kommt zuerst dran."""
+
+    modell_id: str
+    pfad: str
+    geraet: str
+    wo: tuple[str, int, str, dict, str]
+    kandidat: dict
+    zusatz: str
+    kern: bool
+
+
 @dataclass
 class Lauf:
     """Ergebnis eines Modells: Buendel, benannte Luecken (Zeile -> Grund) und
@@ -101,13 +116,15 @@ class Lauf:
     Datenvolumen, Grundgebuehr) fuer die Band-Zuordnung im Bericht
     (`tarifwelt_bestand`). `nicht_lieferbar`: (device_id, Katalogspeicher) jeder
     Stufe, die die Uebersicht belegt als nicht lieferbar nennt
-    (`tarifwelt_lieferbar`)."""
+    (`tarifwelt_lieferbar`). `offen`: Zeilen, die dieser Lauf noch nicht gelesen
+    hat (`lies_offene`)."""
 
     buendel: list[Buendel] = field(default_factory=list)
     luecken: list[tuple[str, str]] = field(default_factory=list)
     abrufe: int = 0
     tarife: dict[str, dict] = field(default_factory=dict)
     nicht_lieferbar: list[tuple[str, int]] = field(default_factory=list)
+    offen: list[Zeile] = field(default_factory=list)
 
 
 def _abruf(hole: Callable, url: str, lauf: Lauf, warte: Callable[[float], None]) -> str:
@@ -135,8 +152,8 @@ def vergleichbare_tarife(liste: list[dict], leiter_gb) -> list[dict]:
     unveraendert aus der Zeit der Bandauswahl): unvergleichbare Tarife
     (`tarifwelt_merkmale.unvergleichbar_grund`: Doppelkarte, Aktion, Young,
     Kids, Senioren, Cashback, Preiswechsel vor Monat 25), unbekannte Netze
-    und Tarife ohne Band der Leiter (`tarifwelt.tarife_mit_band`). Reihenfolge:
-    Netz, dann Datenvolumen, Monatspreis, ID."""
+    und Tarife ohne Band (`tarifwelt.tarife_mit_band`). Reihenfolge: Netz, dann
+    Datenvolumen, Monatspreis, ID."""
     brauchbar = [
         s
         for s in liste
@@ -193,10 +210,16 @@ def lies_modell(
     abgerufen_am: str,
     warte: Callable[[float], None] = time.sleep,
     lauf: Lauf | None = None,
+    nur_kern: bool = False,
+    weiter: Callable[[], bool] = lambda: True,
 ) -> Lauf:
     """Alle Speicher x vergleichbaren Tarife eines Modells (Pflichtmodell oder
     zusaetzliches, nicht ueberwachtes Modell, siehe Moduldoku). Ein mitgegebener
-    `lauf` wird gefuellt: was vor einer Schutzantwort gelesen war, bleibt dort."""
+    `lauf` wird gefuellt: was vor einer Schutzantwort gelesen war, bleibt dort.
+    Uebersicht und Tarifliste je Speicher werden immer gelesen; die Tarife
+    danach (`lies_offene`): mit `nur_kern` zuerst nur der Kern je Netz und Band,
+    der Rest bleibt in `lauf.offen`. `weiter()` wird vor jedem Tarif gefragt;
+    sagt es nein, bleibt der Tarif offen."""
     eintrag = MODELL_SLUGS[modell_id]
     hersteller, name, pfad, slug = eintrag[:4]
     api_name = eintrag[4] if len(eintrag) > 4 else name
@@ -226,48 +249,92 @@ def lies_modell(
             lauf.luecken.append((f"{modell_id} {speicher} GB", "keine Tarife"))
             continue
         zusaetze = namenszusaetze(tarife)
+        kern = tarifwelt.kern_je_netz_und_band(tarife, leiter_gb)
         for kandidat in tarife:
             variante = (
                 f"{modell_id} {speicher} GB {kandidat['netz']} "
                 f"{kandidat['tarif_name'] or kandidat['tarif_id']}"
             )
-            satz = _lies_tarif(
-                (slug, speicher, variante, ids, api_name), kandidat, hole, lauf, warte
-            )
-            if satz is None:
-                continue
-            tarif_name = (satz["tarif_name"] or satz["tarif_id"]) + zusaetze[
-                kandidat["tarif_id"]
-            ]
-            lauf.tarife[f"mediamarkt_tarifwelt:{satz['tarif_id']}"] = {
-                "anbieter": tarifwelt.anbieter_zeile(satz["netz"]) or "",
-                "name": tarif_name,
-                "datenvolumen_gb": kandidat["datenvolumen_gb"],
-                "grundgebuehr": satz["grundgebuehr"],
-            }
-            quelle_url = shop_url(pfad, slug, speicher, kandidat["tarif_id"], ids)
-            lauf.buendel.append(
-                Buendel(
-                    sku_id=sku_id(
-                        geraet, KATALOG_SPEICHER.get(speicher, speicher), None
-                    ),
-                    anbieter=tarifwelt.anbieter_zeile(satz["netz"]) or "",
-                    tarif_name=tarif_name,
-                    tarif_id=f"mediamarkt_tarifwelt:{satz['tarif_id']}",
-                    tarif_id_guete="niedrig",
-                    tarif_monatlich=satz["grundgebuehr"],
-                    geraet_zuzahlung=satz["geraet_zuzahlung"],
-                    geraet_monatsrate=0.0,
-                    laufzeit_monate=LAUFZEIT_MONATE,
-                    anschlusspreis=satz["anschlusspreis"],
-                    quelle_url=quelle_url,
-                    abgerufen_am=abgerufen_am,
-                    herleitung="tarifwelt_productdetail",
-                    zustand="neu",
-                    aktionen=wechselbonus_aktionen(satz.get("hinweise"), quelle_url),
+            lauf.offen.append(
+                Zeile(
+                    modell_id,
+                    pfad,
+                    geraet,
+                    (slug, speicher, variante, ids, api_name),
+                    kandidat,
+                    zusaetze[kandidat["tarif_id"]],
+                    kandidat["tarif_id"] in kern,
                 )
             )
+    return lies_offene(lauf, hole, abgerufen_am, warte, nur_kern, weiter)
+
+
+def lies_offene(
+    lauf: Lauf,
+    hole: Callable,
+    abgerufen_am: str,
+    warte: Callable[[float], None] = time.sleep,
+    nur_kern: bool = False,
+    weiter: Callable[[], bool] = lambda: True,
+) -> Lauf:
+    """Liest die offenen Zeilen des Laufs - eine Anfrage je Tarif und Speicher.
+    Mit `nur_kern` nur die Kernzeilen. Was nicht drankommt (`nur_kern`,
+    `weiter()` sagt nein), bleibt in `lauf.offen`."""
+    rest: list[Zeile] = []
+    for stelle, zeile in enumerate(lauf.offen):
+        if (nur_kern and not zeile.kern) or not weiter():
+            rest.append(zeile)
+            continue
+        try:
+            _lies_zeile(zeile, hole, abgerufen_am, lauf, warte)
+        except GeraeteAbrufFehler:
+            lauf.offen = [*rest, *lauf.offen[stelle:]]
+            raise
+    lauf.offen = rest
     return lauf
+
+
+def _lies_zeile(
+    zeile: Zeile,
+    hole: Callable,
+    abgerufen_am: str,
+    lauf: Lauf,
+    warte: Callable[[float], None],
+) -> None:
+    """Eine Zeile lesen: bei Erfolg ein Buendel samt Stammdaten des Tarifs, sonst
+    die benannte Luecke aus `_lies_tarif`."""
+    slug, speicher, _, ids, _ = zeile.wo
+    kandidat = zeile.kandidat
+    satz = _lies_tarif(zeile.wo, kandidat, hole, lauf, warte)
+    if satz is None:
+        return
+    tarif_name = (satz["tarif_name"] or satz["tarif_id"]) + zeile.zusatz
+    lauf.tarife[f"mediamarkt_tarifwelt:{satz['tarif_id']}"] = {
+        "anbieter": tarifwelt.anbieter_zeile(satz["netz"]) or "",
+        "name": tarif_name,
+        "datenvolumen_gb": kandidat["datenvolumen_gb"],
+        "grundgebuehr": satz["grundgebuehr"],
+    }
+    quelle_url = shop_url(zeile.pfad, slug, speicher, kandidat["tarif_id"], ids)
+    lauf.buendel.append(
+        Buendel(
+            sku_id=sku_id(zeile.geraet, KATALOG_SPEICHER.get(speicher, speicher), None),
+            anbieter=tarifwelt.anbieter_zeile(satz["netz"]) or "",
+            tarif_name=tarif_name,
+            tarif_id=f"mediamarkt_tarifwelt:{satz['tarif_id']}",
+            tarif_id_guete="niedrig",
+            tarif_monatlich=satz["grundgebuehr"],
+            geraet_zuzahlung=satz["geraet_zuzahlung"],
+            geraet_monatsrate=0.0,
+            laufzeit_monate=LAUFZEIT_MONATE,
+            anschlusspreis=satz["anschlusspreis"],
+            quelle_url=quelle_url,
+            abgerufen_am=abgerufen_am,
+            herleitung="tarifwelt_productdetail",
+            zustand="neu",
+            aktionen=wechselbonus_aktionen(satz.get("hinweise"), quelle_url),
+        )
+    )
 
 
 def _lies_tarif(

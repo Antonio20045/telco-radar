@@ -108,9 +108,13 @@ def lauf(
     """ALLE Modelle der Tarifwelt (`MODELL_SLUGS`, Pflichtmodelle zuerst), wenn die
     Quelle aktiv ist - nicht nur die Pflichtmodelle des Waechters. Bricht eine
     Schutzantwort ein Modell ab, bleiben davon nur die schon gelesenen nicht
-    lieferbaren Stufen, nie halbe Preise. `frist_sekunden`: das Zeitbudget der
-    Stufe; vor jedem Modell geprueft, ein laufendes Modell wird zu Ende gelesen.
-    Ist es aufgebraucht, steht der Rest in `ungelesen` (Status "frist")."""
+    lieferbaren Stufen, nie halbe Preise. Zwei Runden: erst je Modell der Kern
+    (je Netz und Band der Tarif der frueheren Auswahl,
+    `tarifwelt.kern_je_netz_und_band`), dann alle uebrigen Tarife; Uebersicht und
+    Tarifliste werden nur einmal gelesen. `frist_sekunden`: das Zeitbudget der
+    Stufe, vor jedem Tarif geprueft. Ist es aufgebraucht, haben alle Modelle,
+    die drankamen, mindestens den Stand vor dem 20.11.2026; der Rest steht in
+    `ungelesen` (Status "frist")."""
     warte = warte or time.sleep
     ergebnis = Ergebnis()
     if not quelle_aktiv(quellen):
@@ -123,33 +127,57 @@ def lauf(
     modelle = modelle_der_stufe()
     ergebnis.status = "ok"
     beginn = monoton()
-    for stelle, modell in enumerate(modelle):
-        if frist_sekunden is not None and monoton() - beginn >= frist_sekunden:
-            ergebnis.status = "frist"
-            ergebnis.ungelesen = modelle[stelle:]
-            ergebnis.grund = (
-                f"Zeitbudget {frist_sekunden:.0f} s aufgebraucht, "
-                f"{len(ergebnis.ungelesen)} Modelle nicht gelesen"
-            )
-            log.warning("Tarifwelt: %s", ergebnis.grund)
-            break
-        teil = tarifwelt_lauf.Lauf()
-        try:
+
+    def weiter() -> bool:
+        return frist_sekunden is None or monoton() - beginn < frist_sekunden
+
+    teile: list[tuple[str, tarifwelt_lauf.Lauf]] = []
+    unberuehrt: list[str] = []
+    aktuell = [tarifwelt_lauf.Lauf()]
+    try:
+        for modell in modelle:
+            if not weiter():
+                unberuehrt.append(modell)
+                continue
+            teil = tarifwelt_lauf.Lauf()
+            teile.append((modell, teil))
+            aktuell[0] = teil
             tarifwelt_lauf.lies_modell(
-                modell, leiter, hole, abgerufen_am, warte=warte, lauf=teil
+                modell,
+                leiter,
+                hole,
+                abgerufen_am,
+                warte=warte,
+                lauf=teil,
+                nur_kern=True,
+                weiter=weiter,
             )
-        except GeraeteAbrufFehler as fehler:
-            ergebnis.nicht_lieferbar.extend(teil.nicht_lieferbar)
-            ergebnis.status = "abgebrochen"
-            ergebnis.grund = str(fehler)
-            log.warning("Tarifwelt: Lauf abgebrochen bei %s: %s", modell, fehler)
-            break
+        for _, teil in teile:
+            aktuell[0] = teil
+            tarifwelt_lauf.lies_offene(teil, hole, abgerufen_am, warte, weiter=weiter)
+    except GeraeteAbrufFehler as fehler:
+        schuldig = aktuell[0]
+        ergebnis.nicht_lieferbar.extend(schuldig.nicht_lieferbar)
+        teile = [(m, t) for m, t in teile if t is not schuldig]
+        ergebnis.status = "abgebrochen"
+        ergebnis.grund = str(fehler)
+        log.warning("Tarifwelt: Lauf abgebrochen: %s", fehler)
+    for _, teil in teile:
         ergebnis.modelle += 1
         ergebnis.buendel.extend(teil.buendel)
         ergebnis.tarife.update(teil.tarife)
         ergebnis.luecken.extend(teil.luecken)
         ergebnis.nicht_lieferbar.extend(teil.nicht_lieferbar)
         ergebnis.abrufe += teil.abrufe
+    if ergebnis.status == "ok":
+        ergebnis.ungelesen = unberuehrt + [m for m, t in teile if t.offen]
+        if ergebnis.ungelesen:
+            ergebnis.status = "frist"
+            ergebnis.grund = (
+                f"Zeitbudget {frist_sekunden:.0f} s aufgebraucht, "
+                f"{len(ergebnis.ungelesen)} Modelle nicht vollstaendig gelesen"
+            )
+            log.warning("Tarifwelt: %s", ergebnis.grund)
     return ergebnis
 
 
