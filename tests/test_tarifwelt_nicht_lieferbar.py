@@ -199,9 +199,7 @@ def _uhr():
 
 def _stufe(monkeypatch, tco: TcoDB, hole, modelle: set[str]) -> dict:
     """Der Tageslauf vom 13.11. über den öffentlichen Eingang `stufe`."""
-    monkeypatch.setattr(
-        geraete_tarifwelt, "pflicht_modelle", lambda: frozenset(modelle)
-    )
+    monkeypatch.setattr(geraete_tarifwelt, "modelle_der_stufe", lambda: sorted(modelle))
     monkeypatch.setattr(geraete_tarifwelt.time, "sleep", lambda s: None)
     return geraete_tarifwelt.stufe(
         _Quellen([_Quelle(tarifwelt_bestand.METHODE, True)]),

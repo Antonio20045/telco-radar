@@ -32,6 +32,7 @@ on:
         default: "1500"
 jobs:
   geraete:
+    timeout-minutes: 70
     steps:
       - name: Heute schon gemessen?
         id: heute
@@ -81,6 +82,7 @@ BELEG_SKRIPT = (
 )
 BELEG_MANIFEST = "SCHRITT_FRIST_S = 300\nGESAMT_FRIST_S = 200\nSCHREIB_RESERVE_S = 20\n"
 PIPELINE = "FRIST_STANDARD = 900.0\nFRIST_TAGESLAUF = 1500.0\n"
+TARIFWELT = "JOB_FRIST_SEKUNDEN = 70 * 60.0\n"
 
 
 def _schreibe(wurzel: Path, pfad: str, inhalt: str | bytes) -> Path:
@@ -116,6 +118,7 @@ def projekt(tmp_path: Path) -> Path:
     _schreibe(tmp_path, wv.SETTINGS, "job_frist_sekunden: 3600\n")
     _schreibe(tmp_path, wv.DEPLOY, DEPLOY)
     _schreibe(tmp_path, wv.GERAETE_PIPELINE, PIPELINE)
+    _schreibe(tmp_path, wv.TARIFWELT_STUFE, TARIFWELT)
     _schreibe(tmp_path, wv.BELEG_ABLAGE, BELEG_ABLAGE)
     _schreibe(tmp_path, wv.BELEG_SKRIPT, BELEG_SKRIPT)
     _schreibe(tmp_path, wv.BELEG_MANIFEST, BELEG_MANIFEST)
@@ -262,6 +265,14 @@ def test_jobfrist_ohne_passendes_timeout_ist_rot(projekt):
     assert wv.pruefe(projekt) == [
         "config/settings.yaml: job_frist_sekunden 3600 ≠"
         " .github/workflows/radar.yml timeout 75 min"
+    ]
+
+
+def test_tarifwelt_frist_ohne_passendes_geraete_timeout_ist_rot(projekt):
+    _ersetze(projekt, wv.GERAETE, "timeout-minutes: 70", "timeout-minutes: 90")
+    assert wv.pruefe(projekt) == [
+        "src/telco_radar/geraete_tarifwelt.py: JOB_FRIST_SEKUNDEN 4200.0 ≠"
+        " .github/workflows/geraete.yml timeout 90 min"
     ]
 
 
