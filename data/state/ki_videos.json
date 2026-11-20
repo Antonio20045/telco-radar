@@ -1,6 +1,146 @@
 {
- "stand": "2026-11-19",
+ "stand": "2026-11-20",
  "videos": [
+  {
+   "id": "wqNIzUmNt9M",
+   "titel": "AI News: This Is The Make or Break Week!!",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 1981,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "wqNIzUmNt9M.jpg"
+  },
+  {
+   "id": "vwbmMpfEo4M",
+   "titel": "KI-Update Deep-Dive: Smart Glasses als Alltagshilfe",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 2114,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "vwbmMpfEo4M.jpg"
+  },
+  {
+   "id": "oJIuz3AFfEQ",
+   "titel": "Connect Your Team’s Data to ChatGPT",
+   "kanal": "OpenAI",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 84,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "oJIuz3AFfEQ.jpg"
+  },
+  {
+   "id": "hWQjNS8iP7M",
+   "titel": "Drug Design's Hidden Challenge",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 26,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "hWQjNS8iP7M.jpg"
+  },
+  {
+   "id": "h9FnoG8xPCU",
+   "titel": "Das bessere Steam Deck?",
+   "kanal": "c't 3003",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 937,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "h9FnoG8xPCU.jpg"
+  },
+  {
+   "id": "f5XVyW_Bjmo",
+   "titel": "Microsoft Entra Agent ID and Egress Rules",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 36,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "f5XVyW_Bjmo.jpg"
+  },
+  {
+   "id": "Y6npte_lEKU",
+   "titel": "Anthropic goes public, ChatGPT gets a wallet & AI designs new drugs",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 1673,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Y6npte_lEKU.jpg"
+  },
+  {
+   "id": "X19Q12hmRjY",
+   "titel": "An underrated way to use ChatGPT: Finding a doctor",
+   "kanal": "OpenAI",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 16,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "X19Q12hmRjY.jpg"
+  },
+  {
+   "id": "WGvsk0LIveU",
+   "titel": "3 ChatGPT Tips to Save Money",
+   "kanal": "OpenAI",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 147,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "WGvsk0LIveU.jpg"
+  },
+  {
+   "id": "VRtJJ8Fiq64",
+   "titel": "KI-Update Deep-Dive: Smart Glasses als Alltagshilfe - KI-Update – ein heise-Podcast",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 2039,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "VRtJJ8Fiq64.jpg"
+  },
+  {
+   "id": "OSHSopaYjTw",
+   "titel": "Create and Share a Dashboard in ChatGPT",
+   "kanal": "OpenAI",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 75,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "OSHSopaYjTw.jpg"
+  },
+  {
+   "id": "L0LMTqUHkLQ",
+   "titel": "Microsoft Copilot Harness in Microsoft Foundry",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 53,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "L0LMTqUHkLQ.jpg"
+  },
+  {
+   "id": "JEgTn37Sk50",
+   "titel": "Ask Questions About Your Data in ChatGPT",
+   "kanal": "OpenAI",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 84,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "JEgTn37Sk50.jpg"
+  },
+  {
+   "id": "sof3vW4mHTs",
+   "titel": "The making of Anthropic",
+   "kanal": "Anthropic",
+   "datum": "2026-11-19",
+   "dauer_sekunden": 881,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "sof3vW4mHTs.jpg"
+  },
   {
    "id": "pmdrmOgoaMM",
    "titel": "Agent Loop and Context Management Explained",
@@ -10,6 +150,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "pmdrmOgoaMM.jpg"
+  },
+  {
+   "id": "meVsuyn6XJg",
+   "titel": "How to Build an App with Microsoft Copilot (No Coding!)",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-19",
+   "dauer_sekunden": 399,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "meVsuyn6XJg.jpg"
   },
   {
    "id": "ikNf7eW8CHk",
@@ -32,6 +182,26 @@
    "bild": "dvcxM2aHKGY.jpg"
   },
   {
+   "id": "YbZDDCHDSnE",
+   "titel": "This will test if AI truly is a bubble",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-19",
+   "dauer_sekunden": 70,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "YbZDDCHDSnE.jpg"
+  },
+  {
+   "id": "KGA7B_c_S4s",
+   "titel": "Anthropic IPOs, GPT 6.2 Astra Arrives, But There’s a Bigger Story",
+   "kanal": "AI Explained",
+   "datum": "2026-11-19",
+   "dauer_sekunden": 1842,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "KGA7B_c_S4s.jpg"
+  },
+  {
    "id": "JDsFHmq9hlA",
    "titel": "What we make of this moment, will make this moment.",
    "kanal": "Anthropic",
@@ -40,6 +210,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "JDsFHmq9hlA.jpg"
+  },
+  {
+   "id": "FORdPIWOH5k",
+   "titel": "Gemini and the path to AGI with Koray Kavukcuoglu",
+   "kanal": "Google DeepMind",
+   "datum": "2026-11-19",
+   "dauer_sekunden": 2818,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "FORdPIWOH5k.jpg"
   },
   {
    "id": "Cy7Wz6Z4TWU",
@@ -120,273 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "hT0qW_DRFLw.jpg"
-  },
-  {
-   "id": "b5ZSPULTrz8",
-   "titel": "Build apps by describing what you want | Copilot Code",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 465,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "b5ZSPULTrz8.jpg"
-  },
-  {
-   "id": "TrXieGlY85Y",
-   "titel": "KI-Update kompakt: Destillation, Anthropics Börsengang, OpenAI-Klage, IdeaLens",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 1115,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "TrXieGlY85Y.jpg"
-  },
-  {
-   "id": "KtV_f3chj9A",
-   "titel": "Introducing Autopilot, your personal and proactive agent",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 576,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "KtV_f3chj9A.jpg"
-  },
-  {
-   "id": "JVHkb8PTMvc",
-   "titel": "OpenAI GPT-6.2 Astra is Here - It's Not What You Think",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 898,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "JVHkb8PTMvc.jpg"
-  },
-  {
-   "id": "EDp4IoAUsXY",
-   "titel": "Introducing the new Project Genie, powered by Genie 4",
-   "kanal": "Google DeepMind",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 92,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "EDp4IoAUsXY.jpg"
-  },
-  {
-   "id": "Bn8DhYpy-qI",
-   "titel": "Grok Build leaks apps and Outlook goes dark worldwide",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 1572,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Bn8DhYpy-qI.jpg"
-  },
-  {
-   "id": "AhmCKHNqhB8",
-   "titel": "Introducing ChatGPT for Accounting",
-   "kanal": "OpenAI",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 47,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "AhmCKHNqhB8.jpg"
-  },
-  {
-   "id": "2pdF52EVlbM",
-   "titel": "An underrated way to use ChatGPT: Life admin",
-   "kanal": "OpenAI",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 34,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "2pdF52EVlbM.jpg"
-  },
-  {
-   "id": "2nAFAIXdXew",
-   "titel": "KI-Update kompakt: Destillation, Anthropics Börsengang, OpenAI-Klage, IdeaLens",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 1190,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "2nAFAIXdXew.jpg"
-  },
-  {
-   "id": "-oA6oLxWpJg",
-   "titel": "Insane AI Breakthroughs Nobody Is Talking About",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 1765,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "-oA6oLxWpJg.jpg"
-  },
-  {
-   "id": "xkeXefmxArU",
-   "titel": "Making marketing feel local across 40 markets | Revolut’s Kim Maniovich",
-   "kanal": "OpenAI",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 129,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "xkeXefmxArU.jpg"
-  },
-  {
-   "id": "xGS2TTUowZU",
-   "titel": "Millionen Studenten stehen vor dem Nichts: KI hat alles beendet",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 1060,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "xGS2TTUowZU.jpg"
-  },
-  {
-   "id": "tKoDPOrLMX0",
-   "titel": "Building 3D video sets with GPT-6.2 Astra",
-   "kanal": "OpenAI",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 83,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "tKoDPOrLMX0.jpg"
-  },
-  {
-   "id": "qbsb9DpdZ6s",
-   "titel": "This algorithm changed how I think about compression | Information theory, part 3",
-   "kanal": "3Blue1Brown",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 2245,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "qbsb9DpdZ6s.jpg"
-  },
-  {
-   "id": "pmOJIq7Ah00",
-   "titel": "Introducing ChatGPT for Sales",
-   "kanal": "OpenAI",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 51,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "pmOJIq7Ah00.jpg"
-  },
-  {
-   "id": "gl2U4fGTr6g",
-   "titel": "OpenAI's New Breakthrough Is... Utter Chaos",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 374,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "gl2U4fGTr6g.jpg"
-  },
-  {
-   "id": "a96n0k7PwQE",
-   "titel": "Google spielt wieder ganz vorne mit!",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 4842,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "a96n0k7PwQE.jpg"
-  },
-  {
-   "id": "ZIpm-0RczCk",
-   "titel": "How Revolut’s lean teams take on bigger challenges with OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-11-17",
-   "dauer_sekunden": 163,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "ZIpm-0RczCk.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-19",
-   "abgerufen": "2026-11-19"
+   "versucht": "2026-11-20",
+   "abgerufen": "2026-11-20"
   }
  },
  "error": null
