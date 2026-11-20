@@ -93,28 +93,28 @@ def test_lies_liefert_keine_geraeteliste():
     assert tarifwelt.lies("irrelevant", _URL) == []
 
 
-def test_waehle_je_band_naechstes_volumen_bei_gleichstand_das_groessere():
+def test_tarife_mit_band_behaelt_alle_tarife_eines_bandes_nach_volumen_und_preis():
     saetze = [
         {"tarif_id": "a", "datenvolumen_gb": 40.0, "grundgebuehr": 30.0},
         {"tarif_id": "b", "datenvolumen_gb": 60.0, "grundgebuehr": 20.0},
-        {"tarif_id": "c", "datenvolumen_gb": 10.0, "grundgebuehr": 15.0},
+        {"tarif_id": "c", "datenvolumen_gb": 40.0, "grundgebuehr": 25.0},
     ]
-    gewaehlt = tarifwelt.waehle_je_band(saetze, (("mittel", 50.0),))
-    assert gewaehlt["mittel"]["tarif_id"] == "b"
+    gewaehlt = tarifwelt.tarife_mit_band(saetze, (("mittel", 50.0),))
+    assert [s["tarif_id"] for s in gewaehlt] == ["c", "a", "b"]
 
 
-def test_waehle_je_band_gleich_nah_entscheidet_der_preis():
+def test_tarife_mit_band_nimmt_jede_tarif_id_nur_einmal():
     saetze = [
-        {"tarif_id": "teuer", "datenvolumen_gb": 40.0, "grundgebuehr": 50.0},
-        {"tarif_id": "billig", "datenvolumen_gb": 60.0, "grundgebuehr": 20.0},
+        {"tarif_id": "a", "datenvolumen_gb": 40.0, "grundgebuehr": 30.0},
+        {"tarif_id": "a", "datenvolumen_gb": 40.0, "grundgebuehr": 30.0},
     ]
-    gewaehlt = tarifwelt.waehle_je_band(saetze, (("mittel", 50.0),))
-    assert gewaehlt["mittel"]["tarif_id"] == "billig"
+    assert len(tarifwelt.tarife_mit_band(saetze, (("mittel", 50.0),))) == 1
 
 
-def test_waehle_je_band_ohne_treffer_bleibt_band_aus():
-    gewaehlt = tarifwelt.waehle_je_band([], (("mittel", 50.0),))
-    assert gewaehlt == {}
+def test_tarife_mit_band_ohne_treffer_oder_ohne_volumen_bleibt_leer():
+    assert tarifwelt.tarife_mit_band([], (("mittel", 50.0),)) == []
+    ohne = [{"tarif_id": "x", "datenvolumen_gb": None, "grundgebuehr": 9.0}]
+    assert tarifwelt.tarife_mit_band(ohne, (("mittel", 50.0),)) == []
 
 
 def test_lies_produktdetail_centgenau_iphone17_telekom_magenta_m():
@@ -227,7 +227,7 @@ def test_band_regel_ist_dieselbe_wie_im_bericht():
         assert band.band_von_gb(gb, leiter) == stufe_fuer(gb, LEITER), gb
 
 
-def test_genau_ein_tarif_je_netz_und_band_ohne_doppelkarte_aktion_young():
+def test_alle_vergleichbaren_tarife_je_netz_ohne_doppelkarte_aktion_young():
     from telco_radar.collect.geraete import tarifwelt_lauf
 
     liste = _tarifliste()
@@ -249,25 +249,25 @@ def test_genau_ein_tarif_je_netz_und_band_ohne_doppelkarte_aktion_young():
             "doppelkarte": False,
         },
     ]
-    gewaehlt = tarifwelt_lauf.waehle_tarife(liste + zusatz, LEITER)
-    assert len(gewaehlt) == len(set(gewaehlt))
-    ids = {s["tarif_id"] for s in gewaehlt.values()}
+    gewaehlt = tarifwelt_lauf.vergleichbare_tarife(liste + zusatz, LEITER)
+    ids = [s["tarif_id"] for s in gewaehlt]
+    assert len(ids) == len(set(ids))
     assert "aktion" not in ids and "young" not in ids
-    assert not any(s["doppelkarte"] for s in gewaehlt.values())
-    telekom = {b: s for (n, b), s in gewaehlt.items() if n == "freenet - Telekom"}
-    assert set(telekom) == {"m", "l", "xl"}
-    assert telekom["m"]["grundgebuehr"] == 29.99
-    assert telekom["l"]["grundgebuehr"] == 44.99
-    assert telekom["xl"]["tarif_name"] == "magenta-mobil-xl-5g"
-    o2 = {b: s for (n, b), s in gewaehlt.items() if n == "o2"}
-    assert set(o2) == {"xl"}
-    assert o2["xl"]["grundgebuehr"] == 29.99
-    vodafone = {b: s for (n, b), s in gewaehlt.items() if n == "freenet - Vodafone"}
-    assert set(vodafone) == {"s", "m", "l", "xl"}
-    assert vodafone["l"]["datenvolumen_gb"] == 120.0
+    assert not any(s["doppelkarte"] for s in gewaehlt)
+    telekom = [s for s in gewaehlt if s["netz"] == "freenet - Telekom"]
+    assert len(telekom) > 3
+    assert {29.99, 44.99} <= {s["grundgebuehr"] for s in telekom}
+    assert "magenta-mobil-xl-5g" in {s["tarif_name"] for s in telekom}
+    assert {s["netz"] for s in gewaehlt} == {
+        "o2",
+        "freenet - Telekom",
+        "freenet - Vodafone",
+    }
+    vodafone = [s for s in gewaehlt if s["netz"] == "freenet - Vodafone"]
+    assert 120.0 in {s["datenvolumen_gb"] for s in vodafone}
 
 
-def test_ein_band_ohne_passenden_tarif_bleibt_leer_statt_geraten():
+def test_tarif_ohne_band_der_leiter_bleibt_draussen_statt_geraten():
     from telco_radar.collect.geraete import tarifwelt_lauf
 
     nur_unbegrenzt = [
@@ -278,10 +278,11 @@ def test_ein_band_ohne_passenden_tarif_bleibt_leer_statt_geraten():
             "datenvolumen_gb": float("inf"),
             "grundgebuehr": 30.0,
             "doppelkarte": False,
+            "preiswechsel": False,
         }
     ]
-    gewaehlt = tarifwelt_lauf.waehle_tarife(nur_unbegrenzt, LEITER[:4])
-    assert gewaehlt == {}
+    assert tarifwelt_lauf.vergleichbare_tarife(nur_unbegrenzt, LEITER[:4]) == []
+    assert len(tarifwelt_lauf.vergleichbare_tarife(nur_unbegrenzt, LEITER)) == 1
 
 
 class _Antwort(tuple):
@@ -449,7 +450,7 @@ def test_lauf_zwei_geraete_zwei_tarife_centgenau_gegen_die_fixtures():
     assert all("/pks" not in u and "checkout" not in u for u in aufrufe)
 
 
-def test_lauf_nicht_waehlbarer_erstplatz_faellt_auf_den_naechsten_zurueck():
+def test_lauf_nicht_waehlbare_tarife_sind_benannte_luecken_ein_abruf_je_tarif():
     from telco_radar.collect.geraete import tarifwelt_lauf
 
     hole, aufrufe = fixture_hole()
@@ -460,4 +461,13 @@ def test_lauf_nicht_waehlbarer_erstplatz_faellt_auf_den_naechsten_zurueck():
     assert ("Saturn/MediaMarkt · o2-Netz", "Mobile M Promo") in tarife
     leere = [grund for _, grund in lauf.luecken]
     assert leere and all("waehlbar" in g for g in leere)
-    assert len(aufrufe) <= 1 + 3 * (1 + 15 * tarifwelt_lauf.MAX_KANDIDATEN)
+    liste = tarifwelt.lies_tarifliste(
+        (_FIXTURES / "tarifwelt_mm_tarifliste_galaxys26_20261108.json").read_text()
+    )
+    kandidaten = tarifwelt_lauf.vergleichbare_tarife(liste, LEITER)
+    listen = [u for u in aufrufe if "/tariff?" in u]
+    detail = [u for u in aufrufe if "tfi=" in u]
+    assert len(aufrufe) == 1 + len(listen) + len(detail)
+    assert len(detail) == len(listen) * len(kandidaten)
+    assert len(detail) == len(set(detail))
+    assert len(kandidaten) > 3

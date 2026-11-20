@@ -409,6 +409,8 @@ belegte_luecken:
   # Warenkorb; Methodik und Rohdaten in
   # docs/belege/tarifwelt-modelle-1313/README.md):
   #
+  # (Stand 20.11.2026: sieben - motorola-edge-70 ist wieder lieferbar und steht
+  # in `MODELL_SLUGS`.)
   # acht weitere Katalogmodelle stehen in der Sitemap, aber JEDE Variante war
   # beim Abruf `available: false` - wie bei den drei oben bereits belegten
   # Modellen ist das "nicht lieferbar", NICHT "nicht im Sortiment", deshalb
@@ -417,7 +419,6 @@ belegte_luecken:
   # zurueck, ist das beim naechsten Nachmessen zu pruefen.
   - anbieter: "Saturn/MediaMarkt · Telekom-Netz"
     modelle:
-      - motorola-edge-70
       - samsung-galaxy-z-flip-7
       - samsung-galaxy-a17
       - samsung-galaxy-a26
@@ -430,7 +431,6 @@ belegte_luecken:
     bis: "2026-11-27"
   - anbieter: "Saturn/MediaMarkt · Vodafone-Netz"
     modelle:
-      - motorola-edge-70
       - samsung-galaxy-z-flip-7
       - samsung-galaxy-a17
       - samsung-galaxy-a26
@@ -443,7 +443,6 @@ belegte_luecken:
     bis: "2026-11-27"
   - anbieter: "Saturn/MediaMarkt · o2-Netz"
     modelle:
-      - motorola-edge-70
       - samsung-galaxy-z-flip-7
       - samsung-galaxy-a17
       - samsung-galaxy-a26

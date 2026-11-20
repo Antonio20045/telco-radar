@@ -49,7 +49,7 @@ def test_endliche_volumen_bleiben_wie_sie_waren():
 
 def test_sammeln_nimmt_unbegrenzt_auch_bei_xl_ohne_volumen_auf():
     saetze = [{"tarif_id": "u", "datenvolumen_gb": INF, "grundgebuehr": 40.0}]
-    assert set(tarifwelt.rangliste_je_band(saetze, _leiter(None))) == {"xl"}
+    assert tarifwelt.tarife_mit_band(saetze, _leiter(None)) == saetze
 
 
 def test_erklaersatz_nennt_die_regel_in_einem_satz():
@@ -153,7 +153,7 @@ def test_einsundeins_unlimited_xl_bekommt_stufe_xl_im_bericht():
 
 def test_einsundeins_unlimited_xl_bekommt_stufe_xl_im_sammeln():
     satz = _einsundeins_unlimited_xl()
-    assert set(tarifwelt.rangliste_je_band([satz], _leiter(INF))) == {"xl"}
+    assert tarifwelt.tarife_mit_band([satz], _leiter(INF)) == [satz]
 
 
 def test_gegenprobe_ohne_erfasstes_volumen_keine_stufe():
@@ -178,7 +178,7 @@ def test_sammeln_kennt_die_ausnahmeliste_nicht(monkeypatch):
 
     monkeypatch.setattr(band_regel, "preis_widerspruch", nie)
     saetze = [{"tarif_id": "u", "datenvolumen_gb": INF, "grundgebuehr": 40.0}]
-    assert set(tarifwelt.rangliste_je_band(saetze, _leiter(INF))) == {"xl"}
+    assert tarifwelt.tarife_mit_band(saetze, _leiter(INF)) == saetze
 
 
 def test_widerspruchsstand_nennt_bei_leerer_liste_derzeit_kein_tarif():

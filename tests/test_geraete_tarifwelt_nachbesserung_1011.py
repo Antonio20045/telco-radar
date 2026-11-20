@@ -237,20 +237,21 @@ def test_gegenprobe_vergleichbarer_tarif_hat_keinen_grund():
     assert unvergleichbar_grund({**ok, "preiswechsel": None})
 
 
-def test_tarifliste_laesst_unvergleichbare_nicht_zum_bandsieger_werden():
+def test_tarifliste_laesst_unvergleichbare_nicht_in_die_auswahl():
     liste = tarifwelt.lies_tarifliste(
         (FIXTURES / "tarifwelt_mm_tarifliste_galaxys26_20261108.json").read_text()
     )
-    vorher = tarifwelt_lauf.rangliste_tarife(liste, LEITER)
+    vorher = tarifwelt_lauf.vergleichbare_tarife(liste, LEITER)
     assert vorher
-    gewinner = next(iter(vorher.values()))[0]
+    gewinner = vorher[0]
     schlechter = [
         {**s, "cashback": 50} if s["tarif_id"] == gewinner["tarif_id"] else s
         for s in liste
     ]
-    nachher = tarifwelt_lauf.rangliste_tarife(schlechter, LEITER)
-    ids = {s["tarif_id"] for rang in nachher.values() for s in rang}
+    nachher = tarifwelt_lauf.vergleichbare_tarife(schlechter, LEITER)
+    ids = {s["tarif_id"] for s in nachher}
     assert gewinner["tarif_id"] not in ids
+    assert len(nachher) == len(vorher) - 1
 
 
 def test_wechselbonus_steht_als_hinweis_und_ist_nicht_eingerechnet():

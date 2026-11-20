@@ -163,13 +163,13 @@ def test_stufe_ist_aus_solange_die_quelle_inaktiv_ist_die_echte_config_ist_aktiv
     assert any(a.methode == "mediamarkt_tarifwelt" for a in echt.anbieter)
 
 
-def test_aktive_stufe_liest_nur_pflichtmodelle_und_sammelt_tarife(monkeypatch):
+def test_aktive_stufe_liest_die_gewaehlten_modelle_und_sammelt_tarife(monkeypatch):
     hole, aufrufe = fixture_hole()
     quellen = _Quellen([_Quelle("mediamarkt_tarifwelt", aktiv=True)])
     monkeypatch.setattr(
         geraete_tarifwelt,
-        "pflicht_modelle",
-        lambda: frozenset({"apple-iphone-17", "samsung-galaxy-s26"}),
+        "modelle_der_stufe",
+        lambda: ["apple-iphone-17", "samsung-galaxy-s26"],
     )
     e = geraete_tarifwelt.lauf(
         quellen, _vodafone_tarife(), hole, "2026-11-08", warte=lambda s: None
@@ -199,8 +199,8 @@ def test_schutzantwort_beendet_die_stufe_ohne_weiteren_abruf(monkeypatch):
 
     monkeypatch.setattr(
         geraete_tarifwelt,
-        "pflicht_modelle",
-        lambda: frozenset({"apple-iphone-17", "samsung-galaxy-s26"}),
+        "modelle_der_stufe",
+        lambda: ["apple-iphone-17", "samsung-galaxy-s26"],
     )
     quellen = _Quellen([_Quelle("mediamarkt_tarifwelt", aktiv=True)])
     e = geraete_tarifwelt.lauf(
@@ -231,8 +231,8 @@ def test_tageslauf_stufe_schreibt_buendel_und_tarifbestand(tmp_path, monkeypatch
 
     monkeypatch.setattr(
         geraete_tarifwelt,
-        "pflicht_modelle",
-        lambda: frozenset({"apple-iphone-17", "samsung-galaxy-s26"}),
+        "modelle_der_stufe",
+        lambda: ["apple-iphone-17", "samsung-galaxy-s26"],
     )
     monkeypatch.setattr(geraete_tarifwelt.time, "sleep", lambda s: None)
     bestand = Tarifbestand(

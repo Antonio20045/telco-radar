@@ -27,7 +27,6 @@ from telco_radar.geraete_model import device_id
 WURZEL = Path(__file__).resolve().parent.parent
 
 NICHT_LIEFERBAR_NEU = {
-    "motorola-edge-70",
     "samsung-galaxy-z-flip-7",
     "samsung-galaxy-a17",
     "samsung-galaxy-a26",
