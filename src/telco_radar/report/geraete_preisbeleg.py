@@ -183,7 +183,8 @@ def hinweise(e: gp.Ergebnis, buendel_id: str, abgerufen_am: str) -> list[str]:
     out = []
     if buendel_id and e.buendel_id != buendel_id:
         name = farbe(e.buendel_id)
-        out.append(f"andere Farbe ({name})" if name else "andere Farbe")
+        bekannt = name and name != "ohne farbe"
+        out.append(f"andere Farbe ({name})" if bekannt else "andere Farbvariante")
     if abgerufen_am and e.datum != abgerufen_am:
         gelesen = datum_de(abgerufen_am)
         out.append(f"Prüfung vom {datum_de(e.datum)}, Preis gelesen am {gelesen}")

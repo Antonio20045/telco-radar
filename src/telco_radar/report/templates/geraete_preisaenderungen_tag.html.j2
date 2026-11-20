@@ -27,7 +27,7 @@
   <ul class="pa-liste">{% for a in zeilen %}
     <li class="pa-zeile" style="--anb:{{ a.anb_farbe }}">
       <p class="pa-kopf"><b class="gr-pb-anb">{{ a.anbieter }}</b> {{ a.geraet }} · {{ a.tarif }}{% if a.raten %} · {{ a.raten }} Raten{% endif %}</p>
-      <p class="pa-preis">{{ a.alt.gesamt | euro }} → <b>{{ a.neu.gesamt | euro }}</b>{% if a.delta is not none %} <span class="pa-delta">{{ '+' if a.delta > 0 else '−' }}{{ (a.delta | abs) | euro }}</span>{% endif %}</p>
+      <p class="pa-preis">{{ a.alt.gesamt | euro }} → <b>{{ a.neu.gesamt | euro }}</b>{% if a.delta is not none %} <span class="pa-delta">{{ '+' if a.delta > 0 else ('−' if a.delta < 0 else '±') }}{{ (a.delta | abs) | euro }}</span>{% endif %}</p>
       {% if a.posten %}<p class="pa-posten">{{ a.posten | join(' · ') }}</p>{% endif %}
       <div class="pa-belege">{{ tagesbeleg(a.alt, a) }}{{ tagesbeleg(a.neu, a) }}</div>
     </li>{% endfor %}
