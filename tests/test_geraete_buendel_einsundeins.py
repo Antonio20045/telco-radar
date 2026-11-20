@@ -702,9 +702,7 @@ def _neue_seite(
         },
     ]
     return (
-        "<script>window.hwdVariantsHardwarePrices = "
-        + json.dumps(karte)
-        + ";</script>"
+        "<script>window.hwdVariantsHardwarePrices = " + json.dumps(karte) + ";</script>"
         "<script>const products = " + json.dumps(produkte) + ";</script>"
     )
 
@@ -738,6 +736,103 @@ def test_echte_seite_a57_vom_20_11_zweites_geraet():
         (128, 34.99),
         (256, 37.99),
     ]
+
+
+def test_angezeigt_monatlich_faellt_auf_die_preiskarte_zurueck_a_72zcss():
+    """A-72ZCSS/A-CHUGVZ: `id="<hw_id>--price__digits"` steht auf der
+    K1-Seite nicht mehr (nur noch `<span class="price__digits">` ohne
+    ID, Modulkopf) - `_angezeigter_preis` liefert dafür `None`. Ohne
+    Rückfall schlägt die Gegenprobe in `ergaenze_tarifstufen` dann für
+    JEDES Gerät fehl (`angezeigt is None`) und es wird keine einzige
+    Tarifstufe hergeleitet (Befund: 4 statt ~541 Bündel). Der Rückfall
+    auf den Preiskarten-Betrag selbst hält die VORAUSGEWÄHLTE Variante
+    gesetzt, alle anderen bleiben None."""
+    for name, url in (
+        ("einsundeins_produktseite_iphone_17_pro_2026-11-20.html.gz", _IPHONE_URL),
+        ("einsundeins_produktseite_galaxy_a57_2026-11-20.html.gz", _A57_URL),
+    ):
+        saetze = lies_buendel(_fixture(name), url=url)
+        vor = [s for s in saetze if s["vorausgewaehlt"]]
+        assert len(vor) == 1, name
+        assert vor[0]["angezeigt_monatlich"] == vor[0]["buendel_monatlich"]
+        assert all(
+            s["angezeigt_monatlich"] is None for s in saetze if not s["vorausgewaehlt"]
+        )
+
+
+def test_tarifstufen_werden_auf_der_neuen_seite_wieder_hergeleitet():
+    """Der eigentliche Regressionstest zu A-CHUGVZ: mit gesetztem
+    `angezeigt_monatlich` besteht die Gegenprobe in `ergaenze_tarifstufen`
+    wieder, und ein zweiter Tarif (unterschiedlicher Aufschlag je Gerät)
+    wird für die vorausgewählte Größe hergeleitet - nicht mehr nur der
+    eine Default-Tarif-Satz je Seite."""
+    from telco_radar.collect.geraete.einsundeins import ergaenze_tarifstufen
+
+    saetze = []
+    for name, url in (
+        ("einsundeins_produktseite_iphone_17_pro_2026-11-20.html.gz", _IPHONE_URL),
+        ("einsundeins_produktseite_galaxy_a57_2026-11-20.html.gz", _A57_URL),
+    ):
+        for s in lies_buendel(_fixture(name), url=url):
+            saetze.append({**s, "sku_id": s["titel"], "anbieter": "1&1"})
+
+    raster_m = (
+        '<div class="hardware-container__items" id="hardware-list">'
+        '<form class="hardware-box">'
+        '<span data-hardware-select="hw-apple-iphone-17-pro"></span>'
+        '<span data-hardware-months="24"></span>'
+        '<span class="-price--euro">69</span>'
+        '<span class="-price--cent">99</span>'
+        "Inkl. 1&amp;1 All-Net-Flat M (50 GB)"
+        "</form>"
+        '<form class="hardware-box">'
+        '<span data-hardware-select="hw-samsung-galaxy-a57-5g"></span>'
+        '<span data-hardware-months="24"></span>'
+        '<span class="-price--euro">44</span>'
+        '<span class="-price--cent">99</span>'
+        "Inkl. 1&amp;1 All-Net-Flat M (50 GB)"
+        "</form>"
+        "</form>"
+    )
+    raster_s = (
+        '<div class="hardware-container__items" id="hardware-list">'
+        '<form class="hardware-box">'
+        '<span data-hardware-select="hw-apple-iphone-17-pro"></span>'
+        '<span data-hardware-months="24"></span>'
+        '<span class="-price--euro">59</span>'
+        '<span class="-price--cent">99</span>'
+        "Inkl. 1&amp;1 All-Net-Flat S"
+        "</form>"
+        '<form class="hardware-box">'
+        '<span data-hardware-select="hw-samsung-galaxy-a57-5g"></span>'
+        '<span data-hardware-months="24"></span>'
+        '<span class="-price--euro">34</span>'
+        '<span class="-price--cent">99</span>'
+        "Inkl. 1&amp;1 All-Net-Flat S"
+        "</form>"
+        "</form>"
+    )
+    uebersicht = (
+        '<a targetpage="/smartphones-all-net-flat-s"></a>'
+        '<a targetpage="/smartphones-all-net-flat-m"></a>'
+    )
+    netz = {
+        "https://mobile.1und1.de/all-net-flat-vergleich": (200, uebersicht),
+        "https://mobile.1und1.de/unbegrenztes-datenvolumen": (200, ""),
+        "https://mobile.1und1.de/smartphones-all-net-flat-s": (200, raster_s),
+        "https://mobile.1und1.de/smartphones-all-net-flat-m": (200, raster_m),
+    }
+
+    def hole(url, kopfzeilen=None, **kw):
+        return netz.get(url, (404, ""))
+
+    neu = ergaenze_tarifstufen(hole, {}, saetze)
+    assert neu == 2, "je vorausgewählter Größe ein zweiter Tarif (M) je Gerät"
+    hergeleitet = [s for s in saetze if s.get("herleitung")]
+    assert {(s["hw_id"], s["tarif_name"]) for s in hergeleitet} == {
+        ("hw-apple-iphone-17-pro", "1&1 All-Net-Flat M"),
+        ("hw-samsung-galaxy-a57-5g", "1&1 All-Net-Flat M"),
+    }
 
 
 def test_tarifdetails_und_zuzahlung_fehlen_jetzt_ohne_falsche_zahl():
@@ -778,7 +873,7 @@ def test_24_plus_12_wird_nicht_als_flacher_preis_gelesen():
 
 
 def test_flex_wird_nie_gelesen_auch_wenn_sie_der_einzige_eintrag_ist():
-    """"flex" verlängert die Bindung über die Mindestlaufzeit hinaus
+    """ "flex" verlängert die Bindung über die Mindestlaufzeit hinaus
     (24+12/36+12, Modulkopf) und wird deshalb NIE als Quelle für
     `buendel_monatlich` genutzt - fehlt "fix", bleibt die Variante
     unbelegt, auch wenn "flex" einen Preis nennt."""
