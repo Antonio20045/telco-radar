@@ -20,6 +20,7 @@ from pathlib import Path
 import waechter_belegvertraege
 import waechter_claude
 import waechter_erkundung
+import waechter_gegenprobe
 import waechter_speicher
 import yaml
 
@@ -382,4 +383,5 @@ REGELN: tuple[Callable[[Path], list[str]], ...] = (
     buendelwaechter_zuletzt,
     ein_crawl_je_tag,
     waechter_belegvertraege.belegbilder_halten_commit_und_zeit_frei,
+    waechter_gegenprobe.gegenprobe_haelt_zeit_und_grenzen,
 )

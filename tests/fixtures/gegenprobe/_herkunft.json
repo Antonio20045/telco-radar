@@ -1,0 +1,71 @@
+{
+  "zweck": "Sichtbare Preisbereiche der Anbieterseiten für die Leser der Gegenprobe (tests/test_gegenprobe_sicht.py).",
+  "eintraege": [
+    {
+      "datei": "telekom.html",
+      "url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=9.5&instalmentId=24",
+      "abgerufen_am": "2026-11-20",
+      "buendel_id": "buendel--telekom--google-pixel-10a-128gb-ohne-farbe--magentamobil-m--24m",
+      "werkzeug": "scripts/gegenprobe.py --aufnehmen (Chromium, sichtbare Knoten des Preisbereichs ohne Attribute)",
+      "beleg": "Gegenprobe-Lauf vom 2026-11-20, 2026-11-20T17:43:45+00:00: Kundenweg im Browser, Status abweichend; Inhalt maschinell gekürzt, Text unverändert.",
+      "gzip": false,
+      "bytes_roh": 5418,
+      "sha256_roh": "66261abb1cc3544b2d3961c5a0e47d8cc08ca33219b6e7676ad0e66029d3b0e3"
+    },
+    {
+      "datei": "o2.html",
+      "url": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+      "abgerufen_am": "2026-11-20",
+      "buendel_id": "buendel--o2--apple-iphone-14-128gb-schwarz-refurbished--o2-mobile-unlimited-s-special-plus-mit-15-mbit-s-24-mon--24m",
+      "werkzeug": "scripts/gegenprobe.py --aufnehmen (Chromium, sichtbare Knoten des Preisbereichs ohne Attribute)",
+      "beleg": "Gegenprobe-Lauf vom 2026-11-20, 2026-11-20T17:43:45+00:00: Kundenweg im Browser, Status abweichend; Inhalt maschinell gekürzt, Text unverändert.",
+      "gzip": false,
+      "bytes_roh": 1031,
+      "sha256_roh": "701a7561a23e8e8a920a627299d5b96538e8843d9d83fa9cc2a1e624f8eddb7c"
+    },
+    {
+      "datei": "congstar.html",
+      "url": "https://www.congstar.de/geraete/apple/apple-iphone-18-pro-max/?planId=543&installmentPlanId=501",
+      "abgerufen_am": "2026-11-20",
+      "buendel_id": "buendel--congstar--apple-iphone-18-pro-max-256gb-burgunder--allnet-flat-xs--36m",
+      "werkzeug": "scripts/gegenprobe.py --aufnehmen (Chromium, sichtbare Knoten des Preisbereichs ohne Attribute)",
+      "beleg": "Gegenprobe-Lauf vom 2026-11-20, 2026-11-20T17:43:45+00:00: Kundenweg im Browser, Status bestaetigt; Inhalt maschinell gekürzt, Text unverändert.",
+      "gzip": false,
+      "bytes_roh": 1958,
+      "sha256_roh": "0fe68ca3b9ed92b5179e4a101694a79e13b94e605769273c86e9864f88666905"
+    },
+    {
+      "datei": "saturn-mediamarkt-telekom-netz.html",
+      "url": "https://tarife.mediamarkt.de/smartphones/apple/iphone-17-pro-max/?farbe=cosmic-orange&speicher=256&ogi=68c3d584dc3c619fff3e4a1e&ofi=6a4cfdd823a2483330f37bce&tfi=5afd4e3a56b4536a4d6348d8&hwi=68c2da78cbe7b003287a2b2b_HW110231-1",
+      "abgerufen_am": "2026-11-20",
+      "buendel_id": "buendel--saturn-mediamarkt-telekom-netz--apple-iphone-17-pro-max-256gb-ohne-farbe--magenta-mobil-xl-5g--24m",
+      "werkzeug": "scripts/gegenprobe.py --aufnehmen (Chromium, sichtbare Knoten des Preisbereichs ohne Attribute)",
+      "beleg": "Gegenprobe-Lauf vom 2026-11-20, 2026-11-20T17:43:46+00:00: Kundenweg im Browser, Status bestaetigt; Inhalt maschinell gekürzt, Text unverändert.",
+      "gzip": false,
+      "bytes_roh": 1119,
+      "sha256_roh": "e28122b3e4ec2abd91b8e263639049d727f09397e1f8ffd2f15cd0071d15bc83"
+    },
+    {
+      "datei": "vodafone.html",
+      "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "abgerufen_am": "2026-11-20",
+      "buendel_id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-schwarz--mobil-xs--24m",
+      "werkzeug": "scripts/gegenprobe.py --aufnehmen (Chromium, sichtbare Knoten des Preisbereichs ohne Attribute)",
+      "beleg": "Gegenprobe-Lauf vom 2026-11-20, 2026-11-20T17:44:05+00:00: Kundenweg im Browser, Status bestaetigt; Inhalt maschinell gekürzt, Text unverändert.",
+      "gzip": false,
+      "bytes_roh": 3537,
+      "sha256_roh": "1c614410c8033b0c6825982f445b2d76dd38ea2c5efd49e193792d8f29008ce6"
+    },
+    {
+      "datei": "1-1.html",
+      "url": "https://mobile.1und1.de/xiaomi-18-pro",
+      "abgerufen_am": "2026-11-20",
+      "buendel_id": "buendel--1-1--xiaomi-18-pro-256gb-velvet-red--1-1-all-net-flat-s--24m",
+      "werkzeug": "scripts/gegenprobe.py --aufnehmen (Chromium, sichtbare Knoten des Preisbereichs ohne Attribute)",
+      "beleg": "Gegenprobe-Lauf vom 2026-11-20, 2026-11-20T17:43:53+00:00: Kundenweg im Browser, Status bestaetigt; Inhalt maschinell gekürzt, Text unverändert.",
+      "gzip": false,
+      "bytes_roh": 1385,
+      "sha256_roh": "0762707d42d4bcc57d584ff441387b0b23a1d71eaa878673fb4705224066ae53"
+    }
+  ]
+}

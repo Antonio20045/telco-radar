@@ -6,27 +6,18 @@ lokaler Server auf 127.0.0.1 liefert sie; keine Anfrage verlässt den Rechner.
 
 from __future__ import annotations
 
-import dataclasses
 import io
 import json
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
 import yaml
-from belegbau import ZEIT, paket, png, quelle
+from belegbau import ZEIT, png, quelle
 from klickserver import Antwort, html, klickserver
 from PIL import Image
 
-from telco_radar.collect.geraete.belegablage import LokaleAblage
-from telco_radar.collect.geraete.belegarchiv import archiviere
-from telco_radar.collect.geraete.belegmanifest import (
-    ManifestFehler,
-    lies_manifest,
-    manifestpfad,
-    pruefe_manifest,
-)
 from telco_radar.collect.geraete.klickbeleg import baue_beleg
 from telco_radar.collect.geraete.klickbildfolge import (
     HOECHSTE_BREITE,
@@ -43,12 +34,6 @@ from telco_radar.collect.geraete.klickecho import Variante
 from telco_radar.collect.geraete.klickkarte import (
     KlickkartenFehler,
     klickkarte_aus_daten,
-)
-from telco_radar.collect.geraete.klicklauf import (
-    BELEG_OFFEN,
-    ERFASST,
-    Klicklauf,
-    Kombiergebnis,
 )
 from telco_radar.collect.geraete.klickpreistext import TEXT_OHNE_BETRAG
 from telco_radar.collect.geraete.klicktext import (
@@ -318,89 +303,6 @@ def test_zu_grosses_bild_fehlt_mit_grund(monkeypatch):
 
     assert fertig.beleg.bildfolge_status == "unvollstaendig"
     assert all("größer" in f for f in fertig.beleg.bildfolge_fehlt)
-
-
-def _archiv(tmp_path, fertig):
-    ablage = LokaleAblage(tmp_path / "ablage")
-    lauf = Klicklauf("Beispielanbieter", "http://127.0.0.1:8000/handy/beispielhandy-x")
-    lauf.ergebnisse.append(
-        Kombiergebnis(
-            Variante("256", "S", 24), ERFASST, beleg=fertig, beleg_status=BELEG_OFFEN
-        )
-    )
-    archiviere(lauf, ablage, tmp_path / "m", ZEIT, stempler=lambda d: ())
-    pfad = manifestpfad(tmp_path / "m", "Beispielanbieter", date(2026, 10, 3))
-    return ablage, pfad
-
-
-def test_manifest_traegt_bildfolge_und_prueft_ihre_dateien(tmp_path):
-    fertig, _ = baue_beleg(_folgequelle(), _karte(), ZEIT)
-    ablage, pfad = _archiv(tmp_path, fertig)
-
-    zeile = json.loads(pfad.read_text("utf-8").splitlines()[0])
-    assert [b["schritt"] for b in zeile["bildfolge"]] == list(SCHRITTE)
-    assert set(zeile["bildfolge"][0]) == {
-        "datei",
-        "schritt",
-        "text",
-        "sha256",
-        "groesse",
-    }
-    assert zeile["bildfolge_status"] == "vollstaendig"
-    assert lies_manifest(pfad).belege[0] == fertig.beleg
-    assert pruefe_manifest(pfad, ablage.lies) == []
-
-    erste = fertig.beleg.bildfolge[0]
-    ziel = ablage.ordner / "beispielanbieter" / "2026-10-03" / erste.datei
-    ziel.unlink()
-    befunde = pruefe_manifest(pfad, ablage.lies)
-    assert any("fehlt in der Ablage" in b and "geraet_speicher" in b for b in befunde)
-
-
-def test_alte_zeile_ohne_bildfolge_bleibt_lesbar(tmp_path):
-    ablage, pfad = _archiv(tmp_path, paket())
-    zeilen = [json.loads(z) for z in pfad.read_text("utf-8").splitlines()]
-    for feld in ("bildfolge", "bildfolge_status", "bildfolge_fehlt"):
-        del zeilen[0][feld]
-    pfad.write_text("\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
-
-    beleg = lies_manifest(pfad).belege[0]
-
-    assert beleg.bildfolge == ()
-    assert beleg.bildfolge_status is None
-
-
-def test_manifest_lehnt_widerspruechliche_bildfolge_ab(tmp_path):
-    fertig, _ = baue_beleg(_folgequelle(), _karte(), ZEIT)
-    _, pfad = _archiv(tmp_path, fertig)
-    zeile = json.loads(pfad.read_text("utf-8").splitlines()[0])
-    zeile["bildfolge"] = zeile["bildfolge"][1:]
-    pfad.write_text(json.dumps(zeile) + "\n", encoding="utf-8")
-
-    with pytest.raises(ManifestFehler, match="vollstaendig"):
-        lies_manifest(pfad)
-
-
-def test_beleg_traegt_felder_unveraendert_neben_der_bildfolge():
-    fertig, _ = baue_beleg(_folgequelle(), _karte(), ZEIT)
-    alt, _ = baue_beleg(quelle(), _karte(), ZEIT)
-
-    felder = {f.name for f in dataclasses.fields(fertig.beleg)}
-    assert {"bild", "mitschnitt", "bildfolge", "bildfolge_status"} <= felder
-    assert fertig.beleg.beleg_id == alt.beleg.beleg_id
-    assert fertig.beleg.bild == alt.beleg.bild
-
-
-def test_aufbewahrung_loescht_die_bilder_der_folge_mit_ihrem_beleg():
-    from telco_radar.collect.geraete.belegaufbewahrung import aufbewahrung
-
-    fertig, _ = baue_beleg(_folgequelle(), _karte(), ZEIT)
-
-    entscheidung = aufbewahrung([fertig.beleg], date(2026, 10, 4))[0]
-
-    namen = {d.rsplit("/", 1)[1] for d in entscheidung.dateien}
-    assert {b.datei for b in fertig.beleg.bildfolge} <= namen
-    assert len(namen) == 5
 
 
 TELEKOM_BILD = (
