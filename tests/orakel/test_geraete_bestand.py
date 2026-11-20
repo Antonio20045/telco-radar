@@ -134,15 +134,14 @@ def _gw_bindung(buendel: dict, blaetter: dict) -> int | None:
 def gw_zeitraum(buendel: dict, blaetter: dict) -> int | None:
     """H der Soll-Definition (Datenkonzept Geräte 5.3): der größere Wert aus
     Ratenlaufzeit und Tarifbindung, eine unbekannte Bindung zählt 24 Monate.
-    Ohne Ratenlaufzeit gibt es keinen Zeitraum. Ein Betrag für Tarif und Gerät
-    über mehr als 24 Monate (1&1) zählt nur 24 (Antonio, 10.10.2026)."""
+    Ohne Ratenlaufzeit gibt es keinen Zeitraum; ohne Bindung (0) zählen 24
+    Vergleichsmonate. Ein Betrag für Tarif und Gerät (1&1) zählt seit 20.11.2026 alle
+    Monate seiner Laufzeit (docs/geraete/gesamtkosten.md, die Ablöse ist entfallen)."""
     laufzeit = buendel.get("laufzeit_monate")
     if laufzeit is None:
         return None
-    if buendel.get("buendel_monatlich") is not None and int(laufzeit) > _GW_HORIZONT:
-        return _GW_HORIZONT
     bindung = _gw_bindung(buendel, blaetter)
-    return max(int(laufzeit), _GW_HORIZONT if bindung is None else bindung)
+    return max(int(laufzeit), bindung if bindung else _GW_HORIZONT)
 
 
 def _gw_nur_grundpreis(phasen: list[dict]) -> bool:
@@ -210,8 +209,7 @@ def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     Kosten über H Monate = Anzahlung + Anschlusspreis + alle N Geräteraten +
     Tarif in jedem Monat 1 bis T, T der kleinere Wert aus H und der Bindung (ohne
     Bindung 24; Antonio, 10.10.2026: ab Monat 25 nur die Rate); ein
-    zusammengelegter Bündelbetrag (1&1) trägt H × Betrag und gilt nur für H = N
-    oder H = 24 < N; dann ist die Zuzahlung die Ablöse nach Monat 24.
+    zusammengelegter Bündelbetrag (1&1) trägt H × Betrag und gilt nur für H = N.
     Fehlt ein Posten, gibt es keine Zahl."""
     monate = gw_zeitraum(buendel, blaetter)
     if monate is None:
@@ -1241,7 +1239,8 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
 
     abweich, geprueft = [], 0
     for r in zeilen:
-        zu, tarif = _n(r["Zuzahlung EUR"]), _n(r["Tarif/Monat EUR"])
+        zu = _n(r["Gerät einmalig EUR"])
+        tarif = _n(r["Tarif/Monat EUR"])
         rate = _n(r["Geräterate EUR"])
         buendel = _n(r["Bündel/Monat EUR"])
         anschluss = _n(r["Anschlusspreis EUR"])
@@ -1250,7 +1249,7 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
             continue
         monate = max(int(lz), _GW_HORIZONT) if lz else None
         if buendel is not None and lz:
-            monate = min(int(lz), _GW_HORIZONT)
+            monate = int(lz)
             soll = (
                 buendel * monate
                 + (zu or 0)
@@ -1338,7 +1337,7 @@ def _gw_csv_store_abgleich(zeilen: list, tco: dict, blaetter: dict, stand: str) 
             r["Speicher GB"],
             r["Laufzeit Monate"],
             r["Zustand"],
-            r["Zuzahlung EUR"],
+            r["Gerät einmalig EUR"],
             r["Tarif/Monat EUR"],
             r["Geräterate EUR"],
             r["Bündel/Monat EUR"],
@@ -1403,13 +1402,12 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     """Der FACHLICHE Soll der SIM-only-Zeilen: 24 × Tarif PLUS
     Anschlusspreis, wo die Zeile ihn trägt (A4, 20.09.2026: die
     SIM-only-Leitzahl ist dieselbe Rechnung wie die der Bündel - Soll-
-    Definition der Leitzahl und Konsistenz zu geraeteanteil(), das
-    tco_24(als_buendel()) schon immer so rechnete; bis A4 rechnete der
-    Export ohne ihn, und der Orakel-Soll war der Bug). Eine LEERE Zelle
-    ist die Lücke des Modells (unbekannt ist nicht kostenlos), der
-    Orakel-Soll rechnet dann ohne ihn - dieselbe Konvention wie beim
-    Bündel-Zweig oben. Zuzahlung und Geräterate werden in SIM-only-Zeilen
-    nicht erhoben und stehen leer.
+    Definition der Leitzahl; bis A4 rechnete der Export ohne ihn, und der
+    Orakel-Soll war der Bug). Eine LEERE Anschlusszelle ist eine Lücke
+    (unbekannt ist nicht kostenlos): seit 20.11.2026 (docs/geraete/
+    gesamtkosten.md) trägt die Zeile dann auch keine Leitzahl - vorher
+    stand dort 24 × Tarif, als wäre der Anschluss 0 €. Zuzahlung und
+    Geräterate werden in SIM-only-Zeilen nicht erhoben und stehen leer.
 
     Auftrag P0.8: "Im SIM-only-Export fehlt der Anschlusspreis" - bis
     P0-A4 (2026-09-20) rechnete die Kennzahl ihn nicht ein; seither ist
@@ -1431,16 +1429,15 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     for r in zeilen:
         tarif, ist = _z(r["Tarif/Monat EUR"]), _z(_gw_leitzahl_aus_zeile(r))
         anschluss = _z(r["Anschlusspreis EUR"])
-        if tarif is None or ist is None:
+        if tarif is None:
             continue
-        soll = (
-            tarif * 24
-            + (anschluss if anschluss is not None else _gw_Dez(0))
-            + _gw_versand(r["Anbieter"])
-        )
-        if anschluss is not None:
-            mit_anschluss += 1
         geprueft += 1
+        if anschluss is None:
+            if ist is not None:
+                abweich.append((r["Anbieter"], r["Tarif"], float(ist), None))
+            continue
+        soll = tarif * 24 + anschluss + _gw_versand(r["Anbieter"])
+        mit_anschluss += 1
         if ist != soll:
             abweich.append((r["Anbieter"], r["Tarif"], float(ist), float(soll)))
     assert geprueft >= 40, (
@@ -2166,8 +2163,8 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
     max(Ratenlaufzeit, Tarifbindung) Monate = Anzahlung + Tarif in jedem Monat
     der Bindung (24) + ALLE Geraeteraten + Anschlusspreis; ab Monat 25 nur die
     Rate. Bei einem zusammengelegten Buendelmonatspreis (1&1) tritt dieser
-    Betrag ueber H an die Stelle von Tarif UND Rate; ueber mehr als 24 Monate
-    zaehlen 24 Betraege und die Abloese.
+    Betrag ueber H an die Stelle von Tarif UND Rate (seit 20.11.2026 alle Monate
+    der Laufzeit; die Abloese „24 + 12“ ist entfallen).
 
     Rundung offen benannt: jeder Monatsbetrag wird als ganze Cent gelesen
     und danach multipliziert (eine Rate von 30,50 EUR ist 3050 Cent), die
@@ -2185,8 +2182,7 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
         24 Raten: 0,99 + 24 x 31,95 + 24 x 60,00 + 0,00 + 9,98 = 2.217,77 EUR
         36 Raten: 0,99 + 24 x 31,95 + 36 x 40,00 + 0,00 + 9,98 = 2.217,77 EUR
       1&1 / iPhone 18 Pro 256 / All-Net-Flat S, Buendelbetrag
-        36 Monate, gerechnet 24 (Antonio 10.10.2026: nur über 24 Monate):
-                   420,00 Ablöse + 24 x 49,99 + 39,90       = 1.659,66 EUR
+        36 Monate:  420,00 einmalig + 36 x 49,99 + 39,90    = 2.259,54 EUR
       congstar / Galaxy S26 Ultra 256 / Allnet Flat S
         24 Raten: 119,00 + 24 x 20,00 + 24 x 43,50 + 15,00 + 4,99  = 1.662,99 EUR
         36 Raten: 119,00 + 24 x 20,00 + 36 x 29,00 + 15,00 + 4,99  = 1.662,99 EUR
@@ -2203,7 +2199,7 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 12, 221777),
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 24, 221777),
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 36, 221777),
-        ("apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 36, 165966),
+        ("apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 36, 225954),
         ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 24, 166299),
         ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 36, 166299),
     )

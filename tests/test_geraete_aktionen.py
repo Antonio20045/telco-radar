@@ -29,7 +29,7 @@ from telco_radar.tco_model import (
     Aktion,
     Buendel,
     aktionen_aus,
-    tco_24,
+    kosten_ueber,
 )
 
 FIX = Path(__file__).parent / "fixtures" / "geraete"
@@ -196,8 +196,8 @@ def _buendel(**kw):
 
 
 def test_keine_aktion_veraendert_die_leitzahl():
-    ohne = tco_24(_buendel())
-    mit = tco_24(
+    ohne = kosten_ueber(_buendel())
+    mit = kosten_ueber(
         _buendel(
             aktionen=[
                 _aktion(betrag=324.0),

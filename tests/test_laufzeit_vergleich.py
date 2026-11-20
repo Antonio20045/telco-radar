@@ -3,7 +3,7 @@ Ratenlaufzeit.
 
 Ein Bestand für das iPhone 17 Pro 256 GB im Band XS mit allen drei
 Ansichten (12, 24 und 36 Raten): Vodafone und congstar je 12/24/36, o2 nur 24,
-Telekom nur 36, 1&1 ein Vertrag über 36 Monate. Die Erwartungen stehen als
+Telekom nur 36, 1&1 ein Vertrag „24 Monate Fix“. Die Erwartungen stehen als
 Rechnung aus den Rohwerten im Test, nicht aus dem Produktcode:
 
   12 Raten (H 24): congstar 1 + 24 × 15 + 12 × 70 = 1.201,00
@@ -11,15 +11,14 @@ Rechnung aus den Rohwerten im Test, nicht aus dem Produktcode:
   24 Raten (H 24): congstar 1 + 24 × 15 + 24 × 38,25 = 1.279,00
                    o2       1 + 24 × 25 + 24 × 40 = 1.561,00
                    Vodafone 1 + 24 × 29,95 + 24 × 45 = 1.799,80
-                   1&1      24 × 42,99 + 340 Ablöse + 39,90 = 1.411,66
+                   1&1      24 × 42,99 + 340 einmalig + 39,90 = 1.411,66
   36 Raten (H 36): congstar 1 + 24 × 15 + 36 × 26 = 1.297,00
                    Telekom  1 + 24 × 20 + 36 × 31 = 1.597,00
                    Vodafone 1 + 24 × 29,95 + 36 × 31 = 1.835,80
 
 Der Tarif zählt nur seine 24 Monate, ab Monat 25 nur die Rate; 1&1 (Tarif und
-Gerät in einem Betrag über 36 Monate, „24 + 12“) wird nur über 24 Monate
-verglichen: 24 Beträge plus Einmalzahlung, in der 24er-Ansicht (Manager,
-05.11.2026).
+Gerät in einem Betrag) zählt alle Beträge seiner Laufzeit (seit 20.11.2026 „24/36
+Monate Fix“, die frühere Ablöse „24 + 12“ ist entfallen).
 
 Vor Teil B stellte die 12er-Karte von congstar den Sieger der 24-Monats-Tafel,
 Δ rechnete gegen die günstigste Vodafone-Karte über alle Laufzeiten, und 1&1
@@ -131,7 +130,7 @@ def _getrennt(anbieter, tid, laufzeit, rate, **kw):
 
 def _vertrag():
     return {
-        "id": buendel_id(SKU, "1&1", "All-Net-Flat S", 36),
+        "id": buendel_id(SKU, "1&1", "All-Net-Flat S", 24),
         "sku_id": SKU,
         "anbieter": "1&1",
         "tarif_name": "All-Net-Flat S",
@@ -139,11 +138,11 @@ def _vertrag():
         "tarif_id_guete": "hoch",
         "buendel_monatlich": 42.99,
         "geraet_zuzahlung": 340.0,
-        "laufzeit_monate": 36,
+        "laufzeit_monate": 24,
         "anschlusspreis": 39.9,
         "zustand": "neu",
         "rabatte": [],
-        "quelle_url": "https://example.de/1und1/36",
+        "quelle_url": "https://example.de/1und1/24",
         "abgerufen_am": HEUTE,
         "first_seen": GESTERN,
         "last_verified": HEUTE,
@@ -459,7 +458,7 @@ def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(g):
     assert zwoelf["Telekom"].startswith("Mit 12 Raten nicht erfasst"), zwoelf
     sechsunddreissig = zustand(36)
     assert "Telekom" not in sechsunddreissig, sechsunddreissig
-    assert sechsunddreissig["1&1"] == "Nur über 24 Monate verglichen"
+    assert sechsunddreissig["1&1"].startswith("Mit 36 Raten nicht erfasst")
 
 
 def test_spanne_je_laufzeit(g):
@@ -584,10 +583,9 @@ def test_ohne_24er_nennt_der_katalog_die_raten_des_gezeigten_buendels(tmp_path):
     ) == ("o2", 75.0, 12)
 
 
-def test_der_radar_vergleicht_1und1_24_plus_12_mit_der_gerechneten_zahl(g):
-    """1&1 führt nur „24 + 12“ (36 Monate): Radarzeile und Bündel-Export tragen
-    dieselbe gerechnete 24-Monats-Zahl (24 × 42,99 + 340 Ablöse + 39,90 =
-    1.411,66, Preisprüfung 05.11.2026), ohne Lücke."""
+def test_der_radar_vergleicht_1und1_24_fix_mit_der_gerechneten_zahl(g):
+    """1&1 „24 Monate Fix“: Radarzeile und Bündel-Export tragen dieselbe Zahl
+    (24 × 42,99 + 340 einmalig + 39,90 = 1.411,66), ohne Lücke."""
     gruppen = geraete_radar.netzbetreiber_gruppen(
         g["tco"]["modelle"], g["tco"]["band_je_tarif"]
     )
@@ -608,9 +606,8 @@ def test_der_radar_vergleicht_1und1_24_plus_12_mit_der_gerechneten_zahl(g):
     assert not any(z["Lücke"] for z in zeilen), zeilen
 
 
-def test_gegenprobe_ein_anbieter_ohne_24_plus_12_behaelt_seinen_grund(g):
-    """Wer nicht „24 + 12“ führt, bekommt den Satz nicht: eine Zeile ohne
-    Karte nennt weiter „kein Bündel erhoben“."""
+def test_gegenprobe_ein_anbieter_ohne_karte_behaelt_seinen_grund(g):
+    """Ohne 1&1-Karte nennt die Zeile „kein Bündel erhoben“."""
     modell = next(m for m in g["tco"]["modelle"] if m["id"] == MODELL)
     ohne = {**modell, "karten": [k for k in modell["karten"] if k["anbieter"] != "1&1"]}
     gruppen = geraete_radar.netzbetreiber_gruppen([ohne], g["tco"]["band_je_tarif"])

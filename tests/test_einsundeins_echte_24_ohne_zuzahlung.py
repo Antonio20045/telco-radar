@@ -42,14 +42,12 @@ def test_echte_24_ohne_zuzahlung_wird_erkannt():
     assert geraete_laufzeit.ist_echte_24_ohne_zuzahlung(_karte())
 
 
-def test_24_plus_12_ist_keine_echte_24_ohne_zuzahlung():
-    """36 Monate (= „24 + 12“) mit bestätigter Zuzahlung ist die andere Regel
-    (`ist_24_plus_12`), nicht diese - beide schließen sich aus."""
+def test_36_monate_sind_keine_echte_24_ohne_zuzahlung():
+    """36 Monate fallen nie unter diese 24-Monats-Regel (die frühere Regel
+    „24 + 12 mit Ablöse“ ist seit 20.11.2026 entfallen)."""
     karte = _karte(zuzahlung=360.0, raten_laufzeit=36)
     assert not geraete_laufzeit.ist_echte_24_ohne_zuzahlung(karte)
-    assert geraete_laufzeit.ist_24_plus_12(
-        karte["buendel_monatlich"], karte["raten_laufzeit"]
-    )
+    assert not hasattr(geraete_laufzeit, "ist_24_plus_12")
 
 
 def test_echte_24_mit_zuzahlung_ist_keine_luecke():

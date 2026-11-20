@@ -30,7 +30,7 @@ from collections.abc import Mapping
 
 from .. import rechenweise
 from ..tarif_model import BUENDELPHASEN
-from ..tco_model import Buendel, tco_24
+from ..tco_model import Buendel, kosten_ueber
 from .geraete_pruefstatus import (
     AUSREISSER_VORTAG,
     NICHT_PRUEFBAR,
@@ -182,11 +182,9 @@ def regel_11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     vorher = _zeile(satz, alt)
     if vorher is None:
         return _nicht("Vortageswert unlesbar")
-    neu_t, alt_t = tco_24(b), tco_24(vorher)
+    neu_t, alt_t = kosten_ueber(b), kosten_ueber(vorher)
     neu_g, alt_g = geraetepreis(b), geraetepreis(vorher)
-    if not (neu_t.belastbar and alt_t.belastbar) or neu_t.gesamt is None:
-        return _nicht("Gesamtpreis heute oder am Vortag unvollständig")
-    if not alt_t.gesamt:
+    if neu_t.gesamt is None or not alt_t.gesamt:
         return _nicht("Gesamtpreis heute oder am Vortag unvollständig")
     tag = datum(str(alt.get("datum") or ""))
     sprung = _abstand(neu_t.gesamt, alt_t.gesamt)

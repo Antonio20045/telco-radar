@@ -32,7 +32,7 @@ from telco_radar.report import geraete_rechenweg, geraete_tco_view
 from telco_radar.report.geraete_tco_karten import tarif_anreichern
 from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tco_kosten import tarifphasen
-from telco_radar.tco_model import Buendel, kosten_ueber, tco_24
+from telco_radar.tco_model import Buendel, kosten_ueber
 
 FIX = Path(__file__).parent / "fixtures" / "geraete"
 CONGSTAR_URL = "https://www.congstar.de/geraete/apple/apple-iphone-17/"
@@ -214,26 +214,26 @@ def _ueber_36(b: Buendel) -> tuple:
 def test_mit_beleg_traegt_die_phase_monat_36_die_summe_bleibt_bei_24_tarifmonaten():
     """Allnet Flat XS zu 15,00 € mit 36 Raten: das Tarifblatt nennt nur den Grundpreis
     (eine Phase ohne Ende), die Messung die Phase 1 bis 36 - sie bleibt stehen. Die
-    Summe über 36 Monate ist mit und ohne Beleg `tco_24`."""
+    Summe über 36 Monate ist mit und ohne Beleg `kosten_ueber`."""
     bestand = _bestand()
     xs = _buendel(_congstar_roh("Allnet Flat XS", 36), bestand)
-    assert _ueber_36(xs) == (tco_24(xs).gesamt, True)
+    assert _ueber_36(xs) == (kosten_ueber(xs).gesamt, True)
     assert [(p.von_monat, p.bis_monat) for p in xs.tarif_phasen] == [(1, 36)]
 
     m = _buendel(_congstar_roh("Allnet Flat M", 36), bestand)
-    assert _ueber_36(m) == (tco_24(m).gesamt, False)
+    assert _ueber_36(m) == (kosten_ueber(m).gesamt, False)
     xs_ohne = _buendel(
         {**_congstar_roh("Allnet Flat XS", 36), "tarif_phasen": []}, bestand
     )
-    assert _ueber_36(xs_ohne) == (tco_24(xs).gesamt, False)
-    assert tco_24(xs).gesamt == tco_24(xs_ohne).gesamt
+    assert _ueber_36(xs_ohne) == (kosten_ueber(xs).gesamt, False)
+    assert kosten_ueber(xs).gesamt == kosten_ueber(xs_ohne).gesamt
 
 
 def test_ein_24_raten_buendel_bekommt_keine_36er_phase():
     b = _buendel(_congstar_roh("Allnet Flat XS", 24), _bestand())
     assert [(p.von_monat, p.bis_monat) for p in b.tarif_phasen] == [(1, 24)]
-    assert _ueber_36(b) == (tco_24(b).gesamt, False)
-    assert kosten_ueber(b).gesamt == tco_24(b).gesamt
+    assert _ueber_36(b) == (kosten_ueber(b).gesamt, False)
+    assert kosten_ueber(b).gesamt == kosten_ueber(b).gesamt
 
 
 @pytest.mark.parametrize(
@@ -249,7 +249,7 @@ def test_ein_24_raten_buendel_bekommt_keine_36er_phase():
 def test_eine_phase_ohne_beleg_oder_monate_belegt_nichts(phase):
     roh = {**_congstar_roh("Allnet Flat XS", 36), "tarif_phasen": [phase]}
     b = _buendel(roh, _bestand())
-    assert _ueber_36(b) == (tco_24(b).gesamt, False)
+    assert _ueber_36(b) == (kosten_ueber(b).gesamt, False)
 
 
 def test_die_phase_geht_durch_speicher_historie_und_ansicht(tmp_path):

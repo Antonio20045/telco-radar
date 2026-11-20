@@ -7,7 +7,7 @@ Die Pruefkriterien des Briefs, je eine eigene Funktion:
   mit Vorzeichen"
 - Sortierung: negativste Abweichung zuerst (§2b: "die groesste Abweichung
   zuungunsten von Vodafone zuerst")
-- TCO ausschliesslich tco_24() - im gerenderten Artefakt steht kein
+- TCO ausschliesslich kosten_ueber() - im gerenderten Artefakt steht kein
   "TCO-36" (§3: "Immer 24 Monate")
 - Haendler vergleichen reinen GERAETEPREIS, nie Tarif oder TCO (§3:
   "Zahlen, nie vermischt"; §8: "Haendler zaehlen als Wettbewerb")
@@ -18,7 +18,7 @@ Die Pruefkriterien des Briefs, je eine eigene Funktion:
 
 Drei Lagen, dieselbe Bauform wie die Nachbardateien:
 - Konstruierte Faelle laufen den ECHTEN Weg über `karten.modelle()` -
-  die Karten sind also echt gerechnete `tco_24()`-Ergebnisse mit echter
+  die Karten sind also echt gerechnete `kosten_ueber()`-Ergebnisse mit echter
   Band-Zuordnung, keine handgebauten Dicts im Karten-Format (Lektion aus
   dem Adapter-Befund vom 11.08.: eine erfundene Fixture beweist nichts).
 - Das gerenderte Artefakt entsteht in tmp_path wie in

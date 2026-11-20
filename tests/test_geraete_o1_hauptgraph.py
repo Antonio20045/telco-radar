@@ -10,7 +10,7 @@ misst `tests/test_geraete_o1_hauptgraph_browser.py` im echten Chromium.
 DIE DREI REGELN, DIE HIER PRUEFBAR SIND
 ---------------------------------------
 1. GERECHNET WIRD NUR IN `tco_model`. Der Balken liest `gesamt` aus den
-   Karten, die `tco_24()` schon gerechnet hat - dieses Modul addiert keinen
+   Karten, die `kosten_ueber()` schon gerechnet hat - dieses Modul addiert keinen
    Euro. Δ ist Differenzbildung gegen die günstigste echte Vodafone-Karte
    DESSELBEN BANDES (der Entwurf: "Δ = Abstand zum günstigsten
    Vodafone-Bündel im selben Band"), keine zweite TCO.

@@ -1,5 +1,9 @@
 """Etikett 1&1 (Live-Abnahme 08.11.2026): das Ratenwort nennt, was die Summe trägt.
 
+Seit 20.11.2026 („36 Monate Fix“, die Ablöse „24 + 12“ ist entfallen) trägt ein
+Vertrag über 36 Monate 36 Bündelbeträge und heißt „36 Monatsraten“, nie „36 Raten“
+(das Wort für Geräteraten neben einem eigenen Tarif). Bis dahin galt:
+
 Eine 1&1-Zeile mit Vertrag über 36 Monate („24 + 12“) rechnet 24 Bündelbeträge, die
 Einmalzahlung bei Kündigung und den Anschluss, aber KEINE 36 Geräteraten
 (Datenkonzept Geräte 5.3). Ihr Etikett „Kosten über 24 Monate“ war richtig; falsch war
@@ -22,7 +26,7 @@ from test_geraete_laufzeit_auf_der_seite import HEUTE, vorlage_text, zeile_html
 from telco_radar.report import geraete_laufzeit, geraete_zeilenbelege
 
 BEIDES = "Kosten über 24 Tarifmonate und 36 Geräteraten"
-ABLOESE = "24 Monate + Ablöse"
+VERTRAG_36 = "36 Monatsraten"
 
 
 @pytest.fixture(scope="module")
@@ -76,12 +80,12 @@ def _ratenwort_der_zeile(karte: dict) -> str:
     return vorlage_text(zeile_html(karte).select_one(".gr-bnd-raten"))
 
 
-def test_die_beschriftung_nennt_beim_24_plus_12_vertrag_keine_36_raten(modell):
+def test_die_beschriftung_nennt_beim_vertrag_monatsraten_nicht_raten(modell):
     karte = _karte(modell, "1&1", 36)
-    assert karte["label"] == "Kosten über 24 Monate" and karte["gesamt"] is not None
+    assert karte["label"] == "Kosten über 36 Monate" and karte["gesamt"] is not None
     text = _beschriftung(karte)
     assert "36 Raten" not in text, text
-    assert f"{ABLOESE} · Kosten über 24 Monate" in text, text
+    assert f"{VERTRAG_36} · Kosten über 36 Monate" in text, text
 
 
 def test_beschriftung_und_zeile_sagen_dasselbe_ratenwort(modell):
@@ -107,7 +111,7 @@ def test_eine_veraltete_zeile_behauptet_keine_36_raten(modell):
     alt = {**_karte(modell, "1&1", 36), "frisch": False}
     html = zeile_html(alt)
     assert html.select_one("details.gr-bnd--leer"), "die Zeile trägt noch einen Preis"
-    assert _ratenwort_der_zeile(alt) == ABLOESE
+    assert _ratenwort_der_zeile(alt) == VERTRAG_36
     neu = {**_karte(modell, "congstar", 36), "frisch": False}
     assert _ratenwort_der_zeile(neu).startswith("36 Raten")
 
@@ -116,7 +120,9 @@ def test_die_regel_gilt_fuer_jeden_anbieter_ohne_sonderfall():
     """`raten_text` liest nur Bündelbetrag und Laufzeit, nie den Namen."""
     vertrag = {"buendel_monatlich": 25.99, "raten_laufzeit": 36}
     for anbieter in ("1&1", "Fremd", "freenet"):
-        assert geraete_laufzeit.raten_text({**vertrag, "anbieter": anbieter}) == ABLOESE
+        assert geraete_laufzeit.raten_text({**vertrag, "anbieter": anbieter}) == (
+            VERTRAG_36
+        )
     assert geraete_laufzeit.raten_text({**vertrag, "raten_laufzeit": 24}) == (
         "24 Monatsraten"
     )

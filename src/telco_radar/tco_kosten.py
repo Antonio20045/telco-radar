@@ -1,30 +1,27 @@
-"""Was ein Bündel über H Monate kostet: die Kernzahl je Ratenlaufzeit.
+"""Die Gesamtkosten eines Bündels: die EINE Rechnung (`docs/geraete/gesamtkosten.md`).
 
-Datenkonzept Geräte 5.3 (Antonio, 10.10.2026: der Tarif endet nach seiner Bindung,
-die Raten laufen weiter):
+Gesamtkosten = Vergleichsbasis: was Tarif über seine Mindestlaufzeit (ohne oder ohne
+bekannte Bindung 24 Monate) und das Gerät bis zur letzten Rate kosten. Datenkonzept 5.3
+(Antonio, 10.10.2026: der Tarif endet nach seiner Bindung, die Raten laufen weiter):
 
     Kosten über H Monate = Anzahlung + Anschluss + N Geräteraten
                          + Tarif in jedem Monat 1 bis T zum Preis seiner Phase
-    ein Vertrag (1&1):   = Anschluss + 24 × Bündelbetrag + Ablöse nach Monat 24
+    ein Vertrag (1&1):   = Anzahlung + Anschluss + N × Bündelbetrag
 
-H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung (`zeitraum`), T der
-kleinere aus H und den Tarifmonaten (`tarifmonate`, höchstens 24 nach § 56 TKG):
+H ist der größere Wert aus Ratenlaufzeit N und Tarifmonaten, T der kleinere aus H
+und den Tarifmonaten (`tarifmonate`: Bindung, sonst 24; höchstens 24 nach § 56 TKG):
 bei 36 Raten zählen Monat 1 bis 24 Tarif und Rate, Monat 25 bis 36 nur die Rate. Ein
 gemessener Grundpreis ohne Preisphasen ist nur bis zum Ende der Bindung belegt (ohne
 Bindung 24 Monate); die Bestellstrecke nennt ihn nicht für die Monate danach. Dasselbe
 gilt für eine einzige Phase ab Monat 1 ohne Ende (`belegte_phasen`). Fehlt
 ein Posten oder der Preis eines Monats, ist `Kosten.gesamt` None und die Lücke
 benannt; Boni und Aktionen gehen nie ein, eingerechnete Aktionen stecken schon in der
-gemessenen Rate. Für H = 24 ist es dieselbe Zahl wie `tco_24`.
+gemessenen Rate. Seite, Export, Historie, Regel 11, SIM-only-Referenz und Belegwahl
+rufen nur diese Funktion.
 
-Ein Vertrag über mehr als 24 Monate (1&1 „24+12“) wird über 24 Monate gerechnet: 24 ×
-Bündelbetrag plus die Einmalzahlung, mit der der Kunde nach Monat 24 kündigt und das
-Gerät behält (Manager, 05.11.2026: vergleichbar machen statt weglassen, nimmt die
-Ausnahme vom 02.11.2026 zurück). `geraet_zuzahlung` ist dann die Ablöse nach Monat 24,
-keine Anzahlung; ohne sie die Lücke `POSTEN_EINMALZAHLUNG`. Weicht die Ablöse zwischen
-Tarifen desselben Geräts ab, ist sie widersprüchlich und wird vorher entfernt
-(`analyze.geraete_widerspruch.mit_einheitlicher_einmalzahlung`) - dieselbe Lücke, nie
-geschätzt. Ein ausdrücklicher Zeitraum (`kosten_ueber(b, monate)`) rechnet ebenso.
+Ein Vertrag (1&1: ein Betrag für Tarif und Gerät) zählt alle N Beträge; seit
+20.11.2026 misst der Adapter „24 Monate Fix“ und „36 Monate Fix“, die frühere
+Ablöse nach Monat 24 („24+12“) gibt es nicht mehr (`rechenweise`, 1&1 Stufe 2).
 
 `tco_model` reexportiert `Kosten`, `kosten_ueber` und `zeitraum` und lädt dieses Modul
 dafür beim eigenen Laden. Die Namen aus `tco_model` liest dieses Modul deshalb erst
@@ -45,8 +42,7 @@ if TYPE_CHECKING:
 
 ZEITRAUM_OHNE_BINDUNG = 24
 POSTEN_ZEITRAUM = "Zeitraum"
-POSTEN_EINMALZAHLUNG = "Einmalzahlung bei Kündigung"
-EINMALPOSTEN = (POSTEN_VERSAND, POSTEN_EINMALZAHLUNG)
+EINMALPOSTEN = (POSTEN_VERSAND,)
 SCHRITT_GERAET = "geraet"
 SCHRITT_TARIF = "tarif"
 SCHRITT_VERTRAG = "vertrag"
@@ -56,14 +52,12 @@ SCHRITT_VERSAND = "versand"
 SCHRITT_BARPREIS = "barpreis"
 SCHRITT_MONAT = "monat"
 SCHRITT_NUR_GERAET = "nur_geraet"
-SCHRITT_ABLOESE = "abloese"
 REIHENFOLGE_SCHRITTE = (
     SCHRITT_BARPREIS,
     SCHRITT_GERAET,
     SCHRITT_VERTRAG,
     SCHRITT_TARIF,
     SCHRITT_ANZAHLUNG,
-    SCHRITT_ABLOESE,
     SCHRITT_ANSCHLUSS,
     SCHRITT_VERSAND,
 )
@@ -91,13 +85,12 @@ class Kosten:
 
     `gesamt` ist None, sobald `luecken` einen Posten nennt. `monate` ist der Zeitraum
     H, `ratenlaufzeit` die Zahl N der Geräteraten (None ohne Gerät), `monatlich` der
-    Schnitt über H, `posten` Name → Betrag in der Reihenfolge von `tco_24`.
+    Schnitt über H, `posten` Name → Betrag in Rechenreihenfolge.
     `rechnung` sind dieselben Posten als Summanden (Gerät, Tarif, einmalig, ohne
     Nullbeträge); ihre Summe ist `gesamt`. Ohne `gesamt` stehen darin nur die
     gemessenen Posten, die fehlenden nennt `luecken`. `tarifmonate` sind die Monate
     mit Tarif in der Zahl (`tarifmonate`; ein Bündelbetrag läuft über H). `hinweise`
-    nennen, was die Zahl trägt, ohne sie zu entwerten: ein Versand ohne Beleg zählt
-    0 €, und der Hinweis sagt es (`config/versandkosten.yaml`).
+    nennen, was die Zahl trägt, ohne sie zu entwerten.
     """
 
     gesamt: float | None = None
@@ -110,18 +103,23 @@ class Kosten:
     tarifmonate: int | None = None
     hinweise: list[str] = field(default_factory=list)
 
+    @property
+    def versand(self) -> float | None:
+        """Der Versand in der Zahl: 0.0 belegt kostenlos, None nicht belegt."""
+        return (
+            None
+            if POSTEN_VERSAND in self.luecken
+            else self.posten.get(POSTEN_VERSAND, 0.0)
+        )
+
 
 def zeitraum(buendel: Buendel) -> int | None:
     """Der Standardzeitraum H: der größere Wert aus Ratenlaufzeit und Tarifbindung.
 
-    Eine unbekannte Bindung zählt `ZEITRAUM_OHNE_BINDUNG` Monate. None, wenn das
-    Bündel ein Gerät hat und seine Ratenlaufzeit fehlt, oder wenn ohne Gerät und ohne
-    Mindestlaufzeit kein Monat bleibt.
+    Eine unbekannte oder fehlende Bindung zählt `ZEITRAUM_OHNE_BINDUNG` Monate
+    (`tarifmonate`). None, wenn das Bündel ein Gerät hat und seine Ratenlaufzeit fehlt.
     """
-    if _mit_abloese(buendel, ZEITRAUM_OHNE_BINDUNG):
-        return ZEITRAUM_OHNE_BINDUNG
-    bindung = buendel.tarif_bindung_monate
-    laengen = [ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung]
+    laengen = [tarifmonate(buendel)]
     if not buendel.ohne_geraet:
         if buendel.laufzeit_monate is None:
             return None
@@ -136,13 +134,10 @@ def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
     Getrennte Preisform: der Tarif in jedem Monat 1 bis T, alle N Raten (auch die
     nach Monat H), Anzahlung und Anschluss; endet H vor der Tarifbindung, fehlen die
     geschuldeten Tarifmonate danach. Ein Vertrag (`buendel_monatlich`) trägt
-    H × Bündelbetrag nur für H = N: davor fehlt die Einmalzahlung bei Kündigung,
+    H × Bündelbetrag nur für H = N: davor fehlen die übrigen Beträge,
     danach der Preis. Ein `monate`, das keine ganze Zahl über null ist, ist ein
-    Aufruffehler (ValueError).
-
-    Abweichung von `tco_24`: Nennen die Preisphasen einen Monat bis 24 nicht, ist er
-    hier eine Lücke; `tco_24` schreibt über `phasensumme` den letzten Preis fort. Im
-    Schnappschuss vom 3. Oktober 2026 kommt keine solche Phasenlücke vor.
+    Aufruffehler (ValueError). Nennen die Preisphasen einen Monat nicht, ist er
+    eine Lücke; ein letzter Preis wird nie fortgeschrieben.
     """
     from .tco_model import POSTEN_LAUFZEIT, monatsschnitt
 
@@ -183,6 +178,8 @@ def _vertrag(k: Kosten, betrag: float, laufzeit: int | None, h: int) -> None:
         k.luecken.append(POSTEN_LAUFZEIT)
     elif h > laufzeit:
         k.luecken.append(f"{POSTEN_BUENDEL} Monat {spanne(laufzeit + 1, h)}")
+    elif h < laufzeit:
+        k.luecken.append(f"{POSTEN_BUENDEL} Monat {spanne(h + 1, laufzeit)}")
     else:
         k.posten[f"{POSTEN_BUENDEL} über {h} Monate"] = round(betrag * h, 2)
         k.rechnung.append(
@@ -279,18 +276,17 @@ def tarifschritte(phasen: list[Preisphase], h: int) -> list[Rechenschritt]:
 
 def tarifmonate(buendel: Buendel) -> int:
     """Wie viele Monate der Tarif zählt: seine Mindestlaufzeit, ohne Angabe oder
-    ohne Bindung `ZEITRAUM_OHNE_BINDUNG` Monate (§ 56 TKG: höchstens 24).
+    ohne Bindung (0) `ZEITRAUM_OHNE_BINDUNG` Vergleichsmonate (§ 56 TKG: höchstens 24).
 
     Laufen die Raten länger, zahlt man danach nur noch die Rate: der Ratenkauf ist
     ein eigener Vertrag, der Tarif ab dann monatlich kündbar (Antonio, 10.10.2026).
     """
-    pflicht = _pflicht(buendel)
-    return pflicht if pflicht > 0 else ZEITRAUM_OHNE_BINDUNG
+    return _pflicht(buendel)
 
 
 def _pflicht(buendel: Buendel) -> int:
     bindung = buendel.tarif_bindung_monate
-    return ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung
+    return bindung if bindung else ZEITRAUM_OHNE_BINDUNG
 
 
 def tarifphasen(buendel: Buendel) -> list[Preisphase]:
@@ -347,9 +343,7 @@ def _geraet_und_anschluss(k: Kosten, buendel: Buendel) -> None:
         POSTEN_ZUZAHLUNG,
     )
 
-    if _mit_abloese(buendel, k.monate):
-        _posten(k, POSTEN_EINMALZAHLUNG, buendel.geraet_zuzahlung, SCHRITT_ABLOESE)
-    elif not buendel.ohne_geraet:
+    if not buendel.ohne_geraet:
         _posten(k, POSTEN_ZUZAHLUNG, buendel.geraet_zuzahlung, SCHRITT_ANZAHLUNG)
     if not buendel.ohne_geraet and buendel.buendel_monatlich is None:
         rate, laufzeit = buendel.geraet_monatsrate, buendel.laufzeit_monate
@@ -369,25 +363,16 @@ def _versand(k: Kosten, buendel: Buendel) -> None:
     """Der Pflichtversand als einmaliger Posten, für jeden Anbieter dieselbe Regel.
 
     Der Betrag steht je Anbieter in `config/versandkosten.yaml` (Beleg, Datum,
-    Screenshot). Ohne belegten Betrag zählt der Versand 0 € und `hinweise` nennt
-    die Lücke; ein Betrag von 0 € bleibt ohne Posten (Antonio, 05.11.2026).
+    Screenshot). Ohne belegten Betrag ist der Versand die Lücke `POSTEN_VERSAND`, nie
+    0 € (20.11.2026, nimmt „zählt 0 €“ vom 05.11.2026 zurück); ein belegter Betrag von
+    0 € bleibt ohne Posten.
     """
     angabe = versand_fuer(buendel.anbieter)
     if angabe.betrag is None:
+        k.luecken.append(POSTEN_VERSAND)
         k.hinweise.append(hinweis_unbelegt(buendel.anbieter))
-    if angabe.betrag:
+    elif angabe.betrag:
         _posten(k, POSTEN_VERSAND, angabe.betrag, SCHRITT_VERSAND)
-
-
-def _mit_abloese(buendel: Buendel, h: int | None) -> bool:
-    """Ein Vertrag, der vor seinem Ende gerechnet wird: die Zuzahlung ist die Ablöse."""
-    laufzeit = buendel.laufzeit_monate
-    return (
-        buendel.buendel_monatlich is not None
-        and laufzeit is not None
-        and h is not None
-        and h < laufzeit
-    )
 
 
 def _posten(k: Kosten, name: str, betrag: float | None, art: str) -> None:

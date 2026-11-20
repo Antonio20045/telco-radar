@@ -84,7 +84,7 @@ from telco_radar.geraete_config import Anbieter, Einstieg, lade_farben, lade_kat
 from telco_radar.report.geraete_tco_band import tarif_baender
 from telco_radar.report.geraete_tco_karten import modelle
 from telco_radar.tarif_bezug import Tarifbestand
-from telco_radar.tco_model import POSTEN_ZUZAHLUNG, Buendel, tco_24
+from telco_radar.tco_model import POSTEN_ZUZAHLUNG, Buendel, kosten_ueber
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _WURZEL = Path(__file__).parent.parent
@@ -146,12 +146,10 @@ def test_tarifname_slug_und_laufen_kommen_aus_der_antwort():
 
 
 def test_der_iphone_satz_nach_rechnung():
-    """44,99 €/Monat über 36 Monate: Kosten über 24 Monate = ALLE 36 Raten
-    = 36 × 44,99 = 1.619,64 €, davon nach Monat 24 noch offen 12 × 44,99 =
-    539,88 €. `tco_24()` und Handrechnung müssen exakt gleich sein - die
-    zusammen-Formel ist der Bewährungsfall aus TCO24-1, hier an einem
-    echten Satz des Bestands. Bis A1 (20.09.2026) kappte die Rechnung bei
-    24 Raten (1.079,76) und stellte den Rest daneben."""
+    """44,99 €/Monat über 36 Monate: die Gesamtkosten zählen alle 36 Bündelbeträge
+    (docs/geraete/gesamtkosten.md; die Ablöse „24 + 12“ ist seit 20.11.2026
+    entfallen). Der Satz nennt weder Einmalzahlung noch Anschluss - dann ist die Summe
+    eine benannte Lücke, und die belegten 36 × 44,99 = 1.619,64 € stehen als Posten."""
     s = next(x for x in _saetze() if x["speicher_gb"] == 256)
     b = Buendel(
         sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
@@ -160,14 +158,12 @@ def test_der_iphone_satz_nach_rechnung():
         buendel_monatlich=s["buendel_monatlich"],
         laufzeit_monate=s["laufzeit_monate"],
     )
-    tco = tco_24(b)
+    tco = kosten_ueber(b)
     assert s["buendel_monatlich"] == 44.99
-    assert tco.gesamt == pytest.approx(36 * 44.99)
-    assert tco.restbetrag == pytest.approx(12 * 44.99)
-    assert tco.leitzahl_monate == 36
-    assert tco.monatlich == pytest.approx(round(36 * 44.99 / 36, 2))
-    assert tco.monatlich * tco.leitzahl_monate == pytest.approx(tco.gesamt)
-    assert tco.belastbar
+    assert tco.monate == 36
+    assert tco.gesamt is None
+    assert tco.luecken == [POSTEN_ZUZAHLUNG, "Anschlusspreis"]
+    assert list(tco.posten.values()) == [pytest.approx(36 * 44.99)]
 
 
 def test_keine_vorzeitige_aufspaltung_des_monatsbetrags():
@@ -276,11 +272,8 @@ def test_die_einmalzahlung_gilt_nur_fuer_die_eigene_variante():
 
 
 def test_die_einmalzahlung_steht_in_der_leitzahl():
-    """S2-C, Kriterium 3: die Leitzahl rechnet die Einmalzahlung MIT -
-    A1: ALLE 36 Raten, also 36 x 44,99 + 360 + 39,90 = 2.019,54 €. Ohne
-    die Einmalzahlung steht sie als LÜCKE da (`tco_24`), nicht als 0,00 -
-    dieselbe Regel wie beim Anschlusspreis. Ohne BEIDE bleibt die Zahl,
-    die der Anbieter nennt."""
+    """S2-C, Kriterium 3: die gemessene Einmalzahlung zählt einmal mit:
+    360 + 36 × 44,99 + 39,90 = 2.019,54 €. Ohne sie steht die Lücke, nicht 0,00."""
     komplett = Buendel(
         sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
         anbieter="1&1",
@@ -290,9 +283,8 @@ def test_die_einmalzahlung_steht_in_der_leitzahl():
         anschlusspreis=39.9,
         laufzeit_monate=36,
     )
-    tco = tco_24(komplett)
-    assert tco.gesamt == pytest.approx(36 * 44.99 + 360.0 + 39.9)
-    assert POSTEN_ZUZAHLUNG not in tco.luecken
+    tco = kosten_ueber(komplett)
+    assert tco.gesamt == pytest.approx(360.0 + 36 * 44.99 + 39.9)
     ohne_zuzahlung = Buendel(
         sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
         anbieter="1&1",
@@ -301,9 +293,9 @@ def test_die_einmalzahlung_steht_in_der_leitzahl():
         anschlusspreis=39.9,
         laufzeit_monate=36,
     )
-    tco_offen = tco_24(ohne_zuzahlung)
-    assert POSTEN_ZUZAHLUNG in tco_offen.luecken
-    assert tco_offen.gesamt == pytest.approx(36 * 44.99 + 39.9)
+    tco_offen = kosten_ueber(ohne_zuzahlung)
+    assert tco_offen.luecken == [POSTEN_ZUZAHLUNG]
+    assert tco_offen.gesamt is None
 
 
 def test_tarifdetails_adresse_kommt_aus_dem_data_iframe_attribut():
@@ -558,7 +550,9 @@ def test_aus_rohsaetzen_reicht_buendel_monatlich_durch():
     )
     assert len(bilanz.buendel) == 1
     assert bilanz.buendel[0].buendel_monatlich == 44.99
-    assert tco_24(bilanz.buendel[0]).gesamt == pytest.approx(1619.64)
+    assert kosten_ueber(bilanz.buendel[0]).posten == {
+        "Bündelpreis (Tarif und Gerät zusammen) über 36 Monate": 1619.64
+    }
 
 
 def test_der_zustand_kommt_aus_dem_titelweg_ohne_buendel(katalog, farben):
