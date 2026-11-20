@@ -35,17 +35,31 @@ METHODE = tarifwelt_bestand.METHODE
 
 JOB_FRIST_SEKUNDEN = 70 * 60.0
 """`timeout-minutes: 70` von `.github/workflows/geraete.yml` (Test: gleicher Wert)."""
-RESERVE_NACH_STUFE_SEKUNDEN = 600.0
-"""Was nach der Stufe noch laeuft (Speichern, Seite bauen, Commit) und was vor dem
-Lauf an Einrichtung (checkout, pip) schon verbraucht ist: nie in die Stufe."""
+VORLAUF_SEKUNDEN = 120.0
+"""Zeit im Job VOR der Pipeline (checkout, pip; gemessen 70 s im Lauf 44728882384)."""
+NACH_SCHRITTE_SEKUNDEN = 23 * 60.0
+"""Schlimmster Fall aller Schritte NACH "Run geraete stage" in
+`.github/workflows/geraete.yml` (Upload log, Belege-Manifest mit 5 min Limit,
+Commit state, Render site, Commit site, Render-Hook mit bis zu 340 s, Alarme,
+Buendelwaechter). Gemessen im Lauf 44728882384: rund 440 s."""
+IN_PIPELINE_NACH_STUFE_SEKUNDEN = 60.0
+"""Arbeit der Pipeline nach der Tarifwelt-Stufe (Pruefstelle, Speichern, Bilanz);
+gemessen 15 s im Lauf 44728882384."""
+RESERVE_NACH_STUFE_SEKUNDEN = NACH_SCHRITTE_SEKUNDEN + IN_PIPELINE_NACH_STUFE_SEKUNDEN
 
 
 def stufen_frist(vergangen_sekunden: float) -> float:
-    """Das Zeitbudget der Stufe: die Restzeit des Jobs (`JOB_FRIST_SEKUNDEN` minus
-    schon vergangene Zeit minus `RESERVE_NACH_STUFE_SEKUNDEN`), nie unter null.
-    Keine feste Zahl und keine Obergrenze: wird die Sammelphase kuerzer, fliesst
-    die frei gewordene Zeit sofort in die Tarifwelt."""
-    rest = JOB_FRIST_SEKUNDEN - vergangen_sekunden - RESERVE_NACH_STUFE_SEKUNDEN
+    """Das Zeitbudget der Stufe: die Restzeit des Jobs, gerechnet ab dem Start der
+    Pipeline: `JOB_FRIST_SEKUNDEN` minus `VORLAUF_SEKUNDEN` minus die seither
+    vergangene Zeit minus `RESERVE_NACH_STUFE_SEKUNDEN`, nie unter null. Keine
+    feste Zahl und keine Obergrenze: wird die Sammelphase kuerzer, fliesst die
+    frei gewordene Zeit sofort in die Tarifwelt."""
+    rest = (
+        JOB_FRIST_SEKUNDEN
+        - VORLAUF_SEKUNDEN
+        - vergangen_sekunden
+        - RESERVE_NACH_STUFE_SEKUNDEN
+    )
     return max(0.0, rest)
 
 
@@ -196,8 +210,9 @@ def stufe(
     Buendel und Stammdaten der Tarife (`TcoDB.haendler_tarife`) in den TCO-Store,
     aeltere Buendel nicht lieferbarer Stufen markiert (`tarifwelt_lieferbar`);
     `tco.save` sichert alles in `geraete_tco.json`. `beginn` ist `time.monotonic()`
-    beim Start des Tageslaufs; daraus rechnet `stufen_frist` das Zeitbudget der
-    Stufe gegen die Restzeit des Jobs (ohne `beginn` gibt es keins).
+    beim Start des Tageslaufs; daraus rechnet
+    `stufen_frist` das Zeitbudget der Stufe gegen die Restzeit
+    des Jobs (ohne `beginn` gibt es keins).
     Die Abrufe gehen durch dieselbe `Abrufschleuse` (robots.txt, Besuchsfenster)
     wie die uebrigen Quellen. Wirft nie: ein Fehler kostet nur diese Stufe."""
     if not quelle_aktiv(quellen):

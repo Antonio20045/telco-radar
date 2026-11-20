@@ -121,19 +121,6 @@ def test_ohne_zeitbudget_werden_alle_modelle_gelesen_gegenprobe():
     assert e.status == "ok" and e.ungelesen == []
 
 
-def test_stufen_frist_rechnet_gegen_die_restzeit_des_jobs():
-    voll = (
-        geraete_tarifwelt.JOB_FRIST_SEKUNDEN
-        - geraete_tarifwelt.RESERVE_NACH_STUFE_SEKUNDEN
-    )
-    assert geraete_tarifwelt.stufen_frist(0.0) == voll
-    assert geraete_tarifwelt.stufen_frist(1000.0) == voll - 1000.0
-    spaet = geraete_tarifwelt.JOB_FRIST_SEKUNDEN - 600.0 - 120.0
-    assert geraete_tarifwelt.stufen_frist(spaet) == pytest.approx(120.0)
-    assert geraete_tarifwelt.stufen_frist(geraete_tarifwelt.JOB_FRIST_SEKUNDEN) == 0.0
-    assert geraete_tarifwelt.stufen_frist(10**9) == 0.0
-
-
 @pytest.mark.parametrize("vergangen", [0.0, 2000.0, 3500.0])
 def test_stufe_reicht_die_restzeit_als_frist_an_den_lauf_weiter(
     monkeypatch, tmp_path, vergangen
@@ -265,3 +252,22 @@ def test_zeitbudget_nur_fuer_den_kern_liest_den_kern_aller_modelle_zuerst(monkey
     assert knapp.ungelesen == MODELLE
     assert {b.id for b in knapp.buendel} <= {b.id for b in voll.buendel}
     assert {b.id for b in knapp.buendel}
+
+
+def test_reserve_ist_nachschritte_plus_pipelinearbeit_und_gross_genug():
+    stufe = geraete_tarifwelt
+    assert stufe.RESERVE_NACH_STUFE_SEKUNDEN == (
+        stufe.NACH_SCHRITTE_SEKUNDEN + stufe.IN_PIPELINE_NACH_STUFE_SEKUNDEN
+    )
+    assert stufe.RESERVE_NACH_STUFE_SEKUNDEN > 440.0 + 15.0
+
+
+def test_restzeit_ist_job_minus_vorlauf_minus_vergangen_minus_reserve():
+    stufe = geraete_tarifwelt
+    assert stufe.stufen_frist(0.0) == 4200.0 - 120.0 - 1380.0 - 60.0
+    assert stufe.stufen_frist(1000.0) == 4200.0 - 120.0 - 1000.0 - 1380.0 - 60.0
+    ende = stufe.JOB_FRIST_SEKUNDEN - stufe.VORLAUF_SEKUNDEN
+    ende -= stufe.RESERVE_NACH_STUFE_SEKUNDEN
+    assert stufe.stufen_frist(ende) == 0.0
+    assert stufe.stufen_frist(ende - 100.0) == pytest.approx(100.0)
+    assert stufe.stufen_frist(10**9) == 0.0
