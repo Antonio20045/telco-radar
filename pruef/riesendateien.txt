@@ -18,7 +18,7 @@ src/telco_radar/analyze/tco_store.py zeilen 500
 src/telco_radar/collect/ct_log.py zeilen 463
 src/telco_radar/collect/geraete/__init__.py zeilen 1033
 src/telco_radar/collect/geraete/autoerkennung.py zeilen 499
-src/telco_radar/collect/geraete/congstar.py zeilen 911
+src/telco_radar/collect/geraete/congstar.py zeilen 873
 src/telco_radar/collect/geraete/einsundeins.py zeilen 959
 src/telco_radar/collect/geraete/o2.py zeilen 682
 src/telco_radar/collect/geraete/telekom.py zeilen 658
