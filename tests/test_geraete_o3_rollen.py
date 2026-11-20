@@ -214,7 +214,10 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     assert all(
         title.startswith("Mit Tarif") and aria.startswith("Mit Tarif")
         for title, aria in katalog_beschriftung
-    ), katalog_beschriftung
+    ), (
+        "Katalog (Ruhe-Umbau): Linktext nur noch →, „Mit Tarif“ in title/aria-label",
+        katalog_beschriftung,
+    )
     label = geraete.select_one("#tafel-katalog .gr-leit--katalog .gr-leit-label")
     assert label is not None and not any(ch.isdigit() for ch in label.get_text()), label
     fehlende = [

@@ -50,7 +50,12 @@ knoepfe:
     # be 42-44 (Gruppe 31 „Zahlungsoptionen“): aria-label „26,90 € pro Monat
     # für 36 Monate, zuzüglich 99 € Anzahlung“, ebenso 24 und 12 Monate;
     # gewählt aria-checked="true" (be 42).
-    selektor: '#dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-label*=" Monate"]'
+    # Ohne „Einmalpreis“ (seit 20.11.2026 der erste Knopf, aria-label „0 pro Monat für
+    # 0 Monate, zuzüglich 1.199 € Anzahlung“): sein Klick öffnet den Dialog
+    # „Einmalzahlung“ (Gerät ohne Tarif), dessen Overlay jeden weiteren Klick der
+    # Seite abfängt (Tageslauf 20.11.2026: 622 von 1206 Kombinationen „nicht
+    # klickbar“). Ein Bündel gibt es nur mit Ratenzahlung.
+    selektor: '#dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-label*=" Monate"]:not([aria-label*="für 0 Monate"])'
     wert: aria-label
     muster: 'für (\d+) Monate'
     gewaehlt: {attribut: aria-checked, wert: "true"}
