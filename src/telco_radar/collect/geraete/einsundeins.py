@@ -37,6 +37,11 @@ Fees` (Einmalzahlung) und der `data-iframe`-Link zur Bereitstellungs-
 gebuehr fehlen ebenfalls; beide degradieren ohne ihren Textmarker auf
 `None`/`""` (E1) statt eine falsche Zahl anzunehmen.
 
+MARKUP-STAND 20.11.2026 (K2): die Geraeteraster nennen mit
+`data-hardware-months` die Zahl der GERAETERATEN (seit diesem Tag 48),
+nicht die Mindestbindung - Gegenprobe und Begruendung stehen in
+`einsundeins_raten.py`.
+
 Keine zusaetzlichen Abrufe: `lies_buendel` liest dieselbe Antwort, die
 der Ernte-Weg fuer die Listung ohnehin holt.
 """
@@ -56,6 +61,7 @@ from bs4 import BeautifulSoup
 from ...tarif_model import zahl
 from ..tarif_ldjson import ld_json_bloecke
 from .basis import GeraeteAbrufFehler
+from .einsundeins_raten import flache_tarifrate, gegenwert, geraeteraten_preise
 
 log = logging.getLogger(__name__)
 
@@ -266,15 +272,8 @@ def _fixpreis(karteneintrag: dict, dauer: int) -> tuple[float, float] | None:
     if not isinstance(stufe, dict):
         return None
     hardwarerate = zahl(str(stufe.get("hardwarePricePerMonth")))
-    tarifrate = zahl(str(stufe.get("tariffPricePerMonth")))
-    monatspreise = stufe.get("tariffMonthlyPrices")
-    if hardwarerate is None or tarifrate is None or not monatspreise:
-        return None
-    erster = monatspreise[0]
-    flach_bis = erster.get("end")
-    deckt = flach_bis in (0, None) or flach_bis >= dauer
-    betrag = round(float(erster.get("amount", -1)), 2)
-    if erster.get("begin") != 1 or not deckt or betrag != round(tarifrate, 2):
+    tarifrate = flache_tarifrate(stufe, dauer)
+    if hardwarerate is None or tarifrate is None:
         return None
     return hardwarerate, tarifrate
 
@@ -430,11 +429,14 @@ def lies_buendel(text: str, url: str = "", proben: dict | None = None) -> list[d
             )
         vorausgewaehlt = str(gb) == vorauswahl
         angezeigt = angezeigt_html if angezeigt_html is not None else betrag
+        raten_preise = geraeteraten_preise(eintrag)
+        raten_preise.setdefault(dauer, betrag)
         out.append(
             {
                 "hw_id": hw_id,
                 "vorausgewaehlt": vorausgewaehlt,
                 "angezeigt_monatlich": angezeigt if vorausgewaehlt else None,
+                "raten_preise": raten_preise if vorausgewaehlt else None,
                 "titel": " ".join(x for x in (marke, name, f"{gb} GB", farbe) if x),
                 "farbe": farbe,
                 "speicher_gb": gb,
@@ -617,6 +619,8 @@ _KLAMMERZUSATZ_RE = re.compile(r"\s*\([^()]*\)\s*$")
 _MINDEST_GERAETE_EINHEITLICH = 5
 HERLEITUNG_TARIFAUFSCHLAG = "tarifaufschlag_aus_tarifraster"
 
+_NUR_DEFAULTSATZ = ("angezeigt_monatlich", "anschlusspreis", "raten_preise")
+
 
 def tarifname_bereinigt(name: str) -> str:
     """ "1&1 All-Net-Flat M (50 GB)" -> "1&1 All-Net-Flat M".
@@ -744,6 +748,12 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
     Tarif (am 29.09.2026: 2 + 7). Haengt die neuen Saetze an `rohbuendel` an,
     gibt ihre Zahl zurueck. Ohne Default-Raster keine Gegenprobe, also
     nichts. Die Ablöse hängt nur an der Gerätevariante (`klickraster`).
+
+    GEGENPROBE (K2, Modulkopf): ein Gerät zählt nur, wenn beide Raster
+    dieselbe Ratenzahl nennen und das Raster des Default-Tarifs denselben
+    Preis nennt wie die Geräteseite (`_gegenwert`). Die Mindestbindung des
+    hergeleiteten Satzes ist die des Default-Satzes, nicht die Ratenzahl
+    des Rasters.
     """
     basis = [
         s
@@ -828,35 +838,29 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
             vorher = next((s for s in saetze if s.get("vorausgewaehlt")), None)
             basis_cent, basis_monate = basisraster["preise"][hw]
             monate = gelesen["preise"][hw][1]
-            angezeigt = vorher.get("angezeigt_monatlich") if vorher else None
+            gegen = gegenwert(vorher, basis_monate)
             if (
-                angezeigt is None
-                or round(angezeigt * 100) != basis_cent
+                gegen is None
                 or monate is None
                 or monate != basis_monate
-                or monate != vorher.get("laufzeit_monate")
+                or round(gegen * 100) != basis_cent
             ):
                 unstimmig += 1
                 continue
             ziele = saetze if einheitlich else [vorher]
             for satz in ziele:
-                schluessel = (satz.get("sku_id"), tarif, monate)
+                schluessel = (satz.get("sku_id"), tarif, satz.get("laufzeit_monate"))
                 if schluessel in vorhanden:
                     continue
                 vorhanden.add(schluessel)
                 cent = round(satz["buendel_monatlich"] * 100) + aufschlaege[hw]
-                kopie = {
-                    k: v
-                    for k, v in satz.items()
-                    if k not in ("angezeigt_monatlich", "anschlusspreis")
-                }
+                kopie = {k: v for k, v in satz.items() if k not in _NUR_DEFAULTSATZ}
                 kopie.update(
                     {
                         "tarif_name": tarif,
                         "tarif_slug": slug,
                         "tarifdetails_url": detail_url,
                         "buendel_monatlich": round(cent / 100.0, 2),
-                        "laufzeit_monate": monate,
                         "herleitung": HERLEITUNG_TARIFAUFSCHLAG,
                         "url": adresse,
                         "quelle_url": adresse,
