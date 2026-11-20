@@ -130,6 +130,7 @@ def seite_als_daten(ziel: Seitenziel, lauf: Klicklauf) -> dict:
     return {
         "geraet": ziel.geraet,
         "speicher_gb": ziel.speicher_gb,
+        "zustand": ziel.zustand,
         "adresse": ohne_geheimnisse(ziel.adresse),
         "status": lauf.status,
         "grund": lauf.grund,
@@ -153,6 +154,7 @@ def nicht_besucht(ziel: Seitenziel, grund: str) -> dict:
     return {
         "geraet": ziel.geraet,
         "speicher_gb": ziel.speicher_gb,
+        "zustand": ziel.zustand,
         "adresse": ohne_geheimnisse(ziel.adresse),
         "status": SEITE_NICHT_BESUCHT,
         "grund": grund,
@@ -162,8 +164,11 @@ def nicht_besucht(ziel: Seitenziel, grund: str) -> dict:
     }
 
 
-def laufstatus(seiten: list[dict]) -> tuple[str, str | None]:
-    """Status und Grund des Anbieters aus seinen Seiten (siehe Modulkopf)."""
+def laufstatus(
+    seiten: list[dict], ohne_seite: str | None = None
+) -> tuple[str, str | None]:
+    """Status und Grund des Anbieters aus seinen Seiten (siehe Modulkopf);
+    ``ohne_seite`` nennt, warum die Liste leer ist (``Erkundungsziel.seitengrund``)."""
     gelesen = [s for s in seiten if s["status"] in GELESENE_SEITEN]
     gestoert = [s for s in seiten if s["status"] == LAUF_GESTOERT]
     sperre = [s for s in gestoert if s.get("stoerung") not in OHNE_SPERRE]
@@ -172,7 +177,8 @@ def laufstatus(seiten: list[dict]) -> tuple[str, str | None]:
         return LAUF_GESTOERT, f"{stoerung['adresse']}: {stoerung['grund']}"
     if not gelesen:
         erste = seiten[0] if seiten else None
-        grund = GRUND_KEINE_SEITE if erste is None else f"{erste['grund']}"
+        leer = ohne_seite or GRUND_KEINE_SEITE
+        grund = leer if erste is None else f"{erste['grund']}"
         return LAUF_NICHT_GELESEN, grund
     erfasst = any(k["status"] == ERFASST for s in gelesen for k in s["kombinationen"])
     return (LAUF_GELESEN, None) if erfasst else (LAUF_LEER, GRUND_NICHTS_ERFASST)

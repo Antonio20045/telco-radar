@@ -278,8 +278,11 @@ def geraetepreis(
     kombination: dict, seite: dict, daten: dict, katalog: Katalog
 ) -> dict | None:
     """Anzahlung, Rate und Ratenzahl einer erfassten Kombination in getrennter
-    Preisform; ``None`` ohne Gerät, Speicher aus dem Katalog oder Rate."""
+    Preisform; ``None`` ohne Gerät, Speicher aus dem Katalog oder Rate und für ein
+    Gerät, das nicht neu ist (``seite_zustand``)."""
     if kombination.get("status") != ERFASST or daten.get("vertragsform") == EIN_VERTRAG:
+        return None
+    if seite_zustand(seite) != ZUSTAND_NEU:
         return None
     variante = kombination.get("variante") or {}
     geraet = katalog.nach_id(str(seite.get("geraet") or ""))
@@ -324,10 +327,11 @@ def rohsatz(
     werte = kombination.get("werte") or {}
     laufzeit = werte.get("ratenzahl")
     laufzeit = variante.get("laufzeit") if laufzeit is None else laufzeit
+    zustand = seite_zustand(seite)
     satz = {
-        "sku_id": sku_id(geraet.device_id, gb, None, ZUSTAND_NEU),
+        "sku_id": sku_id(geraet.device_id, gb, None, zustand),
         "anbieter": str(daten.get("name") or ""),
-        "zustand": ZUSTAND_NEU,
+        "zustand": zustand,
         "device_id": geraet.device_id,
         "speicher_gb": gb,
         "tarif_name": tarif,
@@ -372,6 +376,12 @@ def _preise(werte: dict, buendel: dict | None, vertragsform: object) -> dict:
         "tarif_monatlich": _ab_monat_eins(werte.get("tarifphasen")),
         "buendel_monatlich": None,
     }
+
+
+def seite_zustand(seite: dict) -> str:
+    """Zustand des Geräts auf der Seite (``klickziele.Seitenziel.zustand``); Seiten
+    ohne das Feld (Ergebnisdateien vor dem 20.11.2026) zeigen Neuware."""
+    return str(seite.get("zustand") or ZUSTAND_NEU)
 
 
 def _ab_monat_eins(phasen: object) -> float | None:

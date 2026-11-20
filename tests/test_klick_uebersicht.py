@@ -19,7 +19,7 @@ import gzip
 from datetime import UTC, datetime
 
 import pytest
-from bestand_pfad import lese_wurzel
+from bestand_pfad import kachel_wurzel, lese_wurzel
 from klickergebnisse import WURZEL
 from klickserver import Antwort, html, klickserver
 
@@ -88,7 +88,7 @@ def karte():
 
 @pytest.fixture(scope="module")
 def telekom():
-    ziele = lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
+    ziele = lade_ziele(kachel_wurzel(), TAGESDATEI, hoechste=None)
     return next(z for z in ziele if z.schluessel == "telekom")
 
 

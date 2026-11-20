@@ -13,7 +13,9 @@ oder ``recurringChargeOccurrence``, je nachdem, welche ``upfrontPrice + n ×
 recurringPrice == totalPrice`` auf den Cent erfüllt (``probe_geht_auf``); erfüllen
 beide oder keine, ist der Plan die Lücke ``LUECKE_RATENZAHL``. Der Produktlink gilt
 nur, wenn ``/shop/geraet/<brandSlug>/<productSlug>/<variantSlug>`` so als ``href``
-auf der Seite steht; sonst ist die Quelle die Übersicht. Dieses Modul ruft kein Netz.
+auf der Seite steht; sonst ist die Quelle die Übersicht. ``kacheln`` nennt jedes Gerät
+mit Produktlink, auch ohne lesbaren Preis (Rückgabedeal, Rechenprobe): daraus kommen
+die Produktseiten des Klick-Laufs (``klickliste_kacheln``). Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -43,6 +45,7 @@ class Listenlesung:
     """Sätze, Zahl der Geräte, je Lücke ihre Zahl und ``resultCount`` der Antworten."""
 
     saetze: list[dict] = field(default_factory=list)
+    kacheln: list[dict] = field(default_factory=list)
     geraete: int = 0
     mit_rueckgabedeal: int = 0
     luecken: Counter[str] = field(default_factory=Counter)
@@ -84,6 +87,7 @@ def lies_listing(nutzlasten: list[object], text: str, adresse: str) -> Listenles
                 continue
             gesehen.add(schluessel)
             lesung.geraete += 1
+            _merke_kachel(eintrag, links, lesung)
             _lies_geraet(eintrag, tarif, links, adresse, lesung)
     return lesung
 
@@ -106,9 +110,7 @@ def _lies_geraet(
     if gb is None:
         lesung.luecken[LUECKE_SPEICHER] += 1
         return
-    pfad = "/shop/geraet/" + "/".join(
-        str(eintrag.get(f) or "") for f in ("brandSlug", "productSlug", "variantSlug")
-    )
+    pfad = _pfad(eintrag)
     name = " ".join(str(eintrag.get("name") or "").split())
     anzahlung = _betrag(preis.get("upfrontPrice"))
     for plan in plaene or [{}]:
@@ -133,6 +135,23 @@ def _lies_geraet(
                 "url": links.get(pfad, adresse),
             }
         )
+
+
+def _merke_kachel(eintrag: dict, links: dict[str, str], lesung: Listenlesung) -> None:
+    """Titel, Speicher und Produktlink der Kachel, wenn der Link auf der Seite steht."""
+    link = links.get(_pfad(eintrag))
+    if link is None:
+        return
+    gb = _speicher(str(eintrag.get("variantSlug") or ""))
+    name = " ".join(str(eintrag.get("name") or "").split())
+    titel = name if gb is None else f"{name} {gb} GB"
+    lesung.kacheln.append({"titel": titel, "speicher_gb": gb, "url": link})
+
+
+def _pfad(eintrag: dict) -> str:
+    return "/shop/geraet/" + "/".join(
+        str(eintrag.get(f) or "") for f in ("brandSlug", "productSlug", "variantSlug")
+    )
 
 
 def _tarif(plan: object) -> dict:

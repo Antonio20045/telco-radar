@@ -38,6 +38,7 @@ from ..klick_vertrag import (
 )
 
 SATZ = "{anbieter} nicht erfasst: {art} ({angaben})"
+SATZ_TEILWEISE = "{anbieter} teilweise erfasst: {grund}"
 ART_SPERRE = "Seite sperrt automatisches Lesen"
 ART_STOERUNG = "Lesen gestört"
 SERVERFEHLER_AB = 500
@@ -58,12 +59,19 @@ Angebot = dict[str, dict[str, set[int]]]
 
 
 def erfassungsgrund(eintrag: dict) -> str | None:
-    """Der Satz zu einem Bilanzeintrag, ``None`` ohne frische Störung."""
+    """Der Satz zu einem Bilanzeintrag, ``None`` ohne frische Störung. Ein sonst
+    gelesener Lauf mit ``seitengrund`` (Übersicht fehlt, Seiten aus dem Kachelvorrat)
+    heißt ``SATZ_TEILWEISE``."""
     alter = eintrag.get("alter_tage")
-    if eintrag.get("laufstatus") != LAUF_GESTOERT or alter is None:
+    if alter is None or not 0 <= alter < FRISCHEGRENZE_TAGE:
         return None
-    if not 0 <= alter < FRISCHEGRENZE_TAGE:
-        return None
+    if eintrag.get("laufstatus") != LAUF_GESTOERT:
+        teil = eintrag.get("seitengrund")
+        return (
+            SATZ_TEILWEISE.format(anbieter=eintrag.get("anbieter"), grund=teil)
+            if teil
+            else None
+        )
     grund = str(eintrag.get("grund") or "")
     treffer = _HTTP.search(grund)
     status = int(treffer[1]) if treffer else None
@@ -84,8 +92,12 @@ def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
     gruende = {}
     dateien = (bilanz or {}).get("dateien", [])
     for eintrag in dateien:
-        if (satz := erfassungsgrund(eintrag)) is not None:
-            gruende[str(eintrag.get("anbieter"))] = satz
+        anbieter = str(eintrag.get("anbieter"))
+        gestoert = eintrag.get("laufstatus") == LAUF_GESTOERT
+        if (satz := erfassungsgrund(eintrag)) is not None and (
+            gestoert or anbieter not in gruende
+        ):
+            gruende[anbieter] = satz
         gruende.update(nicht_im_angebot(eintrag))
     for eintrag in je_anbieter_vereint(dateien):
         gruende.update(speicher_gelesen(eintrag))
