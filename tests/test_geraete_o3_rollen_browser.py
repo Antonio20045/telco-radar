@@ -656,10 +656,16 @@ _KATALOG_MESSEN = """() => {
       bar: [...z.querySelectorAll('td.gr-sp--barpreis')].map(
         c => getComputedStyle(c).display),
       tco: [...z.querySelectorAll('td.gr-sp--tco')].map(
-        c => getComputedStyle(c).display),
+        c => ({display: getComputedStyle(c).display, k: c.dataset.k})),
     })),
   };
 }"""
+
+# RUHIG-RUNDE3-1119-R4 (20.11.2026): "Ø €/Monat" und "Stufe" bleiben am
+# Telefon in der TCO-Karte absichtlich ausgeblendet (title der Preis-
+# Zelle traegt den Wert stattdessen) - die uebrigen gr-sp--tco-Zellen
+# (Kosten über … Monate, Unterschied zu Vodafone) bleiben Block.
+_AM_TELEFON_VERSTECKT = {"Ø €/Monat", "Stufe"}
 
 
 def test_der_katalog_steht_am_telefon_als_karten(ctx):
@@ -681,13 +687,15 @@ def test_der_katalog_steht_am_telefon_als_karten(ctx):
         for z in an:
             assert z["rechts"] <= m["boxRechts"] + 1, (z, m["boxRechts"])
             assert all(d == "none" for d in z["bar"]), z
-            assert all(d == "block" for d in z["tco"]), z
+            for c in z["tco"]:
+                erwartet = "none" if c["k"] in _AM_TELEFON_VERSTECKT else "block"
+                assert c["display"] == erwartet, (c, z)
         s.click(".gr-reiter [data-tafel=tafel-verlauf]")
         s.wait_for_timeout(200)
         m = s.evaluate(_KATALOG_MESSEN)
         for z in (z for z in m["zeilen"] if z["an"]):
             assert all(d == "block" for d in z["bar"]), z
-            assert all(d == "none" for d in z["tco"]), z
+            assert all(c["display"] == "none" for c in z["tco"]), z
         s.click(".gr-reiter [data-tafel=tafel-tco]")
         s.wait_for_timeout(200)
         etikett = s.evaluate("""() => getComputedStyle(document.querySelector(
@@ -705,7 +713,9 @@ def test_der_katalog_steht_am_telefon_als_karten(ctx):
         s.wait_for_timeout(300)
         m = s.evaluate(_KATALOG_MESSEN)
         an = [z for z in m["zeilen"] if z["an"]]
-        assert an and all(d == "table-cell" for z in an for d in z["tco"]), an
+        assert an and all(
+            c["display"] == "table-cell" for z in an for c in z["tco"]
+        ), an
     finally:
         s.close()
 
