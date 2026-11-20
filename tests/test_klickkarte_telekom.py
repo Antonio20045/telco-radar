@@ -264,3 +264,35 @@ def test_volumen_auch_unbegrenzt(karte, inventar, volumen, erwartet):
     treffer = karte.textlesung.muster["volumen_gb"].muster.search(text)
     gelesen = None if treffer is None else feldwert("volumen_gb", treffer[1])
     assert gelesen == erwartet
+
+
+ZAHLUNGSKNOEPFE = (
+    WURZEL
+    / "tests"
+    / "fixtures"
+    / "klickcrawler"
+    / "telekom_laufzeitknoepfe_20261120.html"
+)
+
+
+def test_laufzeitknoepfe_ohne_einmalpreis(karte):
+    """Seit 20.11.2026 steht vor den Ratenknöpfen „1.199 € Einmalpreis“ (aria-label
+    „0 pro Monat für 0 Monate“). Sein Klick öffnet den Dialog „Einmalzahlung“ (Gerät
+    ohne Tarif), dessen Overlay jeden weiteren Klick abfängt: im Tageslauf vom 20.11.
+    blieben 622 von 1206 Telekom-Kombinationen „nicht klickbar“, 211 ein Befund „Seite
+    zeigt 36 statt 0“. Die Karte klickt nur Ratenknöpfe. Gegenprobe: die echte Gruppe
+    hat drei Knöpfe, gewählt ist der 36er."""
+    suppe = BeautifulSoup(ZAHLUNGSKNOEPFE.read_text("utf-8"), "html.parser")
+    alle = suppe.select('#dyt_productViewDesktop button.dt_filterChips[role="radio"]')
+    assert "Einmalpreis" in alle[0].get_text()
+    assert len(alle) == 3
+    laufzeit = karte.knoepfe["laufzeit"]
+    werte = [
+        wert_nach_muster(t[laufzeit.wert_attribut], laufzeit.muster)
+        for t in suppe.select(laufzeit.selektor)
+    ]
+    assert werte == ["36", "24"]
+    gewaehlt = karte.seite["laufzeit_gewaehlt"]
+    assert [t[gewaehlt.attribut] for t in suppe.select(gewaehlt.selektor)] == [
+        alle[1]["aria-label"]
+    ]

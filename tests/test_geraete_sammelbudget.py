@@ -135,11 +135,16 @@ def test_die_ausgelieferte_konfiguration_nennt_telekom_bedarf():
     telekom = next(a for a in quellen.anbieter if a.name == "Telekom")
 
     assert telekom.sammelbedarf_sekunden is not None
-    assert sammelbedarf(telekom) > (len(telekom.crawled_einstiege) + telekom.max_produkte) * telekom.rate_limit_sekunden
-    # Telekoms eigener Katalog ist kleiner als o2s - der Anteil bleibt darunter
-    # (siehe test_die_ausgelieferten_anteile_bleiben_im_budget).
+    assert (
+        sammelbedarf(telekom)
+        > (len(telekom.crawled_einstiege) + telekom.max_produkte)
+        * telekom.rate_limit_sekunden
+    )
     o2 = next(a for a in quellen.anbieter if a.name == "o2")
-    assert sammelbedarf(telekom) < sammelbedarf(o2)
+    assert sammelbedarf(telekom) < sammelbedarf(o2), (
+        "Telekoms eigener Katalog ist kleiner als o2s, der Anteil bleibt darunter "
+        "(test_die_ausgelieferten_anteile_bleiben_im_budget)"
+    )
 
 
 def test_die_ausgelieferte_konfiguration_nennt_congstar_bedarf():

@@ -208,15 +208,16 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     assert katalog, "kein Sprung-Link im Katalog"
     radar_texte = {a.get_text(strip=True) for a in links}
     assert all(t.startswith("Mit Tarif") for t in radar_texte), radar_texte
-    # Katalog (Ruhe-Umbau): Linktext ist nur noch "→", die Aussage "Mit
-    # Tarif" steht in title/aria-label statt in der Zeile.
     katalog_beschriftung = {
         (a.get("title") or "", a.get("aria-label") or "") for a in katalog
     }
     assert all(
         title.startswith("Mit Tarif") and aria.startswith("Mit Tarif")
         for title, aria in katalog_beschriftung
-    ), katalog_beschriftung
+    ), (
+        "Katalog (Ruhe-Umbau): Linktext nur noch →, „Mit Tarif“ in title/aria-label",
+        katalog_beschriftung,
+    )
     label = geraete.select_one("#tafel-katalog .gr-leit--katalog .gr-leit-label")
     assert label is not None and not any(ch.isdigit() for ch in label.get_text()), label
     fehlende = [
