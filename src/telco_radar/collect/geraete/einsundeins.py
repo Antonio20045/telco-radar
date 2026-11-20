@@ -1,178 +1,61 @@
 """1&1: der Monatspreis des BUENDELS, und nichts anderes.
 
-DER BEFUND, DER DIESEN ANBIETER EIN JAHR LANG DRAUSSEN HIELT
-------------------------------------------------------------
-Die Produktseite traegt ein sauberes `application/ld+json` vom Typ
-`Product` - und sein `offers.price` ist NICHT der Geraetepreis, sondern der
-Monatspreis des Buendels aus Geraet und Tarif. Gemessen am 04.09.2026 an
-`https://mobile.1und1.de/iphone-17-pro` (HTTP 200, 325 KB):
+1&1 verkauft Geraete nur im Tarifbund - es gibt keinen Barpreis zu
+verschweigen. Jeder Satz traegt deshalb NUR `buendel_monatlich`
+(Geraet+Tarif kombiniert) und `tarif_name`, nie eine Aufspaltung in
+`geraet_monatsrate`/`tarif_monatlich` (§ 13.2): die Seite nennt oft eine
+Aufteilung, die sich widerspricht (45,00+14,99=59,99 bei einem Buendel
+von 44,99 - der Rabatt gilt nur im Verbund). Ohne lesbaren Tarifnamen
+wird der Satz verworfen (`Listung.__post_init__` ohnehin).
 
-    "name": "iPhone 17 Pro",
-    "description": "iPhone 17 Pro mit 1&1 All-Net-Flat S",
-    "offers": {"priceCurrency": "EUR", "price": "44.99"}
+MARKUP-STAND 20.11.2026 (K1, Befund A-72ZCSS): die Preiskarte heisst
+jetzt `window.hwdVariantsHardwarePrices`, JSON mit Schluesseln
+`product-FARBE-GB`, aber je Schluessel VERSCHACHTELT nach Finanzierungs-
+dauer ("24", "36", "1") und darunter nach "fix"/"flex" (Zubehoer-Bundles
+tragen andere, hw_id-basierte Schluessel in `hwdBundleOfferPrices` und
+tauchen hier nie auf). Die alte flache Preiskarte (`_alte_preiskarte`,
+Cent-Array) bleibt als Rueckfallstufe fuer Seiten von VOR K1.
 
-44,99 EUR ist kein Preis fuer ein Telefon. Als Barpreis gespeichert waere
-die Zahl **plausibel falsch** - genau die Sorte Fehler, gegen die der
-Lockpreis-Waechter gebaut ist, nur oberhalb seiner Grenze von 30 EUR. Der
-`grund` in `geraete_quellen.yaml` sagte das seit 08/2026 richtig; falsch war
-nur die Folgerung, dass man deshalb warten muesse.
+NUR "fix" IST OHNE "24+12" BELEGBAR: Der Analytics-Datalayer derselben
+Antwort (`const products = [...]`, GA4-Schema) nennt die echte Mindest-
+bindung `tariff.contractduration` und schluesselt ihre Perioden als
+"mandatory" gegen "optional-24+12"/"optional-36+12" - eine FREIWILLIGE
+Verlaengerung zum gleichen Preis ueber die Mindestbindung hinaus. Genau
+das ist "flex": ihre `tariffMonthlyPrices` laufen bis Laufzeit+12
+(24->36, 36->48). "fix" ist dagegen fuer GENAU `contractduration` flach
+und springt danach auf den Listenpreis - gegengeprueft ueber dem ersten
+Eintrag von `tariffMonthlyPrices` (deckt Monat 1 bis mindestens
+`contractduration` zum Betrag aus `tariffPricePerMonth`). Gelesen wird
+deshalb nur "fix"; eine Abweichung bleibt unbelegt und wird verworfen
+(lieber keine Zahl als eine 24+12-Zahl).
 
-UNTER TCO-FIRST IST GENAU DIESE ZAHL DIE LEITGROESSE
-----------------------------------------------------
-1&1 verkauft Geraete NUR im Tarifbund. Es gibt dort keinen Barpreis, den
-dieser Adapter verschweigen wuerde - es gibt ihn nicht. Was es gibt, ist
-eine vollstaendige Buendelaussage, und die Seite nennt alle drei Teile
-selbst:
+Tarifname/Marke/Modell kommen aus demselben Datalayer (`tariff.external
+name`, `hardware.brand`/`name`) - der `tariff-description`-Span und das
+`application/ld+json`-Product dafuer stehen auf keiner gemessenen Seite
+mehr, bleiben aber als Rueckfallstufe im Code. `hwdVariantsOneOffPayment
+Fees` (Einmalzahlung) und der `data-iframe`-Link zur Bereitstellungs-
+gebuehr fehlen ebenfalls; beide degradieren ohne ihren Textmarker auf
+`None`/`""` (E1) statt eine falsche Zahl anzunehmen.
 
-    Monatspreis     `offers.price`                     44,99 EUR
-    Tarif           aus `description` ("... mit X")    1&1 All-Net-Flat S
-    Laufzeit        `window.currentHardwareOfferDuration`   36
-
-`preis_ohne_vertrag` bleibt deshalb LEER. Nicht, weil die Zahl fehlt,
-sondern weil es sie nicht gibt; sie aus 44,99 x 36 minus Tarif zu rechnen
-waere eine Rechnung dieses Projekts und keine Angabe des Anbieters
-(dieselbe Grenze wie beim Vierwochenpreis im Tarif-Sammler).
-
-WARUM DER TARIFNAME AUS DER BESCHREIBUNG KOMMT
-----------------------------------------------
-`Listung.__post_init__` verwirft jede Buendelzahl ohne `tarif_referenz` -
-"iPhone fuer 1 Euro" ist ohne den Vertrag daneben bedeutungslos. 1&1
-schreibt den Tarif in dieselbe Zeile wie das Geraet ("iPhone 17 Pro mit
-1&1 All-Net-Flat S"), also steht er in der Quelle und muss nicht geraten
-werden. Findet sich dort kein Tarif, wird der Satz verworfen - lieber keine
-Listung als eine Zahl ohne ihren Vertrag.
-
-Der so gelesene Name trifft den Tarifbestand: `/handytarife` fuehrt densel-
-ben Tarif als ld+json-Knoten "1&1 All-Net-Flat S", und `tarif_bezug` loest
-beide auf dieselbe ID auf (`11:1-1-all-net-flat-s`). Das ist kein Zufall,
-sondern derselbe Anbietertext an zwei Stellen seiner eigenen Seite.
-
-WELCHE VARIANTE DER PREIS MEINT
--------------------------------
-Die Seite zeigt eine Variante VORAUSGEWAEHLT und nennt sie:
-
-    window.currentProductVariants[window.productId] = {
-        'color': 'COSMIC_ORANGE', 'size': '256', 'depositValue': '' };
-
-Der Preis im ld+json gehoert zu dieser Variante. Die uebrigen Kombinationen
-(drei Farben x drei Speicherstufen in `window.availabilities`) tragen andere
-Preise, die die Seite erst im Browser nachlaedt - sie werden hier NICHT
-angefasst. Eine Preistabelle ueber Tarif x Speicher braucht einen eigenen
-Spike; sie hier aus einer einzigen Zahl zu vervielfaeltigen hiesse, drei
-Viertel der Saetze zu erfinden.
-
-`depositValue` ist die Anzahlung. Im gemessenen Fall ist sie leer - dann
-gibt es keine, und das Feld bleibt leer statt 0.00: "nicht genannt" und
-"null Euro" sind zwei verschiedene Aussagen.
-
-ROBOTS.TXT (04.09.2026 gelesen)
--------------------------------
-`mobile.1und1.de/robots.txt` sperrt fuer `User-agent: *` die Verzeichnisse
-`/xml/`, `/static/`, `/modules/`, dazu einzelne Aktions- und
-Bestellstrecken. Die Produktseiten und `/smartphones` sind frei; der
-Parameter `?chosenTariff=` ist sogar ausdruecklich erlaubt. Unser Absender
-ist `TelcoRadar/1.0` und faellt unter `*`.
-
-DER BUENDELKATALOG: DIE PREISKARTE AUF DER GERAETESEITE (B4, 08.09.2026)
--------------------------------------------------------------------------
-Die Geraet-x-Tarif-Kombinatorik ueber ALLE Tarife traegt die Seite NICHT
-serverseitig - der Konfigurator laedt seine Tariftabelle erst im Browser
-nach. Gemessen 08.09.2026: `?chosenTariff=tariff-anf-m-mvl` liefert eine
-BYTE-IDENTISCHE Antwort wie die Seite ohne Parameter (326 604 Bytes), das
-ld+json bleibt bei "All-Net-Flat S", 44,99. Echte Tarifwaehler gibt es an
-dieser Quelle nur im Browser - das ist eine Messgrenze, keine Luecke.
-
-DIE EINMALZAHLUNG DES GERAETS (S2-C, 09.09.2026)
--------------------------------------------------
-DIE GERAETE-EINMALZAHLUNG steht in derselben Antwort wie die Preiskarte:
-`hwdVariantsOneOffPaymentFees = {"product-COSMIC_ORANGE-256":"360,–", …}`
-- dieselben Schluessel wie `hwdVariantsPrices`, Werte als deutsche
-Betraege, mit Gedankenstrich statt der Centstelle ("360,-" heisst
-360,00 EUR). Die Zuweisung steht hinter der Bedingung
-`window.currentHardwareOfferDuration === '36'`: die Einmalzahlung gibt es
-NUR bei der 36-Monats-Finanzierung. Fehlt der Block, fehlt die Zahl - und
-"nicht genannt" bleibt leer statt 0.00 (dieselbe Regel wie beim
-`depositValue` oben).
-
-DER TARIFDETAILS-IFRAME UND DIE BEREITSTELLUNGSGEBUEHR (S2-C, 09.09.2026)
--------------------------------------------------------------------------
-Bis zum 08.09.2026 stand hier, der von der Seite verlinkte Tarifdetails-
-Iframe sei "eine 48-KB-JavaScript-Huelle ohne einen Preis". Das war falsch
-gemessen: Er traegt keinen BUNDELpreis (sein Smartphoneangebot sagt
-woertlich "Preis abhängig vom gewählten Smartphone"), sehr aber die
-EINMALIGE BEREITSTELLUNGSGEBUEHR des Tarifs - nachgemessen 09.09.2026 an
-`/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&…`
-(HTTP 200, 48 112 B, Absender TelcoRadar/1.0):
-
-    <td><strong>Einmalige Bereitstellungsgebühr</strong></td>
-    <td><div><strong>Tarif ohne Smartphone:</strong> 19,90&nbsp;€<br>
-        <strong>Tarif mit Smartphone:</strong> 39,90&nbsp;€</div></td>
-
-Die Gebuehr ist TARIFF- und GERATEUNABHAENGIG - gegenprobe mit anderem
-Geraet (hw-samsung-galaxy-a57) und anderem Tarif (tariff-anf-m-mvl):
-jeweils 19,90/39,90. Erhoben wird sie als `anschlusspreis` auf dem
-BUNDEL-Satz (unser Bündel hat immer ein Smartphone, also 39,90) durch
-`ergaenze_bereitstellungsgebuehr()` - EIN GET je Tarif-Slug, nicht je
-Geraet, die Adresse nimmt der Adapter unverandert aus dem `data-iframe`-
-Attribut der Geräteseite (nur verlinkte Adressen). robots.txt (gelesen
-09.09.2026): der Pfad ist fuer `User-agent: *` frei - gesperrt sind
-/xml/, /static/, /modules/ und Bestellstrecken, nicht /details-all-net-
-flat-preisliste.
-
-Was serverseitig da ist, ist die Preiskarte des DEFAULT-Tarifs ueber ALLE
-Farben und Speichergroessen - und damit mehr als das ld+json, das nur die
-VORAUSGEWAEHLTE Variante bepreist:
-
-    function setHwdPrices() { hwdVariantsPrices = {
-        'product-COSMIC_ORANGE-256': [4499,],
-        'product-COSMIC_ORANGE-256-bundle-hw-…-WEISS-0': [5399,],
-        …
-
-Die Schluessel OHNE `-bundle-`-Segment sind das Tarifbuendel (Wert in
-CENT); die mit sind ZUBEHOER-Bundles (AirPods, `data-iframe="/Details
-AirPods4"`), kein Tarif - ihr Preis steht HOEHER als der Tarifbund und
-wird ueber den Schluessel verworfen, nicht ueber den Betrag. Der Tarifname
-desselben Bündels steht in derselben Antwort (`<span id="tariff-
-description">1&1 All-Net-Flat S</span>`), seine Slug im eigenen
-Tarifdetails-Link (`?chosenTariff=tariff-anf-s-mvl`), seine Laufzeit in
-`window.currentHardwareOfferDuration`. Gemessen an zehn Geräteseiten
-(08.09.2026): der Default-Tarif ist ueberall die 1&1 All-Net-Flat S, die
-Dauer ueberall 36, und der Preis ist bei jeder Farbe derselben
-Speichergroesse identisch - je Speichergroesse EIN Satz, die erste Farbe
-vertritt ihn (dieselbe Dedupe-Regel wie congstar B3).
-
-DER EINE MONATSBETRAG WIRD NICHT AUFGETEILT (§ 13.2)
-----------------------------------------------------
-Der Datalayer der Seite nennt eine Aufteilung - und widerlegt sich selbst:
-Hardware-Rate 45,00 plus Tarif 14,99 waere 59,99, das Buendel kostet aber
-44,99 (ld+json und Preiskarte, beide 256 GB). Die Differenz von 15,00 ist
-ein unbenannter Nachlass, der nur im Verbund gilt; bei 512 GB sind es 18,00.
-Diese Zahlen in `geraet_monatsrate` und `tarif_monatlich` zu schreiben
-waere eine Aufspaltung OHNE Beleg - genau der Fall, fuer den
-`tco_model.Buendel.buendel_monatlich` existiert. Der Satz traegt deshalb
-NUR den kombinierten Monatsbetrag, dazu die Laufzeit der Hardware-Angebots.
-
-KEINE ZUSAETZLICHEN ABRUFE: `lies_buendel` liest SELBE Antwort, die der
-Ernte-Weg fuer die Listung ohnehin holt (`buendel_auf_produktseite` bleibt
-an, dasselbe Muster wie Vodafone B1). Der Parameter `?size=` (robots:
-erlaubt) wuerde dieselbe Karte je Speichergroesse einzeln liefern - die
-Karte steht schon in EINER Antwort, also wird er nicht benutzt.
+Keine zusaetzlichen Abrufe: `lies_buendel` liest dieselbe Antwort, die
+der Ernte-Weg fuer die Listung ohnehin holt.
 """
 
 from __future__ import annotations
 
 import html as html_modul
+import json
 import logging
 import re
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-from .basis import GeraeteAbrufFehler
 from ...tarif_model import zahl
 from ..tarif_ldjson import ld_json_bloecke
+from .basis import GeraeteAbrufFehler
 
 log = logging.getLogger(__name__)
 
@@ -217,7 +100,7 @@ def variante(html: str) -> dict:
     }
 
 
-def laufzeit_monate(html: str) -> Optional[int]:
+def laufzeit_monate(html: str) -> int | None:
     """Die Bindungsdauer des Hardware-Angebots, wie die Seite sie nennt."""
     treffer = _LAUFZEIT_RE.search(html or "")
     if not treffer:
@@ -232,30 +115,14 @@ _KACHEL_KLASSE = "hardware-box__heading"
 def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]:
     """Aus der Kategorieseite die Produktadressen - eine je Geraet.
 
-    WARUM DIE ALLGEMEINE LINKERNTE HIER NICHT REICHT
-    ------------------------------------------------
-    `mobile.1und1.de/smartphones` traegt am 04.09.2026 **167** Adressen auf
-    der eigenen Domain, davon nur 42 Produktseiten. Der Rest sind
-    Hauptnavigation, Themenseiten (`/unbegrenztes-datenvolumen`,
-    `/handyvertrag-ohne-laufzeit`), Zubehoer-Auflagen
-    (`/DetailsAirPods4?lightbox=true`) und 39 Bilder unter
-    `/_catalog/images/`. Ein Pfadmuster hilft nicht: die Produktseiten
-    heissen `/iphone-17-pro` und `/fairphone-6` und haben keinen
-    gemeinsamen Pfadteil, den die Themenseiten nicht auch haetten.
-
-    Mit `ernte_links` liefe der Sammler deshalb in seinen Deckel
-    (`max_produkte`), meldete die Seite als unvollstaendig gelesen - und
-    haette dafuer ueber hundert Abrufe verbraucht, die kein Geraet tragen
-    koennen.
-
-    Gelesen wird stattdessen das, was die Seite selbst als Katalogkachel
-    auszeichnet: `<a class="hardware-box__heading">`. Das ist keine
-    Konstruktion, sondern die Auswahl, die 1&1 auf seiner eigenen Seite
-    trifft; die Adressen stehen woertlich als `href` darin.
+    `mobile.1und1.de/smartphones` traegt neben Produktseiten auch Haupt-
+    navigation, Themenseiten und Zubehoer-Auflagen ohne gemeinsamen
+    Pfadteil - ein Pfadmuster allein hilft nicht. Gelesen wird deshalb
+    das, was die Seite selbst als Katalogkachel auszeichnet:
+    `<a class="hardware-box__heading">`, keine eigene Konstruktion.
 
     `pfadmuster` wirkt zusaetzlich, wenn eines konfiguriert ist - dieselbe
-    Bedeutung wie in `ernte_links`, damit eine Konfiguration den Umfang
-    weiter einengen kann, ohne den Adapter anzufassen.
+    Bedeutung wie in `ernte_links`.
     """
     muster = (
         [m for m in pfadmuster if m]
@@ -288,11 +155,11 @@ def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]
     return out
 
 
-_PREISKARTE_ANFANG = "hwdVariantsPrices = {"
+_HARDWAREPREISKARTE_ANFANG = "window.hwdVariantsHardwarePrices = "
 
-_PREISKARTE_SCHLUESSEL = re.compile(
-    r"'product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)':\s*\[\s*(?P<cents>\d+)"
-)
+_VARIANTSCHLUESSEL_RE = re.compile(r"^product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)$")
+
+_PRODUKTE_ANFANG = "const products = ["
 
 _TARIF_SPAN_RE = re.compile(r'<span id="tariff-description">([^<]*)</span>')
 
@@ -301,20 +168,115 @@ _SLUG_RE = re.compile(r"[?&]chosenTariff=([A-Za-z0-9_.-]+)")
 _TARIFDETAILS_RE = re.compile(r'data-iframe="(/details-[^"]+)"')
 
 
-def _preiskarte(text: str) -> str:
-    """Der Rumpf der Preiskarte - oder `""`, wenn die Seite keine trägt.
-
-    Wirft nicht: Eine Geräteseite ohne `hwdVariantsPrices` ist ein
-    GERAETESEITE-ohne-Preiskarte, und darueber entscheidet `lies_buendel`
-    mit einer eigenen, lautenden Ausnahme - hier wird nur geschnitten.
-    """
-    anfang = (text or "").find(_PREISKARTE_ANFANG)
+def _json_rumpf(text: str, anfang_marke: str, klammer_auf: str, klammer_zu: str) -> str:
+    """Rumpf eines `window.x = {...};`-Literals bis zum ersten `klammer_zu;`."""
+    roh = text or ""
+    anfang = roh.find(anfang_marke)
     if anfang < 0:
         return ""
-    ende = text.find("};", anfang)
+    start = anfang + len(anfang_marke) - 1
+    ende = roh.find(klammer_zu + ";", start)
     if ende < 0:
         return ""
-    return text[anfang:ende]
+    return roh[start : ende + 1]
+
+
+def _hardwarepreiskarte(text: str) -> dict:
+    """{'product-FARBE-GB': {Laufzeit: {'fix': {...}}}}; `{}` ohne den
+    Marker oder bei kaputtem JSON."""
+    rumpf = _json_rumpf(text, _HARDWAREPREISKARTE_ANFANG, "{", "}")
+    if not rumpf:
+        return {}
+    try:
+        geladen = json.loads(rumpf)
+    except ValueError:
+        return {}
+    return geladen if isinstance(geladen, dict) else {}
+
+
+_ALT_PREISKARTE_ANFANG = "hwdVariantsPrices = {"
+
+_ALT_PREISKARTE_SCHLUESSEL = re.compile(
+    r"'product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)':\s*\[\s*(?P<cents>\d+)"
+)
+
+
+def _alte_preiskarte(text: str) -> dict:
+    """Rueckfallstufe fuer Seiten von VOR K1: liefert dieselbe Schluessel-
+    form wie `_hardwarepreiskarte`, mit Platzhalter fuer `_preis_je_
+    schluessel`; `{}` ohne den alten Marker."""
+    anfang = (text or "").find(_ALT_PREISKARTE_ANFANG)
+    if anfang < 0:
+        return {}
+    ende = text.find("};", anfang)
+    if ende < 0:
+        return {}
+    out: dict = {}
+    for treffer in _ALT_PREISKARTE_SCHLUESSEL.finditer(text[anfang:ende]):
+        schluessel = f"product-{treffer.group('farbe')}-{treffer.group('gb')}"
+        out.setdefault(schluessel, {"_alt_cent": int(treffer.group("cents"))})
+    return out
+
+
+def _preis_je_schluessel(eintrag: dict, dauer: int) -> tuple[float, float] | None:
+    """(Hardware-, Tarifrate) ueber `_fixpreis`, ausser bei einem Eintrag
+    aus `_alte_preiskarte` (ein Cent-Betrag ohne Aufteilung)."""
+    if "_alt_cent" in eintrag:
+        return round(eintrag["_alt_cent"] / 100.0, 2), 0.0
+    return _fixpreis(eintrag, dauer)
+
+
+def _datalayer(text: str) -> dict:
+    """{'hardware': Posten, 'tariff': Posten} aus `const products = [...]`
+    (GA4-Schema, Modulkopf); nennt auch `contractduration`."""
+    rumpf = _json_rumpf(text, _PRODUKTE_ANFANG, "[", "]")
+    if not rumpf:
+        return {}
+    try:
+        eintraege = json.loads(rumpf)
+    except ValueError:
+        return {}
+    if not isinstance(eintraege, list):
+        return {}
+    out: dict = {}
+    for eintrag in eintraege:
+        produkt = (eintrag or {}).get("product") if isinstance(eintrag, dict) else None
+        if not isinstance(produkt, dict):
+            continue
+        typ = produkt.get("type")
+        if typ in ("hardware", "tariff") and typ not in out:
+            out[typ] = produkt
+    return out
+
+
+def _vertragslaufzeit(text: str) -> int | None:
+    """Mindestbindung aus `tariff.contractduration`, NICHT `current
+    HardwareOfferDuration` (Modulkopf, "24+12"); nur fuer die neue
+    Preiskarte, die alte bleibt bei `laufzeit_monate`."""
+    tarifposten = _datalayer(text).get("tariff") or {}
+    dauer = (tarifposten.get("tariff") or {}).get("contractduration")
+    return dauer if isinstance(dauer, int) and dauer > 0 else None
+
+
+def _fixpreis(karteneintrag: dict, dauer: int) -> tuple[float, float] | None:
+    """(Hardware-, Tarifrate/Monat) der "fix"-Stufe zu `dauer`, nur bei
+    belegter Flachheit (Modulkopf, "24+12"); sonst `None`."""
+    stufe = (karteneintrag or {}).get(str(dauer), {})
+    stufe = stufe.get("fix") if isinstance(stufe, dict) else None
+    if not isinstance(stufe, dict):
+        return None
+    hardwarerate = zahl(str(stufe.get("hardwarePricePerMonth")))
+    tarifrate = zahl(str(stufe.get("tariffPricePerMonth")))
+    monatspreise = stufe.get("tariffMonthlyPrices")
+    if hardwarerate is None or tarifrate is None or not monatspreise:
+        return None
+    erster = monatspreise[0]
+    flach_bis = erster.get("end")
+    deckt = flach_bis in (0, None) or flach_bis >= dauer
+    betrag = round(float(erster.get("amount", -1)), 2)
+    if erster.get("begin") != 1 or not deckt or betrag != round(tarifrate, 2):
+        return None
+    return hardwarerate, tarifrate
 
 
 _EINMALZAHLUNG_ANFANG = "hwdVariantsOneOffPaymentFees = {"
@@ -350,8 +312,13 @@ def _einmalzahlungen(text: str) -> dict:
 
 
 def _tarifname(text: str) -> str:
-    """Der Tarif des Bündels aus dem `tariff-description`-Span, alternativ
-    aus der ld+json-Beschreibung (derselbe Anbietertext an zwei Stellen)."""
+    """Tarifname aus `tariff.externalname` (Modulkopf), sonst Span/ld+json."""
+    tarifposten = _datalayer(text).get("tariff") or {}
+    name = (tarifposten.get("tariff") or {}).get("externalname")
+    if name:
+        name = str(name).strip()
+        if name:
+            return name
     treffer = _TARIF_SPAN_RE.search(text or "")
     if treffer:
         name = html_modul.unescape(treffer.group(1)).strip()
@@ -367,43 +334,50 @@ def _tarifname(text: str) -> str:
     return ""
 
 
-def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
+def lies_buendel(text: str, url: str = "", proben: dict | None = None) -> list[dict]:
     """Aus einer Geräteseite je SPEICHERGROESSE einen Bündel-Rohsatz.
 
-    Die Karte preist den Default-Tarif der Seite (gemessen an zehn Seiten:
-    ueberall die 1&1 All-Net-Flat S) über alle Farben - die erste Farbe
-    vertritt ihre Groesse. Der Satz traegt NUR den kombinierten Monatsbetrag
-    (`buendel_monatlich`, § 13.2): die Aufteilung der Seite widerspricht
-    sich selbst (Modulkopf), und ein Betrag ohne Beleg wird nicht
-    aufgespalten.
+    Die Karte preist den Default-Tarif der Seite ueber alle Farben - die
+    erste Farbe vertritt ihre Groesse. Der Satz traegt NUR den kombi-
+    nierten Monatsbetrag (`buendel_monatlich`, § 13.2), nie eine
+    Aufspaltung ohne Beleg.
 
-    Wirft, wenn die Seite gar keine Preiskarte trägt - eine Geräteseite
-    ohne `hwdVariantsPrices` ist ein geaendertes Markup, und ein leeres
-    Ergebnis waere dafuer die falsche Meldung (dasselbe Muster wie bei
-    o2, Telekom und congstar). Eine Karte ohne lesbaren Tarifnamen liefert
-    nur ihre leere Ausbeute mit einer Protokollzeile - ein Satz ohne
-    benannten Tarif ist bedeutungslos, die Karte darunter kann aber noch
-    eine andere Groesse hergeben (der Name steht einmal je Seite, also
-    trifft das heute die ganze Seite - gelogt, nicht geworfen).
+    Wirft, wenn die Seite gar keine Preiskarte trägt (altes wie neues
+    Markup, Modulkopf) - ein leeres Ergebnis waere dafuer die falsche
+    Meldung (dasselbe Muster wie bei o2, Telekom und congstar). Ohne
+    lesbaren Tarifnamen oder ohne bestimmbare Mindestbindung liefert sie
+    nur ihre leere Ausbeute mit einer Protokollzeile (Name/Laufzeit
+    stehen einmal je Seite, trifft also die ganze Seite - gelogt, nicht
+    geworfen).
     """
-    karte = _preiskarte(text)
+    karte = _hardwarepreiskarte(text)
+    dauer = _vertragslaufzeit(text) if karte else None
+    if not karte:
+        karte = _alte_preiskarte(text)
+        dauer = laufzeit_monate(text)
     if not karte:
         raise GeraeteAbrufFehler(
-            f"1&1-Geräteseite ohne hwdVariantsPrices ({len(text or '')} Bytes)"
+            f"1&1-Geräteseite ohne hwdVariantsHardwarePrices ({len(text or '')} Bytes)"
             " - kein Bündelkatalog (Markup geändert?)"
         )
 
     tarif = tarifname_bereinigt(_tarifname(text))
     if not tarif:
         log.info(
-            "1&1: %s nennt keinen Tarifnamen (tariff-description/"
+            "1&1: %s nennt keinen Tarifnamen (Datalayer/tariff-description/"
             "Beschreibung) - Bündelsätze verworfen",
+            url,
+        )
+        return []
+    if dauer is None:
+        log.info(
+            "1&1: %s nennt keine Mindestbindung (Datalayer-contractduration/"
+            "currentHardwareOfferDuration) - Bündelsätze verworfen",
             url,
         )
         return []
     slug_treffer = _SLUG_RE.search(text or "")
     tarif_slug = slug_treffer.group(1) if slug_treffer else ""
-    dauer = laufzeit_monate(text)
 
     marke, name = _marke_name(text)
     einmalzahlungen = _einmalzahlungen(text)
@@ -413,11 +387,24 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
     angezeigt = _angezeigter_preis(text, hw_id)
     out: list[dict] = []
     gesehen: dict[int, tuple[str, float]] = {}
-    for treffer in _PREISKARTE_SCHLUESSEL.finditer(karte):
+    for schluessel, eintrag in karte.items():
+        treffer = _VARIANTSCHLUESSEL_RE.match(schluessel)
+        if not treffer:
+            continue
         gb = int(treffer.group("gb"))
         farbe_roh = treffer.group("farbe")
         farbe = farbe_roh.replace("_", " ").strip().lower()
-        betrag = round(int(treffer.group("cents")) / 100.0, 2)
+        preis = _preis_je_schluessel(eintrag, dauer)
+        if preis is None:
+            log.info(
+                "1&1: %s/%s ohne belegten Flachpreis zur Mindestbindung "
+                "(%d Monate) - Variante verworfen",
+                url,
+                schluessel,
+                dauer,
+            )
+            continue
+        betrag = round(sum(preis), 2)
         vorher = gesehen.get(gb)
         if vorher is not None:
             if vorher[1] != betrag:
@@ -464,11 +451,14 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
 
 
 def _marke_name(text: str) -> tuple[str, str]:
-    """Marke und Modellname aus dem Product-Knoten der Seite.
-
-    Derselbe Knoten, aus dem auch `lies()` baut - zwei Lesarten desselben
-    Textes sollen nicht zwei Namen fuer dasselbe Gerät gebären.
-    """
+    """Marke/Modell aus dem `hardware`-Posten (Modulkopf), sonst ld+json."""
+    hardwareposten = _datalayer(text).get("hardware") or {}
+    marke_name = str((hardwareposten.get("hardware") or {}).get("brand") or "").strip()
+    name = str(hardwareposten.get("name") or "").strip()
+    if name:
+        if marke_name and name.lower().startswith(marke_name.lower() + " "):
+            name = name[len(marke_name) :].strip()
+        return marke_name, name
     for block in ld_json_bloecke(text or ""):
         knoten = block if isinstance(block, dict) else {}
         typ = knoten.get("@type")
@@ -499,7 +489,7 @@ def _tarifdetails_url(text: str, basis_url: str) -> str:
     )
 
 
-def bereitstellungsgebuehr(text: str) -> Optional[float]:
+def bereitstellungsgebuehr(text: str) -> float | None:
     """Die einmalige Bereitstellungsgebühr des Tarifs MIT Smartphone.
 
     None, wenn die Antwort sie nicht nennt - der Iframe ist auch ohne
@@ -647,7 +637,7 @@ def _cent(euro: str, cent: str) -> int:
     return int(euro) * 100 + (0 if rest in ("–", "-") else int(rest))
 
 
-def _angezeigter_preis(text: str, hw_id: str) -> Optional[float]:
+def _angezeigter_preis(text: str, hw_id: str) -> float | None:
     """Der Monatspreis, den die Geraeteseite serverseitig anzeigt."""
     if not hw_id:
         return None
@@ -728,7 +718,7 @@ def lies_tarifraster(text: str) -> dict:
     }
 
 
-def _hole_text(hole: Callable, kopfzeilen: dict, adresse: str) -> Optional[str]:
+def _hole_text(hole: Callable, kopfzeilen: dict, adresse: str) -> str | None:
     """Ein Abruf; None bei Fehler - protokolliert, nie still."""
     try:
         status, text = hole(adresse, kopfzeilen=kopfzeilen)

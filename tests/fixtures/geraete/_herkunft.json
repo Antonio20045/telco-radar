@@ -1066,6 +1066,24 @@
       "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
       "bytes_abgelegt": 115173,
       "zweck": "Beleg der eingerechneten congstar-Aktion anschluss_erlassen (Fussnote 'bis zum 07.12.2026', 15,00 EUR) neben anschlusspreis 0,00 EUR - Grundlage von tests/test_klick_aktion_belegt.py"
+    },
+    {
+      "datei": "einsundeins_produktseite_iphone_17_pro_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/iphone-17-pro",
+      "abgerufen_am": "2026-11-20",
+      "beleg": "Auftrag A-72ZCSS (K1): HTTP 200, TelcoRadar/1.0, robots.txt erlaubt /iphone-17-pro; Markupwechsel von hwdVariantsPrices auf hwdVariantsHardwarePrices + Analytics-Datalayer, siehe Modulkopf einsundeins.py.",
+      "gzip": true,
+      "bytes_roh": 368426,
+      "sha256_roh": "9cae2613db4c230be1d08036bc6ca6943c79a78418196969daac5e5b8d017680"
+    },
+    {
+      "datei": "einsundeins_produktseite_galaxy_a57_2026-11-20.html.gz",
+      "url": "https://mobile.1und1.de/samsung-galaxy-a57",
+      "abgerufen_am": "2026-11-20",
+      "beleg": "Auftrag A-72ZCSS (K1): HTTP 200, TelcoRadar/1.0, robots.txt erlaubt /samsung-galaxy-a57; zweites Geraet zur Gegenprobe derselben neuen Struktur.",
+      "gzip": true,
+      "bytes_roh": 379851,
+      "sha256_roh": "5474ff5ffc192b28463c904f07e984176ba445a63d0fe475396ea535087a1005"
     }
   ]
 }

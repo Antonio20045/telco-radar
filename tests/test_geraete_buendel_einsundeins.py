@@ -48,9 +48,20 @@ DIE DREI REGELN, AN DENEN DIESES PAKET SCHEITERN KANN
    `geraet_zuzahlung` leer - "nicht genannt" ist keine Zahl und kein 0,00.
    Dasselbe gilt für die Bereitstellungsgebühr: Ein Iframe ohne die Zeile
    (oder ein gescheiterter Abruf) setzt KEINEN Default.
+
+NACHTRAG K1 (20.11.2026, Befund A-72ZCSS): 1&1 hat die Preiskarte auf
+`window.hwdVariantsHardwarePrices` umgestellt (verschachtelt nach Lauf-
+zeit und "fix"/"flex", Modulkopf von `einsundeins.py`) - die obigen drei
+Fixtures sind damit ein HISTORISCHER Schnappschuss (vor K1), den die
+Tests oben weiter gegen die ALTE Rückfallstufe des Adapters prüfen.
+`einsundeins_produktseite_iphone_17_pro_2026-11-20.html.gz` und
+`einsundeins_produktseite_galaxy_a57_2026-11-20.html.gz` (HTTP 200,
+TelcoRadar/1.0, robots.txt erlaubt) sind der aktuelle Stand; ihre Tests
+stehen am Dateiende.
 """
 
 import gzip
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -663,3 +674,179 @@ def test_die_konfiguration_braucht_keinen_buendel_einstieg():
     quellen = lade_quellen(_WURZEL)
     anbieter = next(a for a in quellen.anbieter if a.name == "1&1")
     assert [e.kind for e in anbieter.einstiege] == ["static"]
+
+
+def _neue_seite(
+    karte: dict, tarifname: str = "1&1 All-Net-Flat S", contractduration: int = 24
+) -> str:
+    """Eine minimale Seite im Markup seit K1 (20.11.2026): `hwdVariants
+    HardwarePrices` (Preiskarte) plus `const products` (Datalayer fuer
+    Tarifname/Marke/Mindestbindung) - dieselben zwei Quellen wie die
+    echten Fixtures unten, nur auf das Noetigste gekuerzt."""
+    produkte = [
+        {
+            "product": {
+                "type": "hardware",
+                "name": "Testgerät",
+                "hardware": {"brand": "Testmarke"},
+            }
+        },
+        {
+            "product": {
+                "type": "tariff",
+                "tariff": {
+                    "externalname": tarifname,
+                    "contractduration": contractduration,
+                },
+            }
+        },
+    ]
+    return (
+        "<script>window.hwdVariantsHardwarePrices = "
+        + json.dumps(karte)
+        + ";</script>"
+        "<script>const products = " + json.dumps(produkte) + ";</script>"
+    )
+
+
+def test_echte_seite_vom_20_11_liefert_wieder_buendel():
+    """K1/A-72ZCSS: der Regressionsfall selbst - 1&1 hat die Preiskarte auf
+    `hwdVariantsHardwarePrices` umgestellt, die alte Lesart lieferte 0
+    Bündel aus 41 Seiten. Gegen die echte Seite vom 20.11.2026 müssen
+    wieder Sätze herauskommen, mit der MANDATORY-Laufzeit (24, nicht der
+    vorausgewählten Finanzierung 36) und ohne Aufteilung."""
+    saetze = lies_buendel(
+        _fixture("einsundeins_produktseite_iphone_17_pro_2026-11-20.html.gz"),
+        url=_IPHONE_URL,
+    )
+    assert [(s["speicher_gb"], s["buendel_monatlich"]) for s in saetze] == [
+        (256, 59.99),
+        (512, 70.99),
+    ]
+    assert all(s["tarif_name"] == "1&1 All-Net-Flat S" for s in saetze)
+    assert all(s["laufzeit_monate"] == 24 for s in saetze)
+
+
+def test_echte_seite_a57_vom_20_11_zweites_geraet():
+    """Gegenprobe an einem zweiten Gerät: derselbe Markupwechsel, andere
+    Zahlen - kein Zufallstreffer der iPhone-Fixture."""
+    saetze = lies_buendel(
+        _fixture("einsundeins_produktseite_galaxy_a57_2026-11-20.html.gz"),
+        url=_A57_URL,
+    )
+    assert [(s["speicher_gb"], s["buendel_monatlich"]) for s in saetze] == [
+        (128, 34.99),
+        (256, 37.99),
+    ]
+
+
+def test_tarifdetails_und_zuzahlung_fehlen_jetzt_ohne_falsche_zahl():
+    """K1: `data-iframe`/`chosenTariff` und `hwdVariantsOneOffPaymentFees`
+    stehen auf der neuen Seite nicht mehr - die Felder bleiben leer statt
+    eine falsche Zahl zu übernehmen (E1, "lieber keine Preise als
+    falsche")."""
+    saetze = lies_buendel(
+        _fixture("einsundeins_produktseite_iphone_17_pro_2026-11-20.html.gz"),
+        url=_IPHONE_URL,
+    )
+    assert all(s["tarif_slug"] == "" for s in saetze)
+    assert all(s["tarifdetails_url"] == "" for s in saetze)
+    assert all(s["geraet_zuzahlung"] is None for s in saetze)
+
+
+def test_24_plus_12_wird_nicht_als_flacher_preis_gelesen():
+    """Der Kern von K1: eine "fix"-Stufe, deren Tarifpreis VOR Ende der
+    Mindestbindung springt (hier bei Monat 12 statt 24 - ein konstruier-
+    tes 24+12-Muster), ist nicht belegt und wird verworfen, nicht mit
+    dem falschen (niedrigeren) Preis übernommen."""
+    karte = {
+        "product-SCHWARZ-128": {
+            "24": {
+                "fix": {
+                    "hardwarePricePerMonth": "10.00",
+                    "tariffPricePerMonth": "5.00",
+                    "tariffMonthlyPrices": [
+                        {"amount": 5.00, "begin": 1, "end": 12},
+                        {"amount": 9.00, "begin": 13, "end": 24},
+                        {"amount": 14.99, "begin": 25, "end": 0},
+                    ],
+                }
+            }
+        }
+    }
+    assert lies_buendel(_neue_seite(karte), url="https://mobile.1und1.de/x") == []
+
+
+def test_flex_wird_nie_gelesen_auch_wenn_sie_der_einzige_eintrag_ist():
+    """"flex" verlängert die Bindung über die Mindestlaufzeit hinaus
+    (24+12/36+12, Modulkopf) und wird deshalb NIE als Quelle für
+    `buendel_monatlich` genutzt - fehlt "fix", bleibt die Variante
+    unbelegt, auch wenn "flex" einen Preis nennt."""
+    karte = {
+        "product-SCHWARZ-128": {
+            "24": {
+                "flex": {
+                    "hardwarePricePerMonth": "8.00",
+                    "tariffPricePerMonth": "6.00",
+                    "tariffMonthlyPrices": [
+                        {"amount": 6.00, "begin": 1, "end": 36},
+                        {"amount": 14.99, "begin": 37, "end": 0},
+                    ],
+                }
+            }
+        }
+    }
+    assert lies_buendel(_neue_seite(karte), url="https://mobile.1und1.de/x") == []
+
+
+def test_fix_mit_belegter_flachheit_liefert_den_kombinierten_preis():
+    """Gegenprobe zu den beiden vorigen Tests: eine "fix"-Stufe, deren
+    Preis für die GESAMTE Mindestbindung flach ist, liefert
+    `hardwarePricePerMonth + tariffPricePerMonth`, kombiniert (§ 13.2)."""
+    karte = {
+        "product-SCHWARZ-128": {
+            "24": {
+                "fix": {
+                    "hardwarePricePerMonth": "10.00",
+                    "tariffPricePerMonth": "5.00",
+                    "tariffMonthlyPrices": [
+                        {"amount": 5.00, "begin": 1, "end": 24},
+                        {"amount": 14.99, "begin": 25, "end": 0},
+                    ],
+                }
+            }
+        }
+    }
+    saetze = lies_buendel(_neue_seite(karte), url="https://mobile.1und1.de/x")
+    assert len(saetze) == 1
+    assert saetze[0]["buendel_monatlich"] == 15.00
+    assert saetze[0]["laufzeit_monate"] == 24
+
+
+def test_zubehoer_bundles_der_neuen_struktur_tauchen_nie_auf():
+    """Zubehör-Preise stehen in der neuen Struktur in `hwdBundleOfferPrices`
+    mit hw_id-Schlüsseln (kein `product-FARBE-GB`) - ein Fund dort kann
+    `_hardwarepreiskarte` gar nicht erst erreichen, kein Form-Filter mehr
+    nötig (Modulkopf)."""
+    karte = {
+        "product-SCHWARZ-128": {
+            "24": {
+                "fix": {
+                    "hardwarePricePerMonth": "10.00",
+                    "tariffPricePerMonth": "5.00",
+                    "tariffMonthlyPrices": [
+                        {"amount": 5.00, "begin": 1, "end": 24},
+                        {"amount": 14.99, "begin": 25, "end": 0},
+                    ],
+                }
+            }
+        }
+    }
+    seite = _neue_seite(karte) + (
+        "<script>window.hwdBundleOfferPrices = "
+        '{"hw-apple-x-1234":{"WEISS 0":{"one_time":{"amount":"999.00"}}}};'
+        "</script>"
+    )
+    saetze = lies_buendel(seite, url="https://mobile.1und1.de/x")
+    assert len(saetze) == 1
+    assert saetze[0]["buendel_monatlich"] == 15.00
