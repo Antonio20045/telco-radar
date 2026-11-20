@@ -35,7 +35,7 @@ from telco_radar.analyze.geraete_pruefstatus import (
 from telco_radar.analyze.geraete_regeln import pruefe_bestand, sim_only_preis
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
-from telco_radar.collect.geraete import sammle_anbieter
+from telco_radar.collect.geraete import o2, sammle_anbieter
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.collect.geraete.vodafone import lies_buendel, loese_tarifnamen
 from telco_radar.geraete_config import Anbieter, Einstieg, lade_farben, lade_katalog
@@ -98,7 +98,24 @@ def o2_roh():
         datetime(2026, 9, 29, 3, tzinfo=UTC),
     )
     assert len(bilanz.buendel) == 48
-    return bilanz.buendel
+    return _mit_gemessenem_anschluss(bilanz.buendel, mitschnitt["antworten"])
+
+
+def _mit_gemessenem_anschluss(saetze, antworten):
+    """Abgeleitete Sätze tragen seit 20.11.2026 keinen Anschlusspreis aus der Referenz
+    (`o2_anschluss`); hier geht es um Tarif-ID und Tarifmonate. Eingesetzt wird der
+    Anschlusspreis, den die Seite desselben Geräts für diesen Tarif misst (je Tarif
+    eine Antwort im Mitschnitt)."""
+    gemessen = {}
+    for text in antworten.values():
+        g = o2._gemessen(o2.lies_konfiguration(text))
+        if g is not None:
+            gemessen.setdefault(g["slug"], set()).add(g["anschluss"])
+    for s in saetze:
+        if s.get("anschlusspreis") is None:
+            (betrag,) = gemessen[s["tarif_slug"]]
+            s["anschlusspreis"] = betrag
+    return saetze
 
 
 @pytest.fixture(scope="module")

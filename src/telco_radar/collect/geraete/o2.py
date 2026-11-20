@@ -81,6 +81,7 @@ from functools import partial
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
+from .o2_anschluss import abgeleiteter_anschluss
 from .o2_referenz import Referenzstand, belegadresse, modellname, passt, tarife_aus
 from .ratenlaufzeit import katalog_mit_phasen, o2_phasen, ratenzahl_im_knopf
 from ...geraete_model import probe_geht_auf
@@ -499,7 +500,7 @@ def _rohsatz(
     name: str,
     slug: str,
     tarif_rate: float,
-    anschluss: float,
+    anschluss: float | None,
     url: str,
 ) -> dict:
     m = _OFFER_RE.match(g["angebot"])
@@ -544,6 +545,8 @@ def saetze_aus_konfiguration(
     Antwort zur Referenz passt (gleicher Slug, gleicher Anschlusspreis),
     und nur fuer Tarife, die die Referenz kennt. Jeder Verzicht wird
     gezaehlt, ebenso jede Phase ueber die ganze Ratenlaufzeit (`o2_phasen`).
+    Den Anschlusspreis eines abgeleiteten Tarifs nennt nur seine eigene Option
+    (`o2_anschluss`), nie die Referenz eines anderen Geraets.
     """
     z = zaehler if zaehler is not None else {}
     g = _gemessen(pv)
@@ -574,15 +577,9 @@ def saetze_aus_konfiguration(
         if tarif_rate <= 0:
             _zaehle(z, "unplausibel")
             continue
-        satz = _rohsatz(
-            basis,
-            g,
-            _tarifname(option, pv),
-            ref["slug"],
-            tarif_rate,
-            ref["anschluss"],
-            url,
-        )
+        anschluss = abgeleiteter_anschluss(option, z)
+        name = _tarifname(option, pv)
+        satz = _rohsatz(basis, g, name, ref["slug"], tarif_rate, anschluss, url)
         satz["tarif_phasen"] = o2_phasen(pv, _link(option), g, tarif_rate, z)
         satz["herleitung"] = HERLEITUNG_TARIFSUMME
         out.append(satz)

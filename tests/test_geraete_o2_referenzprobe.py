@@ -260,7 +260,9 @@ def test_ohne_zeit_keine_probe(m18, m17, xiaomi):
 
 
 def _falsch_gegen_die_seite(saetze, m17):
-    """17 Pro 256 GB / 36 Raten: jeder Satz gegen die echte Seite seines Tarifs."""
+    """17 Pro 256 GB / 36 Raten: jeder Satz gegen die echte Seite seines Tarifs.
+
+    Ein abgeleiteter Satz ohne Anschlusspreis ist eine Lücke, kein Fehler."""
     echt = {}
     for text in m17["antworten"].values():
         pv = o2.lies_konfiguration(text)
@@ -273,7 +275,12 @@ def _falsch_gegen_die_seite(saetze, m17):
         for s in _modell(saetze, "Apple iPhone 17 Pro")
         if (s["speicher_gb"], s["laufzeit_monate"]) == (256, 36)
         and _kennung(s)[2:] != _kennung(echt[s["tarif_slug"]])[2:]
+        and not (s["anschlusspreis"] is None and _gleich_ohne_anschluss(s, echt))
     ]
+
+
+def _gleich_ohne_anschluss(s, echt):
+    return _kennung(s)[2:-1] == _kennung(echt[s["tarif_slug"]])[2:-1]
 
 
 def test_aktion_beim_xiaomi_schreibt_nichts_fuer_andere_geraete(m18, m17, xiaomi):
