@@ -562,6 +562,22 @@ anbieter:
     # ohne Vertrag plus fuenf Buendelseiten je Tarif) - der Abstand gilt.
     rate_limit_sekunden: 10
     max_produkte: 15
+    # BEFUND 20.11.2026 (arbeit/ursache-telekom-2011.md): ohne diese Angabe
+    # schaetzte die Aufteilung aus `max_produkte` (15) einen Bedarf von nur
+    # rund 176-210 s - das deckt knapp die eigene Buendel-Vertiefung (Lauf
+    # 44693241299, 07:13:57-07:17:19: 1 Kategorieseite ohne Tarif + 5
+    # Tarif-Kategorieseiten + 15 Duo-Produktseiten = 21 Abrufe a 10 s,
+    # bereits 202 s gemessen), laesst aber keine Reserve fuer zusaetzliche
+    # Pflichtmodell-Produktseiten je Tarif: derselbe Lauf meldete bei der
+    # Klick-Nachlese "Klick-Ergebnis Telekom: N Seiten ueberfaellig" mit N
+    # zwischen 6 und 11 ueber elf Zeilen, in Summe 96 offene Produktseiten.
+    # Angesetzt mit Reserve: rund 105 Abrufe x 10 s = 1050 s, aufgerundet
+    # auf 1100 s - groessenordnungsmaessig wie gemessen, aber bewusst unter
+    # o2s 1140 s (o2 hat mit rund 560 Abrufen je Lauf den mit Abstand
+    # groessten eigenen Bedarf, Vorbild #138). Das Budget bleibt insgesamt
+    # 3000 s (`geraete.yml`); die Aufteilung (`sammelbudget.sammelanteile`)
+    # gibt Telekom dadurch rund 600 s statt 176 s. Vorbild #157 (congstar).
+    sammelbedarf_sekunden: 1100
     # Per-Anbieter-Override des Absenders (BRIEF_B2_BUENDEL_TELEKOM,
     # 08.09.2026) - dasselbe Muster wie bei Saturn und den Telekom-
     # Tarifquellen: `config/settings.yaml -> http.user_agent` traegt

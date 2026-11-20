@@ -126,6 +126,22 @@ def test_die_ausgelieferte_konfiguration_nennt_o2_bedarf():
     assert sammelbedarf(o2) > (len(o2.crawled_einstiege) + o2.max_produkte) * 2
 
 
+def test_die_ausgelieferte_konfiguration_nennt_telekom_bedarf():
+    """BEFUND 20.11.2026 (arbeit/ursache-telekom-2011.md): die Schaetzung aus
+    ``max_produkte`` (15) lag bei rund 176-210 s - das deckt kaum die eigene
+    Buendel-Vertiefung (21 Abrufe a 10 s, gemessen 202 s) und liess keine
+    Reserve fuer zusaetzliche Pflichtmodell-Seiten je Tarif."""
+    quellen = lade_quellen(_WURZEL)
+    telekom = next(a for a in quellen.anbieter if a.name == "Telekom")
+
+    assert telekom.sammelbedarf_sekunden is not None
+    assert sammelbedarf(telekom) > (len(telekom.crawled_einstiege) + telekom.max_produkte) * telekom.rate_limit_sekunden
+    # Telekoms eigener Katalog ist kleiner als o2s - der Anteil bleibt darunter
+    # (siehe test_die_ausgelieferten_anteile_bleiben_im_budget).
+    o2 = next(a for a in quellen.anbieter if a.name == "o2")
+    assert sammelbedarf(telekom) < sammelbedarf(o2)
+
+
 def test_die_ausgelieferte_konfiguration_nennt_congstar_bedarf():
     """BEFUND 18./19.11.2026 (arbeit/ursache-je-anbieter-1818.md): die
     Schätzung aus ``max_produkte`` × ``rate_limit_sekunden`` lag praktisch auf
