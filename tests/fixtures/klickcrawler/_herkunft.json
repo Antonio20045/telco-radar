@@ -70,6 +70,13 @@
       "abgerufen_am": null,
       "bytes_roh": 8262,
       "sha256_roh": "51fa442a896d05fc6c0b89f9f168bade34a8877ca5f63b6173dcb9d90f018395"
+    },
+    {
+      "datei": "telekom_dialog_einmalzahlung_20261120.html",
+      "quelle": "Ausschnitt (nur das Floating-UI-Portal des Dialogs „Einmalzahlung“ nach Klick auf „Einmalpreis“, ohne SVG-Pfade und Fokuswächter) von https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false, gerendert mit Playwright-Chromium ohne Tarnung, kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-20",
+      "bytes_roh": 4999,
+      "sha256_roh": "00276a72a3af257773a2b8e47bd4fb0cc9029f05392de80cb0832ca5b900f4c7"
     }
   ]
 }

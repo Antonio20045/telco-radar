@@ -46,6 +46,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickadressen import Adresse, lies_adressen, ohne_adresse, pruefe_robots
 from .klickbedienung import Bedienung
+from .klickdialog import frei_vor_klick, nach_klick
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN, Adressen, Klickkarte
 from .klickkontext import Browserzustand, oeffne_sitzung
@@ -82,7 +83,6 @@ if TYPE_CHECKING:
     from playwright.sync_api import (
         APIResponse,
         Browser,
-        Locator,
         Page,
         Request,
         ViewportSize,
@@ -153,10 +153,6 @@ def klicke_durch(
     if lauf.status != LAUF_GELESEN:
         log.warning("Klick-Crawler %s %s: %s", karte.anbieter, adresse, lauf.grund)
     return lauf
-
-
-class _Klickfehler(Exception):
-    """Ein Knopf ließ sich nicht klicken."""
 
 
 class _Gang:
@@ -380,10 +376,14 @@ class _Gang:
             return self.nicht_besucht(variante)
         marke = self.wache.marke()
         knopf = self.seite.locator(selektor).nth(stelle)
+        grund = frei_vor_klick(self.seite, knopf, self.frist_ms)
         try:
-            self._druecke(knopf)
-        except _Klickfehler as fehler:
-            grund = f"Knopf für {dimension} nicht klickbar: {fehler}"
+            if grund is None:
+                knopf.click(timeout=self.frist_ms)
+        except PlaywrightFehler as fehler:
+            grund = f"nicht klickbar: {kurz(fehler)}"
+        if grund is not None:
+            grund = f"Knopf für {dimension} {grund}"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
         self.geklickt = True
         self.unberuehrt = False
@@ -391,10 +391,5 @@ class _Gang:
             self.wache.nimm_antwort(marke)
         else:
             self.wache.warte_ruhe()
-        return None
-
-    def _druecke(self, knopf: Locator) -> None:
-        try:
-            knopf.click(timeout=self.frist_ms)
-        except PlaywrightFehler as fehler:
-            raise _Klickfehler(kurz(fehler)) from fehler
+        grund = nach_klick(self.seite, knopf, self.frist_ms, dimension)
+        return None if grund is None else Kombiergebnis(variante, NICHT_ERFASST, grund)

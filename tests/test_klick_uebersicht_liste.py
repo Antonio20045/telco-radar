@@ -211,6 +211,11 @@ def test_browser_liest_nur_antworten_nach_dem_ausschalten(
     titel = sorted(s["titel"] for s in ergebnis["saetze"])
     assert titel == ["Apple iPhone 17 256 GB", "Apple iPhone 17e 256 GB"]
     (seite,) = ergebnis["seiten"]
+    kacheln = seite["liste"].pop("kacheln")
+    assert [(k["titel"], k["speicher_gb"]) for k in kacheln] == [
+        ("Apple iPhone 17 256 GB", 256)
+    ]
+    assert kacheln[0]["url"].endswith(f"{IPHONE_17}?tariffId=MF_17791")
     assert seite["liste"] == {
         "result_count": 14,
         "antworten_beim_laden": 1,

@@ -66,7 +66,7 @@ from ...geraete_model import (
     zustand_aus_titel,
 )
 from ...tarif_model import QUELLE_KLICK
-from .klickanschluss import ART_ANSCHLUSS
+from .klickanschluss import ART_ANSCHLUSS, anschluesse
 from .klickcrawler import GRUND_NICHT_BESUCHT
 from .klickergebnis import GELESENE_SEITEN
 from .klickkarte import EIN_VERTRAG
@@ -148,7 +148,7 @@ def speicher_gb(text: object) -> int | None:
 def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
     """Alle Rohsätze und Lücken einer Ergebnisdatei."""
     ergebnis = Klickausbeute(anbieter=str(daten.get("name") or ""))
-    anschluss = _anschluesse(daten)
+    anschluss = anschluesse(daten)
     for seite in daten.get("seiten") or []:
         if seite.get("status") not in GELESENE_SEITEN:
             ergebnis.luecken[LUECKE_SEITE] += 1
@@ -205,30 +205,6 @@ def _nimm(ergebnis: Klickausbeute, satz: dict | str) -> None:
         ergebnis.rohsaetze.append(satz)
     else:
         ergebnis.luecken[satz] += 1
-
-
-def _anschluesse(daten: dict) -> dict[str, float]:
-    """Anschlusspreis je Tarif-Slug und je Tarifname aus heute gelesenen
-    Tarifdetail-Seiten (1&1, ``klickanschluss.anschluss_saetze``), nur bei
-    ``ein_vertrag``. Der Name trägt, wo die Kachel den Tarif mit Namen nennt (Nachweis
-    ``tarifname``, 1&1 seit 20.11.2026) und ihr Slug von dem der Detailseite abweicht
-    (Unlimited XL: ``…-xl-mvl`` gegen ``…-xl-ovl``)."""
-    if daten.get("vertragsform") != EIN_VERTRAG:
-        return {}
-    saetze = [
-        roh
-        for u in daten.get("uebersichten") or []
-        if u.get("status") in GELESENE_SEITEN
-        for roh in u.get("saetze") or []
-        if roh.get("art") == ART_ANSCHLUSS
-    ]
-    je_slug = {str(roh.get("tarif_slug")): roh["anschlusspreis"] for roh in saetze}
-    je_name = {
-        str(roh["tarif_name"]): roh["anschlusspreis"]
-        for roh in saetze
-        if roh.get("tarif_name")
-    }
-    return {**je_name, **je_slug}
 
 
 def uebersicht_rohsatz(
@@ -288,8 +264,11 @@ def geraetepreis(
     kombination: dict, seite: dict, daten: dict, katalog: Katalog
 ) -> dict | None:
     """Anzahlung, Rate und Ratenzahl einer erfassten Kombination in getrennter
-    Preisform; ``None`` ohne Gerät, Speicher aus dem Katalog oder Rate."""
+    Preisform; ``None`` ohne Gerät, Speicher aus dem Katalog oder Rate und für ein
+    Gerät, das nicht neu ist (``seite_zustand``)."""
     if kombination.get("status") != ERFASST or daten.get("vertragsform") == EIN_VERTRAG:
+        return None
+    if seite_zustand(seite) != ZUSTAND_NEU:
         return None
     variante = kombination.get("variante") or {}
     geraet = katalog.nach_id(str(seite.get("geraet") or ""))
@@ -334,10 +313,11 @@ def rohsatz(
     werte = kombination.get("werte") or {}
     laufzeit = werte.get("ratenzahl")
     laufzeit = variante.get("laufzeit") if laufzeit is None else laufzeit
+    zustand = seite_zustand(seite)
     satz = {
-        "sku_id": sku_id(geraet.device_id, gb, None, ZUSTAND_NEU),
+        "sku_id": sku_id(geraet.device_id, gb, None, zustand),
         "anbieter": str(daten.get("name") or ""),
-        "zustand": ZUSTAND_NEU,
+        "zustand": zustand,
         "device_id": geraet.device_id,
         "speicher_gb": gb,
         "tarif_name": tarif,
@@ -382,6 +362,12 @@ def _preise(werte: dict, buendel: dict | None, vertragsform: object) -> dict:
         "tarif_monatlich": _ab_monat_eins(werte.get("tarifphasen")),
         "buendel_monatlich": None,
     }
+
+
+def seite_zustand(seite: dict) -> str:
+    """Zustand des Geräts auf der Seite (``klickziele.Seitenziel.zustand``); Seiten
+    ohne das Feld (Ergebnisdateien vor dem 20.11.2026) zeigen Neuware."""
+    return str(seite.get("zustand") or ZUSTAND_NEU)
 
 
 def _ab_monat_eins(phasen: object) -> float | None:
