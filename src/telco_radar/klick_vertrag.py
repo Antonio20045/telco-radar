@@ -31,6 +31,12 @@ LESEFRIST_TAGE = 1
 ROTATION_GELESEN = frozenset({LAUF_GELESEN})
 ORDNER = Path("data") / "state" / "klick"
 STAND_DATEI = "klick_stand.json"
+STOERUNG_SEITE = "seitenform"
+SEITE_NICHT_BESUCHT = "nicht_besucht"
+GRUND_NACH_STOERUNG = "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4)"
+"""Stopp nach Sperre, Challenge, Browserfehler oder Serverfehlern in Folge."""
+GRUND_ZEITUEBERSCHREITUNGEN = "Seiten luden nicht"
+"""Stopp nach Seiten, die nicht luden (``"<n> Seiten luden nicht: …"``)."""
 
 
 def abruf_gestoert(status: int | None) -> str | None:
@@ -46,6 +52,36 @@ def serverfehler(status: int | None) -> bool:
     """Wahr bei HTTP 5xx (``SERVERFEHLER_AB`` bis ``SERVERFEHLER_BIS``): eine Störung
     des Anbieters, kein Bot-Schutz (CLAUDE.md Regel 10)."""
     return status is not None and SERVERFEHLER_AB <= status <= SERVERFEHLER_BIS
+
+
+def gestoerte_seiten(daten: dict) -> list[dict]:
+    """Die gestört geendeten Produkt- und Übersichtsseiten einer Ergebnisdatei."""
+    seiten = list(daten.get("seiten") or [])
+    for uebersicht in daten.get("uebersichten") or []:
+        seiten.extend(uebersicht.get("seiten") or [uebersicht])
+    return [s for s in seiten if s.get("status") == LAUF_GESTOERT]
+
+
+def ausfall(daten: dict) -> str | None:
+    """Der benannte Ausfall eines Klick-Laufs, sonst ``None``.
+
+    Ausfall heißt: der Lauf endete ``gestoert`` mit Grund, und mindestens eine Seite
+    scheiterte an etwas anderem als ihrer Form (Sperre oder Challenge, Serverfehler,
+    Zeitüberschreitung, Browserfehler, Seite nicht geladen). Kein Ausfall sind eine
+    Seite anderer Form (``STOERUNG_SEITE``: Kanarienwert, Vorbereitung, Strukturbruch;
+    ein Erfassungsmangel), ein leer gelesener Lauf, eine geplante Verschiebung
+    (``nicht_gelesen``) und eine Datei ohne Laufstatus oder Grund; sie bleiben im
+    Abdeckungswächter Befund (Prüfung zu PR 197).
+
+    Nachtlauf 21.11.2026: ``1und1`` las nach HTTP 502 keine Seite, der Job blieb grün,
+    der Wächter hielt die Lücken für unbelegt. Eine Definition für ``::error``-Zeile und
+    Endcode des Tageslaufs (``scripts/klick_tageslauf.py``) und die belegten Lücken des
+    Wächters (``analyze.klick_ausfall``)."""
+    grund = daten.get("grund")
+    if daten.get("laufstatus") != LAUF_GESTOERT or not grund:
+        return None
+    arten = {s.get("stoerung") for s in gestoerte_seiten(daten)}
+    return None if arten <= {STOERUNG_SEITE} else f"{LAUF_GESTOERT}: {grund}"
 
 
 def ganz_gelesen(seiten: list[dict]) -> list[dict]:
