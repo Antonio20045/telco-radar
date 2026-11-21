@@ -1,6 +1,10 @@
 """Reproduktionen des Prüfers zu PR 205, Runde 3 (``/tmp/pruefer/k205b``),
 übernommen; gegen den Stand ``4a7efc1b3`` rot.
 
+Runde 4: Das Soll kommt allein aus der Produktseite; der Test „kaufbarer Tarif der
+Übersicht“ erwartet darum (1, 1, 0) und den Preis von Unlimited M als „anderer
+Kaufweg (Tarifübersicht), nicht gezählt“ statt (2, 2, 0).
+
 Abweichungen: Im ersten Test bleiben die zehn 36-Monats-Preise des GELESENEN iPhone
 17 (die Seite bietet nur 24 Monate) nach Regel 1 „so nicht angeboten“; geprüft wird,
 dass kein Preis eines Geräts ohne gelesene Auswahl (Pixel 11, Galaxy A57) zählt.
@@ -145,8 +149,8 @@ def test_slug_zu_tarifname_haengt_nicht_von_der_reihenfolge_der_buendel_ab(
     karte = [ga.Option("O2 Mobile Unlimited M", "o2-mobile-unlimited-m")]
     a = _o2_lauf(tmp_path / "a", [s, m], katalog, karte)
     b = _o2_lauf(tmp_path / "b", [m, s], katalog, karte)
-    felder = ("soll", "erfasst", "luecken_zahl", "nicht_im_soll_zahl")
-    assert [a[f] for f in felder] == [b[f] for f in felder] == [2, 2, 0, 0]
+    felder = ("soll", "erfasst", "nicht_im_soll_zahl", "nicht_verglichen_zahl")
+    assert [a[f] for f in felder] == [b[f] for f in felder] == [1, 1, 0, 1]
 
 
 def test_o2_kaufbarer_tarif_der_uebersicht_wird_nicht_auf_falschen_messnamen_abgebildet(
@@ -196,7 +200,10 @@ def test_o2_kaufbarer_tarif_der_uebersicht_wird_nicht_auf_falschen_messnamen_abg
     k = next(x for x in voll["anbieter"] if x["name"] == "o2")["ebenen"][
         "kombinationen"
     ]
-    assert (k["soll"], k["erfasst"], k["nicht_im_soll_zahl"]) == (2, 2, 0), (
+    assert [e["grund"] for e in k["nicht_verglichen"]] == [
+        "anderer Kaufweg (Tarifübersicht), nicht gezählt"
+    ]
+    assert (k["soll"], k["erfasst"], k["nicht_im_soll_zahl"]) == (1, 1, 0), (
         k["soll"],
         k["erfasst"],
         k["nicht_im_soll_zahl"],

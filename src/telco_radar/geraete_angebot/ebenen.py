@@ -34,7 +34,6 @@ def speicher_ebene(soll: ZeilenSoll, ist: Ist, grund) -> dict:
 
 NICHT_IN_UEBERSICHT = "nicht in der Übersicht des Anbieters"
 UEBERSICHT_OFFEN = "Übersicht nicht ganz gelesen"
-AUSWAHL_OFFEN = "Auswahl dieses Geräts nicht ganz gelesen"
 
 
 def modell_ebene(zeile: dict, soll: ZeilenSoll, ist: Ist, ganz: bool, args) -> None:

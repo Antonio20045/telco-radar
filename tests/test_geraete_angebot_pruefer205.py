@@ -70,9 +70,10 @@ def test_ist_ohne_soll_darf_nicht_vollstaendig_heissen(tmp_path):
     assert "vollständig" not in cong["marke"]
     assert "16 Preise, die der Anbieter so nicht anbietet" in cong["marke"]
     befunde = waechter.pruefe({"datum": TAG, "vollstaendigkeit": voll}, TAG)
-    assert any(
-        "16 erfasste Preise, die der Anbieter so nicht anbietet" in b for b in befunde
-    )
+    assert {e["grund"] for e in k["nicht_im_soll"]} == {
+        "Speicher nicht in der Auswahl der Produktseite"
+    }
+    assert not [b for b in befunde if "so nicht anbietet" in b]
 
 
 def test_zwei_verschiedene_tarife_mit_mit_im_namen_werden_nicht_zusammengelegt():

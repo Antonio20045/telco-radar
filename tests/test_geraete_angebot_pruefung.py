@@ -147,8 +147,8 @@ def test_ausschluss_der_seite_benennt_den_erfassten_preis(tmp_path):
     s.ausgeschlossen = [["Allnet Flat M", 36]]
     zeilen, _ = base._voll(tmp_path, [z], _katalog())
     k = zeilen["congstar"]["ebenen"]["kombinationen"]
-    benannt = [e for e in k["nicht_im_soll"] if e["benannt"]]
     grund = AUSGESCHLOSSEN.format(tarif="Allnet Flat M", monate=36)
+    benannt = [e for e in k["nicht_im_soll"] if e["grund"] == grund]
     assert [e["grund"] for e in benannt] == [grund, grund]
     assert sorted(e["schluessel"][16:21] for e in benannt) == ["256gb", "512gb"]
 
@@ -160,10 +160,13 @@ def test_uebersicht_ohne_zahl_braucht_den_beleg(tmp_path):
     assert "vollständig" not in _zeile(voll, "congstar")["marke"]
     mit = base._congstar()
     mit.uebersicht_ende = "Nachladen bis zum Ende (2-mal), danach kein Knopf mehr"
+    mit.konkurrenz = "keine parallelen Läufe auf diesem Host"
     zeilen, voll = base._voll(tmp_path, [mit], _katalog())
     assert zeilen["congstar"]["angebot"]["uebersicht"]["vollstaendig"] is True
-    assert _zeile(voll, "congstar")["marke"].endswith("· vollständig")
-    assert _zeile(voll, "congstar")["satz"] == "congstar: 1 von 1 Geräten gezählt"
+    assert _zeile(voll, "congstar")["marke"] == "vollständig"
+    assert _zeile(voll, "congstar")["satz"] == (
+        "congstar: 32 von 32 Angeboten erfasst (1 von 1 Geräten gezählt)"
+    )
 
 
 def test_ungelesene_auswahl_einer_seite_ist_nicht_vollstaendig(tmp_path):
@@ -281,30 +284,32 @@ def _o2_ist() -> list[dict]:
     ]
 
 
-def test_o2_tarifuebersicht_ist_ein_zweiter_kaufweg(tmp_path):
-    """Antonio, 21.11.2026: Soll bei o2 = Produktseite ∪ Tarifübersicht mit „Handy
-    hinzufügen“. „O2 Mobile Unlimited L“ (ohne Plus) kommt über die Übersicht ins
-    Soll, „O2 Mobile Special“ (auf keinem Weg) bleibt ein Preis ohne Angebot."""
+def test_o2_tarifuebersicht_ist_ein_anderer_kaufweg_nicht_soll(tmp_path):
+    """Soll kommt allein aus der Produktseite (Prüfung PR 205, Runde 4). „O2 Mobile
+    Unlimited L“ (nur über die Tarifübersicht kaufbar) fällt benannt aus dem Vergleich,
+    „O2 Mobile Special“ (auf keinem Weg) ist ein Preis, den o2 so nicht anbietet."""
     uebersicht = base.LS.o2_tarifuebersicht(base._html("o2_tarifuebersicht"))
     assert len(uebersicht) == 10
-    assert "o2-mobile-unlimited-l" in {o.wert for o in uebersicht}
+    assert "O2 Mobile Unlimited L" in {o.text for o in uebersicht}
     zeilen, voll = _haenge(tmp_path, _o2_zaehlung(uebersicht), _o2_ist())
     k = zeilen["o2"]["ebenen"]["kombinationen"]
-    erfasst = {lu["schluessel"] for lu in k["luecken"]}
-    assert k["erfasst"] == 4
+    assert (k["soll"], k["erfasst"], k["luecken_zahl"]) == (2, 2, 0)
     assert {e["schluessel"].split("--")[1] for e in k["nicht_im_soll"]} == {
         "o2-mobile-special"
     }
-    assert not any("unlimited-l-mit" in s for s in erfasst)
+    assert {e["grund"] for e in k["nicht_im_soll"]} == {
+        "Tarif nicht in der Auswahl der Produktseite"
+    }
+    assert k["nicht_verglichen_zahl"] == 2
+    assert {e["grund"] for e in k["nicht_verglichen"]} == {
+        "anderer Kaufweg (Tarifübersicht), nicht gezählt"
+    }
     herkunft = zeilen["o2"]["angebot"]["herkunft"]
     assert herkunft["tarifuebersicht"]["art"] == "browser_tarifuebersicht"
     assert herkunft["produktseite"]["art"] == "browser_auswahl"
-    assert len(herkunft["tarifuebersicht"]["tarife"]) == 10
     o2 = _zeile(voll, "o2")
-    assert (
-        "Tarife: Produktseite und Tarifübersicht (10 mit „Handy hinzufügen“)"
-        in (o2["ebenen_saetze"])
-    )
+    assert any(s.startswith("Tarifübersicht: 10 Tarife") for s in o2["ebenen_saetze"])
+    assert "vollständig" not in o2["marke"]
 
 
 def test_o2_ohne_tarifuebersicht_gilt_die_produktseite_und_der_ausfall(tmp_path):

@@ -55,13 +55,10 @@ WEITERE = "Speicher und Tarife werden noch nicht gegengezählt."
 ART_AUSWAHL = "browser_auswahl"
 SATZ_ANGEBOTE = "{name}: {erfasst} von {soll} Angeboten erfasst"
 HEUTE_NICHT = "Angebot heute nicht gezählt"
-NICHT_GEZAEHLT_SEITEN = {1: "1 Gerät nicht gezählt"}
-NICHT_GEZAEHLT_VIELE = "{n} Geräte nicht gezählt"
 EBENE_SATZ = "{titel}: {erfasst} von {soll} erfasst"
 EXTRA_ANGEBOTE = "Preise, die der Anbieter so nicht anbietet ({n}):"
 OHNE_ANGEBOT = "{n} Preise, die der Anbieter so nicht anbietet"
-GERAETE = " Geräten gezählt"
-DORT = "dort {erfasst} von {soll} Angeboten erfasst"
+GERAETE = " Angeboten erfasst ({gezaehlt} von {soll} Geräten gezählt)"
 NICHT_VERGLICHEN = "{n} Preise nicht verglichen ({grund})"
 KONKURRENZ_OFFEN = "Überschneidung mit anderen Läufen nicht prüfbar"
 UEBERSICHT_OFFEN = "Übersicht nicht ganz gelesen"
@@ -84,12 +81,6 @@ def _ist_angebot(z: dict) -> bool:
     )
 
 
-def _nicht_gezaehlt(n: int | None) -> str:
-    if not n:
-        return ""
-    return NICHT_GEZAEHLT_SEITEN.get(n, NICHT_GEZAEHLT_VIELE.format(n=n))
-
-
 def _ebene_satz(titel: str, e: dict) -> str:
     if e.get("soll") is None:
         return ""
@@ -109,7 +100,9 @@ def _lesbare_luecke(luecke: dict) -> dict:
     return {**luecke, "grund": OHNE_GRUND}
 
 
-KAUFWEGE = "Tarife: Produktseite und Tarifübersicht ({n} mit „Handy hinzufügen“)"
+KAUFWEGE = (
+    "Tarifübersicht: {n} Tarife mit „Handy hinzufügen“ (anderer Kaufweg, nicht gezählt)"
+)
 
 
 def _kaufwege(herkunft: dict | None) -> str:
@@ -137,53 +130,48 @@ def _hinweise(angebot: dict, k: dict) -> list[str]:
     ]
 
 
-def _angebot_marken(z: dict, k: dict, geraete: dict) -> list[str]:
+def _angebot_marken(z: dict, k: dict) -> list[str]:
     angebot = z.get("angebot") or {}
-    uebersicht = angebot.get("uebersicht") or {}
     extra = k.get("nicht_im_soll_zahl")
     marken = [
         x
         for x in (
-            DORT.format(erfasst=zahl(k.get("erfasst")), soll=zahl(k.get("soll"))),
             _luecken(k.get("luecken_zahl")),
             OHNE_ANGEBOT.format(n=zahl(extra)) if extra else "",
-            "" if uebersicht.get("vollstaendig") else UEBERSICHT_OFFEN,
+            ""
+            if (angebot.get("uebersicht") or {}).get("vollstaendig")
+            else UEBERSICHT_OFFEN,
             AUSWAHL_OFFEN if angebot.get("unvollstaendig") else "",
         )
         if x
     ]
-    ganz = (
-        len(marken) == 1
-        and not z.get("ausfall")
-        and k.get("erfasst") == k.get("soll")
-        and geraete.get("soll") is not None
-        and geraete.get("gezaehlt") == geraete.get("soll")
-    )
-    return [*marken, VOLLSTAENDIG] if ganz else marken
+    return marken if geraete_lauf.vorbehalte(z) else [VOLLSTAENDIG]
 
 
 def angebot_zeile(z: dict) -> dict:
-    """Die Anzeige einer Anbieterzeile mit Angebotszählung (Stufe 2): wichtigste Zahl
-    ist, wie viele Geräte gezählt wurden („1 von 45 Geräten gezählt · dort 20 von 20
-    Angeboten erfasst“); „vollständig“ nur, wenn alle Geräte der ganz gelesenen
-    Übersicht gezählt sind und erfasst = Soll, ohne Preise, die nicht angeboten
-    werden."""
+    """Die Anzeige einer Anbieterzeile mit Angebotszählung (Stufe 2): wichtigste
+    Zahl sind die Angebote im gezählten Teil, immer mit dem Anteil gezählter Geräte
+    („Telekom: 20 von 20 Angeboten erfasst (1 von 45 Geräten gezählt)“); „vollständig“
+    nur ohne jeden Vorbehalt (``geraete_lauf.vorbehalte``)."""
     ebenen = z.get("ebenen") or {}
     k = ebenen["kombinationen"]
     angebot = z.get("angebot") or {}
     ausfall = str(z.get("ausfall") or "")
     extra = k.get("nicht_im_soll_zahl")
     geraete = angebot.get("geraete") or {}
-    marken = _angebot_marken(z, k, geraete)
+    marken = _angebot_marken(z, k)
     luecken = list(k.get("luecken") or ())
     quelle = z.get("soll_quelle") or {}
-    zahlen = f"{zahl(geraete.get('gezaehlt'))} von {zahl(geraete.get('soll'))}"
+    zahlen = f"{zahl(k.get('erfasst'))} von {zahl(k.get('soll'))}"
+    hinten = GERAETE.format(
+        gezaehlt=zahl(geraete.get("gezaehlt")), soll=zahl(geraete.get("soll"))
+    )
     return {
         "name": z["name"],
         "vorne": f"{z['name']}: ",
         "zahl": zahlen,
-        "hinten": GERAETE,
-        "satz": f"{z['name']}: {zahlen}{GERAETE}",
+        "hinten": hinten,
+        "satz": f"{z['name']}: {zahlen}{hinten}",
         "ohne_soll": False,
         "soll": k.get("soll"),
         "erfasst": k.get("erfasst"),

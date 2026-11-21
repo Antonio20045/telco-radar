@@ -105,6 +105,15 @@ def o2_tarifuebersicht(s: Sitzung) -> list[Option]:
     return LS.o2_tarifuebersicht(s.html("tarifuebersicht"))
 
 
+NICHT_GEWAEHLT = "Option „{option}“ ließ sich nicht wählen, nicht gelesen"
+
+
+def _nicht_gewaehlt(seite: Seite, option: str) -> None:
+    """Eine wählbare Option ließ sich nicht wählen: die Auswahl dieses Geräts ist
+    nur teilweise gelesen (``Seite.unvollstaendig``), nie still übergangen."""
+    seite.unvollstaendig.append(NICHT_GEWAEHLT.format(option=option))
+
+
 def _setze(seite: Seite, geraet: dict) -> None:
     seite.speicher = geraet["speicher"]
     seite.laufzeiten = geraet.get("laufzeiten", [])
@@ -151,8 +160,12 @@ def telekom(s: Sitzung, seite: Seite) -> None:
             if not s.page.locator(f"#service-{tarif.wert}").count():
                 s.klicke_text(r"^tarif ändern$")
                 s.page.wait_for_timeout(3000)
-            s.klicke(f"label[for='service-{tarif.wert}'], #service-{tarif.wert}", 500)
-            s.klicke_text(r"^tarif auswählen$")
+            gewaehlt_ok = s.klicke(
+                f"label[for='service-{tarif.wert}'], #service-{tarif.wert}", 500
+            )
+            if not (gewaehlt_ok and s.klicke_text(r"^tarif auswählen$")):
+                _nicht_gewaehlt(seite, tarif.text)
+                continue
             s.page.wait_for_timeout(3500)
             stand = LS.telekom_geraet(s.html(f"tarif-{tarif.text}"))
         if not stand["laufzeiten"]:
@@ -173,10 +186,14 @@ def vodafone(s: Sitzung, seite: Seite) -> None:
     _setze(seite, geraet)
     raten_je = {geraet["speicher"][0].wert: geraet["laufzeiten"]}
     for sp in geraet["speicher"][1:]:
-        if sp.waehlbar and s.waehle_radio("capacity|speicher|storage", sp.wert):
-            raten_je[sp.wert] = L.vodafone_geraet(s.html(f"speicher-{sp.text}"))[
-                "laufzeiten"
-            ]
+        if not sp.waehlbar:
+            continue
+        if not s.waehle_radio("capacity|speicher|storage", sp.wert):
+            _nicht_gewaehlt(seite, sp.text)
+            continue
+        raten_je[sp.wert] = L.vodafone_geraet(s.html(f"speicher-{sp.text}"))[
+            "laufzeiten"
+        ]
     namen = [o.text for o in L.vodafone_tarife_inline(erste) if o.waehlbar]
     ausschluss = set(L.vodafone_ausschluesse(erste))
     if not namen:
@@ -185,9 +202,12 @@ def vodafone(s: Sitzung, seite: Seite) -> None:
         auswahl = s.html("tarifauswahl")
         ausschluss |= set(L.vodafone_ausschluesse(auswahl))
         for o in L.vodafone_tarifoptionen(auswahl):
-            if o.waehlbar:
-                s.waehle_radio("tariff", o.wert, 2500)
-                namen.append(L.vodafone_tarifname(s.html(f"tarif-{o.wert}")))
+            if not o.waehlbar:
+                continue
+            if not s.waehle_radio("tariff", o.wert, 2500):
+                _nicht_gewaehlt(seite, o.text)
+                continue
+            namen.append(L.vodafone_tarifname(s.html(f"tarif-{o.wert}")))
         seite.annahmen.append(ANNAHME_TARIFE_EINMAL)
     seite.tarife = [Option(n, n) for n in namen]
     kurz = {n: m.group(0) for n in namen if (m := L._VF_NAME.search(n))}
@@ -217,6 +237,7 @@ def o2(s: Sitzung, seite: Seite) -> None:
             continue
         s.tor.passiere(seite.url)
         if not s.waehle_radio("^storage$", sp.wert, 4000):
+            _nicht_gewaehlt(seite, sp.text)
             continue
         stand = LS.o2_geraet(s.html(f"speicher-{sp.text}"))
         kombis += _kreuz(
@@ -246,10 +267,14 @@ def congstar(s: Sitzung, seite: Seite) -> None:
     for kachel in geraet["tarifkacheln"]:
         if not kachel.waehlbar:
             continue
-        s.waehle_radio(".", kachel.wert, 1500)
+        if not s.waehle_radio(".", kachel.wert, 1500):
+            _nicht_gewaehlt(seite, kachel.text)
+            continue
         for b in bindungen:
+            if b is not None and not s.klicke_text("^" + re.escape(b.text) + "$"):
+                _nicht_gewaehlt(seite, f"{kachel.text}, {b.text}")
+                continue
             if b is not None:
-                s.klicke_text("^" + re.escape(b.text) + "$")
                 s.page.wait_for_timeout(1500)
             namen.append(LS.congstar_tarifname(s.html(f"tarif-{kachel.wert}")))
         if bindungen[0] is not None:
@@ -269,6 +294,7 @@ def tarifwelt(s: Sitzung, seite: Seite) -> None:
         if not sp.waehlbar:
             continue
         if i and not s.klicke(f"button[role=radio][value='{sp.wert}']", 3500):
+            _nicht_gewaehlt(seite, sp.text)
             continue
         kombis += _tarifwelt_dialog(s, seite, sp.text)
         s.page.keyboard.press("Escape")
@@ -288,7 +314,9 @@ def _tarifwelt_dialog(s: Sitzung, seite: Seite, speicher: str) -> list[list]:
         if not zahl:
             continue
         label = f"label[for='form-rhf-checkbox-carrier_{netz}']"
-        s.klicke(label, 2300)
+        if not s.klicke(label, 2300):
+            _nicht_gewaehlt(seite, f"{speicher}, Netz {netz}")
+            continue
         weitere, gewaehlt = LS.tarifwelt_tarifnamen(s.html(f"netz-{netz}-{speicher}"))
         karten = weitere + ([gewaehlt] if gewaehlt and zahl == len(weitere) + 1 else [])
         if len(karten) != zahl:

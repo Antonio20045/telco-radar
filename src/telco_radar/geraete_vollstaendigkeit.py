@@ -336,7 +336,6 @@ def haenge_kombinationen_ein(
     ausgenommen: Iterable[str] = (),
     quelle: dict | None = None,
     grund_extra: Callable[[str], str] | None = None,
-    soll_dazu: Iterable[str] = (),
     nicht_verglichen: dict[str, str] | None = None,
 ) -> dict:
     """Setzt das Kombinations-Soll eines Anbieters aus den Seiten des Browser-Zählers
@@ -346,8 +345,7 @@ def haenge_kombinationen_ein(
     ``grund_extra(k)`` einen erfassten Preis, den die Seite nicht anbietet (sonst
     ``nicht_im_soll_unbenannt``, Wächter rot). Aus dem Vergleich fallen das Ist der
     Modelle in ``ausgenommen`` (Auswahl nicht gelesen) und die Schlüssel in
-    ``nicht_verglichen`` (mit Grund); ``soll_dazu`` sind bestätigte Angebote eines
-    zweiten Kaufwegs (``geraete_angebot.kaufwege``)."""
+    ``nicht_verglichen`` (mit Grund); das Soll kommt allein aus ``auswahlen``."""
     seiten = [a for a in auswahlen if a.anbieter == anbieter]
     zeile = next(z for z in voll["anbieter"] if z["name"] == anbieter)
     weg, offen = set(ausgenommen), dict(nicht_verglichen or {})
@@ -356,7 +354,7 @@ def haenge_kombinationen_ein(
         for k in ist_zaehlung(buendel, voll["datum"]).get(anbieter, Ist()).kombinationen
         if modell_der_kombination(k) not in weg and k not in offen
     }
-    soll = set().union(set(soll_dazu), *(a.schluessel() for a in seiten))
+    soll = set().union(*(a.schluessel() for a in seiten))
     ebene = _ebene(len(soll) if seiten else None, None, len(ist))
     ohne = 0
     if not seiten:

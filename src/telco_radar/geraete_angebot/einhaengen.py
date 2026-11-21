@@ -39,13 +39,18 @@ from ..geraete_vollstaendigkeit import (
     SichtbareAuswahl,
     haenge_kombinationen_ein,
     ist_zaehlung,
-    modell_der_kombination,
 )
 from ..models import normalize_url
-from . import kaufwege
-from .ebenen import AUSWAHL_OFFEN, geraete_zahl, modell_ebene, speicher_ebene
-from .gruende import ZeilenSoll, grund_der_luecke, grund_ohne_angebot
+from .ebenen import geraete_zahl, modell_ebene, speicher_ebene
+from .gruende import (
+    NICHT_GEPRUEFT,
+    ZeilenSoll,
+    grund_der_luecke,
+    grund_ohne_angebot,
+    nicht_vergleichbar,
+)
 from .lesen import ist_smartphone, speicher_segment
+from .lesen_seiten import O2_TARIFUEBERSICHT
 from .namen import benenne, ist_tarifnamen
 
 ANGEBOT_FEHLT = "Angebot heute nicht gezählt"
@@ -184,6 +189,10 @@ def soll_aus(z: ga.Zaehlung, katalog) -> dict[str, ZeilenSoll]:
             if netz is not None and not auswahl.schluessel():
                 continue
             _ins_soll(soll, seite, schluessel, auswahl, katalog)
+    for soll in je.values():
+        ungelesen = {n["schluessel"] for n in soll.nicht_gezaehlt}
+        soll.teilweise_gelesen |= ungelesen & soll.gelesen
+        soll.gelesen -= soll.teilweise_gelesen
     return je
 
 
@@ -253,6 +262,22 @@ def _ohne(ist: Ist, modelle: set[str]) -> Ist:
     )
 
 
+def _herkunft(z: ga.Zaehlung) -> dict:
+    """Woher das Soll kommt (o2): nur die Produktseite; die Tarifübersicht benennt
+    nur, welche gemessenen Preise einen anderen Kaufweg haben."""
+    return {
+        "produktseite": {"art": ART_AUSWAHL},
+        "tarifuebersicht": {
+            "art": "browser_tarifuebersicht",
+            "quelle": O2_TARIFUEBERSICHT,
+            "tarife": None
+            if z.tarifuebersicht is None
+            else [o.text for o in z.tarifuebersicht],
+            "grund": z.tarifuebersicht_grund,
+        },
+    }
+
+
 def _zeile(voll, zeile, z, soll: ZeilenSoll, buendel, signale, ist_je, namen) -> None:
     name = zeile["name"]
     soll.namen = dict(namen)
@@ -261,22 +286,13 @@ def _zeile(voll, zeile, z, soll: ZeilenSoll, buendel, signale, ist_je, namen) ->
     gezaehlt = {a.modell for a in soll.auswahlen}
     weg = voll_ist.modelle - gezaehlt
     ist = _ohne(voll_ist, weg)
-    offen = {
-        k: AUSWAHL_OFFEN
-        for k in voll_ist.kombinationen
-        if modell_der_kombination(k) in soll.teilweise_gelesen
-    }
-    dazu: set[str] = set()
-    herkunft = None
+    karten, ohne_karten, herkunft = None, None, None
     if z.schluessel == "o2":
-        dazu, extra_offen, herkunft = kaufwege.vergleiche(
-            z, soll.auswahlen, voll_ist.kombinationen
-        )
-        offen.update(extra_offen)
-        if z.tarifuebersicht is None:
-            soll.unvollstaendig.append(
-                z.tarifuebersicht_grund or kaufwege.NICHT_GEPRUEFT
-            )
+        karten, herkunft = z.tarifuebersicht, _herkunft(z)
+        if karten is None:
+            ohne_karten = NICHT_GEPRUEFT
+            soll.unvollstaendig.append(z.tarifuebersicht_grund or NICHT_GEPRUEFT)
+    offen = nicht_vergleichbar(soll, voll_ist.kombinationen, karten, ohne_karten)
     grund = grund_der_luecke(name, soll, ist, signale, ist_je)
     ganz, beleg = ga.uebersicht_pruefung(z)
     zeile["soll_quelle"] = {
@@ -302,7 +318,6 @@ def _zeile(voll, zeile, z, soll: ZeilenSoll, buendel, signale, ist_je, namen) ->
         grund_extra=grund_ohne_angebot(soll),
         ausgenommen=weg,
         quelle={"art": ART_AUSWAHL, "gezaehlt_um": z.gezaehlt_bis or z.gezaehlt_von},
-        soll_dazu=dazu,
         nicht_verglichen=offen,
     )
     if not soll.auswahlen:

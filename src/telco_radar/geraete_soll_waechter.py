@@ -97,8 +97,11 @@ def uebersicht(lauf: dict | None) -> list[str]:
     for z in ((lauf or {}).get("vollstaendigkeit") or {}).get("anbieter") or ():
         m, k = z["ebenen"]["modelle"], z["ebenen"]["kombinationen"]
         if k["soll"] is not None:
+            vorbehalte = geraete_lauf.vorbehalte(z)
             zeilen.append(
-                f"{z['name']}: {k['erfasst']} von {k['soll']} Angeboten erfasst, "
+                f"{z['name']}: "
+                + ("vollständig; " if not vorbehalte else f"Vorbehalte {vorbehalte}; ")
+                + f"{k['erfasst']} von {k['soll']} Angeboten erfasst, "
                 f"{k['luecken_zahl']} Lücken, {k['nicht_im_soll_zahl']} nicht im Soll, "
                 f"{(z.get('angebot') or {}).get('nicht_gezaehlt_zahl')} Seiten "
                 "nicht gezählt"
