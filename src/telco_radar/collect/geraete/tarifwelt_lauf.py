@@ -353,7 +353,7 @@ def _lies_zeile(
             tarif_id_guete="niedrig",
             tarif_monatlich=satz["grundgebuehr"],
             geraet_zuzahlung=satz["geraet_zuzahlung"],
-            geraet_monatsrate=0.0,
+            geraet_monatsrate=satz["geraet_monatsrate"],
             laufzeit_monate=LAUFZEIT_MONATE,
             anschlusspreis=satz["anschlusspreis"],
             quelle_url=quelle_url,

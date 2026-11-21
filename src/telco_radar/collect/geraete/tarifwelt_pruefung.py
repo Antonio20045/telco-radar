@@ -48,9 +48,16 @@ def pruefe(
         return f"Laufzeit {satz['laufzeit_monate']} statt {LAUFZEIT_MONATE}", False
     if grund := unvergleichbar_grund(satz):
         return f"nicht vergleichbar: {grund}", False
-    for feld in ("grundgebuehr", "geraet_zuzahlung", "anschlusspreis"):
+    for feld in (
+        "grundgebuehr",
+        "geraet_zuzahlung",
+        "geraet_monatsrate",
+        "anschlusspreis",
+    ):
         if satz[feld] is None:
             return f"{feld} fehlt", False
+    if satz["geraet_monatsrate"] < 0:
+        return f"Geraeterate {satz['geraet_monatsrate']} negativ", False
     bar = satz.get("variante_preis")
     if bar is None or round(abs(bar - satz["geraet_zuzahlung"]), 2) > MONAT_TOLERANZ:
         return (
