@@ -1,0 +1,264 @@
+{
+ "anbieter": "1und1",
+ "datum": "2026-11-21",
+ "dauer_sekunden": 192.4,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": null,
+ "karte": "1und1.yaml",
+ "laufstatus": "gelesen",
+ "lesefrist_tage": 1,
+ "name": "1&1",
+ "seiten": [],
+ "seitengrund": null,
+ "ueberfaellig": [],
+ "uebersichten": [
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T04:18:53Z"
+   },
+   "grund": null,
+   "http_status": 200,
+   "saetze": [
+    {
+     "anschlusspreis": 39.9,
+     "art": "anschluss",
+     "tarif_name": "1&1 All-Net-Flat S",
+     "tarif_slug": "tariff-anf-s-mvl"
+    }
+   ],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T04:18:53Z"
+     },
+     "grund": null,
+     "http_status": 200,
+     "saetze_neu": 1,
+     "status": "gelesen",
+     "stoerung": null
+    }
+   ],
+   "status": "gelesen",
+   "stoerung": null,
+   "unvollstaendig": null,
+   "vollstaendig": true
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T04:18:57Z"
+   },
+   "grund": null,
+   "http_status": 200,
+   "saetze": [
+    {
+     "anschlusspreis": 39.9,
+     "art": "anschluss",
+     "tarif_name": "1&1 All-Net-Flat M",
+     "tarif_slug": "tariff-anf-m-mvl"
+    }
+   ],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T04:18:57Z"
+     },
+     "grund": null,
+     "http_status": 200,
+     "saetze_neu": 1,
+     "status": "gelesen",
+     "stoerung": null
+    }
+   ],
+   "status": "gelesen",
+   "stoerung": null,
+   "unvollstaendig": null,
+   "vollstaendig": true
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T04:19:03Z"
+   },
+   "grund": null,
+   "http_status": 200,
+   "saetze": [
+    {
+     "anschlusspreis": 39.9,
+     "art": "anschluss",
+     "tarif_name": "1&1 All-Net-Flat L",
+     "tarif_slug": "tariff-anf-l-mvl"
+    }
+   ],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T04:19:03Z"
+     },
+     "grund": null,
+     "http_status": 200,
+     "saetze_neu": 1,
+     "status": "gelesen",
+     "stoerung": null
+    }
+   ],
+   "status": "gelesen",
+   "stoerung": null,
+   "unvollstaendig": null,
+   "vollstaendig": true
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T04:19:05Z"
+   },
+   "grund": null,
+   "http_status": 200,
+   "saetze": [
+    {
+     "anschlusspreis": 39.9,
+     "art": "anschluss",
+     "tarif_name": "1&1 Unlimited on demand S",
+     "tarif_slug": "tariff-anf-xxl-unlimited-s-mvl"
+    }
+   ],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T04:19:05Z"
+     },
+     "grund": null,
+     "http_status": 200,
+     "saetze_neu": 1,
+     "status": "gelesen",
+     "stoerung": null
+    }
+   ],
+   "status": "gelesen",
+   "stoerung": null,
+   "unvollstaendig": null,
+   "vollstaendig": true
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T04:19:07Z"
+   },
+   "grund": null,
+   "http_status": 200,
+   "saetze": [
+    {
+     "anschlusspreis": 39.9,
+     "art": "anschluss",
+     "tarif_name": "1&1 Unlimited on demand M",
+     "tarif_slug": "tariff-anf-xxl-unlimited-m-mvl"
+    }
+   ],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T04:19:07Z"
+     },
+     "grund": null,
+     "http_status": 200,
+     "saetze_neu": 1,
+     "status": "gelesen",
+     "stoerung": null
+    }
+   ],
+   "status": "gelesen",
+   "stoerung": null,
+   "unvollstaendig": null,
+   "vollstaendig": true
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T04:19:10Z"
+   },
+   "grund": null,
+   "http_status": 200,
+   "saetze": [
+    {
+     "anschlusspreis": 39.9,
+     "art": "anschluss",
+     "tarif_name": "1&1 Unlimited on demand L",
+     "tarif_slug": "tariff-anf-xxl-unlimited-l-mvl"
+    }
+   ],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T04:19:10Z"
+     },
+     "grund": null,
+     "http_status": 200,
+     "saetze_neu": 1,
+     "status": "gelesen",
+     "stoerung": null
+    }
+   ],
+   "status": "gelesen",
+   "stoerung": null,
+   "unvollstaendig": null,
+   "vollstaendig": true
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T04:19:12Z"
+   },
+   "grund": null,
+   "http_status": 200,
+   "saetze": [
+    {
+     "anschlusspreis": 39.9,
+     "art": "anschluss",
+     "tarif_name": "1&1 Unlimited XL",
+     "tarif_slug": "tariff-anf-xxl-unlimited-xl-ovl"
+    }
+   ],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T04:19:12Z"
+     },
+     "grund": null,
+     "http_status": 200,
+     "saetze_neu": 1,
+     "status": "gelesen",
+     "stoerung": null
+    }
+   ],
+   "status": "gelesen",
+   "stoerung": null,
+   "unvollstaendig": null,
+   "vollstaendig": true
+  }
+ ],
+ "vertragsform": "ein_vertrag",
+ "zeitbudget_sekunden": 3120
+}

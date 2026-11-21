@@ -17,7 +17,8 @@ und JavaScript-Prüfung über ``klickwache.Wache.lade``; gelesen wird
 ``page.content()``. Mit ``zustand`` behält jede Seite Cookies und Speicher der vorigen
 (``klickkontext.Browserzustand``), auch über Tarife hinweg. Eine Seite ohne Gerät
 ist ``leer``; mit Bot-Schutz, Umleitung oder ohne Lesart ist sie ``gestoert`` mit
-Grund und trägt keinen Satz; robots.txt-Sperre heißt ``gesperrt``.
+Grund und trägt keinen Satz, bei einem Serverfehler der Hauptseite (HTTP 5xx) mit
+``stoerung`` ``klicklauf.STOERUNG_SERVER``; robots.txt-Sperre heißt ``gesperrt``.
 
 Danach folgt sie dem gelesenen Folgelink, aufgelöst gegen die Seitenadresse, nur auf
 demselben Host und mit Erlaubnis von robots.txt, höchstens ``HOECHSTE_SEITEN`` Seiten;
@@ -42,12 +43,13 @@ from urllib.parse import urljoin, urlsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from ...klick_vertrag import serverfehler
 from .basis import GeraeteAbrufFehler
 from .klickanschluss import kein_folgelink
 from .klickcrawler import ANTWORT_FRIST_MS, FENSTER
 from .klickergebnis import LAUF_LEER
 from .klickkontext import Browserzustand, Sitzung, oeffne_sitzung, schliesse
-from .klicklauf import LAUF_GELESEN, LAUF_GESTOERT, Klicklauf
+from .klicklauf import LAUF_GELESEN, LAUF_GESTOERT, STOERUNG_SERVER, Klicklauf
 from .klickliste import Datenliste, Listenlauf
 from .klickraster import BEREIT_JS, einsundeins_saetze
 from .klickseite import beobachte
@@ -212,6 +214,8 @@ def _lies_seite(
         schliesse(sitzung)
     if lauf.status == LAUF_GELESEN and tor.stoerung is not None:
         lauf.status, lauf.grund = LAUF_GESTOERT, tor.stoerung
+    if lauf.status == LAUF_GESTOERT and serverfehler(tor.haupt_status):
+        lauf.stoerung = STOERUNG_SERVER
     saetze, folge = _lies_saetze(lesart, liste, lauf, text, adresse)
     if lauf.status != LAUF_GELESEN:
         log.warning("Klick-Übersicht %s: %s", ohne_geheimnisse(adresse), lauf.grund)

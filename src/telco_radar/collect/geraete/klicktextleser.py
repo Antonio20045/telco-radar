@@ -52,6 +52,12 @@ _ERSTER_JS = """(treffer, attribut) => treffer.length === 0 ? null
   : attribut === null ? treffer[0].innerText : treffer[0].getAttribute(attribut)"""
 
 
+def enthaelt(text: str, gesucht: str) -> bool:
+    """Wahr, wenn ``gesucht`` in ``text`` steht, ohne Unterschied der Groß- und
+    Kleinschreibung („REDMI“ wie „Redmi“)."""
+    return gesucht.casefold() in text.casefold()
+
+
 class Textleser:
     """Liest Text, Dialog und Textmuster einer Seite nach Karte."""
 
@@ -61,7 +67,8 @@ class Textleser:
     def text(
         self, bereich: Locator, gesucht: str = "", attribut: str | None = None
     ) -> str:
-        """Sichtbarer Text des ersten Treffers, sobald er ``gesucht`` enthält.
+        """Sichtbarer Text des ersten Treffers, sobald er ``gesucht`` enthält
+        (``enthaelt``, ohne Unterschied der Groß- und Kleinschreibung).
 
         Mit ``attribut`` der Wert dieses Attributs statt des Texts. Wartet in Takten von
         ``WARTE_TAKT_MS``: Zeit, in der das Tor den Crawl-delay abwartet, zählt nicht
@@ -69,7 +76,7 @@ class Textleser:
         """
         for _ in range(max(1, self.frist_ms // WARTE_TAKT_MS)):
             jetzt = self._text(bereich, attribut)
-            if jetzt and gesucht in jetzt:
+            if jetzt and enthaelt(jetzt, gesucht):
                 return jetzt
             self.seite.wait_for_timeout(WARTE_TAKT_MS)
         return self._text(bereich, attribut)

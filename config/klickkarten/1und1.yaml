@@ -162,7 +162,16 @@ antwort:
     laufzeit: hardwareSelectedTermMonths
 
 kanarie:
-  # aria-label „Speicherauswahl iPhone 17“ (Katalog: „iPhone 17“).
+  # aria-label „Speicherauswahl iPhone 17“ (Katalog: „iPhone 17“); ohne Unterschied
+  # der Groß- und Kleinschreibung („Speicherauswahl Xiaomi REDMI Note 17 Pro 5G“,
+  # Katalog „Redmi Note 17 Pro“, Erkundung 21.11.2026).
   selektor: "#hwd-configuration-section label.variant-chooser__tile"
   attribut: aria-label
   enthaelt: "{modell}"
+  # Ein nicht mehr angebotenes Gerät leitet 1&1 (301) auf ein anderes weiter
+  # (Erkundung 21.11.2026: /iphone-16e → /iphone-17e?traceId=…): dort fehlt der
+  # Kanarienwert zu Recht, die Seite ist leer, keine andere Form. Greift nur mit
+  # Umleitung auf einen anderen Pfad, genauem Host und einem Pfad aus einem Glied.
+  ausgelistet_url:
+    host: mobile.1und1.de
+    pfad: '/[a-z0-9-]*/?'

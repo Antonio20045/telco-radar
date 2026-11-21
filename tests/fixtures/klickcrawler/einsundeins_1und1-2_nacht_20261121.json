@@ -1,0 +1,1966 @@
+{
+ "anbieter": "1und1-2",
+ "datum": "2026-11-21",
+ "dauer_sekunden": 1190.5,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": null,
+ "karte": "1und1.yaml",
+ "laufstatus": "gelesen",
+ "lesefrist_tage": 1,
+ "name": "1&1",
+ "seiten": [
+  {
+   "adresse": "https://mobile.1und1.de/google-pixel-10a",
+   "geraet": "google-pixel-10a",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c7f1b265b12ee15be44c171f72c3bd3e065453829e381b5608bc751e18a8b027",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "zeitpunkt": "2026-11-21T00:04:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 27.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 All-Net-Flat S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "1a92e0654b47f2ba9b2b405fc36c7e00af8769b730ce35920c0d1e23bf978a1b",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "zeitpunkt": "2026-11-21T00:04:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 32.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 All-Net-Flat M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "525d129d6d8121401187875fd0042e580f250d82295115ec11b5c0e44a3be855",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "zeitpunkt": "2026-11-21T00:04:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 37.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 All-Net-Flat L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4e17ff6fa322bc79f355931f01ecdb9c594a8c0a11ebeba94b169623f7973ad0",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "zeitpunkt": "2026-11-21T00:04:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 32.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited on demand S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "642e1813d923751146e1c67b493f93e2de1a306589172bd3cc542f46e521faa9",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "zeitpunkt": "2026-11-21T00:04:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 37.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited on demand M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2cf266568c3f6bf4205b64c7483dd37c72ca24752cb9fa4536cd3443da211fa4",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "zeitpunkt": "2026-11-21T00:04:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 42.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited on demand L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "aa6914c9c35d8a382116e7f4ea024abee5bf6e1f40dfdf7857d718061dffab0c",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "zeitpunkt": "2026-11-21T00:04:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 52.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=5e689a86-8abd-4fcc-a33d-8866d010bb82",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "40230d468eed89c934b681ee2be2186a943aedf192e8824c12ab6c3c032bb9fe",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "zeitpunkt": "2026-11-21T00:05:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 34.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 All-Net-Flat S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "dacc70ba213cff6313bc85d0de1d2fc5d31c98a3043f58dbfe71167f81d97023",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "zeitpunkt": "2026-11-21T00:05:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 39.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "fundstellen": [
+       "input[data-tariff-price-hint]",
+       "input[data-tariff-price-hint] in Kachel 7"
+      ],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 All-Net-Flat M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5f4e0c5f20b0d15e71e46eda5329864c838cc149f3e61edb937f5912063709d7",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "zeitpunkt": "2026-11-21T00:05:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 44.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 All-Net-Flat L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "56c5c404fa83dd21d92ca074b9f27d40d8361f11e9acfc9723efac2db737836a",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "zeitpunkt": "2026-11-21T00:05:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 39.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "fundstellen": [
+       "input[data-tariff-price-hint]",
+       "input[data-tariff-price-hint] in Kachel 7"
+      ],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited on demand S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "652fb7dc5f92f1ed5b0e4dcb695de979a5ba27a0de38651a962fcd65558bb356",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "zeitpunkt": "2026-11-21T00:05:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 44.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited on demand M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b575094ea7b42c8f587f45889eee1dedc84a496289c054b3574d2867227ddbe5",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "zeitpunkt": "2026-11-21T00:05:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 49.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited on demand L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "cf611ffc66f2bcb89603dfb3d2e22ffc94d9165bfec01552ff0d9c5e672b0999",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "zeitpunkt": "2026-11-21T00:05:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 59.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=d4181109-854d-4bea-bc81-56b92d34578f",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "576.0",
+      "tarifname": "1&1 Unlimited XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2828910ad2030cb4b20a8387ad35748713362d3ec35cd4c1fd6782abb2170fa7",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "zeitpunkt": "2026-11-21T00:05:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 30.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "648.0",
+      "tarifname": "1&1 All-Net-Flat S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "601345078358ac40639bed903e164fb99a7e6bde3d65851cc917064bf77ce6b4",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "zeitpunkt": "2026-11-21T00:05:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 35.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "648.0",
+      "tarifname": "1&1 All-Net-Flat M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2e167381bca6afb76a0d5cb017c3c2d9068346532bfffaf177a7488951d7f0f1",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "zeitpunkt": "2026-11-21T00:05:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 40.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "648.0",
+      "tarifname": "1&1 All-Net-Flat L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "80c879f9dd1b61e99b27779fb7f753c28d0d78ac25500db2bef71d4e0cb0d524",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "zeitpunkt": "2026-11-21T00:05:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 35.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "648.0",
+      "tarifname": "1&1 Unlimited on demand S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "56d0739b91c1666256910421ce1ffbefb122a955e1e0bd027ff95ff3f24a545f",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "zeitpunkt": "2026-11-21T00:05:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 40.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "648.0",
+      "tarifname": "1&1 Unlimited on demand M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "87010f846e063a62f203cb1312ba29f71ca75a690016bb61bae94b47e471e25a",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "zeitpunkt": "2026-11-21T00:05:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 45.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "648.0",
+      "tarifname": "1&1 Unlimited on demand L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2ffecd08ee8cebdf73d43b8d4543b6a2627736f2618bdc02d23b72ea739b898c",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "zeitpunkt": "2026-11-21T00:05:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 55.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=a5c209a8-ee96-4738-b0fb-f52705af6b4a",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "648.0",
+      "tarifname": "1&1 Unlimited XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b8327d1eee8912fddb47e0f5388863c98a35597f39b564a5ee54595686f58674",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "zeitpunkt": "2026-11-21T00:05:41Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 38.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "672.0",
+      "tarifname": "1&1 All-Net-Flat S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "64ebcc387b953e4c64297a80bdae51dd36cc4e3416f82b1aaf6ed095b7be741c",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "zeitpunkt": "2026-11-21T00:05:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 43.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "672.0",
+      "tarifname": "1&1 All-Net-Flat M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "fbfe26e24e6ead1ade58d0ed9f410d70e078ded2a39c3568ca73ae997c091ac8",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "zeitpunkt": "2026-11-21T00:05:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 48.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "672.0",
+      "tarifname": "1&1 All-Net-Flat L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9350473d7ab6da6b133c91b027b6c323fb31ce69b7ca8dbbffd38ab2edb35c68",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "zeitpunkt": "2026-11-21T00:05:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 43.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "672.0",
+      "tarifname": "1&1 Unlimited on demand S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "34f69a334e66d84b0d240bae4a316684e79ab6a27a466d24c99d370759645b61",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "zeitpunkt": "2026-11-21T00:05:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 48.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "672.0",
+      "tarifname": "1&1 Unlimited on demand M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-m-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "885f5efce8c2dc29342f8e05491245fd55b743a3e4449c66524847aefb798cea",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "zeitpunkt": "2026-11-21T00:05:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 53.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "672.0",
+      "tarifname": "1&1 Unlimited on demand L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-l-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "eb3b433b384b13611f5862bf57fad40d98ea9f50431053133e85ab3b76173687",
+      "bildfolge": [
+       {
+        "schritt": "preis",
+        "text": "Preisbereich der Anbieterseite nach der Wahl"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl",
+       "tarif: Die Tarifkachel selbst ist das Bild des Belegs",
+       "laufzeit: Die Laufzeit steht nur auf der Produktseite, das Bild entsteht auf der Tarifauswahl"
+      ],
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "zeitpunkt": "2026-11-21T00:05:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 63.99,
+      "einmalzahlung": 0.0
+     },
+     "diagnose": {
+      "antwort_betrag": null,
+      "antwort_einmalzahlung": null,
+      "antwort_laufzeit": null,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-10a&addFlowStates=tradeInAvailable%2CbrandGoogle%2Cgooglepixel10Series%2CwatchAvailable%2CaskWatch%2CaskHeadphones&traceId=e559bcae-64b3-4b27-8d69-84c2b79b7fb2",
+      "fundstellen": [],
+      "gleicher_betrag": null,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "nachweise": {
+      "geraetegesamtpreis": "672.0",
+      "tarifname": "1&1 Unlimited XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-xxl-unlimited-xl-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 44,
+    "beendet": 43,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "cdn.appdynamics.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 4.5,
+    "takte_ms": 1850,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.2857142857142857,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 56,
+    "felder_gesucht": 196,
+    "knoepfe_gefunden": 14,
+    "knoepfe_gesucht": 14
+   },
+   "verworfen": 28,
+   "zustand": "neu"
+  }
+ ],
+ "seitengrund": "42 Seiten aus den Übersichten (Übersicht https://mobile.1und1.de/smartphones-all-net-flat-s am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-all-net-flat-m am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-all-net-flat-l am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-s am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-m am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-l am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-xl am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; keine Kachel, 42 Seiten des Laufs vom 20.11.2026)",
+ "ueberfaellig": [],
+ "uebersichten": [],
+ "vertragsform": "ein_vertrag",
+ "zeitbudget_sekunden": 10241
+}

@@ -78,10 +78,11 @@ API = "https://tarife-api2.mediamarkt.de/v1/productdetail"
 SEITE = "https://tarife.mediamarkt.de/smartphones"
 KENNUNG = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 PAUSE_SEKUNDEN = 1.0
-"""Pause zwischen zwei Anfragen. 1 s statt 2 s seit dem 20.11.2026: `robots.txt` von
-tarife.mediamarkt.de nennt keinen Crawl-delay (nur Disallow fuer /*/pks und
-/*/checkout, die der Leser nie anfasst), `tarife-api2.mediamarkt.de` hat keine
-(404)."""
+"""Abstand Start zu Start zweier Anfragen, gleich `rate_limit_sekunden` der Quelle in
+`config/geraete_quellen.yaml` (Test `test_geraete_tarifwelt_abstand_2111`). 1 s seit
+dem 20.11.2026: kein Crawl-delay auf tarife.mediamarkt.de (nur Disallow /*/pks und
+/*/checkout), tarife-api2.mediamarkt.de ohne robots.txt (404). Bis 21.11.2026 lagen
+1 s nach dem Ende und 2 s Schleusen-Standard hintereinander: 2,0 s je Anfrage."""
 KATALOG_SPEICHER = {1000: 1024, 2000: 2048}
 
 
@@ -130,13 +131,16 @@ class Lauf:
     tarife: dict[str, dict] = field(default_factory=dict)
     nicht_lieferbar: list[tuple[str, int]] = field(default_factory=list)
     offen: list[Zeile] = field(default_factory=list)
+    letzter_start: float = 0.0
 
 
 def _abruf(hole: Callable, url: str, lauf: Lauf, warte: Callable[[float], None]) -> str:
-    """EIN Abruf, ohne Wiederholung. Schutzantwort: Ausnahme mit `schutz`."""
+    """EIN Abruf, ohne Wiederholung, `PAUSE_SEKUNDEN` nach dem Start des letzten.
+    Schutzantwort: Ausnahme mit `schutz`."""
     if lauf.abrufe:
-        warte(PAUSE_SEKUNDEN)
+        warte(max(0.0, PAUSE_SEKUNDEN - (time.monotonic() - lauf.letzter_start)))
     lauf.abrufe += 1
+    lauf.letzter_start = time.monotonic()
     antwort = hole(url, user_agent=KENNUNG, einmalig=True)
     try:
         return antwort_text(antwort)

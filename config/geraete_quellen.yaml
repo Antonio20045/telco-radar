@@ -347,6 +347,9 @@ anbieter:
     rang: 2
     methode: mediamarkt_tarifwelt
     aktiv: true
+    # Gleich `tarifwelt_lauf.PAUSE_SEKUNDEN`: Start zu Start, ohne den Eintrag galt der
+    # Standard 2 s (Lauf 44858465074: 2,0 s je Abruf statt 1 s).
+    rate_limit_sekunden: 1
     # Auftrag brief-tarifwelt-0811.md, Recherche 08.11.2026 (Commit
     # afb32aa3), Adapter-Paket 08.11.2026. Vier echte Einzelabrufe als
     # Fixture gesichert (tests/fixtures/geraete/tarifwelt_mm_*.json,
@@ -370,7 +373,7 @@ anbieter:
       Gelesen wird die Schnittstelle der Tarifwelt (tarife-api2.mediamarkt.de,
       kein robots.txt; tarife.mediamarkt.de sperrt nur /pks und /checkout)
       mit ehrlicher Kennung, ein Versuch je Variante, harter Abbruch bei
-      Schutzantwort, Pause 2 s. Je Netz und Band genau ein Tarif nach der
+      Schutzantwort, 1 s von Abruf zu Abruf. Je Netz und Band genau ein Tarif nach der
       Band-Regel der Netzbetreiber (band_regel.stufe_fuer); Doppelkarten,
       Aktions- und Young-Tarife zaehlen nicht. Aktiv seit 08.11.2026: die drei
       Netzzeilen sind Pflichtanbieter (config/geraete_abdeckung.yaml), der
