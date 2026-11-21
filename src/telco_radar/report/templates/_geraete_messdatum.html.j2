@@ -20,8 +20,7 @@
   {% set kurz_anteil = z.anteil | replace(' gezeigten Preisen von diesem Tag', ' Preisen') if z.anteil else '' %}
   {% set lang = [z.satz] %}
   {% if z.anteil %}{% set _ = lang.append(z.anteil) %}{% endif %}
-  {% if z.stand %}{% set _ = lang.append(z.stand) %}{% endif %}
-  {% if z.kaufweg %}{% set _ = lang.append(z.kaufweg) %}{% endif %}
+  {% if z.stand %}{% set _ = lang.append(z.stand) %}{% endif %}{% if z.kaufweg %}{% set _ = lang.append(z.kaufweg) %}{% endif %}
   <li class="gr-md-z{{ ' gr-md-z--alt' if z.alt }}" data-anbieter="{{ z.name }}" data-datum="{{ z.datum }}" title="{{ lang | join('. ') }}">{{ z.satz }}{% if kurz_anteil %} <span class="gr-md-anteil">· {{ kurz_anteil }}</span>{% endif %}{% if z.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ z.stand }}</span>{% endif %}{% if z.kaufweg %} <span class="gr-kk-marke gr-kk-marke--alt gr-md-kaufweg">{{ z.kaufweg_marke }}</span>{% endif %}</li>
   {% endfor %}
 </ul>
