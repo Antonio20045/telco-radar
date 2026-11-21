@@ -10,6 +10,9 @@ Der Erfassungsgrund des Anbieters bleibt (``klick_erfassung``).
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
+from ..collect.geraete.klickanschluss import TAGESANSCHLUESSE, tagesanschluesse
 from ..collect.geraete.klickergebnis import GELESENE_SEITEN
 from ..collect.geraete.klicklauf import ERFASST, LAUF_GELESEN, NICHT_ANGEBOTEN
 from ..collect.geraete.klickrohsatz import (
@@ -24,13 +27,16 @@ from .klick_erfassung import GESPERRT, OFFEN
 
 
 def ausbeute_der_seiten(
-    daten: dict, katalog: Katalog, gestoert: bool
+    daten: dict, katalog: Katalog, gestoert: bool, alle: Iterable[dict] = ()
 ) -> tuple[Klickausbeute, dict]:
     """Die Ausbeute der verwendbaren Seiten und die Felder ``verwendet``,
     ``seiten_verwendet``, ``speicher_gelesen`` und ``speicher_seite`` für den
-    Bilanzeintrag; ein gestörter Lauf ohne ganz gelesene Seite ist nicht verwendet."""
+    Bilanzeintrag; ein gestörter Lauf ohne ganz gelesene Seite ist nicht verwendet.
+    ``alle`` sind alle Ergebnisdateien des Gerätelaufs: den Anschlusspreis eines Tags
+    teilen die Dateien eines Anbieters (``klickanschluss.tagesanschluesse``)."""
     seiten = verwendbare_seiten(daten, gestoert)
-    aus = ausbeute({**daten, "seiten": seiten}, katalog)
+    tag = tagesanschluesse(daten, [daten, *alle])
+    aus = ausbeute({**daten, "seiten": seiten, TAGESANSCHLUESSE: tag}, katalog)
     verwendet = not gestoert or bool(aus.rohsaetze or aus.ohne_tarif)
     anzahl = gelesene_seiten(seiten) if verwendet else 0
     felder = {"verwendet": verwendet, "seiten_verwendet": anzahl}

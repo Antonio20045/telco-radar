@@ -6,20 +6,20 @@ Ein Job je Anbieter (Matrix im eigenen Workflow ``klick.yml``) arbeitet die Klic
 läuft durch den Klick-Crawler (``klickcrawler.klicke_durch``) mit demselben Tor wie die
 Erkundung: robots.txt samt Crawl-delay und Visit-time je Anfrage, eigener Abstand des
 Anbieters, User-Agent aus ``geraete_quellen.yaml``, keine Tarnung. Endet eine Seite
-gestört durch Bot-Schutz oder Challenge, geht für den Anbieter
-keine Anfrage mehr hinaus (CLAUDE.md Regel 4); die übrigen Seiten heißen
-``nicht_besucht`` mit Grund. Lud eine Seite nur nicht (``klicklauf.STOERUNG_ZEIT``,
-kein Bot-Schutz, CLAUDE.md Regel 10), folgt die nächste Seite unter derselben
-Hostschleuse samt Crawl-delay; nach ``HOECHSTE_ZEITUEBERSCHREITUNGEN`` solchen Seiten
-endet er. Hat eine Seite nach bestandener Bot-Prüfung nur eine andere Form
-(``klicklauf.STOERUNG_SEITE``: Kanarienwert, Vorbereitung, Strukturbruch, keine
-angebotene Kombination; o2 11.10.2026), folgt ebenso die nächste;
-erst ``HOECHSTE_SEITENFORMEN_IN_FOLGE`` solche Seiten hintereinander beenden ihn
-(Telekom 10. und 11.10.2026: je eine Seite hielt alle übrigen an). Eine nie gelesene
-Seite zählt dabei nicht, sobald der Anbieter einen Lesestand hat (Vodafone 12.10.2026:
-drei nie gelesene Seiten standen in der Rotation vorn und hielten 22 an). Ebenso
-endet der Lauf, sobald die Parallellauf-Prüfung (``klickparallel``, vor jeder Seite)
-einen anderen Lauf auf denselben Hosts meldet.
+gestört durch Bot-Schutz oder Challenge, geht für den Anbieter keine Anfrage mehr hinaus
+(CLAUDE.md Regel 4); die übrigen Seiten heißen ``nicht_besucht`` mit Grund. Serverfehler
+(HTTP 5xx) wiederholt ``klickwiederholung``. Lud eine Seite nur nicht
+(``klicklauf.STOERUNG_ZEIT``, kein Bot-Schutz, CLAUDE.md Regel 10), folgt die nächste
+Seite unter derselben Hostschleuse samt Crawl-delay; nach
+``HOECHSTE_ZEITUEBERSCHREITUNGEN`` solchen Seiten endet er. Hat eine Seite nach
+bestandener Bot-Prüfung nur eine andere Form (``klicklauf.STOERUNG_SEITE``:
+Kanarienwert, Vorbereitung, Strukturbruch, keine angebotene Kombination; o2 11.10.2026),
+folgt ebenso die nächste; erst ``HOECHSTE_SEITENFORMEN_IN_FOLGE`` solche Seiten
+hintereinander beenden ihn (Telekom 10. und 11.10.2026: je eine Seite hielt alle übrigen
+an). Eine nie gelesene Seite zählt dabei nicht, sobald der Anbieter einen Lesestand hat
+(Vodafone 12.10.2026: drei nie gelesene Seiten standen in der Rotation vorn und hielten
+22 an). Ebenso endet der Lauf, sobald die Parallellauf-Prüfung (``klickparallel``, vor
+jeder Seite) einen anderen Lauf auf denselben Hosts meldet.
 
 Zeitbudget (CLAUDE.md Regel 8): ``budget_ende`` rechnet gegen die Restzeit des Jobs,
 ``job_frist_s`` (Vorgabe ``JOB_FRIST_S``, gleich ``timeout-minutes`` des Matrix-Jobs)
@@ -82,6 +82,7 @@ from .klickseite import GRUND_FRIST, Fristschleuse, beobachte
 from .klickspur import ohne_geheimnisse
 from .klicktor import Hostschleuse
 from .klickuebersicht import lies_uebersicht
+from .klickwiederholung import STOERUNG_SERVER, Wiederholung
 from .robots import RobotsWaechter
 
 if TYPE_CHECKING:
@@ -166,7 +167,7 @@ class _Gang:
             self.zeit += 1
             if self.zeit >= HOECHSTE_ZEITUEBERSCHREITUNGEN:
                 self.stopp = f"{self.zeit} {GRUND_ZEITUEBERSCHREITUNGEN}: {grund}"
-        elif status == LAUF_GESTOERT:
+        elif status == LAUF_GESTOERT and stoerung != STOERUNG_SERVER:
             self.stopp = f"{GRUND_NACH_STOERUNG}: {grund}"
 
 
@@ -347,7 +348,7 @@ def leser_im_browser(
     uhr: Callable[[], datetime],
     hole_robots: Callable[[str], tuple[int, str]],
 ) -> tuple[Crawler, Uebersichtsleser]:
-    """Crawler und Übersichtsleser eines Anbieters an derselben Schleuse samt Frist."""
+    """Crawler und Übersichtsleser an einer Schleuse samt Frist; 5xx wiederholt."""
 
     def hole_mit_frist(url: str) -> tuple[int, str]:
         if time.monotonic() >= schleuse.ende:
@@ -396,4 +397,4 @@ def leser_im_browser(
             zustand=zustand,
         )
 
-    return crawle, lies
+    return Wiederholung(time.monotonic, time.sleep).um(crawle, lies)

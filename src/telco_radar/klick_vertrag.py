@@ -4,9 +4,10 @@ Wurzelmodul ohne Schicht: ``collect.geraete.klicklauf`` und ``klickergebnis``
 führen diese Namen weiter, ``analyze.klick_erfassung`` und ``klick_lesestand`` lesen
 sie hier, damit der Report ``collect`` nicht einmal mittelbar lädt. Laufstatus
 ``gelesen`` und ``gestoert``; HTTP 202 (``CHALLENGE_STATUS``) und ab
-``FEHLER_AB_STATUS`` stört den Abruf (``abruf_gestoert``). Die Ergebnisdateien liegen
-unter ``ORDNER`` im ``FORMAT``; ``lies_ergebnisse`` liest sie, ``ganz_gelesen`` ist
-die eine Definition einer heute gelesenen Seite. Fristen ``LESEFRIST_TAGE`` und
+``FEHLER_AB_STATUS`` stört den Abruf (``abruf_gestoert``), 5xx heißt
+``serverfehler``. Die Ergebnisdateien liegen unter ``ORDNER`` im ``FORMAT``;
+``lies_ergebnisse`` liest sie, ``ganz_gelesen`` ist die eine Definition einer heute
+gelesenen Seite. Fristen ``LESEFRIST_TAGE`` und
 ``FRISCHEGRENZE_TAGE`` erklärt ``collect.geraete.klickergebnis``.
 """
 
@@ -22,6 +23,8 @@ LAUF_GELESEN = "gelesen"
 LAUF_GESTOERT = "gestoert"
 CHALLENGE_STATUS = 202
 FEHLER_AB_STATUS = 400
+SERVERFEHLER_AB = 500
+SERVERFEHLER_BIS = 599
 FORMAT = 1
 FRISCHEGRENZE_TAGE = 3
 LESEFRIST_TAGE = 1
@@ -37,6 +40,12 @@ def abruf_gestoert(status: int | None) -> str | None:
     if status == CHALLENGE_STATUS or status >= FEHLER_AB_STATUS:
         return f"Abruf gestört (HTTP {status})"
     return None
+
+
+def serverfehler(status: int | None) -> bool:
+    """Wahr bei HTTP 5xx (``SERVERFEHLER_AB`` bis ``SERVERFEHLER_BIS``): eine Störung
+    des Anbieters, kein Bot-Schutz (CLAUDE.md Regel 10)."""
+    return status is not None and SERVERFEHLER_AB <= status <= SERVERFEHLER_BIS
 
 
 def ganz_gelesen(seiten: list[dict]) -> list[dict]:

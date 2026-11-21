@@ -11,9 +11,9 @@ und Text und ihre fehlenden Schritte mit Grund (``bildfolge_fehlt``); aus ihnen 
 
 Der Laufstatus des Anbieters (``laufstatus``) ist ``gestoert``, sobald eine Seite
 gestört endete (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch); eine Seite, die
-nur nicht lud oder nur eine andere Form hatte (``stoerung`` gleich
-``klicklauf.STOERUNG_ZEIT`` oder ``STOERUNG_SEITE``), zählt so erst, wenn
-keine Seite gelesen wurde. Sonst ist er ``gelesen``, wenn
+nur nicht lud, nur eine andere Form hatte oder einen Serverfehler bekam (``stoerung``
+gleich ``klicklauf.STOERUNG_ZEIT``, ``STOERUNG_SEITE`` oder ``STOERUNG_SERVER``), zählt
+so erst, wenn keine Seite gelesen wurde. Sonst ist er ``gelesen``, wenn
 eine gelesene Seite mindestens eine Kombination ``erfasst`` hat; ``leer``, wenn Seiten
 gelesen wurden, aber keine Kombination erfasst ist; ``nicht_gelesen``, wenn keine Seite
 gelesen wurde (gesperrt, nicht besucht, Karte fehlt). Nur ``gelesen`` ersetzt im
@@ -63,6 +63,7 @@ from .klicklauf import (
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
     STOERUNG_SEITE,
+    STOERUNG_SERVER,
     STOERUNG_ZEIT,
     Klicklauf,
     Kombiergebnis,
@@ -78,7 +79,7 @@ LAUF_LEER = "leer"
 LAUF_NICHT_GELESEN = "nicht_gelesen"
 SEITE_NICHT_BESUCHT = "nicht_besucht"
 GELESENE_SEITEN = frozenset({LAUF_GELESEN, LAUF_ZEITGRENZE})
-OHNE_SPERRE = frozenset({STOERUNG_ZEIT, STOERUNG_SEITE})
+OHNE_SPERRE = frozenset({STOERUNG_ZEIT, STOERUNG_SEITE, STOERUNG_SERVER})
 GRUND_NICHTS_ERFASST = "keine Kombination erfasst"
 GRUND_KEINE_SEITE = "keine Seite gelesen"
 STAND_FORMAT = 1
