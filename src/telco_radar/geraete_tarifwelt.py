@@ -26,6 +26,7 @@ from . import tarifwelt_bestand, tarifwelt_lieferbar
 from .collect.geraete import tarifwelt_lauf
 from .collect.geraete.basis import GeraeteAbrufFehler
 from .geraete_abruf import hole_fuer_anbieter
+from .geraete_soll import RESERVE_SEKUNDEN as SOLL_ZAEHLUNG_SEKUNDEN
 from .report.geraete_tco_band import tarifleiter
 from .tco_model import Buendel
 
@@ -51,7 +52,12 @@ mit 5 min kein eigenes Limit, der Render-Hook braucht gemessen bis 168 s)."""
 IN_PIPELINE_NACH_STUFE_SEKUNDEN = 60.0
 """Arbeit der Pipeline nach der Tarifwelt-Stufe (Pruefstelle, Speichern, Bilanz);
 gemessen 15 s im Lauf 44728882384."""
-RESERVE_NACH_STUFE_SEKUNDEN = NACH_SCHRITTE_SEKUNDEN + IN_PIPELINE_NACH_STUFE_SEKUNDEN
+RESERVE_NACH_STUFE_SEKUNDEN = (
+    NACH_SCHRITTE_SEKUNDEN + IN_PIPELINE_NACH_STUFE_SEKUNDEN + SOLL_ZAEHLUNG_SEKUNDEN
+)
+"""Was nach der Stufe frei bleibt: Workflow-Schritte, Pipeline-Nacharbeit und die
+Soll-Zählung (``geraete_soll.RESERVE_SEKUNDEN``: Quellen × Sekunden je Abruf, seit
+21.11.2026); die Stufe nimmt jede übrige Zeit, diese nie."""
 
 
 def stufen_frist(vergangen_sekunden: float) -> float:
@@ -97,6 +103,8 @@ class Ergebnis:
             "modelle": self.modelle,
             "ungelesen": list(self.ungelesen),
             "grund": self.grund,
+            "nicht_lieferbar_liste": [list(e) for e in self.nicht_lieferbar],
+            "luecken_liste": [list(e) for e in self.luecken],
         }
 
 

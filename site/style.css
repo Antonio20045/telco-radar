@@ -6523,6 +6523,25 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 @media (max-width:720px){
   .gr-md{grid-template-columns:minmax(0,1fr);gap:4px 0;margin-bottom:12px}
 }
+/* Vollstaendigkeit je Anbieter (Abnahmekriterium 1, 21.11.2026): eine
+   zugeklappte Zeile je Anbieter im Raster der Messdatum-Zeile; Luecken und
+   Quelle erst beim Aufklappen. Die Zahl "n von m" traegt die Zeile. */
+.gr-vs{margin:0 0 14px;font:500 12.5px/1.35 var(--sans);color:var(--ink-2)}
+.gr-vs-liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));
+  gap:4px 18px;list-style:none;margin:0;padding:0}
+.gr-vs-z{min-width:0;overflow-wrap:anywhere}
+.gr-vs-z summary{cursor:pointer}
+.gr-vs-z--ohne summary{color:var(--ink-3)}
+.gr-vs-marke{color:var(--ink-3);font-size:12px}
+.gr-vs-z--offen .gr-vs-marke{color:var(--red-text)}
+.gr-vs-luecken{margin:4px 0 4px 16px;padding:0;font-size:12px;color:var(--ink-3)}
+.gr-vs-unbenannt{color:var(--ink)}
+.gr-vs-grund,.gr-vs-extra,.gr-vs-quelle{margin:4px 0 0 16px;font-size:12px;color:var(--ink-3)}
+.gr-vs-fehlt,.gr-vs-weitere{margin:4px 0 0;font-size:12px;color:var(--ink-3)}
+.gr-vs-ausfall{margin:2px 0 0 16px;font-size:12px;color:var(--red-text)}
+@media (max-width:720px){
+  .gr-vs-liste{grid-template-columns:minmax(0,1fr);gap:2px 0}
+}
 .gr-hm-erklaerung{max-width:var(--wrap-text);margin:12px 0 0;font:400 14px/1.5 var(--sans);color:var(--ink-3)}
 .gr-hm-erklaerung p{margin:0 0 8px}
 @media (max-width:720px){
