@@ -43,19 +43,27 @@ def _aria(tag: Tag | None) -> str:
     return str(tag.get("aria-label") or "") if tag is not None else ""
 
 
+def o2_tarifkacheln(gruppen: dict) -> list[Option]:
+    """Alle Tarifkacheln des Karussells aus dem DOM, nicht nur die sichtbaren: die
+    Vereinigung aller Radiogruppen, deren Labels einen O2-Tarif nennen (Desktop,
+    Mobil, Kopf), je Name einmal. Eine Gruppe allein kann eine Kachel doppelt und eine
+    andere gar nicht führen (o2, 21.11.2026: „Unlimited L“ zweimal, „Unlimited M“
+    fehlt in ``pdp-tariff-plans-desktop``)."""
+    tarife: dict[str, Option] = {}
+    for paare in gruppen.values():
+        namen = [" ".join(_aria(lab).split()) for _, lab in paare]
+        if paare and all(n.upper().startswith("O2") for n in namen):
+            for (e, lab), n in zip(paare, namen, strict=True):
+                tarife.setdefault(n, _option(e, lab, n))
+    return list(tarife.values())
+
+
 def o2_geraet(html: str) -> dict:
-    """Produktseite: Speicher, Tarifkacheln (Name im ``aria-label``), Zahlungsplan."""
+    """Produktseite: Speicher, Tarifkacheln (Name im ``aria-label``, alle Kacheln des
+    Karussells, ``o2_tarifkacheln``), Zahlungsplan."""
     gruppen = radiogruppen(html)
     speicher = _gruppe(gruppen, _ist_speicher)
-    tarife: list[Option] = []
-    for paare in gruppen.values():
-        namen = [str(e_l[1].get("aria-label") or "") if e_l[1] else "" for e_l in paare]
-        if paare and all(n.upper().startswith("O2") for n in namen):
-            tarife = [
-                _option(e, lab, " ".join(n.split()))
-                for (e, lab), n in zip(paare, namen, strict=True)
-            ]
-            break
+    tarife = o2_tarifkacheln(gruppen)
     plaene = next(
         (
             p

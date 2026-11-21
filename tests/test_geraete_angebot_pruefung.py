@@ -320,3 +320,21 @@ def test_o2_ohne_tarifuebersicht_gilt_die_produktseite_und_der_ausfall(tmp_path)
     assert zeilen["o2"]["angebot"]["status"] == ga.TEILWEISE
     o2 = _zeile(voll, "o2")
     assert grund in o2["hinweise"] and "vollständig" not in o2["marke"]
+
+
+def test_o2_tarifkarussell_zaehlt_alle_elf_kacheln_aus_dem_dom():
+    """o2 iPhone 18 Pro Max, 21.11.2026 17:46: senkrechtes Karussell mit 11 Kacheln,
+    Plus und ohne Plus, 4 sichtbar. Gezählt werden alle Kacheln des DOM, je Name einmal
+    über alle Gruppen (die Kopfgruppe führt „Unlimited L“ doppelt und „Unlimited M“
+    gar nicht)."""
+    seite = base.LS.o2_geraet(base._html("o2_iphone18promax_karussell"))
+    namen = [o.text for o in seite["tarife"]]
+    assert len(namen) == len(set(namen)) == 11
+    assert {
+        "O2 Mobile Unlimited M mit 100 MBit/s",
+        "O2 Mobile Unlimited L mit 300 MBit/s",
+        "O2 Mobile on Demand M mit 50 GB+",
+        "O2 Mobile S mit 15 GB+",
+        "O2 Mobile L Plus mit 150 GB+",
+    } <= set(namen)
+    assert sum(1 for n in namen if " Plus " in f"{n} ") == 5

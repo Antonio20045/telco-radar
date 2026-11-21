@@ -226,6 +226,7 @@ def o2(s: Sitzung, seite: Seite) -> None:
     s.oeffne(seite.url)
     geraet = LS.o2_geraet(s.html("geraet"))
     _setze(seite, geraet)
+    geraet["tarife"] = _o2_karussell(s, seite, geraet["tarife"])
     seite.tarife = geraet["tarife"]
     kombis = _kreuz(
         geraet["speicher"][:1],
@@ -244,6 +245,33 @@ def o2(s: Sitzung, seite: Seite) -> None:
             [sp], [t.text for t in stand["tarife"] if t.waehlbar], stand["laufzeiten"]
         )
     seite.kombinationen = kombis
+
+
+KARUSSELL_HOECHSTENS = 15
+
+
+def _o2_karussell(s: Sitzung, seite: Seite, tarife: list[Option]) -> list[Option]:
+    """Das senkrechte Tarifkarussell (``tef-item-stepper``, 4 von 11 sichtbar) bis zum
+    Ende durchblättern („Weiter“ bis gesperrt oder weg) und jede Kachel aufnehmen, auch
+    falls die Seite Kacheln erst beim Blättern ins DOM legt. Endet es nicht, ist die
+    Auswahl nur teilweise gelesen (``Seite.unvollstaendig``)."""
+    page = getattr(s, "page", None)
+    if page is None:
+        return tarife
+    knopf = page.locator("tef-item-stepper").first.get_by_role("button", name="Weiter")
+    alle = {o.text: o for o in tarife}
+    for _ in range(KARUSSELL_HOECHSTENS):
+        if not knopf.count() or not knopf.first.is_enabled():
+            seite.annahmen.append(
+                f"Tarifkarussell bis zum Ende gelesen ({len(alle)} Kacheln)"
+            )
+            return list(alle.values())
+        knopf.first.click()
+        page.wait_for_timeout(600)
+        for o in LS.o2_geraet(s.html("karussell"))["tarife"]:
+            alle.setdefault(o.text, o)
+    seite.unvollstaendig.append("Tarifkarussell nicht bis zum Ende gelesen")
+    return list(alle.values())
 
 
 def einsundeins(s: Sitzung, seite: Seite) -> None:

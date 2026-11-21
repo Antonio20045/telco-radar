@@ -310,6 +310,16 @@
    "gzip": true,
    "bytes_roh": 285345,
    "sha256_roh": "b0504800a4dc4a9463bc5b73af49e555e7b18d2c609b16fc358271fdaa342fc3"
+  },
+  {
+   "datei": "o2_iphone18promax_karussell.html.gz",
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung TelcoRadar/1.0, Abruf 17:46:35 CET beim Befund berichte/o2-plus/schalter.md",
+   "beleg": "DOM der Produktseite mit senkrechtem Tarifkarussell (11 Kacheln, 4 sichtbar); Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 280394,
+   "sha256_roh": "8362807f7dcacbb7d45396bf2025e13bea9dc96f5ffc8e8d917c7de29f6f1a56"
   }
  ]
 }
