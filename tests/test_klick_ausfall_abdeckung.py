@@ -147,9 +147,74 @@ def test_ausfall_nennt_laufstatus_und_grund_der_datei():
 
     assert ausfall(nacht) == f"gestoert: {nacht['grund']}"
     assert ausfall(_lade(ZWEITER)) is None
-    leer = {"laufstatus": "nicht_gelesen", "grund": "verschoben: geraete.yml"}
-    assert ausfall(leer) == "nicht_gelesen: verschoben: geraete.yml"
-    assert ausfall({"laufstatus": "leer", "grund": None}) == "leer: ohne Grund"
+
+
+AUTO = "einsundeins_1und1-auto_20261120.json"
+"""Echte Datei vom 20.11.: eine Seite /iphone-duo, Seitenform, 0 Seiten gelesen."""
+
+
+def _auto_heute(**felder) -> dict:
+    """Die Datei am Messtag; ein Feld ``None`` fehlt danach ganz."""
+    daten = {**_lade(AUTO), "datum": HEUTE, **felder}
+    return {k: v for k, v in daten.items() if v is not None}
+
+
+def _duo_befunde(tmp_path: Path, daten: dict) -> list[str]:
+    wurzel = _wurzel(tmp_path, **{"1und1_auto": daten})
+    pflicht = "pflicht_anbieter:\n  - 1&1\npflicht_modelle:\n  - apple-iphone-duo\n"
+    (wurzel / "config" / "geraete_abdeckung.yaml").write_text(pflicht, "utf-8")
+    return _modell_befunde(wurzel)
+
+
+DUO_ROT = ["1&1: 1 Pflichtmodelle ohne Bündel und ohne belegte Lücke: apple-iphone-duo"]
+
+
+def test_seitenform_am_messtag_ist_kein_ausfall_und_bleibt_befund(tmp_path):
+    """Prüfer zu PR 197: ``laufstatus`` ist ``gestoert``, sobald keine Seite gelesen
+    wurde, auch an der Seitenform. Das ist ein Erfassungsmangel, kein Ausfall: ein
+    Ein-Seiten-Job hieße sonst jeden Tag neu belegt, ohne Verjährung."""
+    daten = _auto_heute()
+    assert daten["laufstatus"] == "gestoert"
+    assert [s["stoerung"] for s in daten["seiten"]] == ["seitenform"]
+
+    assert _duo_befunde(tmp_path, daten) == DUO_ROT
+
+
+@pytest.mark.parametrize(
+    ("laufstatus", "grund"),
+    [
+        ("leer", "keine Kombination erfasst"),
+        ("nicht_gelesen", "verschoben: geraete.yml läuft"),
+        (None, None),
+        ("gestoert", None),
+    ],
+    ids=["leer", "verschoben", "ohne-laufstatus", "ohne-grund"],
+)
+def test_kein_ausfall_belegt_nichts_und_bleibt_gruen(
+    tmp_path, skript, capsys, laufstatus, grund
+):
+    """Prüfer zu PR 197: leer gelesen, geplante Verschiebung und eine Datei ohne
+    Laufstatus oder Grund sind kein Ausfall: kein Beleg, keine ``::error``-Zeile, kein
+    Exit 3."""
+    from telco_radar.klick_vertrag import ausfall
+
+    seite = {**_lade(AUTO)["seiten"][0], "status": "nicht_besucht", "stoerung": None}
+    daten = {**_auto_heute(laufstatus=laufstatus, grund=grund), "seiten": [seite]}
+
+    assert ausfall(daten) is None
+    assert _duo_befunde(tmp_path, daten) == DUO_ROT
+    assert skript.endcode(daten, rot_bei_ausfall=True) == 0
+    assert capsys.readouterr().out == ""
+
+
+def test_im_ausfall_bleibt_eine_seite_anderer_form_befund(tmp_path):
+    """Ausfall (502) und eine Seitenform-Seite im selben Lauf: belegt ist nur, was der
+    Ausfall nicht lesen ließ."""
+    nacht = _lade(NACHT)
+    duo = {**_lade(AUTO)["seiten"][0]}
+    daten = {**nacht, "seiten": [duo, *nacht["seiten"]]}
+
+    assert _duo_befunde(tmp_path, daten) == DUO_ROT
 
 
 @pytest.fixture(scope="module")

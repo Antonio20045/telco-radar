@@ -20,8 +20,9 @@ Schritt); mit ``--job-frist-sekunden`` ergibt er die Restzeit (CLAUDE.md Regel 8
 ``--plan`` gibt die Schlüssel aller Anbieter mit Karte als JSON-Liste aus (Matrix),
 ohne Netz. 2 heißt, die Auswahl oder die Konfiguration ist falsch.
 
-Ausfall (``klick_vertrag.ausfall``: Laufstatus nicht ``gelesen``, etwa 0 Seiten nach
-HTTP 502 oder ein Strukturbruch, Nachtlauf 21.11.2026): die Ergebnisdatei ist trotzdem
+Ausfall (``klick_vertrag.ausfall``: gestört durch Sperre, Serverfehler, Zeit oder
+Browser, etwa 0 Seiten nach HTTP 502 am 21.11.2026; nicht Seitenform, Strukturbruch,
+leer oder Verschiebung): die Ergebnisdatei ist trotzdem
 geschrieben, die Ausgabe nennt ihn als ``::error``-Zeile der Actions-Zusammenfassung,
 und mit ``--rot-bei-ausfall`` endet der Lauf mit ``FEHLER_AUSFALL`` (3), damit der Job
 nicht grün aussieht. Ohne Schalter Exit-Code 0: solange ``geraete.yml`` nur nach einem

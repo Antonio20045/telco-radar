@@ -31,6 +31,7 @@ LESEFRIST_TAGE = 1
 ROTATION_GELESEN = frozenset({LAUF_GELESEN})
 ORDNER = Path("data") / "state" / "klick"
 STAND_DATEI = "klick_stand.json"
+STOERUNG_SEITE = "seitenform"
 
 
 def abruf_gestoert(status: int | None) -> str | None:
@@ -48,19 +49,34 @@ def serverfehler(status: int | None) -> bool:
     return status is not None and SERVERFEHLER_AB <= status <= SERVERFEHLER_BIS
 
 
-def ausfall(daten: dict) -> str | None:
-    """Der benannte Ausfall eines Klick-Laufs: ``None``, wenn er gelesen hat
-    (``LAUF_GELESEN``), sonst Laufstatus und Grund seiner Ergebnisdatei.
+def gestoerte_seiten(daten: dict) -> list[dict]:
+    """Die gestört geendeten Produkt- und Übersichtsseiten einer Ergebnisdatei."""
+    seiten = list(daten.get("seiten") or [])
+    for uebersicht in daten.get("uebersichten") or []:
+        seiten.extend(uebersicht.get("seiten") or [uebersicht])
+    return [s for s in seiten if s.get("status") == LAUF_GESTOERT]
 
-    Nachtlauf 21.11.2026: ``1und1`` las nach HTTP 502 keine Seite, ``o2-tarife-2``
-    endete am Strukturbruch; beide Dateien nannten das (``gestoert`` mit Grund), doch
-    der Job blieb grün und der Abdeckungswächter hielt die Lücken für unbelegt. Eine
-    Definition für den Endcode des Tageslaufs (``scripts/klick_tageslauf.py``) und die
-    belegten Lücken des Wächters (``analyze.klick_ausfall``)."""
-    status = daten.get("laufstatus")
-    if status == LAUF_GELESEN:
+
+def ausfall(daten: dict) -> str | None:
+    """Der benannte Ausfall eines Klick-Laufs, sonst ``None``.
+
+    Ausfall heißt: der Lauf endete ``gestoert`` mit Grund, und mindestens eine Seite
+    scheiterte an etwas anderem als ihrer Form (Sperre oder Challenge, Serverfehler,
+    Zeitüberschreitung, Browserfehler, Seite nicht geladen). Kein Ausfall sind eine
+    Seite anderer Form (``STOERUNG_SEITE``: Kanarienwert, Vorbereitung, Strukturbruch;
+    ein Erfassungsmangel), ein leer gelesener Lauf, eine geplante Verschiebung
+    (``nicht_gelesen``) und eine Datei ohne Laufstatus oder Grund; sie bleiben im
+    Abdeckungswächter Befund (Prüfung zu PR 197).
+
+    Nachtlauf 21.11.2026: ``1und1`` las nach HTTP 502 keine Seite, der Job blieb grün,
+    der Wächter hielt die Lücken für unbelegt. Eine Definition für ``::error``-Zeile und
+    Endcode des Tageslaufs (``scripts/klick_tageslauf.py``) und die belegten Lücken des
+    Wächters (``analyze.klick_ausfall``)."""
+    grund = daten.get("grund")
+    if daten.get("laufstatus") != LAUF_GESTOERT or not grund:
         return None
-    return f"{status or 'ohne Laufstatus'}: {daten.get('grund') or 'ohne Grund'}"
+    arten = {s.get("stoerung") for s in gestoerte_seiten(daten)}
+    return None if arten <= {STOERUNG_SEITE} else f"{LAUF_GESTOERT}: {grund}"
 
 
 def ganz_gelesen(seiten: list[dict]) -> list[dict]:
