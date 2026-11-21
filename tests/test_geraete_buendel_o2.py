@@ -126,11 +126,19 @@ def _antwort(*eintraege, zustand="BUNDLE"):
     )
 
 
-def test_sechsundsechzig_buendel_aus_achtundachtzig_eintraegen():
-    """22 der 88 sind Geraet PLUS Zubehoer und fallen heraus."""
+BUENDEL = 69
+"""22 der 88 Eintraege nennen "mit" in der Beschreibung. 19 davon tragen das Zubehoer
+auch im Angebotsnamen ("-mit-") und fallen heraus; drei nennen es nur in der
+Beschreibung und sind Gratis-Zugaben zum Geraetepreis (Xiaomi 17 Ultra mit Redmi
+Pad 2, Galaxy S25 FE mit Tab S10 FE: 775 EUR Geraetepreis, Pixel 11 Pro mit Fitbit
+Charge 6; Befund 21.11.2026, tests/test_geraete_o2_zugabe.py)."""
+
+
+def test_neunundsechzig_buendel_aus_achtundachtzig_eintraegen():
+    """19 der 88 sind Geraet PLUS Zubehoer und fallen heraus."""
     roh = json.loads(_katalog())
     assert len(roh["hardware"]) == 88
-    assert len(_saetze()) == 66
+    assert len(_saetze()) == BUENDEL
 
 
 def test_jedes_buendel_traegt_seine_vier_posten():
@@ -151,7 +159,7 @@ def test_die_aufteilung_ergibt_wieder_den_monatsbetrag():
     """
     je_sku = {h["externalId"]: h for h in json.loads(_katalog())["hardware"]}
     saetze = _saetze()
-    assert len(saetze) == 66
+    assert len(saetze) == BUENDEL
     for satz in saetze:
         h = je_sku[satz["sku"]]
         summe = satz["geraet_monatsrate"] + satz["tarif_monatlich"]
@@ -207,8 +215,17 @@ def test_unlesbare_nutzlast_wirft():
 
 
 def test_zubehoerbuendel_faellt_heraus():
-    mit = _eintrag(beschreibung="Apple iPhone 17 Pro Max mit AirPods Pro 3")
+    mit = _eintrag(
+        beschreibung="Apple iPhone 17 Pro Max mit AirPods Pro 3",
+        angebot="privatkunden-apple-iphone-17-pro-max-256gb-silber-mit-airpods-pro-3-36xhigh",
+    )
     assert lies_buendel(_antwort(mit)) == []
+
+
+def test_gratis_zugabe_nur_in_der_beschreibung_bleibt():
+    zugabe = _eintrag(beschreibung="Apple iPhone 15 Pro mit AirPods Pro 3")
+    (satz,) = lies_buendel(_antwort(zugabe))
+    assert satz["strukturierter_name"] == "Apple iPhone 15 Pro"
 
 
 def test_ohne_tarifnamen_kein_buendel():
@@ -431,7 +448,7 @@ def test_der_ganze_weg_an_der_echten_antwort():
         for i, s in enumerate(_saetze())
     ]
     bilanz = aus_rohsaetzen(roh, _bestand(), "2026-09-04")
-    assert len(bilanz.buendel) == 66
+    assert len(bilanz.buendel) == BUENDEL
     assert bilanz.ohne_tarif == 0
     assert {b.tarif_id for b in bilanz.buendel if "Plus" not in b.tarif_name} == {
         "o2:o2-mobile-on-demand-m"

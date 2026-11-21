@@ -224,6 +224,9 @@ def test_ohne_referenz_nur_der_gemessene_satz(mitschnitt):
 
 
 def test_widerspricht_die_antwort_der_referenz_wird_nicht_abgeleitet(mitschnitt):
+    """Widerspruch heißt anderer Slug (`o2_referenz.gleicher_slug`); ein anderer
+    Anschlusspreis allein hält die Ableitung seit 21.11.2026 nicht mehr auf
+    (tests/test_geraete_o2_eigene_aktion.py)."""
     start = o2.lies_konfiguration(
         mitschnitt["antworten"][_katalogsaetze(mitschnitt)[0]["url"]]
     )
@@ -237,7 +240,7 @@ def test_widerspricht_die_antwort_der_referenz_wird_nicht_abgeleitet(mitschnitt)
         for o in start["tariff"]["tariffOptions"]
     }
     referenz[_ohne_markup(anzeige)] = {
-        "slug": "o2-mobile-unlimited-m-plus",
+        "slug": "o2-mobile-unlimited-m",
         "anschluss": 39.99,
     }
     z = {}

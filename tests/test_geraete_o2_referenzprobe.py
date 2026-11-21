@@ -284,13 +284,16 @@ def _gleich_ohne_anschluss(s, echt):
 
 
 def test_aktion_beim_xiaomi_schreibt_nichts_fuer_andere_geraete(m18, m17, xiaomi):
+    """Seit 21.11.2026 leitet auch das Gerät mit eigener Aktion ab (gleicher Slug
+    genügt, `o2_referenz.gleicher_slug`); die Referenz für andere Geräte bleibt
+    unberührt: keine Probe an dieser Antwort."""
     antworten, rohsaetze = _drei_geraete(m18, m17, _mit_aktion(xiaomi))
     saetze, protokoll, z = _lauf(antworten, rohsaetze)
     assert _falsch_gegen_die_seite(saetze, m17) == []
     pro_x = _modell(saetze, "Xiaomi 17")
-    assert pro_x and all("herleitung" not in s for s in pro_x)
-    assert {s["anschlusspreis"] for s in pro_x} == {0.0}
-    assert z["referenz_widerspricht"] >= 1
+    gemessen = [s for s in pro_x if "herleitung" not in s]
+    assert gemessen and {s["anschlusspreis"] for s in gemessen} == {0.0}
+    assert len(pro_x) > len(gemessen)
     assert "referenz_probe" not in z
 
     gegen, _, _ = _lauf(*_drei_geraete(m18, m17, xiaomi))

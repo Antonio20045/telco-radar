@@ -81,8 +81,9 @@ from functools import partial
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
-from .o2_anschluss import abgeleiteter_anschluss
-from .o2_referenz import Referenzstand, belegadresse, modellname, passt, tarife_aus
+from .o2_anschluss import ADRESSE, abgeleiteter_anschluss, fussnoten_tragen
+from .o2_referenz import Referenzstand, belegadresse, modellname, tarife_aus
+from .o2_referenz import gleicher_slug
 from .ratenlaufzeit import katalog_mit_phasen, o2_phasen, ratenzahl_im_knopf
 from ...geraete_model import probe_geht_auf
 
@@ -541,12 +542,10 @@ def saetze_aus_konfiguration(
 ) -> list[dict]:
     """Alle Buendel einer Antwort: der gemessene Tarif plus die abgeleiteten.
 
-    Abgeleitet wird nur mit Referenz, nur wenn der eigene Tarif dieser
-    Antwort zur Referenz passt (gleicher Slug, gleicher Anschlusspreis),
-    und nur fuer Tarife, die die Referenz kennt. Jeder Verzicht wird
-    gezaehlt, ebenso jede Phase ueber die ganze Ratenlaufzeit (`o2_phasen`).
-    Den Anschlusspreis eines abgeleiteten Tarifs nennt nur seine eigene Option
-    (`o2_anschluss`), nie die Referenz eines anderen Geraets.
+    Nur mit Referenz, wenn der eigene Tarif dort denselben Slug traegt
+    (`o2_referenz.gleicher_slug`), nur fuer Tarife, die sie kennt; Verzicht und Phase
+    gezaehlt (`o2_phasen`), Anschluss nur aus der eigenen Option (`o2_anschluss`).
+    Warum abgeleitet statt gemessen: docs/geraete/ist-zustand-preise.md (21.11.2026)
     """
     z = zaehler if zaehler is not None else {}
     g = _gemessen(pv)
@@ -562,9 +561,10 @@ def saetze_aus_konfiguration(
     _zaehle(z, "gemessen")
     if referenz is None:
         return out
-    if not passt(referenz, g):
+    if not gleicher_slug(referenz, g):
         _zaehle(z, "referenz_widerspricht")
         return out
+    fussnoten = fussnoten_tragen(_ausgewaehlt(optionen) or {}, g["anschluss"])
     for option in optionen:
         if not isinstance(option, dict) or option.get("selected"):
             continue
@@ -577,11 +577,11 @@ def saetze_aus_konfiguration(
         if tarif_rate <= 0:
             _zaehle(z, "unplausibel")
             continue
-        anschluss = abgeleiteter_anschluss(option, z)
+        anschluss = abgeleiteter_anschluss(option, z, fussnoten)
         name = _tarifname(option, pv)
         satz = _rohsatz(basis, g, name, ref["slug"], tarif_rate, anschluss, url)
         satz["tarif_phasen"] = o2_phasen(pv, _link(option), g, tarif_rate, z)
-        satz["herleitung"] = HERLEITUNG_TARIFSUMME
+        satz["herleitung"], satz[ADRESSE] = HERLEITUNG_TARIFSUMME, _link(option)
         out.append(satz)
         _zaehle(z, "abgeleitet")
     return out
