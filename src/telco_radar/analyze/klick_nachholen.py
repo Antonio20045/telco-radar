@@ -27,6 +27,11 @@ Stand blieb noch einen Abruf lang beim Vortag). „Fertig“ muss sich darum ein
 wiederholen, bevor es den noch veralteten Anbieter endgültig aufgibt; „keiner“ (kein
 Lauf heute) bleibt dagegen beim ersten Abruf.
 
+Bleibt ein Anbieter nach dem Abruf vom Zweig veraltet oder leer gestört und läuft kein
+Klick-Tageslauf, ruft ``klick_erneut.Erneut`` ihn selbst ab (zuerst 1&1, mit
+Wiederholung und Pause, nur dieser Anbieter); die Bilanz steht unter
+``nachholen.erneut``.
+
 Bleibt eine Datei alt, ändert sich nichts am Merge: sie liefert nichts
 (``klick_zusammenfuehrung.GRUND_NICHT_HEUTE``), der Bestand behält die Klick-Messung mit
 ihrem Datum (Vorrang), kein Preis rückt auf heute. Die Bilanz nennt die Anbieter unter
@@ -58,6 +63,7 @@ from ..klick_vertrag import (
     ganz_gelesen,
     lies_ergebnisse,
 )
+from .klick_erneut import Erneut, abruf_im_repo, laufpruefung_aus_umgebung
 from .klick_zusammenfuehrung import alter_tage, klickordner
 
 log = logging.getLogger(__name__)
@@ -191,6 +197,8 @@ class Nachholen:
     bilanz: dict = field(default_factory=dict)
     gestartet: float | None = None
     """Beginn der Stufe auf ``uhr``; ohne Angabe der Zeitpunkt der Anlage."""
+    erneut: Erneut | None = None
+    """Ruft einen noch veralteten Anbieter selbst ab (``klick_erneut``)."""
 
     def __post_init__(self) -> None:
         if self.gestartet is None:
@@ -260,6 +268,8 @@ class Nachholen:
                 bilanz["grund"] = f"nach {gewartet:.0f} s nicht vom Messtag"
                 break
             self.schlafe(self.abstand_s)
+        if geholt and bilanz["veraltet"] and bilanz["klicklauf"] != LAEUFT:
+            self._abruf_selbst(ziel, heute, restzeit_s - (self.uhr() - beginn), geplant)
         bilanz["gewartet_s"] = round(self.uhr() - beginn, 1)
         log.info(
             "Klick-Stand: %d von %d veraltet, %d Abruf(e), %.0f s (Klick-Lauf %s)%s",
@@ -271,6 +281,24 @@ class Nachholen:
             f": {', '.join(bilanz['veraltet'])}" if bilanz["veraltet"] else "",
         )
         return geholt
+
+    def _abruf_selbst(
+        self, ziel: Path, heute: str, frist_s: float, geplant: list[str] | None
+    ) -> None:
+        """Der Anbieter, den der Zweig nicht frisch lieferte, wird selbst abgerufen.
+
+        Nur bei erreichtem ``origin`` (``ziel`` trägt dann alle Dateien) und ohne
+        laufenden Klick-Tageslauf, der denselben Host liest.
+        """
+        if self.erneut is None:
+            return
+        ergebnis = self.erneut(self.bilanz["veraltet"], ziel, heute, frist_s)
+        if not ergebnis:
+            return
+        self.bilanz["erneut"] = ergebnis
+        self.bilanz["veraltet"] = veraltet(ziel, heute, geplant)
+        if not self.bilanz["veraltet"]:
+            self.bilanz["grund"] = None
 
     def _hole(self, ziel: Path) -> int:
         """Fetch, dann ``ORDNER`` von ``FETCH_HEAD`` nach ``ziel``; Zahl der Dateien."""
@@ -332,4 +360,7 @@ def nachholen_aus_umgebung(
         git_im_repo(root),
         klicklauf_aus_umgebung(umg),
         zweig=umg.get(ZWEIG_VARIABLE) or ZWEIG_STANDARD,
+        erneut=Erneut(
+            root, abruf_im_repo(root), laufpruefung_aus_umgebung(umg), veraltet
+        ),
     )
