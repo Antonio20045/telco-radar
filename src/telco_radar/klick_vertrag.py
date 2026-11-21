@@ -48,6 +48,21 @@ def serverfehler(status: int | None) -> bool:
     return status is not None and SERVERFEHLER_AB <= status <= SERVERFEHLER_BIS
 
 
+def ausfall(daten: dict) -> str | None:
+    """Der benannte Ausfall eines Klick-Laufs: ``None``, wenn er gelesen hat
+    (``LAUF_GELESEN``), sonst Laufstatus und Grund seiner Ergebnisdatei.
+
+    Nachtlauf 21.11.2026: ``1und1`` las nach HTTP 502 keine Seite, ``o2-tarife-2``
+    endete am Strukturbruch; beide Dateien nannten das (``gestoert`` mit Grund), doch
+    der Job blieb grün und der Abdeckungswächter hielt die Lücken für unbelegt. Eine
+    Definition für den Endcode des Tageslaufs (``scripts/klick_tageslauf.py``) und die
+    belegten Lücken des Wächters (``analyze.klick_ausfall``)."""
+    status = daten.get("laufstatus")
+    if status == LAUF_GELESEN:
+        return None
+    return f"{status or 'ohne Laufstatus'}: {daten.get('grund') or 'ohne Grund'}"
+
+
 def ganz_gelesen(seiten: list[dict]) -> list[dict]:
     """Die Seiten, die der Lauf ganz gelesen hat (``ROTATION_GELESEN``)."""
     return [s for s in seiten if s["status"] in ROTATION_GELESEN]
