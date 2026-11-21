@@ -4276,6 +4276,8 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pb-summe{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 .gr-pb-gp{font-size:12px;padding:1px 7px;border-radius:999px;border:1px solid var(--rule);
   white-space:nowrap}
+.gr-pb-gp--bestaetigt{color:var(--gruen-tief);border-color:var(--gruen-tief)}
+.gr-pb-gp--bestaetigt::before{content:"✓ "}
 .gr-pb-gp--nicht_pruefbar,.gr-pb-gp--offen{color:var(--ink-4)}
 .gr-pb-daten{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;
   margin:2px 0 10px}
