@@ -2483,9 +2483,7 @@ var TelcoFrage = (function () {
     var p = document.createElement('p');
     p.className = 'gr-zr-keine';
     p.setAttribute('role', 'status');
-    p.textContent = 'Der Graph dieses Geräts konnte nicht geladen werden – ' +
-                    'die Bündel-Zeilen darunter nennen die Werte aller ' +
-                    'Anbieter.';
+    p.textContent = 'Der Graph dieses Geräts konnte nicht geladen werden.';
     zrGruppe.appendChild(p);
   }
 

@@ -763,11 +763,10 @@ def _paar(
     kopf = f"Für {_satz_name(modell)} im Band {band_info.get('label', band)}"
     seit = historie_lage.get("seit")
     if not serien:
-        leer = notbremse.leersatz(mess, f"{kopf} mit {laufzeit} Raten") or (
+        leer = notbremse.leersatz(mess) or (
             f"{kopf} mit {laufzeit} Raten liegt noch keine Messreihe vor - die "
-            f"Zeitreihe beginnt {'seit dem ' + _datum_de(seit) if seit else ''} "
-            "und wächst mit jedem Messtag. Der Stand heute steht in den Bündel-"
-            "Zeilen darunter."
+            f"Zeitreihe beginnt {'seit dem ' + _datum_de(seit) + ' ' if seit else ''}"
+            "und wächst mit jedem Messtag."
         )
     ueberholt = ueberholt_html(modell, mess, serien, satz)
     standard_serien = fenster_serien(serien, ZEITFENSTER_STANDARD, heute)
