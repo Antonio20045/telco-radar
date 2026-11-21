@@ -182,5 +182,6 @@ def test_tagesdatei_zwei_1und1_eintraege_aus_der_uebersicht():
 
     assert [z.schluessel for z in ziele] == ["1und1", "1und1-2"]
     assert {z.seitenquelle for z in ziele} == {"1und1"}
-    assert ziele[0].uebersichten[-1] == UEBERSICHT
-    assert ziele[1].uebersichten == ()
+    assert ziele[0].uebersichten[0] == UEBERSICHT
+    assert ziele[1].uebersichten == ziele[0].uebersichten[1:]
+    assert UEBERSICHT not in ziele[1].uebersichten
