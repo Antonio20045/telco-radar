@@ -39,20 +39,27 @@ from .gegenprobe_browser import (
     NichtPruefbar,
     mit_beleg,
     sichtbares_html,
-    speicher_aus_sku,
     text_von,
 )
+from .gegenprobe_merkmale import (
+    GERAET,
+    MERKMALE,
+    PREIS,
+    RATEN,
+    SPEICHER,
+    TARIF,
+    angaben,
+    bloecke,
+    nadeln,
+)
+from .gegenprobe_merkmale import modell_text as modell_text
+from .gegenprobe_merkmale import tarif_kern as tarif_kern
 
 if TYPE_CHECKING:
     from playwright.sync_api import FloatRect, Page
 
-GERAET, SPEICHER, TARIF, RATEN, PREIS = "Gerät", "Speicher", "Tarif", "Raten", "Preis"
 WIDERSPRUCH = "widersprüchlicher Preis"
-MERKMALE = (GERAET, SPEICHER, TARIF, RATEN, PREIS)
-"""Was ein Konfigurationsbild eines Ratenbündels zeigen soll."""
 ORDNUNG = (GERAET, SPEICHER, TARIF, RATEN, PREIS, WIDERSPRUCH)
-WAHL = (SPEICHER, TARIF, RATEN)
-"""Merkmale, die als gewählte Option (oder Zusammenfassung) sichtbar sein müssen."""
 HOEHE_HOECHSTENS_PX = 1_900
 """Höher wird ein Ausschnitt nicht; darüber fällt das fernste Merkmal heraus."""
 PREISKASTEN_HOECHSTENS_PX = 1_000
@@ -85,48 +92,6 @@ class Aufnahme:
     """Warum es kein Bild gibt (dann ``bild`` None)."""
     befund: dict[str, str] = field(default_factory=dict)
     """Je Merkmal, warum es nicht als gezeigt zählt (für das Protokoll)."""
-
-
-def modell_text(sku_id: str) -> str | None:
-    """„iphone 17 pro“ aus ``apple-iphone-17-pro-256gb-…`` (ohne Marke und Speicher)."""
-    vorne = re.split(r"-\d+(?:gb|tb)(?:-|$)", sku_id or "")[0]
-    teile = [t for t in vorne.split("-") if t]
-    if len(teile) > 1:
-        teile = teile[1:]
-    return " ".join(teile) or None
-
-
-def tarif_kern(name: str) -> str | None:
-    """Tarifname ohne Zusätze („O2 Mobile L mit 150 GB+ (24 Mon.)“: „O2 Mobile L“)."""
-    kern = re.split(r"\s+mit\s+|\s*\(|\s*\+", name or "", maxsplit=1)[0].strip()
-    return kern or None
-
-
-def nadeln(b: dict, nur: tuple[str, ...] = MERKMALE) -> dict[str, list[str]]:
-    """Je Merkmal die Texte, an denen die Seite es nennt (aus dem Bestandssatz)."""
-    out: dict[str, list[str]] = {}
-    modell = modell_text(str(b.get("sku_id") or ""))
-    if modell:
-        out[GERAET] = [modell]
-    speicher = speicher_aus_sku(str(b.get("sku_id") or ""))
-    if speicher:
-        zahl, einheit = speicher.split()
-        out[SPEICHER] = [speicher] + (
-            [f"{int(zahl) * 1024} GB"] if einheit == "TB" else []
-        )
-    tarif = tarif_kern(str(b.get("tarif_name") or ""))
-    if tarif:
-        out[TARIF] = [tarif]
-    n = b.get("laufzeit_monate")
-    if n and (b.get("geraet_monatsrate") or b.get("buendel_monatlich") is not None):
-        out[RATEN] = [
-            f"x {n}",
-            f"{n} Raten",
-            f"Ratenzahlung: {n} Monate",
-            f"Ratenzahlung Hardware: {n} Monate",
-            f"{n} mtl. Zahlungen",
-        ]
-    return {k: v for k, v in out.items() if k in nur}
 
 
 def erwartet(b: dict, nur: tuple[str, ...] = MERKMALE) -> list[str]:
@@ -193,12 +158,14 @@ def gewaehlte(
 ) -> dict[str, bool]:
     """Je gefundenem Merkmal: gilt es als gewählte Option (``js.SUCHE``)? Merkt sich
     die Elemente für ``aufnehme`` auf der Seite."""
+    teile = str(b.get("id") or "").split("--")
+    schluessel = teile[1] if len(teile) > 2 else ""
     return seite.evaluate(
         js.SUCHE,
         {
             "anker": list(anker or ()),
-            "merkmale": nadeln(b, nur),
-            "wahl": list(WAHL),
+            "merkmale": angaben(b, nur),
+            "bloecke": bloecke(schluessel, b),
             "preis_hoechstens": PREISKASTEN_HOECHSTENS_PX,
         },
     )
@@ -219,7 +186,7 @@ def aufnehme(
     try:
         gewaehlte(seite, b, anker, nur)
         preis_ok = not anker or warte_auf_preis(seite, gelesen)
-        widerspruch = seite.evaluate(js.WIDERSPRUCH) if anker else None
+        widerspruch = seite.evaluate(js.WIDERSPRUCH, None) if anker else None
         rechteck, drin = waehle_kaesten(seite.evaluate(js.KAESTEN))
         if rechteck is None:
             return Aufnahme(None, [], soll, GRUND_NICHTS)
@@ -232,6 +199,7 @@ def aufnehme(
         for m in soll
         if m in drin and befund.get(m) == "" and (m != PREIS or preis_ok)
     ]
+    widerspruch = widerspruch or befund.get(WIDERSPRUCH)
     ohne = [m for m in soll if m not in zeigt] + ([WIDERSPRUCH] if widerspruch else [])
     if not preis_ok:
         befund[PREIS] = "Preis im Bild nicht wie gelesen"
@@ -281,6 +249,8 @@ def _fotografiere(
             "height": min(r["h"] + 2 * RAND_PX, hoehe - y),
         }
         befund = seite.evaluate(js.PRUEFE, clip)
+        if gelesen is not None and (im_bild := seite.evaluate(js.WIDERSPRUCH, clip)):
+            befund[WIDERSPRUCH] = im_bild
         if not preis_da:
             befund[PREIS] = "Preis im Bild nicht wie gelesen"
         return seite.screenshot(clip=clip), befund

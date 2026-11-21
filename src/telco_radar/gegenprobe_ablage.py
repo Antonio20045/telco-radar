@@ -206,32 +206,27 @@ def _vermerke(ergebnisse, dateien, ziel, vorhanden, grund: str) -> None:
             e.bild, e.bild_fehlt = None, grund
 
 
-VERWEIS_JUNG_TAGE = 7
 VERWEIS_MINDESTANTEIL = 0.5
-"""Von den Bildern der letzten ``VERWEIS_JUNG_TAGE`` Tage muss die Verweisliste
-mindestens diesen Anteil nennen (fast jedes ist noch die letzte gute Prüfung eines
-Preises); sonst ist sie unplausibel und niemand löscht."""
+"""Nennt die Verweisliste weniger als diesen Anteil der Bilder, die die Liste davor
+nannte (am Vortag), ist sie unplausibel und niemand löscht."""
 
 
 def unplausibel(
-    anhaenge: Mapping[str, Iterable[str]], verlinkt: set[str], heute: date
+    anhaenge: Mapping[str, Iterable[str]],
+    verlinkt: set[str],
+    heute: date,
+    vorher: int | None = None,
 ) -> str | None:
     """Der Grund, warum die Verweisliste nicht zum Löschen taugt; None, wenn sie passt.
-    Leer ist sie nie plausibel, nennt sie zu wenige der jungen Bilder auch nicht."""
+    Leer ist sie nie plausibel; nennt sie weniger als die Hälfte der Bilder der Liste
+    davor (``vorher``, aus ``verlinkt.json``), auch nicht. Wie oft eine Seite besucht
+    wird, spielt keine Rolle: verglichen wird Liste mit Liste."""
     if not verlinkt:
         return "Verweisliste leer"
-    jung = {
-        url(tag, n)
-        for tag, namen in anhaenge.items()
-        if (d := datum_des_tags(tag)) is not None
-        and (heute - d).days <= VERWEIS_JUNG_TAGE
-        for n in namen
-    }
-    if jung and len(jung & verlinkt) < VERWEIS_MINDESTANTEIL * len(jung):
+    if vorher and len(verlinkt) < VERWEIS_MINDESTANTEIL * vorher:
         return (
-            f"Verweisliste nennt {len(jung & verlinkt)} von {len(jung)} Bildern der "
-            f"letzten {VERWEIS_JUNG_TAGE} Tage (mindestens "
-            f"{VERWEIS_MINDESTANTEIL:.0%})"
+            f"Verweisliste nennt {len(verlinkt)} Bilder, die Liste davor {vorher} "
+            f"(Einbruch unter {VERWEIS_MINDESTANTEIL:.0%})"
         )
     return None
 
@@ -243,6 +238,8 @@ class Plan:
     releases: list[str]
     dateien: list[tuple[str, str]]
     bleibt: dict[str, list[str]]
+    gesperrt: str | None = None
+    """Warum nichts gelöscht wird (steht im Belege-Manifest); None: Löschen frei."""
 
 
 def plane(
@@ -310,11 +307,15 @@ class Liste:
         return tag_datum is not None and (self.stand - tag_datum).days < mindest_tage
 
 
-def als_abschnitt(stand: date, bleibt: Mapping[str, Iterable[str]]) -> dict:
-    """Der Abschnitt ``SCHLUESSEL`` für das Belege-Manifest."""
+def als_abschnitt(
+    stand: date, bleibt: Mapping[str, Iterable[str]], gesperrt: str | None = None
+) -> dict:
+    """Der Abschnitt ``SCHLUESSEL`` für das Belege-Manifest; ``loeschen_gesperrt``
+    nennt den Grund, wenn das Aufräumen ausgesetzt ist."""
     return {
         "stand": stand.isoformat(),
         "anhaenge": {t: sorted(n) for t, n in sorted(bleibt.items())},
+        "loeschen_gesperrt": gesperrt,
     }
 
 

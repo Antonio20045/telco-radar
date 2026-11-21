@@ -129,17 +129,31 @@ def verlinkte(
 
 
 def schreibe_verlinkt(wurzel: Path, datum: str, urls: Iterable[str]) -> Path:
-    """``data/state/gegenprobe/verlinkt.json``: Tag und Adressen, sortiert."""
+    """``data/state/gegenprobe/verlinkt.json``: Tag, Adressen (sortiert) und ``vorher``,
+    die Zahl der Liste eines früheren Tages (Plausibilität beim Löschen); ein zweiter
+    Lauf am selben Tag behält das ``vorher`` des ersten."""
     pfad = wurzel / VERLINKT
     pfad.parent.mkdir(parents=True, exist_ok=True)
-    daten = {"format": FORMAT, "datum": datum, "bilder": sorted(set(urls))}
+    vorher = None
+    try:
+        alt = lies_verlinkt(wurzel)
+    except ValueError:
+        alt = None
+    if alt is not None:
+        vorher = alt[2] if alt[0].isoformat() == datum else len(alt[1])
+    daten = {
+        "format": FORMAT,
+        "datum": datum,
+        "bilder": sorted(set(urls)),
+        "vorher": vorher,
+    }
     pfad.write_text(json.dumps(daten, ensure_ascii=False, indent=0) + "\n", "utf-8")
     return pfad
 
 
-def lies_verlinkt(wurzel: Path) -> tuple[date, set[str]] | None:
-    """(Tag, Adressen) aus ``verlinkt.json``; None ohne Datei, ``ValueError`` bei
-    einer unlesbaren (dann löscht niemand)."""
+def lies_verlinkt(wurzel: Path) -> tuple[date, set[str], int | None] | None:
+    """(Tag, Adressen, Zahl der Liste davor) aus ``verlinkt.json``; None ohne Datei,
+    ``ValueError`` bei einer unlesbaren (dann löscht niemand)."""
     pfad = wurzel / VERLINKT
     if not pfad.is_file():
         return None
@@ -147,7 +161,14 @@ def lies_verlinkt(wurzel: Path) -> tuple[date, set[str]] | None:
         daten = json.loads(pfad.read_text(encoding="utf-8"))
         if daten["format"] != FORMAT:
             raise ValueError(f"Format {daten['format']!r}")
-        return date.fromisoformat(daten["datum"]), {str(u) for u in daten["bilder"]}
+        if not isinstance(daten["bilder"], list):
+            raise TypeError("bilder ist keine Liste")
+        vorher = daten.get("vorher")
+        return (
+            date.fromisoformat(daten["datum"]),
+            {str(u) for u in daten["bilder"]},
+            int(vorher) if vorher is not None else None,
+        )
     except (KeyError, TypeError) as fehler:
         raise ValueError(f"{pfad.name}: {fehler}") from fehler
 

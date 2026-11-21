@@ -17,8 +17,10 @@ SEITE = """<html><body style="margin:0;font:16px sans-serif">
 <main style="display:flex;gap:40px">
   <section id="konf" style="width:600px">
     <h1>Apple iPhone 17</h1>
-    <p>Speicher: <b>256 GB</b></p>
-    <p>Tarif: O₂ Mobile L</p>
+    <p id="sp"><label><input type="radio" name="sp" checked> 256 GB</label>
+      <label><input type="radio" name="sp"> 512 GB</label></p>
+    <p><label><input type="radio" name="t" checked> O₂ Mobile L</label>
+      <label><input type="radio" name="t"> O₂ Mobile M</label></p>
     <label><input type="radio" name="r" onclick="w(24)"> 24 Raten</label>
     <label><input type="radio" name="r" onclick="w(36)"> 36 Raten</label>
   </section>
@@ -178,7 +180,7 @@ def test_nadeln_aus_dem_bestandssatz():
     n = bild.nadeln(_satz(24, "samsung-galaxy-s26-1024gb-schwarz"))
     assert n["Tarif"] == ["O2 Mobile L"]
     assert n["Speicher"] == ["1 TB", "1024 GB"]
-    assert "x 24" in n["Raten"] and "24 Monate" not in n["Raten"]
+    assert "x 24" in n["Raten"] and "x24" in n["Raten"]
     einmal = {**_satz(24), "geraet_monatsrate": 0.0}
     assert "Raten" not in bild.nadeln(einmal)
     assert bild.erwartet(einmal) == ["Gerät", "Speicher", "Tarif", "Preis"]
@@ -190,10 +192,10 @@ def test_von_einer_leiste_verdecktes_merkmal_ist_nicht_im_bild(chromium):
     s = chromium.new_page(viewport={"width": 1440, "height": 1000})
     s.set_content(
         SEITE.replace(
-            "<p>Speicher: <b>256 GB</b></p>",
-            '<p id="sp">Speicher: <b>256 GB</b></p><div style="position:absolute;'
+            '<p id="sp">',
+            '<div style="position:absolute;'
             'left:0;width:700px;height:60px;background:#fff;z-index:5" id="banner">'
-            "Herzlich willkommen</div>",
+            'Herzlich willkommen</div><p id="sp">',
         )
     )
     s.evaluate(

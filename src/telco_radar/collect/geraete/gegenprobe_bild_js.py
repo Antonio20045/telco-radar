@@ -3,15 +3,16 @@ offenen Seite laufen. Sie lesen nur und blenden für das eigene Bild Leisten aus
 klicken nichts und schicken nichts an den Anbieter.
 
 ``SUCHE`` findet den Preisbereich (kleinstes Element mit allen Ankern) und je Merkmal
-das sichtbare Element mit seinem Text. Für Speicher, Tarif und Raten zählt nur die
-GEWÄHLTE Option (``gewaehlt``): ``aria-checked``/``aria-selected``/``aria-pressed``
-oder ``aria-current`` an der Kachel (Telekom: ``button[role=radio]``, congstar
-Speicher), genau ein ``input`` der Kachel mit ``checked`` (o2 ``tef-choice-item``,
-congstar Raten und Tarif, Vodafone, 1&1), ``aria-description`` „ausgewählt“, eine
-Klasse wie ``selected``/``active``; ohne erkennbaren Zustand zählt nur eine
-Zusammenfassung („Speicher: 256 GB“, „Ausgewähltes Gerät“ und „Mein Tarif“ bei
-Saturn/MediaMarkt, „mit Vertrag …“ und „Dein Tarif“ bei o2, der Preisbereich selbst).
-``WIDERSPRUCH`` sucht einen zweiten, sichtbaren
+das Element, das es zeigt. Für Speicher, Tarif und Raten entscheidet zuerst die
+GEWÄHLTE Option (``aria-checked``/``aria-selected``/``aria-pressed`` oder ein
+``input:checked`` mit seiner Kachel; Telekom ``button[role=radio]``, o2
+``tef-choice-item``, congstar, Vodafone, 1&1): trägt sie den Wert des Bündels, ist das
+Merkmal gezeigt, sonst nicht („gewählt: …“), und keine Zusammenfassung überstimmt sie.
+Nur ohne erkennbare Auswahl zählt ein je Anbieter benannter Block
+(``gegenprobe_merkmale.BLOECKE``), der genau EINEN Wert des Merkmals nennt. Werte
+vergleicht ``ARTEN`` mit Wortgrenzen („MagentaMobil S“ ist nicht „… Start“, „24“ nicht
+„124“, „x24“ wie „x 24“, Mindestlaufzeit zählt nicht als Raten). ``WIDERSPRUCH`` sucht
+im Fenster und im fotografierten Ausschnitt einen zweiten, sichtbaren
 Monatspreis außerhalb des Preisbereichs (Leiste mit anderem Tarif, 1&1 21.11.2026).
 ``AUSBLENDEN`` versteckt fest stehende und haftende Leisten, die weder Preis noch
 Auswahl enthalten (``WIEDER`` stellt sie her). Ein Merkmal kommt mit seiner Karte
@@ -35,31 +36,43 @@ SUCHE = (
     """(arg) => {"""
     + KERN
     + """
-  const AN = /(^|[\\s_-])(active|selected|checked|chosen|current)([\\s_-]|$)/i;
-  const AUS = /(un|in|not-?)(selected|active|checked)/i;
-  const ZUSAMMEN = new RegExp('^\\\\s*(\\\\d+\\\\s+)?(ausgewählt|gewählt|dein angebot'
-    + '|deine auswahl|dein tarif|mein tarif|mit vertrag)', 'i');
-  const LABEL = /^\\s*(speicher\\w*|ratenzahlung[\\w ]*|laufzeit|tarif|farbe)\\s*:/i;
-  const text = new Map();
+  const normw = s => ' ' + (s || '').normalize('NFKC').toLowerCase()
+    .replace(/[^a-z0-9äöüß]+/g, ' ').trim() + ' ';
+  const hatWort = (t, n) => t.includes(' ' + n.trim() + ' ');
+  const esc = s => s.trim().replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
+  const ARTEN = {
+    Speicher: t => [...t.matchAll(
+      /(?<= )((?:32|64|128|256|512|1024|2048) ?gb|[12] ?tb)(?= )/g)]
+      .map(m => m[1].replace(/ /g, ''))
+      .map(w => w.endsWith('tb') ? (parseInt(w, 10) * 1024) + 'gb' : w),
+    Raten: t => [...t.matchAll(new RegExp('(?<= )x ?(\\\\d+)(?= )|(?<!laufzeit )'
+      + '(?<= )(\\\\d+) (?:raten|mtl zahlungen|monate)(?= )(?! laufzeit)', 'g'))]
+      .map(m => m[1] || m[2]),
+    Tarif: (t, fam) => fam ? [...t.matchAll(new RegExp('(?<= )' + esc(fam)
+      + ' ([a-z0-9]+)(?= )', 'g'))].map(m => m[1]) : [],
+  };
   const alle = [];
+  const text = new Map();
   for (const el of document.querySelectorAll('body *')) {
     const r = el.getBoundingClientRect();
     if (r.width <= 0 || r.height <= 0) continue;
     if (getComputedStyle(el).visibility === 'hidden') continue;
-    text.set(el, norm(el.innerText));
+    text.set(el, normw(el.innerText));
     alle.push(el);
   }
-  let preis = null, laenge = Infinity;
-  const anker = (arg.anker || []).map(norm);
-  if (anker.length) {
+  const kleinstes = (anker) => {
+    let best = null, laenge = Infinity;
     for (const el of alle) {
       const t = text.get(el);
       if (t.length < laenge && anker.every(a => t.includes(a))) {
-        preis = el;
+        best = el;
         laenge = t.length;
       }
     }
-  }
+    return best;
+  };
+  const anker = (arg.anker || []).map(a => normw(a).trim());
+  const preis = anker.length ? kleinstes(anker) : null;
   const teile = [];
   if (preis) {
     const innen = alle.filter(el => preis.contains(el));
@@ -69,34 +82,35 @@ SUCHE = (
       if (tief) teile.push(tief);
     }
   }
-  const gewaehlt = (el) => {
-    let e = el;
-    for (let i = 0; i < 7 && e && e !== document.body; i++, e = e.parentElement) {
-      for (const a of ['aria-checked', 'aria-selected', 'aria-pressed']) {
-        if (e.hasAttribute(a)) return {ok: e.getAttribute(a) === 'true', kachel: e};
+  const tiefstes = (wurzel, nadeln) => {
+    const hat = el => nadeln.some(n => hatWort(text.get(el) || normw(el.innerText), n));
+    let el = wurzel;
+    for (;;) {
+      const kind = Array.from(el.children).find(hat);
+      if (!kind) return el;
+      el = kind;
+    }
+  };
+  const traeger = [];
+  const WAHL = '[aria-checked="true"],[aria-selected="true"],[aria-pressed="true"],'
+    + 'input[type=radio],input[type=checkbox]';
+  for (const el of document.querySelectorAll(WAHL)) {
+    if (el.matches('input') && !el.checked) continue;
+    let k = el;
+    if (el.matches('input')) {
+      let e = el.parentElement;
+      for (let i = 0; i < 6 && e && e !== document.body; i++, e = e.parentElement) {
+        const knoepfe = e.querySelectorAll('input[type=radio],input[type=checkbox]');
+        if (knoepfe.length > 1) break;
+        k = e;
       }
-      const cur = e.getAttribute('aria-current');
-      if (cur && cur !== 'false') return {ok: true, kachel: e};
-      const knoepfe = e.matches('input') ? [e]
-        : Array.from(e.querySelectorAll('input[type=radio],input[type=checkbox]'));
-      if (knoepfe.length === 1) return {ok: knoepfe[0].checked, kachel: e};
-      if (knoepfe.length > 1) break;
-      const beschreibung = (e.getAttribute('aria-description') || '').toLowerCase();
-      if (beschreibung.includes('ausgewählt')) return {ok: true, kachel: e};
-      const cls = typeof e.className === 'string' ? e.className : '';
-      if (AN.test(cls) && !AUS.test(cls)) return {ok: true, kachel: e};
     }
-    return null;
-  };
-  const zusammenfassung = (el) => {
-    if (preis && preis.contains(el)) return true;
-    let e = el;
-    for (let i = 0; i < 8 && e && e !== document.body; i++, e = e.parentElement) {
-      const t = (e.innerText || '').slice(0, 60);
-      if (ZUSAMMEN.test(t) || (i < 2 && LABEL.test(t))) return true;
-    }
-    return false;
-  };
+    const r = k.getBoundingClientRect();
+    if (r.width <= 0 || r.height <= 0) continue;
+    traeger.push({el: k, t: normw(k.innerText)});
+  }
+  const bloecke = (arg.bloecke || []).map(a => kleinstes(a.map(x => normw(x).trim())))
+    .filter(e => e);
   const grob = (el) => {
     const r = el.getBoundingClientRect();
     if (r.width < 4 || r.height < 4) return false;
@@ -121,27 +135,52 @@ SUCHE = (
   const rp = teile.map(el => el.getBoundingClientRect());
   const mitte = rp.length ? (Math.min(...rp.map(r => r.top))
     + Math.max(...rp.map(r => r.bottom))) / 2 : 0;
-  const merkmale = {};
-  for (const [name, nadeln] of Object.entries(arg.merkmale)) {
-    const n = nadeln.map(norm).filter(x => x);
-    const hat = el => n.some(x => (text.get(el) || '').includes(x));
-    const wahl = arg.wahl.includes(name);
+  const naechstes = (nadeln) => {
     let bestes = null, wert = Infinity;
     for (const el of alle) {
+      const hat = e => nadeln.some(n => hatWort(text.get(e) || '', n));
       if (!hat(el) || Array.from(el.children).some(hat)) continue;
       const r = el.getBoundingClientRect();
       const m = r.top + r.height / 2;
       let d = m > mitte ? (m - mitte) * 1.5 : mitte - m;
-      const sel = wahl ? gewaehlt(el) : null;
-      const ok = !wahl || (sel ? sel.ok : zusammenfassung(el));
-      if (!ok) d += 1e7;
       if (!grob(el) || verdeckt(el)) d += 1e6;
-      if (d < wert) {
-        wert = d;
-        bestes = {el, kachel: sel && sel.ok ? sel.kachel : el, gewaehlt: ok};
-      }
+      if (d < wert) { wert = d; bestes = el; }
     }
-    if (bestes) merkmale[name] = bestes;
+    return bestes;
+  };
+  const kurz = el => (el.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 40);
+  const merkmale = {};
+  for (const [name, angabe] of Object.entries(arg.merkmale)) {
+    const nadeln = angabe.nadeln.map(n => normw(n).trim()).filter(n => n);
+    const art = ARTEN[name];
+    if (!art) {
+      const el = naechstes(nadeln);
+      if (el) merkmale[name] = {el, kachel: el, gewaehlt: true, grund: ''};
+      continue;
+    }
+    const passt = t => art(t, angabe.familie).includes(angabe.wert);
+    const explizit = traeger.filter(c => art(c.t, angabe.familie).length);
+    if (explizit.length) {
+      const treffer = explizit.find(c => passt(c.t));
+      merkmale[name] = treffer
+        ? {el: tiefstes(treffer.el, nadeln), kachel: treffer.el, gewaehlt: true,
+           grund: ''}
+        : {el: explizit[0].el, kachel: explizit[0].el, gewaehlt: false,
+           grund: 'gewählt: ' + kurz(explizit[0].el)};
+      continue;
+    }
+    for (const block of bloecke) {
+      const werte = new Set(art(text.get(block), angabe.familie));
+      if (werte.size !== 1) continue;
+      if (werte.has(angabe.wert)) {
+        const el = tiefstes(block, nadeln);
+        merkmale[name] = {el, kachel: el, gewaehlt: true, grund: ''};
+      } else {
+        merkmale[name] = {el: block, kachel: block, gewaehlt: false,
+          grund: 'Übersicht nennt ' + [...werte][0]};
+      }
+      break;
+    }
   }
   const hoch = preis && preis.getBoundingClientRect().height <= arg.preis_hoechstens;
   window.__gegenprobeBild = {preis, teile: hoch ? [preis] : teile, merkmale, aus: []};
@@ -191,7 +230,7 @@ KAESTEN = """() => {
 }"""
 
 WIDERSPRUCH = (
-    """() => {"""
+    """(clip) => {"""
     + KERN
     + """
   const MONAT = new RegExp('(€\\\\s*/\\\\s*mon|pro monat|monatlich gesamt'
@@ -206,6 +245,8 @@ WIDERSPRUCH = (
     if (Array.from(el.children).some(c => MONAT.test(c.innerText || ''))) continue;
     const r = el.getBoundingClientRect();
     if (r.width <= 0 || r.height <= 0 || r.bottom < 0 || r.top > innerHeight) continue;
+    if (clip && (r.right < clip.x || r.left > clip.x + clip.width
+        || r.bottom < clip.y || r.top > clip.y + clip.height)) continue;
     const mx = r.left + r.width / 2, my = r.top + r.height / 2;
     const treffer = document.elementFromPoint(mx, my);
     if (!treffer || !(el.contains(treffer) || treffer.contains(el))) continue;
@@ -277,7 +318,7 @@ PRUEFE = """(clip) => {
   };
   const out = {};
   for (const [name, m] of Object.entries(k.merkmale)) {
-    out[name] = m.gewaehlt ? sichtbar(m.el) : 'nicht gewählt';
+    out[name] = m.gewaehlt ? sichtbar(m.el) : (m.grund || 'nicht gewählt');
   }
   const teile = (k.teile || []);
   out['Preis'] = teile.length ? (teile.map(sichtbar).find(g => g) || '') : 'fehlt';

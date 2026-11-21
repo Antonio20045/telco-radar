@@ -211,18 +211,20 @@ def gegenprobe_plan(root: Path, heute: date, gh: Releases | None) -> Plan | None
     except GhFehler as fehler:
         print(f"::error::Gegenprobe-Bilder: Releases nicht lesbar: {fehler}")
         return None
+    grund = None
     try:
         verweis = lies_verlinkt(root)
     except ValueError as fehler:
-        print(f"::error::Gegenprobe-Bilder: Verweisliste unlesbar: {fehler}")
-        verweis = None
-    bleibt = Plan([], [], {t: list(n) for t, n in anhaenge.items()})
-    if verweis is None or (heute - verweis[0]).days > VERWEIS_HOECHSTENS_TAGE:
-        print("Gegenprobe-Bilder: keine frische Verweisliste, nichts gelöscht")
-        return bleibt
-    if grund := unplausibel(anhaenge, verweis[1], heute):
+        verweis, grund = None, f"Verweisliste unlesbar: {fehler}"
+    if grund is None and (
+        verweis is None or (heute - verweis[0]).days > VERWEIS_HOECHSTENS_TAGE
+    ):
+        grund = "keine frische Verweisliste"
+    if grund is None and verweis is not None:
+        grund = unplausibel(anhaenge, verweis[1], heute, verweis[2])
+    if grund is not None or verweis is None:
         print(f"::warning::Gegenprobe-Bilder: {grund}, nichts gelöscht")
-        return bleibt
+        return Plan([], [], {t: list(n) for t, n in anhaenge.items()}, grund)
     return plane(anhaenge, verweis[1], heute, MINDEST_TAGE)
 
 
@@ -274,7 +276,7 @@ def erneuere(
     )
     plan = gegenprobe_plan(root, heute, gh_gegenprobe)
     if plan is not None:
-        manifest[GEGENPROBE] = als_abschnitt(heute, plan.bleibt)
+        manifest[GEGENPROBE] = als_abschnitt(heute, plan.bleibt, plan.gesperrt)
     schreibe(root / MANIFEST_DATEI, manifest)
     bilanz, geloescht = Bilanz(), 0
     if not nur_lesen:

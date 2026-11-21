@@ -5,7 +5,7 @@ Uhr, kein Netz."""
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from beleg_attrappe import AttrappeReleases
@@ -260,11 +260,39 @@ def test_ohne_brauchbare_verweisliste_loescht_niemand(tmp_path, schreibe):
     assert gh.releases_geloescht == [] and gh.assets_geloescht == []
 
 
-def test_verweisliste_mit_zu_wenigen_jungen_bildern_ist_unplausibel():
+def test_einbruch_der_verweisliste_gegen_den_vortag_sperrt_das_loeschen():
     heute = date(2026, 12, 10)
-    jung = "gegenprobe-2026-12-08-o2"
-    anhaenge = {jung: ["a.webp", "b.webp", "c.webp"]}
-    eins = {ga.url(jung, "a.webp")}
-    assert "1 von 3" in ga.unplausibel(anhaenge, eins, heute)
-    zwei = eins | {ga.url(jung, "b.webp")}
-    assert ga.unplausibel(anhaenge, zwei, heute) is None
+    liste = {ga.url("gegenprobe-2026-12-08-o2", f"{i}.webp") for i in range(4)}
+    assert "Liste davor 10" in ga.unplausibel({}, liste, heute, vorher=10)
+    assert ga.unplausibel({}, liste, heute, vorher=8) is None
+
+
+def test_korrekte_liste_bei_zweitaegigem_besuch_ist_plausibel():
+    """Prüfer PR 204 Runde 3: die Liste nennt je Preis nur die letzte gute Prüfung,
+    ältere Bilder desselben Preises bleiben unverlinkt; das sperrt nichts."""
+    heute = date(2026, 12, 20)
+    anhaenge = {}
+    for zurueck in (0, 2, 4, 6):
+        tag = ga.release_tag((heute - timedelta(days=zurueck)).isoformat(), "vodafone")
+        anhaenge[tag] = [f"b{i}-{zurueck}.webp" for i in range(10)]
+    heute_tag = ga.release_tag(heute.isoformat(), "vodafone")
+    verlinkt = {ga.url(heute_tag, f"b{i}-0.webp") for i in range(10)}
+    assert ga.unplausibel(anhaenge, verlinkt, heute) is None
+
+
+def test_verweisliste_kennt_die_zahl_des_vortags(tmp_path):
+    gb.schreibe_verlinkt(tmp_path, "2026-12-08", [f"u{i}" for i in range(10)])
+    gb.schreibe_verlinkt(tmp_path, "2026-12-09", ["u1", "u2"])
+    gb.schreibe_verlinkt(tmp_path, "2026-12-09", ["u1", "u2", "u3"])
+    assert gb.lies_verlinkt(tmp_path) == (date(2026, 12, 9), {"u1", "u2", "u3"}, 10)
+
+
+def test_gesperrtes_loeschen_steht_mit_grund_im_manifest(tmp_path):
+    gb.schreibe_verlinkt(tmp_path, "2026-12-08", [f"u{i}" for i in range(10)])
+    gb.schreibe_verlinkt(tmp_path, "2026-12-09", ["u1"])
+    gh = _loeschlauf(tmp_path, lambda p: None)
+    manifest = json.loads(
+        (tmp_path / "data" / "state" / "belege_manifest.json").read_text("utf-8")
+    )
+    assert gh.releases_geloescht == [] and gh.assets_geloescht == []
+    assert "Liste davor 10" in manifest[ga.SCHLUESSEL]["loeschen_gesperrt"]
