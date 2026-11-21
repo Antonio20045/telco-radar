@@ -68,7 +68,7 @@ def test_rate_aus_der_antwort_landet_im_buendel_und_in_den_gesamtkosten():
     assert kosten.gesamt == 1485.69
 
 
-def test_gegenprobe_rate_null_ist_ein_gelesener_wert_und_aendert_die_summe():
+def test_gegenprobe_rate_null_ist_ein_gelesener_wert_summe_300_euro_kleiner():
     satz = tarifwelt.lies_produktdetail(ECHT.read_text(encoding="utf-8"))
     assert satz is not None
     assert satz["geraet_monatsrate"] == 0.0
