@@ -8,10 +8,12 @@ Katalog, einschließlich der Auto-Einträge, das ein Anbieter im Bestand
 fehlt, bekommt dort eine Seite. Die Adresse ist die ``quelle_url`` eines Bündels aus
 dem Bestand, nie zusammengesetzt (Regel 4: IDs werden nicht geraten). Sie gilt nur,
 wenn sie das Gerät nennt und eine darin genannte Speicherstufe zur SKU passt; ein
-Bündel mit Tarifübersicht als Quelle liefert keine Seite. Jeder Anbieter bekommt
-höchstens ``HOECHSTE_SEITEN_JE_ANBIETER`` Plätze (Gerät und Stufe), die neuesten Geräte
-zuerst. Rein, ohne Netz; ``klickziele.lade_ziele`` prüft die Seiten danach wie die aus
-der YAML.
+Bündel mit Tarifübersicht als Quelle liefert keine Seite, ebenso eines, das nicht neu
+ist: die Seite trägt keinen Zustand und gälte als Neuware (Befund 21.11.2026: o2, Galaxy
+S25 Ultra 256 GB „…-erneuert-details“, gebrauchter Preis ersetzte die Neuware-Zeilen).
+Jeder Anbieter bekommt höchstens ``HOECHSTE_SEITEN_JE_ANBIETER`` Plätze (Gerät und
+Stufe), die neuesten Geräte zuerst. Rein, ohne Netz; ``klickziele.lade_ziele`` prüft
+die Seiten danach wie die aus der YAML.
 
 Der Tarif gehört zur Seite (``TARIF_PARAMETER``): Eine Telekom-Produktseite zeigt nur
 den Tarif ihrer Startadresse, die Übersicht der übrigen Tarife nur 36 Raten. Ein Gerät
@@ -53,7 +55,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from ...geraete_model import Geraet, Katalog
+from ...geraete_model import VERGLEICHBARE_ZUSTAENDE, Geraet, Katalog
 
 BESTAND = Path("data") / "state" / "geraete_tco.json"
 FAMILIEN = {
@@ -104,7 +106,7 @@ def leite_ab(
     kandidaten: dict[_Schluessel, str] = {}
     for eintrag in buendel:
         paar = _paar(eintrag, geraete)
-        if paar is None:
+        if paar is None or not _neuware(eintrag):
             continue
         geraet, speicher = paar
         anbieter = str(eintrag.get("anbieter") or "").strip()
@@ -121,6 +123,11 @@ def leite_ab(
         )
         kandidaten.setdefault(schluessel, url)
     return _begrenze(_je_tarif_eine_stufe(_je_adresse_eine_stufe(kandidaten)), geraete)
+
+
+def _neuware(eintrag: dict) -> bool:
+    """Bündel einer Neuware; ohne Zustandsfeld (ältere Bündel) gilt neu."""
+    return str(eintrag.get("zustand") or "") in VERGLEICHBARE_ZUSTAENDE
 
 
 def _tarif_kennung(anbieter: str, url: str) -> str:
