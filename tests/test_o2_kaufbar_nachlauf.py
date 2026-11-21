@@ -15,7 +15,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
+from telco_radar.analyze.kaufweg import mit_kaufweg
 from telco_radar.collect.geraete import o2
+from telco_radar.collect.geraete.vodafone_sicht import UNGEPRUEFT, nicht_geprueft
 from telco_radar.geraete_abruf import Abruf
 from telco_radar.geraete_config import lade_quellen
 from telco_radar.geraete_pipeline import nachsammle_buendel
@@ -72,7 +74,7 @@ def _buendel() -> list[dict]:
     return [{**s, "anbieter": "o2"} for s in roh]
 
 
-def _lauf(antwort_uebersicht) -> tuple[set, list]:
+def _lauf(antwort_uebersicht) -> tuple[set, list, list]:
     abrufe: list = []
 
     def hole(url, **kwargs):
@@ -86,21 +88,34 @@ def _lauf(antwort_uebersicht) -> tuple[set, list]:
 
     bilanz = SimpleNamespace(name="o2", buendel=_buendel())
     nachsammle_buendel([bilanz], lade_quellen(_WURZEL), hole, uhr)
-    return {s["tarif_slug"] for s in bilanz.buendel}, abrufe
+    return {s["tarif_slug"] for s in bilanz.buendel}, abrufe, bilanz.buendel
 
 
 def test_nachlauf_laesst_nur_kaufbare_o2_tarife():
-    slugs, abrufe = _lauf(Abruf(200, _gz("o2_tarifuebersicht_20261121.html.gz")))
+    slugs, abrufe, saetze = _lauf(
+        Abruf(200, _gz("o2_tarifuebersicht_20261121.html.gz"))
+    )
     assert not slugs & _NICHT_KAUFBAR
     assert "o2-mobile-unlimited-l" in slugs
     assert len(slugs) == 6
     assert [a for a in abrufe if not a.endswith("/robots.txt")] == [
         "https://www.o2online.de/tarife/"
     ]
+    assert not any(s.get(UNGEPRUEFT) for s in saetze)
+    assert nicht_geprueft(saetze) == []
+    assert mit_kaufweg({}, saetze, "2026-11-21", UNGEPRUEFT) == {}
 
 
 def test_nachlauf_bei_ausfall_der_uebersicht_nur_produktseite():
-    slugs, _ = _lauf(Abruf(503, ""))
+    slugs, _, saetze = _lauf(Abruf(503, ""))
     assert not slugs & (_NICHT_KAUFBAR | {"o2-mobile-unlimited-l"})
     assert len(slugs) == 5
     assert all(s.endswith("-plus") for s in slugs)
+    assert {s[UNGEPRUEFT] for s in saetze} == {"Tarifübersicht nicht gelesen"}
+    assert nicht_geprueft(saetze) == ["o2"]
+    assert mit_kaufweg({"1&1": "x"}, saetze, "2026-11-21", UNGEPRUEFT) == {
+        "1&1": "x",
+        "o2|kaufweg": (
+            "o2: Kaufweg nicht geprüft (Tarifübersicht nicht gelesen, 21.11.2026)"
+        ),
+    }

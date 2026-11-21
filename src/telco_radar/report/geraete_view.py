@@ -187,8 +187,7 @@ def pruefe_zahlen(text: str, erlaubt: set) -> bool:
     werden.
 
     Vorbild ist `analyze/faithfulness.py`: fail closed. Was sich nicht
-    pruefen laesst, erscheint nicht.
-    """
+    pruefen laesst, erscheint nicht."""
     return zahlen_im_text(text).issubset({round(float(z), 2) for z in erlaubt})
 
 
@@ -243,8 +242,7 @@ def _nachfolger_leer_hinweis(eintraege: list, katalog, nachfolger: list) -> str:
 
     Jede Zahl im Satz kommt aus einer oeffentlichen Konstante oder wird an
     Ort und Stelle aus *eintraege*/*katalog* gezaehlt - keine geschaetzte
-    Staffelung, kein Kalenderdatum.
-    """
+    Staffelung, kein Kalenderdatum."""
     if nachfolger:
         return ""
 
@@ -1651,7 +1649,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "pruefbefunde": pruefung["befunde"],
         "hat_daten": bool(bestand),
         "stand": heute,
-        **geraete_messdatum.felder(bestand, tco, heute, tco_db.updated, bestand_heute),
+        **geraete_messdatum.felder(
+            bestand, tco, heute, tco_db.updated, bestand_heute, tco_db.erfassung
+        ),
         "fenster_tage": FENSTER_TAGE,
         "db_lesbar": db.lesbar,
         "bilanz": {

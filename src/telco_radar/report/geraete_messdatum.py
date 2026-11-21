@@ -36,6 +36,8 @@ from __future__ import annotations
 import datetime as _dt
 from collections.abc import Iterable
 
+from ..analyze import kaufweg
+
 LUECKE = "Messdatum unbekannt"
 SATZ = "{anbieter}: zuletzt gemessen am {datum}"
 SATZ_LUECKE = "{anbieter}: " + LUECKE
@@ -159,8 +161,23 @@ def gezeigte_preise(tco: dict | None) -> list[dict]:
     ]
 
 
+def mit_kaufweg(messdatum: dict, erfassung: dict | None) -> dict:
+    """Jede Zeile mit ``kaufweg``: der Satz des ungeprüften Kaufwegs ihres Anbieters
+    (``analyze.kaufweg``) oder "". Die Seite zeigt dann die Marke ``kaufweg.MARKE``."""
+    saetze = kaufweg.je_anbieter(erfassung)
+    for zeile in messdatum.get("zeilen") or ():
+        zeile["kaufweg"] = saetze.get(zeile["name"], "")
+        zeile["kaufweg_marke"] = kaufweg.MARKE if zeile["kaufweg"] else ""
+    return messdatum
+
+
 def felder(
-    bestand: list, tco: dict, heute: str, tco_updated: str, bestand_heute: str
+    bestand: list,
+    tco: dict,
+    heute: str,
+    tco_updated: str,
+    bestand_heute: str,
+    erfassung: dict | None = None,
 ) -> dict:
     """Die Felder des ``geraete``-Views für Abrufdaten und Messdatum.
 
@@ -176,5 +193,7 @@ def felder(
         "abgerufen_bis": daten[-1] if daten else "",
         "abgerufen_ab": daten[0] if daten else "",
         "einzel_stichtag": juengster_tag(daten, bestand_heute),
-        "messdatum": je_anbieter(gezeigte_preise(tco), stichtag),
+        "messdatum": mit_kaufweg(
+            je_anbieter(gezeigte_preise(tco), stichtag), erfassung
+        ),
     }

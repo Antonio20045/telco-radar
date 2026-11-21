@@ -8,7 +8,11 @@
    acht Extrazeilen). Jetzt steht der Anteil gekürzt ("n von m Preisen"
    statt "n von m gezeigten Preisen von diesem Tag") IN der einen Zeile;
    die Langform (Satz, voller Anteil, Stand-Marke) steht vollständig im
-   `title`, keine Information ist gefallen. #}
+   `title`, keine Information ist gefallen.
+
+   Kaufweg: konnte der Gerätelauf nicht prüfen, welche Tarife ein Kunde kaufen kann
+   (o2-Tarifübersicht nicht gelesen, analyze/kaufweg.py), steht an der Zeile die
+   Marke „Kaufweg nicht geprüft“, der Satz mit Grund und Datum im `title`. #}
 {% set md = geraete.messdatum %}
 {% if md and md.zeilen %}
 <ul class="gr-md" id="messdatum" aria-label="Letztes Messdatum je Anbieter">
@@ -17,7 +21,8 @@
   {% set lang = [z.satz] %}
   {% if z.anteil %}{% set _ = lang.append(z.anteil) %}{% endif %}
   {% if z.stand %}{% set _ = lang.append(z.stand) %}{% endif %}
-  <li class="gr-md-z{{ ' gr-md-z--alt' if z.alt }}" data-anbieter="{{ z.name }}" data-datum="{{ z.datum }}" title="{{ lang | join('. ') }}">{{ z.satz }}{% if kurz_anteil %} <span class="gr-md-anteil">· {{ kurz_anteil }}</span>{% endif %}{% if z.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ z.stand }}</span>{% endif %}</li>
+  {% if z.kaufweg %}{% set _ = lang.append(z.kaufweg) %}{% endif %}
+  <li class="gr-md-z{{ ' gr-md-z--alt' if z.alt }}" data-anbieter="{{ z.name }}" data-datum="{{ z.datum }}" title="{{ lang | join('. ') }}">{{ z.satz }}{% if kurz_anteil %} <span class="gr-md-anteil">· {{ kurz_anteil }}</span>{% endif %}{% if z.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ z.stand }}</span>{% endif %}{% if z.kaufweg %} <span class="gr-kk-marke gr-kk-marke--alt gr-md-kaufweg">{{ z.kaufweg_marke }}</span>{% endif %}</li>
   {% endfor %}
 </ul>
 {% endif %}

@@ -40,10 +40,20 @@ L, Mobile S, Mobile Special, Unlimited M, Unlimited S Special, on Demand M (ohne
 „Plus“). Ihre Bestandszeilen werden nicht mehr aufgefrischt und fallen nach
 `ALT_AB_TAGEN` aus der Ansicht (`report.geraete_tco_karten.ist_frisch`).
 
-AUSFALL DER ÜBERSICHT
----------------------
+GRENZE DER ANNAHME
+------------------
+Hätte ein Tarif eine Kachel, aber keinen Slug mit `-plus`, fiele er aus Weg 1 und
+stünde nur in der Zählung der verworfenen Tarife. Ohne Browser ist das nicht
+bestimmbar; die Zählung nennt deshalb jeden verworfenen Tarif mit Namen.
+
+AUSFALL DER ÜBERSICHT, VERLORENES MUSTER
+----------------------------------------
 Nicht gelesen ist nicht leer und nicht „alles kaufbar“: dann gelten nur die Wege 1
-und 2, und das Protokoll nennt den Ausfall (`AUSFALL`).
+und 2, das Protokoll nennt den Ausfall (`AUSFALL`), und jeder behaltene Satz trägt
+wie bei Vodafone `UNGEPRUEFT` mit dem Grund (`Befund.ungeprueft`). Daraus schreibt
+der Gerätelauf den Erfassungssatz „Kaufweg nicht geprüft“
+(`analyze.klick_erfassung.mit_kaufweg`), den die Geräteseite an der Zeile von o2
+zeigt. Dasselbe gilt, wenn kein Satz das Kachelmuster trägt (`MUSTER_FEHLT`).
 """
 
 from __future__ import annotations
@@ -59,6 +69,7 @@ from bs4 import BeautifulSoup
 from ..http import HttpFehler
 from .basis import GeraeteAbrufFehler
 from .o2 import HERLEITUNG_TARIFSUMME
+from .vodafone_sicht import UNGEPRUEFT
 
 log = logging.getLogger(__name__)
 
@@ -75,6 +86,8 @@ AUSFALL = (
     "o2: Tarifübersicht nicht gelesen - nur die Auswahl der Produktseite gilt als "
     "kaufbar"
 )
+GRUND_AUSFALL = "Tarifübersicht nicht gelesen"
+GRUND_MUSTER = "kein Tarif mit Slug-Endung -plus"
 MUSTER_FEHLT = (
     "o2: kein Tarif mit Slug-Endung '-plus' - Kacheln der Produktseite unbekannt, "
     "nur vorgewählte und verlinkte Tarife gelten als kaufbar"
@@ -168,6 +181,19 @@ class Befund:
     muster_gesehen: bool = False
 
     @property
+    def ungeprueft(self) -> str | None:
+        """Warum der Kaufweg in diesem Lauf nicht ganz geprüft ist - oder None."""
+        gruende = [
+            text
+            for text, fehlt in (
+                (GRUND_AUSFALL, not self.uebersicht_gelesen),
+                (GRUND_MUSTER, not self.muster_gesehen),
+            )
+            if fehlt
+        ]
+        return "; ".join(gruende) or None
+
+    @property
     def zeile(self) -> str:
         """Die Protokollzeile: wie viele Tarife nur in der Schnittstelle stehen."""
         teile = ", ".join(
@@ -214,7 +240,8 @@ def nur_kaufbare(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
     """Nachbearbeitungs-Haken (`Adapter.loese_tarifnamen`) für o2.
 
     Liest die Tarifübersicht einmal (`lies_uebersicht`), behält nur kaufbare Sätze
-    (`pruefe`) und ändert `rohbuendel` an Ort und Stelle. `kopfzeilen` (der
+    (`pruefe`) und ändert `rohbuendel` an Ort und Stelle; ist der Kaufweg nicht
+    ganz geprüft, trägt jeder Satz `UNGEPRUEFT` mit dem Grund. `kopfzeilen` (der
     Medientyp der Shop-Schnittstelle) gilt für die HTML-Seite nicht. Gibt 0 zurück:
     hier wird kein Tarifname aufgelöst.
     """
@@ -222,6 +249,9 @@ def nur_kaufbare(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
     if not any(not ist_vorgewaehlt(s) for s in rohbuendel):
         return 0
     befund = pruefe(rohbuendel, lies_uebersicht(hole))
-    rohbuendel[:] = befund.behalten
+    grund_offen = befund.ungeprueft
+    rohbuendel[:] = [
+        {**s, UNGEPRUEFT: grund_offen} if grund_offen else s for s in befund.behalten
+    ]
     protokolliere(befund)
     return 0

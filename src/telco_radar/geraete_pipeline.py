@@ -21,8 +21,7 @@ DIE REGEL, DIE DIESE DATEI TRAEGT
 `mark_stale` laeuft NUR fuer Anbieter, deren Bilanz `vollstaendig` ist. Ein
 Teilausfall, ein Fristablauf, eine gesperrte oder ausserhalb ihrer Besuchszeit
 liegende Quelle - alles das heisst "nicht gelesen", und was nicht gelesen
-wurde, altert nicht.
-"""
+wurde, altert nicht."""
 
 from __future__ import annotations
 
@@ -46,6 +45,7 @@ from .analyze.geraete_store import (
 )
 from .analyze.klick_angebot import zusammenfuehren
 from .geraete_adressen import adressbilanz as _adressbilanz
+from .analyze.kaufweg import mit_kaufweg
 from .analyze.klick_nachholen import Nachholen
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
@@ -54,7 +54,7 @@ from .tarif_bezug import Tarifbestand
 from .collect.geraete import ADAPTER, laufuhr, sammle
 from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
-from .collect.geraete.vodafone_sicht import nicht_geprueft
+from .collect.geraete.vodafone_sicht import UNGEPRUEFT, nicht_geprueft
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 
@@ -138,8 +138,7 @@ def _abdeckungszustand(bilanz) -> str:
     Erkannt wird die Besuchszeit am Flag der Bilanz
     (`ausserhalb_besuchszeit`), nicht am Grundtext - ein Waechter, der
     zwei Zustaende an einem String auseinanderhaelt, kippt bei der ersten
-    Umformulierung.
-    """
+    Umformulierung."""
     if bilanz.status in ("uebersprungen", "nicht_umgesetzt"):
         return NICHT_GELESEN
     if getattr(bilanz, "ausserhalb_besuchszeit", False):
@@ -158,8 +157,7 @@ def melde_proben(bilanzen: list) -> None:
     an der Buendelzeile ("0 von 0", Info) und am Ausfallalarm (o2 liefert seine
     LISTUNGEN weiter, Funde bleiben > 0) vorbeigehen (S2-1 der P5-Codepruefung). Ohne
     Kandidaten (Probe lief nicht - kein Bündelzweig, nur Zubehör- und tariflose Sätze)
-    steht keine Zeile: dafuer sind die Buendel- und Ausfallzeile da.
-    """
+    steht keine Zeile: dafuer sind die Buendel- und Ausfallzeile da."""
     for satz in bilanzen:
         proben = satz.get("proben") or {}
         erwartete = int(proben.get("kandidaten", 0))
@@ -210,8 +208,7 @@ def nachsammle_buendel(
     Laufs, an der ein Besuchsfenster am ehesten zu ist. Er bekommt deshalb ein
     `hole` durch dieselbe `Abrufschleuse` wie die Sammelphase, je Anbieter eine.
 
-    `uhr()` ist die Zeit des NAECHSTEN Abrufs (Echtzeit, nie eingefroren).
-    """
+    `uhr()` ist die Zeit des NAECHSTEN Abrufs (Echtzeit, nie eingefroren)."""
     for bilanz in bilanzen:
         if not bilanz.buendel:
             continue
@@ -408,7 +405,10 @@ def run_geraete_stage(
             )
             if klickzug.rohsaetze:
                 buendelbilanz = klickzug.buendel(bestand, heute, tco.nach_id)
-            klickbilanz, tco.erfassung = klickzug.bilanz, klickzug.erfassung
+            klickbilanz = klickzug.bilanz
+            tco.erfassung = mit_kaufweg(
+                klickzug.erfassung, rohbuendel, heute, UNGEPRUEFT
+            )
             tarifwelt = geraete_tarifwelt.stufe(
                 quellen, bestand, hole, uhr, heute, zustand, tco, beginn
             )

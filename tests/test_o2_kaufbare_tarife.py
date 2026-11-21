@@ -258,4 +258,5 @@ def test_verlorenes_plus_muster_wird_benannt(s26, paare, uebersicht, caplog):
         kb.protokolliere(befund)
     assert not befund.muster_gesehen
     assert kb.MUSTER_FEHLT in caplog.text
+    assert befund.ungeprueft == kb.GRUND_MUSTER
     assert kb.pruefe(_saetze(s26, paare), uebersicht).muster_gesehen
