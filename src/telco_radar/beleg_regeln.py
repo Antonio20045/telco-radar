@@ -35,6 +35,7 @@ from __future__ import annotations
 import hashlib
 import re
 import unicodedata
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, timedelta
 
@@ -273,3 +274,25 @@ def ist_sichtbar(tag: str, datei: str, heute: date) -> bool:
     if datum is None or not ist_beleg_tag(tag):
         return False
     return not ist_abgelaufen(datum, heute, ist_gross_tag(tag))
+
+
+def abgelaufen(
+    anhaenge: Mapping[str, Sequence[str]], heute: date
+) -> tuple[list[str], list[tuple[str, str]], dict[str, list[str]]]:
+    """Was ``beleg_ablage.raeume_auf`` löscht, ohne ``gh``: abgelaufene Releases,
+    abgelaufene Einzeldateien jüngerer Releases und die Anhänge, die danach bleiben."""
+    releases: list[str] = []
+    dateien: list[tuple[str, str]] = []
+    bleibt: dict[str, list[str]] = {}
+    for tag in sorted(anhaenge):
+        if release_abgelaufen(tag, heute):
+            releases.append(tag)
+            continue
+        bleibt[tag] = []
+        for datei in anhaenge[tag]:
+            datum = datum_der_datei(datei)
+            if datum is None or not ist_abgelaufen(datum, heute, ist_gross_tag(tag)):
+                bleibt[tag].append(datei)
+            else:
+                dateien.append((tag, datei))
+    return releases, dateien, bleibt

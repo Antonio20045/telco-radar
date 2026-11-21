@@ -2,7 +2,9 @@
 
 Der Klick-Crawler (``klickcrawler``) prüft nach dem Öffnen den Kanarienwert der Karte:
 Text oder Attribut am ersten Treffer, ``{modell}`` steht für den Modellnamen aus dem
-Katalog. Fehlt er oder der Modellname, ist der Abruf gestört. Dann lehnt
+Katalog; Groß- und Kleinschreibung zählen nicht (``klicktextleser.enthaelt``: 1&1
+schreibt „Xiaomi REDMI Note 17 Pro 5G“, der Katalog „Redmi Note 17 Pro“, Tageslauf
+21.11.2026). Fehlt er oder der Modellname, ist der Abruf gestört. Dann lehnt
 ``lehne_einwilligung_ab`` eine sichtbare Einwilligungsabfrage ab wie die Erkundung
 (``klickproben.einwilligungsknopf``); hinter ihr nimmt die Seite keinen Klick an (1&1,
 Erkundung 07.10.2026). Ein anderer Knopf der Abfrage wird nie geklickt; lässt sich der
@@ -33,6 +35,7 @@ from .klickergebnis import LAUF_LEER
 from .klickkarte import PLATZHALTER_MODELL, Kanarie, Klickkarte, Vorbereitung
 from .klicklauf import LAUF_GESTOERT, STOERUNG_SEITE
 from .klickproben import einwilligungsknopf
+from .klicktextleser import enthaelt
 from .klicktor import kurz
 from .klickwache import Abbruch, Wache
 
@@ -95,7 +98,7 @@ class Bedienung:
         kanarie = self.karte.kanarie
         erwartet = kanarientext(kanarie, self.modell)
         ort = self.seite.locator(kanarie.selektor)
-        if erwartet not in self.leser.text(ort, erwartet, kanarie.attribut):
+        if not enthaelt(self.leser.text(ort, erwartet, kanarie.attribut), erwartet):
             self.wache.pruefe_tor()
             ende = self.seite.url
             if any(m in ende for m in AUSGELISTET) or ist_ausgelistet(

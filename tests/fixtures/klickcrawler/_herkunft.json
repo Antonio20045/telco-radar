@@ -105,6 +105,27 @@
       "abgerufen_am": "2026-11-20",
       "bytes_roh": 35423,
       "sha256_roh": "8b197a34333b80f005edc1fefa2074e5403f2ebac10258a25254449da703d4cd"
+    },
+    {
+      "datei": "einsundeins_1und1_tarifdetail_20261121.json",
+      "quelle": "Ergebnisdatei eines lokalen Klick-Tageslaufs (scripts/klick_tageslauf.py, Eintrag 1und1 auf die sieben Tarifdetail-Seiten und die Produktseite /iphone-17-pro-max verengt, Playwright-Chromium ohne Tarnung, Kennung TelcoRadar/1.0); die Liste seiten (iPhone 17 Pro Max, 56 erfasst) entfernt, uebersichten unverändert; kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-21",
+      "bytes_roh": 8701,
+      "sha256_roh": "3ee8e2c6b00bef8b583d5384164518396220f5c3028c3accc1337f2fb0139f3b"
+    },
+    {
+      "datei": "einsundeins_1und1-2_nacht_20261121.json",
+      "quelle": "data/state/klick/1und1-2.json aus dem Klick-Lauf 44840854026 (Commit a76248f55 „klick: Stand 2026-11-21“); von 21 Seiten nur /google-pixel-10a (28 erfasst) behalten, ueberfaellig geleert; kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-21",
+      "bytes_roh": 81873,
+      "sha256_roh": "055e818cf3a69f73b7725c36d99a4fff13e3544f370b1b884b685f3b4bb56f25"
+    },
+    {
+      "datei": "einsundeins_1und1_nacht_20261121.json",
+      "quelle": "data/state/klick/1und1.json aus dem Klick-Lauf 44840854026 (Commit a76248f55): erste Tarifdetail-Seite HTTP 502, danach nichts mehr besucht; unverändert",
+      "abgerufen_am": "2026-11-21",
+      "bytes_roh": 14710,
+      "sha256_roh": "b62ec95924acbbf1a2d3bf905f673b9e69abd5c5404b06b7d2d530061370f732"
     }
   ]
 }

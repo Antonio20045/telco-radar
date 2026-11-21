@@ -43,12 +43,10 @@ from .beleg_bilanz import Bilanz
 from .beleg_regeln import (
     MAX_ANHAENGE_JE_RELEASE,
     REPO,
-    datum_der_datei,
+    abgelaufen,
     gross_tag,
-    ist_abgelaufen,
     ist_beleg_tag,
     ist_gross_tag,
-    release_abgelaufen,
     tages_tag,
 )
 
@@ -371,30 +369,31 @@ def veroeffentliche(
 
 
 def raeume_auf(
-    anhaenge: Anhaenge, heute: date, gh: Releases
+    anhaenge: Anhaenge,
+    heute: date,
+    gh: Releases,
+    weiter: Callable[[], bool] = lambda: True,
 ) -> tuple[Bilanz, dict[str, list[str]]]:
-    """Löscht Abgelaufenes (Modulkopf); gibt Bilanz und verbleibende Anhänge zurück."""
+    """Löscht Abgelaufenes (Modulkopf, ``beleg_regeln.abgelaufen``), Releases zuerst;
+    gibt Bilanz und verbleibende Anhänge zurück. ``weiter()`` wird vor jedem
+    Löschaufruf gefragt; sagt es nein, bleibt der Rest liegen (``ausgelassen``)."""
     bilanz = Bilanz()
-    rest: dict[str, list[str]] = {}
-    for tag in sorted(anhaenge):
-        if release_abgelaufen(tag, heute):
-            try:
+    releases, dateien, _ = abgelaufen(anhaenge, heute)
+    rest = {tag: list(d) for tag, d in sorted(anhaenge.items())}
+    for tag, datei in [(t, None) for t in releases] + dateien:
+        if not weiter():
+            bilanz.ausgelassen += 1
+            continue
+        try:
+            if datei is None:
                 gh.release_loeschen(tag)
                 bilanz.releases_geloescht.append(tag)
-            except GhFehler as fehler:
-                bilanz.fehler.append(f"{tag} nicht gelöscht: {fehler}")
-                rest[tag] = list(anhaenge[tag])
-            continue
-        rest[tag] = []
-        for datei in anhaenge[tag]:
-            datum = datum_der_datei(datei)
-            if datum is None or not ist_abgelaufen(datum, heute, ist_gross_tag(tag)):
-                rest[tag].append(datei)
-                continue
-            try:
+                rest.pop(tag)
+            else:
                 gh.asset_loeschen(tag, datei)
                 bilanz.assets_geloescht += 1
-            except GhFehler as fehler:
-                bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
-                rest[tag].append(datei)
+                rest[tag].remove(datei)
+        except GhFehler as fehler:
+            ort = tag if datei is None else f"{tag}/{datei}"
+            bilanz.fehler.append(f"{ort} nicht gelöscht: {fehler}")
     return bilanz, rest

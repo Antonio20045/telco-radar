@@ -138,10 +138,17 @@ def test_anderer_pfad_ist_gestoert(pfad):
     assert lauf("telekom", ANGEFORDERT, f"{TELEKOM}{pfad}")[0] == "gestoert"
 
 
-@pytest.mark.parametrize("anbieter", ["congstar", "o2", "vodafone", "1und1"])
+@pytest.mark.parametrize("anbieter", ["congstar", "o2", "vodafone"])
 def test_andere_karte_kennt_die_regel_nicht(anbieter):
     assert karte(anbieter).kanarie.ausgelistet_url is None
     assert lauf(anbieter, ANGEFORDERT, UEBERSICHT)[0] == "gestoert"
+
+
+def test_einsundeins_regel_greift_nicht_auf_dem_telekom_host():
+    """1&1 hat seit 21.11.2026 eine eigene Regel (``mobile.1und1.de``,
+    ``test_klick_1und1_seitenform``); die Telekom-Übersicht bleibt dort gestört."""
+    assert karte("1und1").kanarie.ausgelistet_url.host == "mobile.1und1.de"
+    assert lauf("1und1", ANGEFORDERT, UEBERSICHT)[0] == "gestoert"
 
 
 def test_ohne_umleitung_bleibt_die_uebersicht_gestoert():

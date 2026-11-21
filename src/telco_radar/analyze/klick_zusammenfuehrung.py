@@ -210,7 +210,7 @@ def fuehre_zusammen(
     saetze: list[dict] = []
     ohne_tarif: list[dict] = []
     for daten in ergebnisse:
-        eintrag, aus_datei, geraetepreise = _datei(daten, katalog, heute)
+        eintrag, aus_datei, geraetepreise = _datei(daten, katalog, heute, ergebnisse)
         eintraege.append(eintrag)
         saetze.extend(aus_datei)
         ohne_tarif.extend(geraetepreise)
@@ -294,7 +294,7 @@ def schluesseltext(schluessel: Schluessel) -> str:
 
 
 def _datei(
-    daten: dict, katalog: Katalog, heute: str
+    daten: dict, katalog: Katalog, heute: str, alle: list[dict]
 ) -> tuple[dict, list[dict], list[dict]]:
     """Kopf einer Ergebnisdatei für die Bilanz und, wenn verwendet, ihre Rohsätze und
     Gerätepreise ohne Tarif."""
@@ -325,7 +325,7 @@ def _datei(
     teil = status == LAUF_GESTOERT and alter == 0
     if eintrag["warum_nicht"] is not None and not teil:
         return eintrag, [], []
-    aus, felder = ausbeute_der_seiten(daten, katalog, teil)
+    aus, felder = ausbeute_der_seiten(daten, katalog, teil, alle)
     eintrag.update(aus.als_daten(), **felder)
     return eintrag, aus.rohsaetze, aus.ohne_tarif
 
