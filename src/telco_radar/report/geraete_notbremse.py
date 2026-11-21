@@ -73,7 +73,17 @@ SATZ_BEDINGT = (
     "ein zweites Produkt aktiv ist."
 )
 DELTA_PLUS = "Plus: {betrag} € günstiger mit Zweitprodukt"
+DELTA_PLUS_BIS = "Plus: bis {betrag} € günstiger mit Zweitprodukt"
 SATZ_PLUS = SATZ_BEDINGT + " Ohne Plus kostet derselbe Tarif {betrag} € im Monat mehr."
+LEERSATZ = "Keine Kurve: die Preise zählen hier nicht im Vergleich."
+LEERSATZ_GRUND = (
+    "Keine Kurve: die gemessenen Preise zählen nicht im Vergleich ({grund})."
+)
+LEERSATZ_NICHT_ERFASST = "Keine Kurve: kein Bündel erfasst."
+
+
+def _betrag(wert: float) -> str:
+    return f"{wert:.2f}".replace(".", ",")
 
 
 def plus_zustand(plus_vorteil: float | None) -> dict:
@@ -81,7 +91,7 @@ def plus_zustand(plus_vorteil: float | None) -> dict:
     am Bündel) „Plus: x € günstiger mit Zweitprodukt“, sonst ``DELTA_BEDINGT``."""
     if plus_vorteil is None:
         return {"kurz": DELTA_BEDINGT, "satz": SATZ_BEDINGT}
-    betrag = f"{plus_vorteil:.2f}".replace(".", ",")
+    betrag = _betrag(plus_vorteil)
     return {
         "kurz": DELTA_PLUS.format(betrag=betrag),
         "satz": SATZ_PLUS.format(betrag=betrag),
@@ -273,25 +283,51 @@ def kurz(b: Buendel, heute: str) -> str:
 
 
 def namen(karten: list) -> list[str]:
-    """„1&1 (Schätzung)“ je Anbieter und Grund, wo die Notbremse Karten nimmt."""
-    return list(dict.fromkeys(f"{k['anbieter']} ({gruende([k])})" for k in karten))
+    """„o2 (nicht direkt genannt)“ je Anbieter genau EINMAL, wo die Notbremse
+    Karten nimmt; mehrere Gründe eines Anbieters stehen mit „oder“ in seiner
+    Klammer (Befund Prüfer zu PR 207, 21.11.2026: „o2 (…), o2 (…), o2 (…)“)."""
+    je_anbieter: dict[str, list] = {}
+    for k in karten:
+        je_anbieter.setdefault(k["anbieter"], []).append(k)
+    return [
+        f"{anbieter} ({grund})" if (grund := _gruende_eines(eigene)) else anbieter
+        for anbieter, eigene in je_anbieter.items()
+    ]
+
+
+def _gruende_eines(karten: list) -> str:
+    """Die Gründe EINES Anbieters, je Grund einmal; alle Plus-Tarife sind ein
+    Grund (``_plus_kurz``), nicht einer je Betrag."""
+    kurz: list[str] = []
+    plus = [k.get("plus_vorteil") for k in karten if _ist_plus(k)]
+    for k in karten:
+        if _ist_plus(k):
+            kurz.append(_plus_kurz(plus))
+        elif (z := zustand(k)) is not None:
+            kurz.append(z["kurz"])
+    return " oder ".join(dict.fromkeys(kurz))
+
+
+def _ist_plus(karte: dict) -> bool:
+    """Nimmt die Notbremse die Karte als Plus-Tarif (``plus_zustand``)?"""
+    return bool(karte.get("bedingter_tarif")) and not karte.get("schaetzung")
+
+
+def _plus_kurz(betraege: list) -> str:
+    """Ein Betrag: „Plus: x €“; mehrere: „Plus: bis <größter> €“ aus dem Feld
+    ``plus_vorteil`` (gewählt, nicht gerechnet). Fehlt einer, ist kein Betrag
+    belegt: ``DELTA_BEDINGT``."""
+    if None in betraege:
+        return DELTA_BEDINGT
+    if len(set(betraege)) == 1:
+        return plus_zustand(betraege[0])["kurz"]
+    return DELTA_PLUS_BIS.format(betrag=_betrag(max(betraege)))
 
 
 def gruende(karten: list) -> str:
     """„Schätzung“, „Aktion abgelaufen“, „Quarantäne“ …, je Grund einmal."""
     kurz = (z["kurz"] for k in karten if (z := zustand(k)) is not None)
     return ", ".join(dict.fromkeys(kurz))
-
-
-def leersatz(slot: dict, kopf: str) -> str | None:
-    """Der Satz für ein Paar der Zeitreihe, das nur Messungen hat, die nicht
-    zählen (F3, 14.10.2026); `None`, wenn es gar keine Messungen hat."""
-    if grund := gruende([m for tage in slot.values() for m in tage.values()]):
-        return (
-            f"{kopf} liegen nur Preise vor, die nicht im Vergleich zählen "
-            f"({grund}). Sie stehen in den Bündel-Zeilen darunter."
-        )
-    return None
 
 
 def nur_zaehlende(messungen: dict) -> dict:

@@ -54,7 +54,7 @@ from .anbieter_farben import STRICHMUSTER, TARIFWELT_ANBIETER, stil_fuer
 from .geraete_antwort import _antwort_html as _antwort_html
 from .geraete_antwort import _leitzahl_html as _leitzahl_html
 from .geraete_antwort import _rechnung_html as _rechnung_html
-from .geraete_antwort import _satz_name
+from .geraete_antwort import _satz_name, fall, leersatz
 from .geraete_laufzeit import ALLE_TEXT as ALLE_TEXT
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht, zeitraum
 from .geraete_luecken import _alternativen as _alternativen
@@ -763,11 +763,10 @@ def _paar(
     kopf = f"Für {_satz_name(modell)} im Band {band_info.get('label', band)}"
     seit = historie_lage.get("seit")
     if not serien:
-        leer = notbremse.leersatz(mess, f"{kopf} mit {laufzeit} Raten") or (
+        leer = leersatz(mess, fall(satz)) or (
             f"{kopf} mit {laufzeit} Raten liegt noch keine Messreihe vor - die "
-            f"Zeitreihe beginnt {'seit dem ' + _datum_de(seit) if seit else ''} "
-            "und wächst mit jedem Messtag. Der Stand heute steht in den Bündel-"
-            "Zeilen darunter."
+            f"Zeitreihe beginnt {'seit dem ' + _datum_de(seit) + ' ' if seit else ''}"
+            "und wächst mit jedem Messtag."
         )
     ueberholt = ueberholt_html(modell, mess, serien, satz)
     standard_serien = fenster_serien(serien, ZEITFENSTER_STANDARD, heute)

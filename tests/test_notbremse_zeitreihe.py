@@ -101,6 +101,15 @@ def _bloecke(fragment: BeautifulSoup) -> list[tuple[tuple, str]]:
     ]
 
 
+def _in_klammer(antwort: str, grund: str) -> bool:
+    """Steht ``grund`` als einer der Gründe in der Klammer eines Anbieters?
+    Je Anbieter steht EINE Klammer, mehrere Gründe mit „oder“ (21.11.2026)."""
+    return any(
+        grund in klammer.split(" oder ")
+        for klammer in re.findall(r"\(([^()]*)\)", antwort)
+    )
+
+
 def _sieger(antwort: str, karten: list) -> list[dict]:
     """Die Karten, deren Betrag der Antwortsatz als erste Zahl nennt."""
     zahl = re.search(r"<b class=\"gr-zr-zahl\">([^<]+)</b>", antwort)
@@ -151,10 +160,10 @@ def test_band_nur_mit_schaetzungen_bleibt_und_nennt_den_grund(gerendert, karten)
         paar
         for paar, antwort in nur_gesperrt
         if "steht kein Bündel im Vergleich: " not in antwort
-        or (
-            "(nicht direkt genannt)" not in antwort
-            and "(Rabatt nur mit Zweitprodukt)" not in antwort
-            and "(Aktion abgelaufen)" not in antwort
+        or not (
+            _in_klammer(antwort, "nicht direkt genannt")
+            or _in_klammer(antwort, "Rabatt nur mit Zweitprodukt")
+            or _in_klammer(antwort, "Aktion abgelaufen")
         )
     ]
     mit_preis = [paar for paar, antwort in nur_gesperrt if "gr-zr-zahl" in antwort]

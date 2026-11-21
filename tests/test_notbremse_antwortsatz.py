@@ -94,6 +94,13 @@ def _satz(paar: dict) -> str:
     return html.unescape(re.sub(r"<[^>]+>", "", paar["antwort_html"]))
 
 
+def _gruende_von(teil: str, anbieter: str) -> list[str]:
+    """Die Gründe in der Klammer von ``anbieter``: je Anbieter EINE Klammer,
+    mehrere Gründe mit „oder“ (21.11.2026)."""
+    treffer = re.search(rf"(?:^|, ){re.escape(anbieter)} \(([^()]*)\)", teil)
+    return treffer.group(1).split(" oder ") if treffer else []
+
+
 def _nur_vodafone_zaehlt(geraete, roh):
     """(Paar, gesperrte Wettbewerber) je Paar, dessen einzige Zeile Vodafone ist."""
     karten = {m["id"]: m["karten"] for m in geraete["tco"]["modelle"]}
@@ -134,7 +141,7 @@ def test_satz_nennt_die_gesperrten_wettbewerber_mit_grund(bestand):
             f"{a} ({g})"
             for a, gruende in andere.items()
             for g in gruende
-            if f"{a} ({g})" not in teil
+            if g not in _gruende_von(teil, a)
         ]
         if "steht nur Vodafone im Vergleich" not in satz or fehlt:
             ohne_namen.append(f"{p['modell']}/{p['band']}: „{satz}“ – fehlt {fehlt}")
