@@ -67,3 +67,50 @@ def juengster_tag(state_dir: Path) -> str | None:
     """Der jüngste Messtag mit Lauf-Datei; ``None`` ohne jede Datei."""
     tage = sorted(p.stem for p in (Path(state_dir) / ORDNER).glob("*.json"))
     return tage[-1] if tage else None
+
+
+KONKURRENZ_OFFEN = "Prüfung auf parallele"
+"""Anfang des Vermerks, wenn die Überschneidung mit anderen Läufen nicht prüfbar war
+(``geraete_angebot.konkurrenz.NICHT_PRUEFBAR``)."""
+
+
+def vorbehalte(zeile: dict) -> list[str]:
+    """Was einer Anbieterzeile das Wort „vollständig“ verbietet (Prüfung PR 205).
+
+    Die eine Entscheidung für Seite und Wächter: vollständig nur ohne jeden
+    Vorbehalt, also Angebotszählung vorhanden, Übersicht ganz gelesen, alle Geräte
+    gezählt, keine teilweise gelesene Auswahl, Überschneidung geprüft, erfasst = Soll
+    ohne Lücke, ohne Preis, den der Anbieter so nicht anbietet, ohne nicht verglichene
+    Preise und ohne Ausfallvermerk."""
+    k = (zeile.get("ebenen") or {}).get("kombinationen") or {}
+    angebot = zeile.get("angebot") or {}
+    geraete = angebot.get("geraete") or {}
+    pruefungen = (
+        ("keine Angebotszählung", k.get("soll") is None),
+        ("kein Angebot gezählt", k.get("soll") == 0),
+        ("Ausfall vermerkt", bool(zeile.get("ausfall"))),
+        (
+            "Übersicht nicht ganz gelesen",
+            not (angebot.get("uebersicht") or {}).get("vollstaendig"),
+        ),
+        (
+            "nicht alle Geräte gezählt",
+            geraete.get("soll") is None
+            or geraete.get("gezaehlt") != geraete.get("soll"),
+        ),
+        ("Auswahl nicht ganz gelesen", bool(angebot.get("unvollstaendig"))),
+        (
+            "Überschneidung mit anderen Läufen nicht geprüft",
+            str(angebot.get("konkurrenz") or KONKURRENZ_OFFEN).startswith(
+                KONKURRENZ_OFFEN
+            ),
+        ),
+        ("nicht alle Angebote erfasst", k.get("erfasst") != k.get("soll")),
+        ("Lücken", bool(k.get("luecken_zahl"))),
+        (
+            "Preise, die der Anbieter so nicht anbietet",
+            bool(k.get("nicht_im_soll_zahl")),
+        ),
+        ("Preise nicht verglichen", bool(k.get("nicht_verglichen_zahl"))),
+    )
+    return [name for name, trifft in pruefungen if trifft]
