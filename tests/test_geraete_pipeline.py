@@ -721,6 +721,15 @@ def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path)
     )
 
 
+def test_das_laufergebnis_nennt_ungepruefte_sichtbarkeit(tmp_path):
+    """``sichtbarkeit_nicht_geprueft`` steht immer im Laufergebnis (die Seite kann
+    „Sichtbarkeit nicht geprüft“ zeigen); o2 prüft keine Ausblendung, also leer."""
+    root = _o2_root(tmp_path)
+    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
+    assert bilanz["rohbuendel"] == 1
+    assert bilanz["sichtbarkeit_nicht_geprueft"] == []
+
+
 def test_der_lauf_schreibt_den_status_der_pruefstelle_in_jedes_buendel(tmp_path):
     """Schritt 7: Die Prüfstelle läuft vor dem Speichern über den ganzen Bestand."""
     root = _o2_root(tmp_path)
