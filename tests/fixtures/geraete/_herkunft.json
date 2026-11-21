@@ -1103,6 +1103,31 @@
       "gzip": true,
       "bytes_roh": 90341,
       "sha256_roh": "b24718efe2ee07755f3960214a7c80f34fd5273d52c58c0abceccfcdfd2e81ea"
+    },
+    {
+      "datei": "o2_tarifuebersicht_20261121.html.gz",
+      "url": "https://www.o2online.de/tarife/",
+      "abgerufen_am": "2026-11-21",
+      "http_status": 200,
+      "content_type": "text/html;charset=UTF-8",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "beleg": "Echter Abruf 2026-11-21T14:50:04Z ohne Browser (httpx, Accept text/html), robots.txt (User-agent: *) erlaubt /tarife/. Vollstaendige Antwort, nur gzip-komprimiert. Serverseitig gezeichnet: zehn Links 'Handy hinzufuegen' auf /e-shop?tarif=<slug>, darunter o2-mobile-unlimited-l (Befund o2-nicht-plus, 21.11.2026).",
+      "gzip": true,
+      "bytes_roh": 215825,
+      "sha256_roh": "4624afa8e2f2e30fc529415e3d06b5af6a49d52aedf93ce13513f32c7e634473"
+    },
+    {
+      "datei": "o2_s26_tarifkacheln_browser_20261121.html",
+      "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+      "abgerufen_am": "2026-11-21",
+      "http_status": 200,
+      "absender": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), Playwright Chromium headless, nichts angeklickt",
+      "abgeleitet_aus": "Gerendertes DOM (page.content()) des Browserbefunds vom 21.11.2026 15:40:34 MEZ, 1533495 B (sha256 394388065ec42973154582bd9016f6b934955d9274b31acfc366081f43624450)",
+      "filter": "gekuerzt auf das Element tef-item-stepper der Tarifauswahl (fuenf tef-choice-panel, Reiter Neukunden), Kopfkommentar mit Quelle; Text unveraendert",
+      "beleg": "Dieselbe Seite wie o2_galaxy_s26_tarifoptionen_20261121.json.gz (gleiche Adresse, gleicher Tag): die Antwort nennt zwoelf Tarife, die Seite zeigt diese fuenf Kacheln.",
+      "gzip": false,
+      "bytes_roh": 5882,
+      "sha256_roh": "89085fbd6cfd58f15a4a9a4cb308d966da902268277548eaf392ea8dddfee6b9"
     }
   ]
 }

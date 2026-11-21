@@ -12,6 +12,7 @@ from . import (
     coolblue,
     mediamarkt,
     o2,
+    o2_kaufbar,
     saturn,
     telekom,
     telekom_zusatz,
@@ -40,6 +41,7 @@ def registriere_anbieter_adapter() -> None:
             lies_buendel=o2.lies_buendel,
             vertiefe_buendel=o2.vertiefe_buendel,
             fuehre_zusammen=o2.fuehre_zusammen,
+            loese_tarifnamen=o2_kaufbar.nur_kaufbare,
             direkt=True,
         ),
     )
