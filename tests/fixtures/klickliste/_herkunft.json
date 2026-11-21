@@ -21,6 +21,13 @@
    "commit": "82bf141d",
    "filter": "nur die o2-Einträge, wörtlich; Kopfkommentar neu",
    "sha256_roh": "853c6057f5ac81254557143ee5f1bf6b013375367aee847368052709d683404a"
+  },
+  {
+   "datei": "congstar_tageslauf_20261121.yaml",
+   "quelle": "config/klick_tageslauf.yaml @ origin/main 049566124 (Stand 2026-11-21, der Eintrag congstar)",
+   "commit": "049566124",
+   "filter": "nur der congstar-Eintrag, wörtlich; Kopfkommentar neu",
+   "sha256_roh": "0d99432aa09df6294aacea19a048c5ab2fcf54b8c789fc74252a68b0341e80b3"
   }
  ]
 }

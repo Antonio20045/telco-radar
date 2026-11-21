@@ -29,14 +29,11 @@ einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzt
 Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
 
 Vorrang steht im Bestand: ``Zusammenfuehrung.buendel`` lässt ein Adapterbündel weg,
-dessen Bestandseintrag eine Klick-Messung von HEUTE ist - oder, bei congstar
-(``ANBIETER_PREISGRENZE``), eine
-ältere innerhalb von ``FRISCHEGRENZE_TAGE``, der das heutige Bündel WIDERSPRICHT
-(``klick_messtag``, ``klick_preisgrenze``; Bilanz ``klick_vorrang`` und
-``klick_widerspruch``). Bei jedem anderen Anbieter weicht eine solche ältere Messung
-unverändert wie zuvor, ohne Preisvergleich. Sonst behält die heutige Messung ihren
-Messtag, auch wenn der Klick-Lauf gestört ist, fehlt oder seine Sätze zurückgehalten
-wurden (siehe ``klick_alter``). Vorrang hat nur, was wirklich ein Klick-Bündel wurde.
+dessen Bestandseintrag eine Klick-Messung jünger als ``FRISCHEGRENZE_TAGE`` ist
+(``klick_messtag``; Bilanz ``klick_vorrang``), auch wenn der Klick-Lauf heute gestört
+ist oder fehlt - aber nur, solange der Anbieter im Klick-Tagesplan steht (``geplant``).
+Ohne Plan (o2 und congstar seit 21.11.2026) behält die heutige Adaptermessung ihren
+Messtag. Vorrang hat nur, was wirklich ein Klick-Bündel wurde.
 """
 
 from __future__ import annotations
@@ -54,13 +51,13 @@ from ..collect.geraete.klickrohsatz import ZUSTAND_NEU, tarifschluessel
 from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
-from ..tco_model import Buendel, laufzeit_in_monaten
+from ..tco_model import laufzeit_in_monaten
 from . import klick_anbieterbilanz as anbieterbilanz
-from .klick_alter import alter_tage, widerspruch_zeilen
+from .klick_alter import alter_tage
 from .klick_erfassung import Angebot, erfassungsgruende, nur_geplante
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
-from .klick_messtag import adapterschluessel, lesung_zum_buendel, teile_nach_messtag
+from .klick_messtag import adapterschluessel, teile_nach_messtag
 from .klick_teillauf import ausbeute_der_seiten
 from .klick_vollstaendig import CENT, VERGLEICHSFELDER, begleitend, fehlend, nennt
 from .tco_buendel import Buendelbilanz, aus_rohsaetzen
@@ -90,9 +87,9 @@ class Gegenprobe:
     unvollstaendig: int = 0
     fehlend: Counter[str] = field(default_factory=Counter)
 
-    def unvollstaendig_fuer(self, klick: dict, alt: dict, tag: str = "") -> list[str]:
+    def unvollstaendig_fuer(self, klick: dict, alt: dict) -> list[str]:
         """Die Wertfelder, die der Klick-Satz nicht nennt; leer heißt: er ersetzt."""
-        felder = fehlend(klick, alt, tag)
+        felder = fehlend(klick, alt)
         self.unvollstaendig += bool(felder)
         self.fehlend.update(felder)
         return felder
@@ -132,8 +129,6 @@ class Zusammenfuehrung:
     rohsaetze: list[dict]
     bilanz: dict | None = None
     angebot: Angebot = field(default_factory=dict)
-    heutige_messung: dict[Schluessel, dict] = field(default_factory=dict)
-    geraet: Geraet | None = None
     erfassung_zusatz: dict[str, str] = field(default_factory=dict)
 
     @property
@@ -149,23 +144,15 @@ class Zusammenfuehrung:
     ) -> Buendelbilanz:
         """Die Bündel; ein Adapterbündel weicht einer Klick-Messung (Modulkopf)."""
         bilanz = aus_rohsaetzen(self.rohsaetze, bestand, heute)
-        teile = teile_nach_messtag(bilanz.buendel, nach_id, heute, self._heute_gelesen)
+        geplant = None if self.bilanz is None else self.bilanz.get("geplant")
+        teile = teile_nach_messtag(bilanz.buendel, nach_id, heute, geplant)
         bilanz.buendel = teile.bleiben
         anzahl = len(teile.gewichen)
         if self.bilanz is not None:
             self.bilanz["klick_vorrang"] = anzahl
-            self.bilanz["klick_widerspruch"] = len(teile.widerspruch)
         if anzahl:
             log.info("Klick-Bündel: %d Adapterbündel weichen frischer Messung", anzahl)
-        for text in widerspruch_zeilen(teile.widerspruch, heute):
-            log.warning("%s", text)
         return bilanz
-
-    def _heute_gelesen(self, satz: Buendel) -> dict | None:
-        """Der heutige Klick-Satz zum Schlüssel dieses Bündels, wenn es ihn gibt."""
-        if self.geraet is None or not self.heutige_messung:
-            return None
-        return lesung_zum_buendel(satz, self.heutige_messung, self.geraet)
 
 
 def klickordner(umgebung: Mapping[str, str] | None = None) -> Path | None:
@@ -235,8 +222,8 @@ def fuehre_zusammen(
             zeile.ohne_gegenstueck += 1
             neu += mit_namen(satz, schluessel, adapter, andere_laufzeit, UEBERNOMMEN)
         for stelle in treffer:
-            alt, tag = adapter[stelle], str(satz.get("abgerufen_am") or heute)
-            felder = probe.unvollstaendig_fuer(satz, alt, tag)
+            alt = adapter[stelle]
+            felder = probe.unvollstaendig_fuer(satz, alt)
             if felder:
                 zeile.unvollstaendig += 1
                 zeile.fehlend.update(felder)
@@ -245,7 +232,7 @@ def fuehre_zusammen(
             ersetzt.add(stelle)
             zeile.ersetzt += 1
             uebernommen = {f: alt.get(f) for f in UEBERNOMMEN}
-            neu.append({**satz, **uebernommen, **begleitend(satz, alt, tag)})
+            neu.append({**satz, **uebernommen, **begleitend(satz, alt)})
     vorhanden = {e["anbieter"] for e in eintraege}
     bilanz = {
         "dateien": eintraege,
@@ -262,16 +249,12 @@ def fuehre_zusammen(
         "ohne_gegenstueck": ohne_gegenstueck,
         "je_anbieter": anbieterbilanz.als_daten(je_anbieter),
         "klick_vorrang": 0,
-        "klick_widerspruch": 0,
         "gegenprobe": probe.als_daten(),
         "gegenprobe_geraet": gegenprobe_geraet(ohne_tarif, adapter, geraet),
     }
     _protokolliere(bilanz)
     bleiben = [satz for stelle, satz in enumerate(adapter) if stelle not in ersetzt]
-    gelesen = {klickschluessel(s): s for s in eindeutig if _neu(s)}
-    return Zusammenfuehrung(
-        bleiben + neu, bilanz, heutige_messung=gelesen, geraet=geraet
-    )
+    return Zusammenfuehrung(bleiben + neu, bilanz)
 
 
 def klickschluessel(satz: dict, mit_zustand: bool = False) -> Schluessel:

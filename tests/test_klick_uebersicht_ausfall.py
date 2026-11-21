@@ -127,7 +127,7 @@ def test_kaputte_telekom_datei_legt_nicht_alle_anbieter_lahm(tmp_path):
 
     ziele = lade_ziele(root, TAGESDATEI, hoechste=None, auto=True)
 
-    assert {z.name for z in ziele} >= {"congstar", "Vodafone", "Telekom"}
+    assert {z.name for z in ziele} >= {"1&1", "Vodafone", "Telekom"}
     telekom = [z for z in ziele if z.name == "Telekom" and z.seitenquelle]
     assert all("nicht lesbar" in (z.seitengrund or "") for z in telekom)
 
