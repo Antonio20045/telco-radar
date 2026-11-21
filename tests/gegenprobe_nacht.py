@@ -4,7 +4,9 @@ Vom Prüfer zu PR 200 (dritte Prüfung, 21.11.2026): der Browser ist gespielt (e
 Lesung oder ``NichtPruefbar``), Auswahl, Reihenfolge, Seitenbesuche und Lauf sind echt.
 ``nacht`` spielt eine Nacht und gibt den Lauf, seine neuen Zeilen und die Auswahl
 zurück; die Uhr zählt je Besuch 3 und je Bündel 1 Einheit, ``kapazitaet`` ist die
-Frist des Laufs in diesen Einheiten.
+Frist des Laufs in diesen Einheiten. ``kaputt`` ist eine Menge (Formfehler ``FORM``)
+oder je Bündel der Fehlertext (Schlussprüfung: ``TIMEOUT``); mit ``je_url`` teilen
+sich Bündel mit derselben ``quelle_url`` einen Seitenbesuch.
 """
 
 from __future__ import annotations
@@ -19,6 +21,8 @@ from telco_radar import gegenprobe_fenster as gf
 from telco_radar.collect.geraete import gegenprobe_browser as gb
 
 SKRIPT = lade_skript("gegenprobe")
+TIMEOUT = "Browser: Page.goto: Timeout 45000ms exceeded."
+FORM = "Auswahl nicht gefunden: Tarif"
 
 
 class Args:
@@ -63,23 +67,24 @@ def zeile(s, datum, status, grund=""):
     )
 
 
-def nacht(datum, saetze, rows, kaputt, kapazitaet, aenderungen=()):
+def nacht(datum, saetze, rows, kaputt, kapazitaet=10_000, aenderungen=(), je_url=False):
     """Eine Nacht: (Lauf, neue Zeilen, Auswahl). ``saetze``: Schlüssel → Satz."""
     uhr = [0.0]
-    kaputt_ids = set(kaputt)
+    texte = kaputt if isinstance(kaputt, dict) else dict.fromkeys(kaputt, FORM)
 
     def lies_gruppe(browser, schluessel, gruppe, kennung, vor_laden, aufnehmen):
         uhr[0] += 3
         for b in gruppe:
             uhr[0] += 1
-            if b["id"] in kaputt_ids:
-                yield b, gb.NichtPruefbar("Auswahl nicht gefunden: Tarif")
+            if b["id"] in texte:
+                yield b, gb.NichtPruefbar(texte[b["id"]])
             else:
                 yield b, gb.Lesung(text="", seite=b["quelle_url"])
 
     def pruefe(lesen, s, anlass, d, gemessen_um=None):
-        status = gp.NICHT_PRUEFBAR if s["id"] in kaputt_ids else gp.BESTAETIGT
-        return zeile(s, d, status), None
+        if s["id"] in texte:
+            return zeile(s, d, gp.NICHT_PRUEFBAR, texte[s["id"]]), None
+        return zeile(s, d, gp.BESTAETIGT), None
 
     SKRIPT.lies_gruppe = lies_gruppe
     SKRIPT.pruefe = pruefe
@@ -87,7 +92,7 @@ def nacht(datum, saetze, rows, kaputt, kapazitaet, aenderungen=()):
     wahl = gf.kandidaten(
         datum, list(saetze.values()), bz.gesamt_von, proben, list(aenderungen)
     )
-    gruppen = gf.plane(wahl, lambda bid: bid)
+    gruppen = gf.plane(wahl, lambda bid: saetze[bid]["quelle_url"] if je_url else bid)
     lauf = SKRIPT.Lauf(Args(), None, saetze, datum, {}, kapazitaet, None)
     lauf.uhr = lambda: uhr[0]
     lauf.alle(gruppen)

@@ -17,8 +17,8 @@ import re
 from collections.abc import Callable, Iterable, Mapping
 
 SCHUTZ_SERVERFEHLER = 5
-"""So viele Serverfehler (5xx, Netz, Ladezeit) in Folge stoppen einen Anbieter für den
-Rest des Laufs (``Schutzschalter``)."""
+"""So viele Serverfehler (5xx, Netz) auf nicht verdächtigen Seiten in Folge stoppen
+einen Anbieter für den Rest des Laufs (``Schutzschalter``)."""
 
 
 def reihum(listen: Mapping[str, list]) -> list:
@@ -50,19 +50,22 @@ def fehlerart(grund: str) -> str:
 
 FREI = "frei"
 AUS = "aus"
-SERVERFEHLER = re.compile(r"HTTP 5\d\d|net::ERR_|Page\.goto: Timeout")
-"""Fehler, die für einen gestörten Host sprechen, nicht für eine einzelne Seite."""
+SERVERFEHLER = re.compile(r"HTTP 5\d\d|net::ERR_")
+"""Fehler, die für einen gestörten Host sprechen, nicht für eine einzelne Seite. Eine
+Ladezeitüberschreitung ist ein Seitenfehler (die Seite wird verdächtig), kein
+Host-Ausfall (Schlussprüfung PR 200)."""
 
 
 def ist_serverfehler(grund: str) -> bool:
-    """5xx, Netzfehler oder Ladezeitüberschreitung (nicht „Auswahl nicht gefunden“)."""
+    """5xx oder Netzfehler (nicht Timeout, nicht „Auswahl nicht gefunden“)."""
     return SERVERFEHLER.search(grund) is not None
 
 
 class Schutzschalter:
     """Stoppt einen Anbieter für den Rest des Laufs, aber nur, wenn der Host gestört
     ist: nach einer Sperre (Bot-Schutz, nie umgangen) sofort, nach
-    ``SCHUTZ_SERVERFEHLER`` Serverfehlern in Folge (``ist_serverfehler``). Formfehler
+    ``SCHUTZ_SERVERFEHLER`` Serverfehlern in Folge (``ist_serverfehler``), gezählt nur
+    auf nicht verdächtigen Seiten (der Lauf meldet nur diese). Formfehler
     einer Seite („Auswahl nicht gefunden“) stoppen nie den Anbieter; ihre Wiederholung
     begrenzt ``gegenprobe_fenster.VERDAECHTIG_JE_NACHT``. ``ausfaelle`` nennt den
     Grund."""

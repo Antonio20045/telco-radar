@@ -224,34 +224,33 @@ def lies_bilanz(pfad: Path) -> dict:
 
 
 def _laufkennung(lauf: Mapping) -> str:
+    """Ein Eintrag je Lauf UND Anbieter (ein Sammeljob hat mehrere Anbieter)."""
     kennung = lauf.get("lauf_id")
     if kennung:
-        return str(kennung)
+        return f"{kennung}|{lauf.get('anbieter')}"
     return json.dumps(dict(lauf), sort_keys=True, ensure_ascii=False)
 
 
 def fuehre_laeufe(alt: Iterable[Mapping], neu: Iterable[Mapping]) -> list[dict]:
-    """Die Läufe des Tages ohne Doppel: derselbe Lauf (``lauf_id``) zählt einmal, auch
-    wenn seine Teildatei zweimal abgelegt wird. Ein Platzhalter „Teildatei fehlt“
-    (``platzhalter``) fällt weg, sobald danach ein gemessener Lauf desselben
-    Anbieters und Tages kommt."""
+    """Die Läufe des Tages ohne Doppel: derselbe Lauf eines Anbieters (``lauf_id``,
+    Anbieter) zählt einmal, auch wenn seine Teildatei zweimal abgelegt wird. Ein
+    Platzhalter „Teildatei fehlt“ (``platzhalter``) fällt weg, sobald es am selben Tag
+    einen gemessenen Lauf dieses Anbieters gibt, gleich in welcher Reihenfolge."""
     je: dict[str, dict] = {}
     for lauf in [*alt, *neu]:
         je[_laufkennung(lauf)] = dict(lauf)
-    out: list[dict] = []
-    for lauf in je.values():
-        if not lauf.get("platzhalter"):
-            schluessel = (lauf.get("datum"), lauf.get("anbieter"))
-            out = [
-                v
-                for v in out
-                if not (
-                    v.get("platzhalter")
-                    and (v.get("datum"), v.get("anbieter")) == schluessel
-                )
-            ]
-        out.append(lauf)
-    return out
+    gemessen = {
+        (v.get("datum"), v.get("anbieter"))
+        for v in je.values()
+        if not v.get("platzhalter")
+    }
+    return [
+        v
+        for v in je.values()
+        if not (
+            v.get("platzhalter") and (v.get("datum"), v.get("anbieter")) in gemessen
+        )
+    ]
 
 
 def lege_ab(

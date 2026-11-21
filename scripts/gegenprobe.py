@@ -251,13 +251,13 @@ class Lauf:
 
     def besuche(self, gruppe: list[tuple[str, str]]) -> None:
         """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht.
-        Eine verdächtige Seite (jedes Bündel ``ANLASS_WIEDERHOLUNG``) nur bis
-        ``VERDAECHTIG_JE_NACHT`` je Anbieter, nach einem Ausfall keine mehr."""
+        Verdächtige Seiten (``gf.verdaechtige_seite``) nur bis ``VERDAECHTIG_JE_NACHT``
+        je Anbieter, ihre Fehler belegen keinen Host-Ausfall (``_buche``)."""
         anlass = dict(gruppe)
         schluessel = gp.anbieter_aus_id(gruppe[0][0])
         if self.schutz.stufe(schluessel) == AUS:
             return
-        if all(a == gp.ANLASS_WIEDERHOLUNG for _, a in gruppe):
+        if verdacht := gf.verdaechtige_seite(gruppe):
             if self.verdaechtig[schluessel] >= gf.VERDAECHTIG_JE_NACHT:
                 self.zurueckgestellt[schluessel] += 1
                 return
@@ -300,17 +300,17 @@ class Lauf:
                     break
         finally:
             lesungen.close()
-        self._buche(schluessel, beginn, zahl, (gelesen_ok, fehler))
+        self._buche(schluessel, beginn, zahl, (gelesen_ok, fehler, verdacht))
 
     def _buche(self, schluessel, beginn, zahl, ausgang) -> None:
-        gelesen_ok, fehler = ausgang
+        gelesen_ok, fehler, verdacht = ausgang
         zeit = self.zeit[schluessel]
         zeit[0] += 1
         zeit[1] += self.uhr() - beginn
         zeit[2] += zahl
         if gelesen_ok:
             self.schutz.erfolg(schluessel)
-        elif fehler is not None:
+        elif fehler is not None and (isinstance(fehler, Gesperrt) or not verdacht):
             sperre = isinstance(fehler, Gesperrt)
             self.schutz.fehler(schluessel, str(fehler), sofort=sperre)
 

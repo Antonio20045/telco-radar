@@ -25,10 +25,10 @@ Zeit, und ein Zufallsfehler bekommt vor Fristende einen zweiten Versuch. Was heu
 diesem Preis geöffnet wurde, kommt nicht noch einmal dran: ein zweiter Lauf am selben
 Tag ergänzt. ``plane`` legt die Bündel nach Seitenbesuch zusammen: ein Besuch prüft
 jedes noch nicht heute geöffnete Bündel seiner Seite mit (``ANLASS_GLEICHE_SEITE``);
-die Besuche laufen reihum über die Anbieter. Ein fälliges Bündel, dessen letzter
-Versuch scheiterte, ist verdächtig (``ANLASS_WIEDERHOLUNG``): der Lauf besucht je
-Anbieter höchstens ``VERDAECHTIG_JE_NACHT`` Seiten, deren Bündel alle verdächtig sind,
-und stellt weitere zurück; nie versuchte Seiten werden immer versucht (dritter
+die Besuche laufen reihum über die Anbieter. Eine Seite, deren letzter Besuch ganz
+scheiterte, ist verdächtig (``seite_gescheitert``, ``ANLASS_WIEDERHOLUNG``): der Lauf
+besucht je Anbieter höchstens ``VERDAECHTIG_JE_NACHT`` verdächtige Seiten und stellt
+weitere zurück; nie versuchte Seiten werden immer versucht (dritter
 Prüferbefund zu PR 200: eine Serie von Fehlern sagt nichts über die nächste Seite).
 
 Anbieter-Schnitt (``job_von``): ein Job je Host, damit robots.txt und Abstand je Host
@@ -109,13 +109,19 @@ class Gegenproben:
         """Der jüngste geöffnete Besuch dieses Preises, auch ein gescheiterter."""
         return self.zum_preis(buendel_id, gesamt, gp.VERSUCHT, posten)
 
-    def zuletzt_gescheitert(self, buendel_id: str) -> bool:
-        """Ist der jüngste geöffnete Besuch dieses Bündels (gleich welcher Preis)
-        gescheitert? Dann ist es verdächtig; nie versuchte und zuletzt gute nie."""
-        versuche = [
-            e for e in self._je_id.get(buendel_id, []) if e.status in gp.VERSUCHT
-        ]
-        return bool(versuche) and versuche[-1].status == gp.NICHT_PRUEFBAR
+    def gescheitert_am(self, buendel_id: str) -> str | None:
+        """Der Tag des jüngsten geöffneten Besuchs dieses Bündels (gleich welcher
+        Preis), wenn er gescheitert ist; None bei nie versucht oder zuletzt gut."""
+        eigene = self._je_id.get(buendel_id, [])
+        versuche = [e for e in eigene if e.status in gp.VERSUCHT]
+        if versuche and versuche[-1].status == gp.NICHT_PRUEFBAR:
+            return versuche[-1].datum
+        return None
+
+    def gute_tage(self, buendel_id: str) -> frozenset[str]:
+        """Die Tage, an denen dieses Bündel gut gelesen wurde."""
+        eigene = self._je_id.get(buendel_id, [])
+        return frozenset(e.datum for e in eigene if e.status in gp.GEPRUEFT)
 
     def zum_preis(
         self,
@@ -237,6 +243,10 @@ class Kandidat:
     anlass: str
     faellig: bool
     rang: tuple
+    gescheitert_am: str | None = None
+    """Tag des letzten, gescheiterten Versuchs (``Gegenproben.gescheitert_am``)."""
+    gute_tage: frozenset[str] = frozenset()
+    """Tage guter Lesung dieses Bündels (``seite_gescheitert``)."""
 
 
 def _streu(buendel_id: str, datum: str) -> str:
@@ -259,14 +269,11 @@ def _kandidat(
     )
     if aenderung:
         anlass = gp.ANLASS_AENDERUNG
-    elif not ist_faellig:
-        anlass = gp.ANLASS_GLEICHE_SEITE
-    elif proben.zuletzt_gescheitert(bid):
-        anlass = gp.ANLASS_WIEDERHOLUNG
     else:
-        anlass = gp.ANLASS_FENSTER
+        anlass = gp.ANLASS_FENSTER if ist_faellig else gp.ANLASS_GLEICHE_SEITE
     rang = (max(bis, datum), not aenderung, bis, stelle, _streu(bid, datum))
-    return Kandidat(bid, anlass, ist_faellig, rang)
+    gescheitert = proben.gescheitert_am(bid)
+    return Kandidat(bid, anlass, ist_faellig, rang, gescheitert, proben.gute_tage(bid))
 
 
 def kandidaten(
@@ -293,21 +300,51 @@ def kandidaten(
     return sorted(out, key=lambda k: k.rang)
 
 
+def seite_gescheitert(gruppe: Iterable[Kandidat]) -> bool:
+    """Ist die Seite verdächtig? Ja, wenn ein Bündel darauf zuletzt scheiterte und an
+    jenem Tag kein Bündel der Seite gut gelesen wurde (die ganze Seite war nicht
+    lesbar), gleich ob ein anderes Bündel noch eine gute Prüfung im Fenster hat
+    (Schlussprüfung PR 200). Scheiterte nur ein Bündel, während andere derselben Seite
+    gelesen wurden (Tarif nicht wählbar), ist die Seite lesbar. Eine Preisänderung
+    trägt den Besuch immer."""
+    gruppe = list(gruppe)
+    if any(k.anlass == gp.ANLASS_AENDERUNG for k in gruppe):
+        return False
+    gut: frozenset[str] = frozenset().union(*(k.gute_tage for k in gruppe))
+    return any(k.gescheitert_am and k.gescheitert_am not in gut for k in gruppe)
+
+
+def verdaechtige_seite(gruppe: Iterable[tuple[str, str]]) -> bool:
+    """Trägt ein geplanter Besuch den Verdacht (``plane`` setzt dann jedes fällige
+    Bündel auf ``ANLASS_WIEDERHOLUNG``)? Ihn liest der Lauf für die Kappung."""
+    return any(anlass == gp.ANLASS_WIEDERHOLUNG for _, anlass in gruppe)
+
+
 def plane(
     kandidaten: Iterable[Kandidat], seite: Callable[[str], str]
 ) -> list[list[tuple[str, str]]]:
     """Die Seitenbesuche: je Seite mit mindestens einem fälligen Bündel ein Besuch mit
     allen Kandidaten dieser Seite, Besuche reihum über die Anbieter, je Anbieter in
-    der Reihenfolge ihres ersten Bündels."""
+    der Reihenfolge ihres ersten Bündels. Auf einer verdächtigen Seite
+    (``seite_gescheitert``) heißt jedes fällige Bündel ``ANLASS_WIEDERHOLUNG``."""
     je_seite: dict[str, list[Kandidat]] = {}
     for k in kandidaten:
         je_seite.setdefault(seite(k.buendel_id), []).append(k)
     je_anbieter: dict[str, list[list[tuple[str, str]]]] = defaultdict(list)
     for gruppe in je_seite.values():
         if any(k.faellig for k in gruppe):
+            verdacht = seite_gescheitert(gruppe)
             schluessel = gp.anbieter_aus_id(gruppe[0].buendel_id)
-            je_anbieter[schluessel].append([(k.buendel_id, k.anlass) for k in gruppe])
+            je_anbieter[schluessel].append(
+                [(k.buendel_id, _anlass(k, verdacht)) for k in gruppe]
+            )
     return reihum(je_anbieter)
+
+
+def _anlass(k: Kandidat, verdacht: bool) -> str:
+    if verdacht and k.anlass == gp.ANLASS_FENSTER:
+        return gp.ANLASS_WIEDERHOLUNG
+    return k.anlass
 
 
 def jobs(kandidaten: Iterable[Kandidat]) -> list[str]:

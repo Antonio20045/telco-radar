@@ -39,7 +39,7 @@ def test_fehlerart_ohne_einzelheiten():
 def test_serverfehler_erkannt_formfehler_nicht():
     assert ist_serverfehler("Seite antwortet mit HTTP 502")
     assert ist_serverfehler("Browser: Page.goto: net::ERR_CONNECTION_RESET at …")
-    assert ist_serverfehler("Browser: Page.goto: Timeout 45000ms exceeded.")
+    assert not ist_serverfehler("Browser: Page.goto: Timeout 45000ms exceeded.")
     assert not ist_serverfehler("Auswahl nicht gefunden: 256 GB")
     assert not ist_serverfehler("Browser: Locator.click: Timeout 8000ms exceeded.")
 
