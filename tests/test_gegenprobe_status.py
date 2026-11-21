@@ -152,11 +152,11 @@ def test_luecke_ohne_gesamtkosten_findet_ihre_gegenprobe():
     anderes = gp.Ergebnis(**_zeile(buendel_id=ID + "x", gesamt_gespeichert=None))
     proben = pb.Gegenproben([luecke, anderes])
     posten = dict.fromkeys(gp.FELDER)
-    assert proben.massgeblich(ID, None, posten) is luecke
-    assert proben.massgeblich(ID + "y", None, posten) is None
-    assert proben.massgeblich(ID, None) is None
+    assert proben.letzte_gute(ID, None, posten) is luecke
+    assert proben.letzte_gute(ID + "y", None, posten) is None
+    assert proben.letzte_gute(ID, None) is None
     anderer_preis = {**posten, "geraet_monatsrate": 9.5}
-    assert proben.massgeblich(ID, None, anderer_preis) is None
+    assert proben.letzte_gute(ID, None, anderer_preis) is None
 
 
 def test_seite_nennt_die_gefuellte_luecke():

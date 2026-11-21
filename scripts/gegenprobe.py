@@ -67,7 +67,7 @@ from telco_radar.gegenprobe_pruefung import Lesen as Lesen
 from telco_radar.gegenprobe_pruefung import anderer_tarif as anderer_tarif
 from telco_radar.gegenprobe_pruefung import ohne_lauf as _ohne_lauf
 from telco_radar.gegenprobe_pruefung import pruefe as _pruefe
-from telco_radar.gegenprobe_reihe import Schutzschalter, gruppiere
+from telco_radar.gegenprobe_reihe import AUS, NUR_BEKANNT, Schutzschalter, gruppiere
 
 FEHLER_EINGABE = 2
 TCO_DATEI = Path("data") / "state" / "geraete_tco.json"
@@ -176,7 +176,8 @@ def main(argumente: list[str] | None = None) -> int:
         f"{sum(k.anlass == gp.ANLASS_AENDERUNG for k in wahl)} Preisänderungen; "
         f"{len(gruppen)} Seitenbesuche geplant"
     )
-    ergebnisse, bilder, laeufe = laufe(args, gruppen, saetze, datum, ua, ende)
+    bekannt = {k.buendel_id for k in wahl if k.bekannt_gut}
+    ergebnisse, bilder, laeufe = laufe(args, gruppen, saetze, datum, ua, ende, bekannt)
     veroeffentliche(args, datum, ergebnisse, bilder)
     if args.ausgabe is not None:
         gp.schreibe_tag(args.ausgabe, ergebnisse)
@@ -195,7 +196,7 @@ def _seite(saetze: dict, bid: str) -> str:
     return seite_von(gp.anbieter_aus_id(bid), saetze[bid])
 
 
-def laufe(args, gruppen, saetze, datum, ua, ende):
+def laufe(args, gruppen, saetze, datum, ua, ende, bekannt=frozenset()):
     """Geht die Seitenbesuche durch (``Lauf.alle``), solange die Frist reicht. Vor
     jedem Laden gelten robots.txt und der Abstand (``tor``)."""
     from playwright.sync_api import sync_playwright
@@ -205,6 +206,7 @@ def laufe(args, gruppen, saetze, datum, ua, ende):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         lauf = Lauf(args, browser, saetze, datum, ua, ende, vor_laden)
+        lauf.bekannt_gut = set(bekannt)
         try:
             lauf.alle(gruppen)
         finally:
@@ -229,24 +231,31 @@ class Lauf:
         self.ergebnisse: dict[str, gp.Ergebnis] = {}
         self.bilder: dict[str, bytes] = {}
         self.schutz = Schutzschalter()
+        self.bekannt_gut: set[str] = set()
+        """Bündel mit früherer guter Prüfung (``Kandidat.bekannt_gut``)."""
         self.uhr: Callable[[], float] = time.monotonic
         self.zeit: dict[str, list[float]] = defaultdict(lambda: [0, 0.0, 0])
         """Je Anbieter-Schlüssel [Besuche, Sekunden, Bündel]."""
 
     def alle(self, gruppen: list[list[tuple[str, str]]]) -> None:
-        """Jeder Seitenbesuch, solange die Frist reicht."""
+        """Jeder Seitenbesuch, solange die Frist reicht; jeder geplante Anbieter
+        bekommt einen Lauf-Eintrag, auch mit 0 Besuchen."""
+        for gruppe in gruppen:
+            self.zeit.setdefault(gp.anbieter_aus_id(gruppe[0][0]), [0, 0.0, 0])
         for gruppe in gruppen:
             if self.uhr() > self.ende:
                 return
             self.besuche(gruppe)
 
     def besuche(self, gruppe: list[tuple[str, str]]) -> None:
-        """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht; eine
-        abgeschaltete Art (``Schutzschalter``) wird nicht mehr besucht."""
+        """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht.
+        Nach einer Fehlerserie nur Seiten mit früherer guter Prüfung
+        (``bekannt_gut``), nach einem Ausfall keine mehr (``Schutzschalter``)."""
         anlass = dict(gruppe)
         schluessel = gp.anbieter_aus_id(gruppe[0][0])
-        art = _art(self.saetze[gruppe[0][0]])
-        if self.schutz.grund(schluessel, art):
+        stufe = self.schutz.stufe(schluessel)
+        bekannt = any(bid in self.bekannt_gut for bid, _ in gruppe)
+        if stufe == AUS or (stufe == NUR_BEKANNT and not bekannt):
             return
         aufnehmen = self.args.aufnehmen is not None
         beginn = self.uhr()
@@ -286,19 +295,19 @@ class Lauf:
                     break
         finally:
             lesungen.close()
-        self._buche(schluessel, art, beginn, zahl, (gelesen_ok, fehler))
+        self._buche(schluessel, beginn, zahl, (gelesen_ok, fehler))
 
-    def _buche(self, schluessel, art, beginn, zahl, ausgang) -> None:
+    def _buche(self, schluessel, beginn, zahl, ausgang) -> None:
         gelesen_ok, fehler = ausgang
         zeit = self.zeit[schluessel]
         zeit[0] += 1
         zeit[1] += self.uhr() - beginn
         zeit[2] += zahl
         if gelesen_ok:
-            self.schutz.erfolg(schluessel, art)
+            self.schutz.erfolg(schluessel)
         elif fehler is not None:
             sperre = isinstance(fehler, Gesperrt)
-            self.schutz.fehler(schluessel, str(fehler), sofort=sperre, art=art)
+            self.schutz.fehler(schluessel, str(fehler), sofort=sperre)
 
     def zeilen(self, gruppen: list[list[tuple[str, str]]]) -> list[gp.Ergebnis]:
         """Die geprüften Bündel und je nicht geöffnete Preisänderung eine Zeile
@@ -309,8 +318,8 @@ class Lauf:
                 if bid in self.ergebnisse or anlass != gp.ANLASS_AENDERUNG:
                     continue
                 schluessel = gp.anbieter_aus_id(bid)
-                ausfall = self.schutz.grund(schluessel, _art(self.saetze[bid]))
-                grund = ausfall or gp.GRUND_ZEITBUDGET
+                ausfall = self.schutz.grund(schluessel)
+                grund = gp.GRUND_ZEITBUDGET if ausfall is None else ausfall
                 out.append(_ohne_lauf(self.saetze[bid], anlass, self.datum, grund))
         return out
 
@@ -325,19 +334,13 @@ class Lauf:
                 "buendel": int(self.zeit[s][2]),
                 "ausfall": _verbunden(self.schutz.ausfaelle(s)),
             }
-            for s in sorted(set(self.zeit) | {a for a, _ in self.schutz.aus})
+            for s in sorted(set(self.zeit) | set(self.schutz.abgeschaltet()))
         ]
 
 
 def _verbunden(gruende: list[str]) -> str | None:
     """Die Ausfälle eines Anbieters als ein Text; None, wenn keiner war."""
     return "; ".join(gruende) if gruende else None
-
-
-def _art(satz: dict) -> str:
-    """Die Art eines Bündels für den Schutzschalter: seine Herleitung (Produktseite
-    leer, Tarif-Übersicht ``tarifaufschlag_aus_tarifraster`` …)."""
-    return str(satz.get("herleitung") or "")
 
 
 def _gelesen(gelesen: Lesung | Exception, _schluessel: str, _satz: dict) -> Lesung:

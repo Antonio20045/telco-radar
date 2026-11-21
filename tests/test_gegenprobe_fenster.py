@@ -4,7 +4,8 @@ Seitenbesuche und Anbieter-Schnitt.
 Lauf 21.11.2026: nur die am Tag gemessenen Änderungen und fünf Stichproben je Anbieter
 kamen dran, ältere Bündel nie; 420 von 674 blieben ungeöffnet, Vodafone, congstar und
 Saturn/MediaMarkt ohne einen Besuch. Seitdem ist jedes angezeigte Bündel binnen
-``GEGENPROBE_FENSTER_TAGE`` fällig, die Änderungen des Tages zuerst.
+``GEGENPROBE_FENSTER_TAGE`` fällig, früheste Frist zuerst, die Änderungen des Tages mit
+Frist heute (Regel nach Prüferbefund zu PR 200).
 """
 
 from __future__ import annotations
@@ -19,12 +20,19 @@ def _id(anbieter: str, n: int) -> str:
     return f"buendel--{anbieter}--geraet-{n}-128gb-schwarz--tarif--24m"
 
 
-def _satz(anbieter: str, n: int, seite: str = "", gesamt: float = 100.0) -> dict:
+def _satz(
+    anbieter: str,
+    n: int,
+    seite: str = "",
+    gesamt: float = 100.0,
+    first_seen: str = "2026-11-01",
+) -> dict:
     return {
         "id": _id(anbieter, n),
         "anbieter": anbieter,
         "seite": seite or f"{anbieter}-{n}",
         "gesamt": gesamt,
+        "first_seen": first_seen,
     }
 
 
@@ -84,25 +92,78 @@ def test_preisaenderung_des_tages_kommt_vor_jedem_faelligen():
     ]
 
 
-def test_nie_gepruefte_zuerst_dann_die_aelteste_pruefung():
-    saetze = [_satz("o2", n) for n in range(4)]
+def test_frueheste_frist_zuerst():
+    """Frist: Preisänderung heute, gute Prüfung + 7, ohne gute Prüfung erste Anzeige
+    + 7; überfällig zählt als heute, darunter die ältere Frist zuerst."""
+    saetze = [
+        _satz("o2", 0, first_seen="2026-11-10"),
+        _satz("o2", 1),
+        _satz("o2", 2),
+        _satz("o2", 3),
+        _satz("o2", 4, first_seen="2026-11-18"),
+        _satz("o2", 5),
+    ]
     proben = [
-        _probe(saetze[1]["id"], "2026-11-13"),
+        _probe(saetze[1]["id"], "2026-11-15"),
         _probe(saetze[2]["id"], "2026-11-16"),
         _probe(saetze[3]["id"], "2026-11-20"),
+        _probe(saetze[5]["id"], "2026-11-20"),
+    ]
+    kand = _kandidaten(saetze, proben, aenderungen=[saetze[5]["id"]])
+    reihe = [saetze[i]["id"] for i in (5, 0, 1, 2, 4, 3)]
+    assert [k.buendel_id for k in kand] == reihe
+    assert [k.faellig for k in kand] == [True, True, True, True, False, False]
+    assert kand[0].anlass == gp.ANLASS_AENDERUNG
+
+
+def test_gescheiterter_versuch_aendert_die_frist_nicht():
+    """Gute Prüfung vor 6 Tagen (Frist morgen), gestern ein Timeout: kommt vor einem
+    Bündel, das noch zwei Tage hat (Prüferbefund zu PR 200)."""
+    saetze = [_satz("o2", 1), _satz("o2", 2)]
+    proben = [
+        _probe(saetze[0]["id"], "2026-11-15"),
+        _probe(saetze[0]["id"], "2026-11-20", gp.NICHT_PRUEFBAR),
+        _probe(saetze[1]["id"], "2026-11-16"),
     ]
     kand = _kandidaten(saetze, proben)
-    assert [k.buendel_id for k in kand] == [s["id"] for s in saetze]
-    assert [k.faellig for k in kand] == [True, True, True, False]
-    assert kand[3].anlass == gp.ANLASS_GLEICHE_SEITE
+    assert [(k.buendel_id, k.faellig) for k in kand] == [
+        (saetze[0]["id"], True),
+        (saetze[1]["id"], True),
+    ]
 
 
-def test_gescheiterter_versuch_kommt_nach_den_nie_versuchten():
+def test_dauerfehler_kommt_nicht_jede_nacht():
+    """Nie gut gelesen, Frist längst vorbei, gestern gescheitert: erst nach
+    ``WIEDERHOLUNG_TAGE`` wieder fällig."""
     saetze = [_satz("1-1", 1), _satz("1-1", 2)]
-    proben = [_probe(saetze[0]["id"], "2026-11-19", gp.NICHT_PRUEFBAR)]
-    kand = _kandidaten(saetze, proben)
-    assert [k.buendel_id for k in kand] == [saetze[1]["id"], saetze[0]["id"]]
-    assert all(k.faellig for k in kand)
+    proben = [
+        _probe(saetze[0]["id"], "2026-11-20", gp.NICHT_PRUEFBAR),
+        _probe(saetze[1]["id"], "2026-11-19", gp.NICHT_PRUEFBAR),
+    ]
+    faellig = {k.buendel_id: k.faellig for k in _kandidaten(saetze, proben)}
+    assert gf.WIEDERHOLUNG_TAGE == 2
+    assert faellig == {saetze[0]["id"]: False, saetze[1]["id"]: True}
+
+
+def test_zufallsfehler_bekommt_vor_fristende_einen_zweiten_versuch():
+    saetze = [_satz("o2", 1), _satz("o2", 2)]
+    proben = [
+        _probe(saetze[0]["id"], "2026-11-15"),
+        _probe(saetze[0]["id"], "2026-11-20", gp.NICHT_PRUEFBAR),
+        _probe(saetze[1]["id"], "2026-11-17"),
+        _probe(saetze[1]["id"], "2026-11-20", gp.NICHT_PRUEFBAR),
+    ]
+    faellig = {k.buendel_id: k.faellig for k in _kandidaten(saetze, proben)}
+    assert faellig == {saetze[0]["id"]: True, saetze[1]["id"]: False}
+
+
+def test_neues_buendel_ohne_pruefung_hat_sieben_tage_ab_erster_anzeige():
+    saetze = [
+        _satz("o2", 1, first_seen="2026-11-19"),
+        _satz("o2", 2, first_seen="2026-11-16"),
+    ]
+    faellig = {k.buendel_id: k.faellig for k in _kandidaten(saetze)}
+    assert faellig == {saetze[0]["id"]: False, saetze[1]["id"]: True}
 
 
 def test_heute_geoeffnet_kommt_nicht_noch_einmal_nicht_geoeffnet_schon():

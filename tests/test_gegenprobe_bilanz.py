@@ -9,12 +9,14 @@ von Hand nach und prüfen dazu, dass sich die Teile zum Ganzen fügen (Gegenprob
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 from test_beleg_skripte import lade_skript
 
 from telco_radar import gegenprobe as gp
 from telco_radar import gegenprobe_bilanz as gb
 from telco_radar import gegenprobe_fenster as gf
+from telco_radar.report import geraete_preisbeleg as pb
 
 ABLEGEN = lade_skript("gegenprobe_ablegen")
 TAG = "2026-11-21"
@@ -200,18 +202,24 @@ def test_ablegen_meldet_eine_unlesbare_teildatei(tmp_path):
 
 
 def test_seite_und_bilanz_lesen_dieselbe_gegenprobe():
-    """Vor 3 Tagen bestätigt, gestern belegt gescheitert: die Seite zeigt den
-    jüngsten Besuch, die Bilanz zählt denselben (nicht prüfbar, nicht im Fenster)."""
-    proben = gf.Gegenproben(
-        [
-            _probe(O2[0], "2026-11-18", gp.BESTAETIGT),
-            _probe(O2[0], "2026-11-20", gp.NICHT_PRUEFBAR),
-        ]
-    )
-    gezeigt = proben.massgeblich(O2[0]["id"], gb.gesamt_von(O2[0]), O2[0])
-    assert gezeigt is not None and gezeigt.status == gp.NICHT_PRUEFBAR
+    """Vor 3 Tagen bestätigt, gestern belegt gescheitert: Seite und Bilanz lesen die
+    letzte gute Prüfung (im Fenster, bestätigt); die Seite nennt den gescheiterten
+    Versuch als Hinweis."""
+    gut = _probe(O2[0], "2026-11-18", gp.BESTAETIGT)
+    versuch = _probe(O2[0], "2026-11-20", gp.NICHT_PRUEFBAR)
+    proben = gf.Gegenproben([gut, versuch])
+    preis = gb.gesamt_von(O2[0])
+    assert proben.letzte_gute(O2[0]["id"], preis) is gut
+    assert proben.letzter_versuch(O2[0]["id"], preis) is versuch
     o2 = gb.zusammenfassung(TAG, [O2[0]], proben, [])["anbieter"]["o2"]
-    assert (o2["im_fenster"], o2["nicht_pruefbar"], o2["ueberfaellig"]) == (0, 1, 1)
+    assert (o2["im_fenster"], o2[gp.BESTAETIGT], o2["ueberfaellig"]) == (1, 1, 0)
+    karte = {"buendel_id": O2[0]["id"], "gesamt": preis, "abgerufen_am": TAG}
+    beleg = pb.Preisbelege(Path("."), proben, lambda k: None).der_karte(karte)
+    assert beleg["gegenprobe"]["status"] == gp.BESTAETIGT
+    assert (
+        "letzter Versuch 20.11.2026: nicht prüfbar (Auswahl nicht gefunden: 256 GB)"
+        in beleg["gegenprobe"]["hinweise"]
+    )
 
 
 def test_fehlende_messung_im_lauf_bleibt_eine_luecke():
@@ -221,3 +229,28 @@ def test_fehlende_messung_im_lauf_bleibt_eine_luecke():
     o2 = gb.zusammenfassung(TAG, O2, gf.Gegenproben(), laeufe)["anbieter"]["o2"]
     assert (o2["besuche"], o2["sekunden"], o2["sekunden_je_besuch"]) == (2, None, None)
     assert o2["buendel_je_besuch"] == 1.5
+
+
+def test_fehlende_teildatei_ist_eine_benannte_luecke_nie_null(tmp_path):
+    _bestand(tmp_path, O2 + EINS)
+    quelle = tmp_path / "teile"
+    _teil(quelle / "gegenprobe-teil-o2", "o2", [_proben()[0]], [LAEUFE[0]])
+    argumente = ["--root", str(tmp_path), "--quelle", str(quelle)]
+    assert ABLEGEN.main([*argumente, "--erwartet", '["o2", "1-1"]']) == 0
+    bilanz = json.loads(gb.bilanzdatei(tmp_path, TAG).read_text(encoding="utf-8"))
+    eins = bilanz["anbieter"]["1-1"]
+    assert (eins["besuche"], eins["sekunden"], eins["sekunden_je_besuch"]) == (
+        None,
+        None,
+        None,
+    )
+    assert eins["messung_fehlt"] == ABLEGEN.GRUND_TEIL_FEHLT
+    assert eins["ausfall"] == [ABLEGEN.GRUND_TEIL_FEHLT]
+    assert bilanz["anbieter"]["o2"]["besuche"] == 2
+    assert bilanz["summe"]["besuche"] is None
+    assert "1-1" in bilanz["summe"]["messung_fehlt"]
+
+
+def test_anbieter_ohne_lauf_hat_keine_messung_statt_null():
+    o2 = gb.zusammenfassung(TAG, O2, gf.Gegenproben(), [])["anbieter"]["o2"]
+    assert (o2["besuche"], o2["messung_fehlt"]) == (None, gb.KEIN_LAUF)

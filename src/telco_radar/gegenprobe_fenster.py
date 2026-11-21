@@ -2,30 +2,35 @@
 
 Abnahmekriterium 2 (Antonio, 21.11.2026): jedes Bündel der Geräteseite ist innerhalb
 eines festen Fensters unabhängig gegengeprüft, jede Preisänderung am Tag ihres
-Auftretens. „Zuletzt gegengeprüft“ steht nicht am Bündel, sondern folgt aus den
-Tagesdateien (``gegenprobe.lies_alle``) über ``Gegenproben.zum_preis``: dieselbe
-Stelle, an der die Seite die Gegenprobe eines Preises findet (dasselbe Bündel oder
-dasselbe Angebot in anderer Farbe mit gleichen Gesamtkosten; ein Bündel ohne
-Gesamtkosten nur seine eigene Prüfung mit denselben Einzelposten). Maßgeblich ist für
-Seite, Fenster und Bilanz dieselbe Zeile (``Gegenproben.massgeblich``): der jüngste
-geöffnete Besuch dieses Preises. Nur eine gelesene Seite (``gegenprobe.GEPRUEFT``)
-zählt als Gegenprobe im Fenster; ein geänderter Preis ist wieder ungeprüft.
+Auftretens. Je Bündel gibt es zwei Größen, beide aus den Tagesdateien
+(``gegenprobe.lies_alle``) und an EINER Stelle (``Gegenproben``), gelesen von Seite,
+Fenster und Bilanz: ``letzte_gute`` ist der jüngste Besuch, der den Preis gelesen hat
+(``gegenprobe.GEPRUEFT``), ``letzter_versuch`` der jüngste geöffnete Besuch, auch ein
+belegt gescheiterter. Beide gehören zum aktuellen Preis (``zum_preis``: dasselbe Bündel
+oder dasselbe Angebot in anderer Farbe mit gleichen Gesamtkosten; ohne Gesamtkosten
+dasselbe Bündel mit denselben Einzelposten). „Im Fenster gegengeprüft“ heißt:
+``letzte_gute`` ist jünger als ``GEGENPROBE_FENSTER_TAGE``. Ein gescheiterter Versuch
+nimmt keiner guten Prüfung die Gültigkeit.
 
-Reihenfolge eines Laufs (``kandidaten``): (a) die Preisänderungen des Tages in der
-Folge von ``gegenprobe.auswahl``, (b) die fälligen Bündel, nie geprüfte zuerst, dann
-die älteste Prüfung, (c) Bündel, deren letzter Besuch belegt scheiterte
-(``nicht_pruefbar``), ältester Versuch zuerst: sie verdrängen nie ein prüfbares
-Bündel (Prüferbefund zu PR 200, Aushungern), (d) nicht fällige. Fällig ist ein Bündel
-``VORLAUF_TAGE`` vor Ablauf seines Fensters. Was heute zu diesem Preis schon geöffnet
-wurde, kommt nicht noch einmal dran: ein zweiter Lauf am selben Tag ergänzt.
-``plane`` legt die Bündel nach Seitenbesuch zusammen: ein Besuch prüft jedes noch
-nicht heute geprüfte Bündel seiner Seite mit, auch die noch nicht fälligen
-(``ANLASS_GLEICHE_SEITE``), und die Besuche laufen reihum über die Anbieter.
+Reihenfolge (``kandidaten``) ist EINE Regel, früheste Frist zuerst (Earliest Deadline
+First, Prüferbefund zu PR 200): Frist ist heute für eine Preisänderung des Tages, sonst
+``letzte_gute`` + Fenster, ohne gute Prüfung der Tag der ersten Anzeige (``first_seen``,
+sonst das Messdatum) + Fenster. Eine überfällige Frist zählt als heute; bei gleicher
+Frist kommt die Preisänderung zuerst, dann die ältere Frist. Ein gescheiterter Versuch
+ändert die Frist nicht. Fällig ist ein Bündel ab Frist − ``VORLAUF_TAGE``.
+Wiederholungsbremse: nach einem gescheiterten Versuch erst wieder, wenn
+``WIEDERHOLUNG_TAGE`` vergangen sind oder die Frist heute oder morgen endet (eine schon
+verstrichene Frist zählt nicht dazu); so kosten Dauerfehler nicht jede Nacht Zeit, und
+ein Zufallsfehler bekommt vor Fristende einen zweiten Versuch. Was heute zu diesem Preis
+geöffnet wurde, kommt nicht noch einmal dran: ein zweiter Lauf am selben Tag ergänzt.
+``plane`` legt die Bündel nach Seitenbesuch zusammen: ein Besuch prüft jedes noch nicht
+heute geöffnete Bündel seiner Seite mit (``ANLASS_GLEICHE_SEITE``); die Besuche laufen
+reihum über die Anbieter. ``Kandidat.bekannt_gut`` (das Bündel hatte schon einmal eine
+gute Prüfung) braucht der Schutzschalter im Lauf.
 
 Anbieter-Schnitt (``job_von``): ein Job je Host, damit robots.txt und Abstand je Host
-gelten; die drei Netze von Saturn/MediaMarkt teilen ``tarife.mediamarkt.de`` und
-bilden EINEN Job ``saturn-mediamarkt``. Jeder Anbieter-Schlüssel gehört zu genau einem
-Job.
+gelten; die drei Netze von Saturn/MediaMarkt teilen ``tarife.mediamarkt.de`` und bilden
+EINEN Job ``saturn-mediamarkt``. Jeder Anbieter-Schlüssel gehört zu genau einem Job.
 """
 
 from __future__ import annotations
@@ -35,7 +40,7 @@ import re
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 
 from . import gegenprobe as gp
 from .gegenprobe_reihe import reihum
@@ -44,6 +49,9 @@ GEGENPROBE_FENSTER_TAGE = 7
 """So viele Tage gilt eine Gegenprobe eines Preises (Tag der Prüfung eingeschlossen)."""
 VORLAUF_TAGE = 2
 """So viele Tage vor Ablauf des Fensters ist ein Bündel wieder fällig."""
+WIEDERHOLUNG_TAGE = 2
+"""So viele Tage nach einem gescheiterten Versuch wird ein Bündel frühestens wieder
+versucht, außer seine Frist ist höchstens einen Tag entfernt."""
 
 SAMMELJOBS: dict[str, tuple[str, ...]] = {
     "saturn-mediamarkt": tuple(
@@ -81,13 +89,22 @@ class Gegenproben:
             self._je_id[e.buendel_id].append(e)
             self._je_angebot[angebot(e.buendel_id)].append(e)
 
-    def massgeblich(
+    def letzte_gute(
         self, buendel_id: str, gesamt: float | None, posten: Mapping | None = None
     ) -> gp.Ergebnis | None:
-        """DIE Gegenprobe eines Preises für Seite, Fenster und Bilanz: der jüngste
-        geöffnete Besuch (gelesen oder belegt gescheitert), nie eine nicht geöffnete
-        Zeile."""
+        """Der jüngste Besuch, der diesen Preis gelesen hat (``gp.GEPRUEFT``)."""
+        return self.zum_preis(buendel_id, gesamt, gp.GEPRUEFT, posten)
+
+    def letzter_versuch(
+        self, buendel_id: str, gesamt: float | None, posten: Mapping | None = None
+    ) -> gp.Ergebnis | None:
+        """Der jüngste geöffnete Besuch dieses Preises, auch ein gescheiterter."""
         return self.zum_preis(buendel_id, gesamt, gp.VERSUCHT, posten)
+
+    def hatte_gute(self, buendel_id: str) -> bool:
+        """Hat dieses Bündel schon einmal eine gute Prüfung gehabt (gleich welcher
+        Preis)? Seine Seite ist dann bekannt lesbar."""
+        return any(e.status in gp.GEPRUEFT for e in self._je_id.get(buendel_id, []))
 
     def zum_preis(
         self,
@@ -141,15 +158,42 @@ def alter_tage(datum: str, letzte: str | None) -> int | None:
 
 
 def im_fenster(datum: str, letzte: str | None) -> bool:
-    """Gilt eine Gegenprobe vom Tag ``letzte`` an ``datum`` noch?"""
+    """Gilt eine gute Gegenprobe vom Tag ``letzte`` an ``datum`` noch?"""
     alter = alter_tage(datum, letzte)
     return alter is not None and alter < GEGENPROBE_FENSTER_TAGE
 
 
-def faellig(datum: str, letzte: str | None) -> bool:
-    """Nie geprüft oder höchstens ``VORLAUF_TAGE`` vor Ablauf des Fensters."""
-    alter = alter_tage(datum, letzte)
-    return alter is None or alter >= GEGENPROBE_FENSTER_TAGE - VORLAUF_TAGE
+def frist(datum: str, satz: Mapping, gute: gp.Ergebnis | None) -> str:
+    """Bis wann das Bündel gegengeprüft sein muss: gute Prüfung + Fenster, ohne gute
+    Prüfung erste Anzeige (``first_seen``, sonst Messdatum, sonst ``datum``) +
+    Fenster."""
+    anfang = (
+        gute.datum
+        if gute is not None
+        else str(satz.get("first_seen") or satz.get("abgerufen_am") or datum)
+    )
+    return str(date.fromisoformat(anfang[:10]) + timedelta(GEGENPROBE_FENSTER_TAGE))
+
+
+def tage_bis(datum: str, bis: str) -> int:
+    """Tage von ``datum`` bis ``bis`` (negativ: vorbei)."""
+    return (date.fromisoformat(bis) - date.fromisoformat(datum)).days
+
+
+def faellig(datum: str, bis: str) -> bool:
+    """Fällig ab Frist − ``VORLAUF_TAGE``."""
+    return tage_bis(datum, bis) <= VORLAUF_TAGE
+
+
+def gebremst(datum: str, bis: str, versuch: gp.Ergebnis | None) -> bool:
+    """Wiederholungsbremse: der letzte Versuch scheiterte vor weniger als
+    ``WIEDERHOLUNG_TAGE``, und die Frist ist nicht heute oder morgen. Eine schon
+    verstrichene Frist bremst mit: sonst käme ein Dauerfehler ohne je eine gute
+    Prüfung (Frist längst vorbei) jede Nacht wieder."""
+    if versuch is None or versuch.status != gp.NICHT_PRUEFBAR:
+        return False
+    seit = tage_bis(versuch.datum, datum)
+    return seit < WIEDERHOLUNG_TAGE and not 0 <= tage_bis(datum, bis) <= 1
 
 
 def job_von(schluessel: str) -> str:
@@ -176,6 +220,8 @@ class Kandidat:
     anlass: str
     faellig: bool
     rang: tuple
+    bekannt_gut: bool = False
+    """Das Bündel hatte schon einmal eine gute Prüfung (``Schutzschalter``)."""
 
 
 def _streu(buendel_id: str, datum: str) -> str:
@@ -183,18 +229,25 @@ def _streu(buendel_id: str, datum: str) -> str:
     return hashlib.sha256(f"{datum}|{buendel_id}".encode()).hexdigest()[:12]
 
 
-def _im_fenster(datum: str, bid: str, probe: gp.Ergebnis | None) -> Kandidat:
-    """Rang eines Bündels ohne Preisänderung: fällig (1), belegt gescheitert (2,
-    hinter jedem fälligen prüfbaren), nicht fällig (3)."""
-    letzte = probe.datum if probe is not None else None
-    if probe is not None and probe.status == gp.NICHT_PRUEFBAR:
-        return Kandidat(bid, gp.ANLASS_FENSTER, True, (2, letzte, _streu(bid, datum)))
-    ist_faellig = faellig(datum, letzte)
-    anlass = gp.ANLASS_FENSTER if ist_faellig else gp.ANLASS_GLEICHE_SEITE
-    klasse = 1 if ist_faellig else 3
-    return Kandidat(
-        bid, anlass, ist_faellig, (klasse, letzte or "", _streu(bid, datum))
+def _kandidat(
+    datum: str, satz: Mapping, preis: float | None, proben: Gegenproben, stelle: int
+) -> Kandidat:
+    """Anlass und Rang nach der Fristregel (Modulkopf); ``stelle`` ist der Platz in
+    der Folge der Preisänderungen, -1 ohne Preisänderung."""
+    bid = str(satz["id"])
+    aenderung = stelle >= 0
+    gute = proben.letzte_gute(bid, preis, satz)
+    bis = datum if aenderung else frist(datum, satz, gute)
+    ist_faellig = aenderung or (
+        faellig(datum, bis)
+        and not gebremst(datum, bis, proben.letzter_versuch(bid, preis, satz))
     )
+    if aenderung:
+        anlass = gp.ANLASS_AENDERUNG
+    else:
+        anlass = gp.ANLASS_FENSTER if ist_faellig else gp.ANLASS_GLEICHE_SEITE
+    rang = (max(bis, datum), not aenderung, bis, stelle, _streu(bid, datum))
+    return Kandidat(bid, anlass, ist_faellig, rang, proben.hatte_gute(bid))
 
 
 def kandidaten(
@@ -213,13 +266,11 @@ def kandidaten(
         bid = str(satz["id"])
         if nur is not None and gp.anbieter_aus_id(bid) not in nur:
             continue
-        probe = gegenproben.massgeblich(bid, gesamt(satz), satz)
-        if probe is not None and probe.datum == datum:
+        preis = gesamt(satz)
+        versuch = gegenproben.letzter_versuch(bid, preis, satz)
+        if versuch is not None and versuch.datum == datum:
             continue
-        if bid in stelle:
-            out.append(Kandidat(bid, gp.ANLASS_AENDERUNG, True, (0, stelle[bid])))
-        else:
-            out.append(_im_fenster(datum, bid, probe))
+        out.append(_kandidat(datum, satz, preis, gegenproben, stelle.get(bid, -1)))
     return sorted(out, key=lambda k: k.rang)
 
 

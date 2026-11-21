@@ -185,6 +185,24 @@ def gegenprobe_anzeige(
     }
 
 
+def versuch_ist_neuer(gezeigt: gp.Ergebnis | None, versuch: gp.Ergebnis | None) -> bool:
+    """Ist ``versuch`` ein jüngerer, gescheiterter Besuch als die gezeigte Prüfung?"""
+    if gezeigt is None or versuch is None or versuch is gezeigt:
+        return False
+    zeit = (versuch.datum, versuch.geprueft_um or "")
+    return versuch.status == gp.NICHT_PRUEFBAR and zeit > (
+        gezeigt.datum,
+        gezeigt.geprueft_um or "",
+    )
+
+
+def versuch_hinweis(versuch: gp.Ergebnis | None) -> str:
+    """„letzter Versuch 21.11.2026: nicht prüfbar (Timeout beim Laden)“."""
+    if versuch is None:
+        return ""
+    return f"letzter Versuch {datum_de(versuch.datum)}: nicht prüfbar ({versuch.grund})"
+
+
 def beleg(
     *,
     quelle_url: str,
@@ -194,9 +212,14 @@ def beleg(
     bild: dict | None,
     gegenprobe: gp.Ergebnis | None,
     buendel_id: str = "",
+    versuch: gp.Ergebnis | None = None,
 ) -> dict:
-    """Ein Beleg: jede Angabe da oder als benannte Lücke."""
+    """Ein Beleg: jede Angabe da oder als benannte Lücke. Ist ``versuch`` (der
+    letzte geöffnete Besuch) jünger als die gezeigte Gegenprobe und gescheitert,
+    nennt ein Hinweis Tag und Grund."""
     anzeige = gegenprobe_anzeige(gegenprobe, buendel_id, abgerufen_am)
+    if anzeige is not None and versuch_ist_neuer(gegenprobe, versuch):
+        anzeige["hinweise"].append(versuch_hinweis(versuch))
     if bild is None and gegenprobe is not None and gegenprobe.bild:
         bild = {"url": gegenprobe.bild, "datum": gegenprobe.datum, "art": "Gegenprobe"}
     return {
@@ -235,7 +258,13 @@ class Preisbelege:
         self.zeilenbild = zeilenbild
 
     def der_karte(self, karte: dict) -> dict:
-        """Der Beleg einer Preiszeile der Geräteseite."""
+        """Der Beleg einer Preiszeile der Geräteseite: die letzte gute Gegenprobe des
+        Preises (``Gegenproben.letzte_gute``, dieselbe wie Fenster und Bilanz), ohne
+        sie der letzte Versuch; ein jüngerer gescheiterter Versuch steht als Hinweis
+        daneben."""
+        bid = karte.get("buendel_id") or ""
+        gute = self.gegenproben.letzte_gute(bid, karte.get("gesamt"))
+        versuch = self.gegenproben.letzter_versuch(bid, karte.get("gesamt"))
         bild = self.zeilenbild(karte)
         if bild is not None:
             bild = {"url": bild["url"], "datum": bild["datum"], "art": "Messung"}
@@ -246,10 +275,9 @@ class Preisbelege:
             or _ohne_teile(karte.get("rechnung")),
             gesamt=karte.get("gesamt"),
             bild=bild,
-            gegenprobe=self.gegenproben.massgeblich(
-                karte.get("buendel_id") or "", karte.get("gesamt")
-            ),
-            buendel_id=karte.get("buendel_id") or "",
+            gegenprobe=gute if gute is not None else versuch,
+            buendel_id=bid,
+            versuch=versuch,
         )
 
 

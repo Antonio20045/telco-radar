@@ -3,7 +3,7 @@
 ``zusammenfassung`` zählt je Anbieter-Schlüssel über die angezeigten Bündel
 (``angezeigte``: frisch nach ``report.geraete_tco_karten.ist_frisch``, derselben
 Definition wie die Seite): wie viele im Fenster gegengeprüft sind
-(``gegenprobe_fenster.im_fenster`` über ``Gegenproben.massgeblich``, dieselbe Zeile,
+(``gegenprobe_fenster.im_fenster`` über ``Gegenproben.letzte_gute``, dieselbe Zeile,
 die die Seite als Gegenprobe des Preises zeigt), mit welchem Status, wie viele
 überfällig sind und wie viele davon nicht prüfbar mit welchem Grund
 (``gegenprobe_reihe.fehlerart``).
@@ -42,9 +42,11 @@ ZAEHLER = (
     "ueberfaellig",
     "nicht_pruefbar",
     "heute_geprueft",
-    "besuche",
-    "buendel_besucht",
 )
+MESSUNG = ("besuche", "buendel_besucht", "sekunden")
+"""Was die Läufe des Tages messen; fehlt ein Lauf oder ein Wert, ist es None mit
+Grund in ``messung_fehlt``, nie 0."""
+KEIN_LAUF = "kein Lauf an diesem Tag"
 
 
 def gesamt_von(satz: Mapping) -> float | None:
@@ -103,10 +105,29 @@ def _je(menge: float | None, besuche: float | None, stellen: int) -> float | Non
 def _leer() -> dict:
     return {
         **dict.fromkeys(ZAEHLER, 0),
-        "sekunden": 0.0,
+        **dict.fromkeys(MESSUNG),
+        "messung_fehlt": KEIN_LAUF,
         "gruende": Counter(),
         "ausfall": [],
     }
+
+
+def _messe(e: dict, laeufe: list[Mapping]) -> None:
+    """Besuche, Bündel und Sekunden der Läufe eines Anbieters; ein Lauf ohne Wert
+    (Teildatei fehlt, Messung fehlt) macht die Summe zur benannten Lücke."""
+    if not laeufe:
+        return
+    werte = {"besuche": "besuche", "buendel_besucht": "buendel", "sekunden": "sekunden"}
+    for feld, schluessel in werte.items():
+        e[feld] = 0
+        for lauf in laeufe:
+            e[feld] = _plus(e[feld], lauf.get(schluessel))
+    luecke = [
+        str(lauf.get("ausfall") or "Lauf ohne Messung")
+        for lauf in laeufe
+        if any(lauf.get(k) is None for k in werte.values())
+    ]
+    e["messung_fehlt"] = "; ".join(luecke) if luecke else None
 
 
 def _plus(a: float | None, b: float | None) -> float | None:
@@ -118,17 +139,21 @@ def _zaehle(e: dict, datum: str, satz: Mapping, gegenproben: Gegenproben) -> Non
     bid = str(satz["id"])
     preis = gesamt_von(satz)
     e["angezeigt"] += 1
-    probe = gegenproben.massgeblich(bid, preis, satz)
-    if probe is None or not im_fenster(datum, probe.datum):
-        e["ueberfaellig"] += 1
-    elif probe.status in gp.GEPRUEFT:
+    gute = gegenproben.letzte_gute(bid, preis, satz)
+    if gute is not None and im_fenster(datum, gute.datum):
         e["im_fenster"] += 1
-        e[probe.status] += 1
-        e["heute_geprueft"] += int(probe.datum == datum)
-    else:
-        e["ueberfaellig"] += 1
+        e[gute.status] += 1
+        e["heute_geprueft"] += int(gute.datum == datum)
+        return
+    e["ueberfaellig"] += 1
+    versuch = gegenproben.letzter_versuch(bid, preis, satz)
+    if (
+        versuch is not None
+        and versuch.status == gp.NICHT_PRUEFBAR
+        and im_fenster(datum, versuch.datum)
+    ):
         e["nicht_pruefbar"] += 1
-        e["gruende"][fehlerart(probe.grund or "")] += 1
+        e["gruende"][fehlerart(versuch.grund or "")] += 1
 
 
 def zusammenfassung(
@@ -144,25 +169,27 @@ def zusammenfassung(
         schluessel = gp.anbieter_aus_id(str(satz["id"]))
         namen.setdefault(schluessel, str(satz.get("anbieter") or schluessel))
         _zaehle(je[schluessel], datum, satz, gegenproben)
+    je_lauf: dict[str, list[Mapping]] = defaultdict(list)
     for lauf in laeufe:
-        if lauf.get("datum") != datum:
-            continue
-        e = je[str(lauf["anbieter"])]
-        for feld, wert in (
-            ("besuche", lauf.get("besuche")),
-            ("buendel_besucht", lauf.get("buendel")),
-            ("sekunden", lauf.get("sekunden")),
-        ):
-            e[feld] = _plus(e[feld], wert)
-        if lauf.get("ausfall"):
-            e["ausfall"].append(str(lauf["ausfall"]))
+        if lauf.get("datum") == datum:
+            je_lauf[str(lauf["anbieter"])].append(lauf)
+            if lauf.get("ausfall"):
+                je[str(lauf["anbieter"])]["ausfall"].append(str(lauf["ausfall"]))
+    for schluessel in list(je):
+        _messe(je[schluessel], je_lauf[schluessel])
     summe = _leer()
-    for e in je.values():
+    _messe(summe, [dict.fromkeys(("besuche", "buendel", "sekunden"), 0)])
+    fehlend = []
+    for s, e in je.items():
         for name in ZAEHLER:
+            summe[name] += e[name]
+        for name in MESSUNG:
             summe[name] = _plus(summe[name], e[name])
-        summe["sekunden"] = _plus(summe["sekunden"], e["sekunden"])
+        if e["messung_fehlt"]:
+            fehlend.append(f"{s}: {e['messung_fehlt']}")
         summe["gruende"].update(e["gruende"])
         summe["ausfall"] += e["ausfall"]
+    summe["messung_fehlt"] = "; ".join(fehlend) if fehlend else None
     anbieter = {
         s: {"name": namen.get(s, s), **_abschluss(e), "gruende": dict(e["gruende"])}
         for s, e in sorted(je.items())

@@ -5,8 +5,11 @@ Besuch ``nicht_pruefbar``) standen jede Nacht vor den fälligen Bündeln mit alt
 echter Prüfung; die ersten Besuche scheiterten gleichartig, der Schutzschalter schaltete
 den ganzen Anbieter ab, und prüfbare Bündel liefen aus dem 7-Tage-Fenster. Real: 240
 1&1-Bündel (``tarifaufschlag_aus_tarifraster``) nennen eine Tarif-Übersicht als Quelle.
-Seitdem stehen belegt gescheiterte Bündel hinter den fälligen prüfbaren, und der
-Schutzschalter schaltet nur die Art ab, die scheitert (Herleitung), nicht den Anbieter.
+Nachprüfung: auch nie geöffnete Bündel (o2, Herleitung überall leer) und ein einzelner
+Timeout schoben fällige Bündel hinaus, und „bestätigt, danach gescheitert“ zählte als
+überfällig. Seitdem gilt EINE Regel: früheste Frist zuerst (gute Prüfung + 7 Tage,
+ohne gute Prüfung erste Anzeige + 7), ein gescheiterter Versuch ändert die Frist nicht,
+und „im Fenster“ hängt nur an der letzten guten Prüfung (``gegenprobe_fenster``).
 """
 
 from __future__ import annotations
@@ -16,9 +19,9 @@ import itertools
 from test_beleg_skripte import lade_skript
 
 from telco_radar import gegenprobe as gp
+from telco_radar import gegenprobe_bilanz as bz
 from telco_radar import gegenprobe_fenster as gf
 from telco_radar.collect.geraete import gegenprobe_browser as gb
-from telco_radar.gegenprobe_reihe import SCHUTZ_GLEICHE_FEHLER
 
 SKRIPT = lade_skript("gegenprobe")
 HEUTE = "2026-11-22"
@@ -29,28 +32,33 @@ class _Args:
     gemessen_um = None
 
 
-def _satz(n: int, herleitung: str = "") -> dict:
+def _satz(n: int, anbieter: str = "congstar") -> dict:
     return {
-        "id": f"buendel--congstar--geraet-{n}-256gb-schwarz--tarif--24m",
-        "anbieter": "congstar",
+        "id": f"buendel--{anbieter}--geraet-{n}-256gb-schwarz--tarif--24m",
+        "anbieter": anbieter,
         "sku_id": f"geraet-{n}-256gb-schwarz",
         "tarif_name": "Tarif",
         "laufzeit_monate": 24,
-        "quelle_url": f"https://congstar.example/{n}",
-        "herleitung": herleitung,
+        "quelle_url": f"https://{anbieter}.example/{n}",
+        "abgerufen_am": HEUTE,
+        "tarif_monatlich": 10.0,
+        "geraet_monatsrate": 5.0,
+        "geraet_zuzahlung": 1.0,
+        "anschlusspreis": 0.0,
     }
 
 
-def _zeile(satz: dict, datum: str, status: str) -> gp.Ergebnis:
-    grund = "Auswahl nicht gefunden: x" if status == gp.NICHT_PRUEFBAR else None
+def _zeile(satz: dict, datum: str, status: str, grund: str = "") -> gp.Ergebnis:
+    if status == gp.NICHT_PRUEFBAR and not grund:
+        grund = "Auswahl nicht gefunden: x"
     return gp.Ergebnis(
         datum=datum,
         buendel_id=satz["id"],
-        anbieter="congstar",
+        anbieter=satz["anbieter"],
         status=status,
         anlass="fenster",
-        grund=grund,
-        gesamt_gespeichert=50.0,
+        grund=grund or None,
+        gesamt_gespeichert=bz.gesamt_von(satz),
     )
 
 
@@ -76,9 +84,9 @@ def test_dauerausfaelle_verdraengen_keine_faelligen_buendel(monkeypatch):
     zeilen = [_zeile(s, "2026-11-21", gp.NICHT_PRUEFBAR) for s in kaputt]
     zeilen += [_zeile(s, "2026-11-16", gp.BESTAETIGT) for s in gut]
     wahl = gf.kandidaten(
-        HEUTE, list(saetze.values()), lambda s: 50.0, gf.Gegenproben(zeilen), []
+        HEUTE, list(saetze.values()), bz.gesamt_von, gf.Gegenproben(zeilen), []
     )
-    assert {k.buendel_id for k in wahl if k.faellig} == set(saetze)
+    assert {k.buendel_id for k in wahl if k.faellig} >= {s["id"] for s in gut}
     lauf = _lauf(monkeypatch, saetze, {s["id"] for s in kaputt})
     lauf.alle(gf.plane(wahl, lambda bid: bid))
     ungeoeffnet = [s["id"] for s in gut if s["id"] not in lauf.ergebnisse]
@@ -88,25 +96,46 @@ def test_dauerausfaelle_verdraengen_keine_faelligen_buendel(monkeypatch):
     )
 
 
-def test_schutzschalter_schaltet_nur_die_scheiternde_art_ab(monkeypatch):
-    """Nie versuchte Bündel zweier Herleitungen gemischt: die Übersichts-Bündel
-    scheitern alle, die Produktseiten-Bündel lesen; alle Produktseiten werden besucht,
-    von den Übersichts-Bündeln nur ``SCHUTZ_GLEICHE_FEHLER``."""
-    uebersicht = [_satz(n, "tarifaufschlag_aus_tarifraster") for n in range(10)]
-    produkt = [_satz(n) for n in range(100, 110)]
-    saetze = {s["id"]: s for s in uebersicht + produkt}
-    gruppen = [
-        [(s["id"], gp.ANLASS_FENSTER)]
-        for paar in zip(uebersicht, produkt, strict=True)
-        for s in paar
-    ]
-    gruppen = sorted(
-        gruppen, key=lambda g: g[0][0] not in {s["id"] for s in uebersicht}
+def test_neue_unpruefbare_buendel_verdraengen_keine_faelligen(monkeypatch):
+    """o2: nie geöffnete Bündel, deren Seite nicht lesbar ist, und vor 6 Tagen
+    bestätigte, die morgen ablaufen (Prüfer-Reproduktion ``test_neu_ungeprueft``)."""
+    neu = [_satz(n, "o2") for n in range(8)]
+    alt = [_satz(n, "o2") for n in range(100, 108)]
+    saetze = {s["id"]: s for s in neu + alt}
+    zeilen = [_zeile(s, "2026-11-16", gp.BESTAETIGT) for s in alt]
+    wahl = gf.kandidaten(
+        HEUTE, list(saetze.values()), bz.gesamt_von, gf.Gegenproben(zeilen), []
     )
-    lauf = _lauf(monkeypatch, saetze, {s["id"] for s in uebersicht})
-    lauf.alle(gruppen)
-    assert all(s["id"] in lauf.ergebnisse for s in produkt)
-    besucht = [s for s in uebersicht if s["id"] in lauf.ergebnisse]
-    assert len(besucht) == SCHUTZ_GLEICHE_FEHLER
-    (eintrag,) = lauf.laeufe()
-    assert "tarifaufschlag_aus_tarifraster" in eintrag["ausfall"]
+    lauf = _lauf(monkeypatch, saetze, {s["id"] for s in neu})
+    lauf.alle(gf.plane(wahl, lambda bid: bid))
+    offen = [s["id"] for s in alt if s["id"] not in lauf.ergebnisse]
+    assert not offen, f"{len(offen)} von {len(alt)} nicht geöffnet; {lauf.laeufe()}"
+
+
+def test_einmal_gescheitert_rutscht_nicht_hinter_weniger_dringende():
+    zufall = _satz(1, "o2")
+    andere = [_satz(n, "o2") for n in range(10, 15)]
+    zeilen = [
+        _zeile(zufall, "2026-11-16", gp.BESTAETIGT),
+        _zeile(zufall, "2026-11-21", gp.NICHT_PRUEFBAR, "Timeout beim Laden"),
+        *(_zeile(s, "2026-11-17", gp.BESTAETIGT) for s in andere),
+    ]
+    wahl = gf.kandidaten(
+        HEUTE, [zufall, *andere], bz.gesamt_von, gf.Gegenproben(zeilen), []
+    )
+    erste = [k.buendel_id for k in wahl if k.faellig]
+    assert erste[0] == zufall["id"]
+
+
+def test_bestaetigt_vor_2_tagen_dann_nicht_pruefbar_zaehlt_im_fenster():
+    s = _satz(1, "o2")
+    proben = gf.Gegenproben(
+        [
+            _zeile(s, "2026-11-20", gp.BESTAETIGT),
+            _zeile(s, "2026-11-21", gp.NICHT_PRUEFBAR, "Timeout beim Laden"),
+        ]
+    )
+    e = bz.zusammenfassung(HEUTE, [s], proben, [])["anbieter"]["o2"]
+    assert (e["im_fenster"], e["ueberfaellig"], e["nicht_pruefbar"]) == (1, 0, 0)
+    wahl = gf.kandidaten(HEUTE, [s], bz.gesamt_von, proben, [])
+    assert [k.faellig for k in wahl] == [False]
