@@ -62,7 +62,7 @@ name: Klick-Tageslauf
 # ist GitHubs Warteschlangenverzoegerung fuer geplante Laeufe, keine
 # Eigenschaft der Minute 00:05 - ein anderer Cron-Wert haette denselben
 # Verzug. Seit P1717 haengt sich geraete.yml per `workflow_run` an das Ende
-# DIESES Laufs (nur bei `conclusion == success`), statt auf seinen eigenen,
+# DIESES Laufs (bei `success` oder `failure`), statt auf seinen eigenen,
 # unabhaengig verzoegerten Cron zu warten - das verkuerzt die Kette um eine
 # zweite Zufallsverzoegerung, auch wenn dieser Lauf selbst spaet startet.
 
@@ -161,8 +161,13 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      # Ein gestoerter Anbieter ist ein Ergebnis (Exit 0, Laufstatus in der
-      # Datei); rot wird der Schritt nur bei falscher Auswahl/Konfiguration.
+      # Ein Ausfall (0 Seiten gelesen, Strukturbruch; klick_vertrag.ausfall,
+      # Nachtlauf 21.11.2026) macht den Job rot (Exit 3, --rot-bei-ausfall),
+      # NACHDEM die Ergebnisdatei geschrieben ist: die Upload-Schritte unten
+      # laufen mit `if: always()`, `ablegen` und `belege` ebenso, fail-fast ist
+      # aus - kein anderer Anbieter verliert etwas. Exit 2 = falsche
+      # Auswahl/Konfiguration. Weil der Lauf dann "failure" endet, startet
+      # geraete.yml auch nach `failure` (dort Job-Bedingung).
       - name: Klick-Tageslauf
         env:
           PYTHONPATH: src
@@ -170,7 +175,8 @@ jobs:
         run: |
           python scripts/klick_tageslauf.py --root . \
             --anbieter "${{ matrix.anbieter }}" --ausgabe klick \
-            --job-start "$JOB_START" --job-frist-sekunden 10800
+            --job-start "$JOB_START" --job-frist-sekunden 10800 \
+            --rot-bei-ausfall
 
       # Nur das JSON: keine Screenshots, kein Seitentext, keine Cookies,
       # Adressen ohne Geheimnisse (klickergebnis). Fehlt die Datei, bleibt
