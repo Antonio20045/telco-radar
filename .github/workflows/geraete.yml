@@ -94,8 +94,10 @@ on:
   # `workflow_run` haengt den Geraetelauf an das Ende des Klick-Laufs statt
   # an eine zweite, unabhaengig verzoegerte Uhr - er startet dann so frueh,
   # wie es der (weiterhin verzoegerte) Klick-Lauf zulaesst, nicht spaeter.
-  # Nur bei `conclusion == success` (Job-Bedingung unten); bei Rot bleiben
-  # die drei Cron-Termine als Rueckfall (naechster Absatz).
+  # Bei `success` und `failure` (Job-Bedingung unten): seit dem 21.11.2026
+  # macht ein Klick-Ausfall eines Anbieters den Klick-Lauf rot, die anderen
+  # Anbieter sind trotzdem abgelegt und sollen gemessen werden. Abgebrochen
+  # (`cancelled`) startet nichts; dann bleiben die drei Cron-Termine.
   workflow_run:
     workflows: ["Klick-Tageslauf"]
     types: [completed]
@@ -108,6 +110,9 @@ on:
 
 permissions:
   contents: write
+  # Nur fuer den Schritt "Heute schon gemessen?": Ergebnis des Jobs `ablegen`
+  # eines roten Klick-Laufs lesen.
+  actions: read
 
 concurrency:
   # Nicht dieselbe Gruppe wie `radar`: die zwei Laeufe schreiben verschiedene
@@ -119,10 +124,11 @@ concurrency:
 
 jobs:
   geraete:
-    # Bei workflow_run nur bei gruenem Klick-Lauf; ein roter oder
-    # abgebrochener Klick-Lauf lost hier NICHTS aus, das Nachholen bleibt
-    # den drei Cron-Terminen (Anforderung "robust bei Ausfall", P1717).
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Bei workflow_run nach gruenem oder rotem Klick-Lauf (rot heisst: ein
+    # Anbieter fiel aus, die uebrigen sind abgelegt; klick.yml). Ein
+    # abgebrochener Lauf loest hier NICHTS aus, das Nachholen bleibt den drei
+    # Cron-Terminen (Anforderung "robust bei Ausfall", P1717).
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
     # Grosszuegig, weil die Bremse hier nicht die Rechenzeit ist, sondern die
     # Crawl-delay: zehn Sekunden je Abruf mal zwanzig Produktseiten sind
@@ -143,13 +149,31 @@ jobs:
       # erneuter gruener Klick-Lauf koennten sonst denselben Haendler am
       # selben Tag doppelt anstossen, Anforderung "kein Haendler doppelt",
       # P1717). Ein Lauf von Hand (`workflow_dispatch`) misst immer.
+      # Nach einem ROTEN Klick-Lauf misst er nur, wenn dessen Job `ablegen`
+      # gruen war (die Ergebnisse der uebrigen Anbieter liegen in main). Ist
+      # `plan` oder `ablegen` rot oder nicht gelaufen, endet er benannt; die
+      # Cron-Termine holen den Tag nach (21.11.2026, Pruefung zu PR 197).
       - name: Heute schon gemessen?
         id: heute
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           heute=$(date -u +%Y-%m-%d)
+          # Messtag fuer den Soll/Ist-Waechter: er liest genau die Lauf-Datei
+          # dieses Tages (eine Datei vom Vortag macht ihn nie gruen).
+          echo "datum=$heute" >> "$GITHUB_OUTPUT"
           stand=$(python3 -c "import json; print(json.load(open('data/state/geraete_tco.json')).get('updated',''))" 2>/dev/null || true)
+          ablage=gruen
+          if [ "${{ github.event_name }}" = "workflow_run" ] && [ "${{ github.event.workflow_run.conclusion }}" = "failure" ]; then
+            ablage=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/jobs?per_page=100" \
+              --jq '[.jobs[] | select(.name == "ablegen") | .conclusion][0] // "fehlt"' 2>/dev/null || echo "nicht lesbar")
+            if [ "$ablage" = "success" ]; then ablage=gruen; fi
+          fi
           if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$stand" = "$heute" ]; then
             echo "Bestand ist vom $stand - dieser Anstoss crawlt nicht."
+            echo "fertig=true" >> "$GITHUB_OUTPUT"
+          elif [ "$ablage" != "gruen" ]; then
+            echo "::warning::Klick-Lauf rot und Ablage nicht gruen (ablegen: $ablage) - kein Crawl auf altem Klick-Stand, Rueckfall sind die Cron-Termine."
             echo "fertig=true" >> "$GITHUB_OUTPUT"
           else
             echo "Bestand ist vom ${stand:-unbekannt}, heute ist $heute - es wird gemessen."
@@ -266,6 +290,12 @@ jobs:
             # Liste der Belegbilder aus den Releases (scripts/belege_manifest.py).
             git add data/state/belege_manifest.json
           fi
+          if [ -d data/state/geraete_lauf ]; then
+            # Lauf-Datei je Messtag (21.11.2026, Abnahmekriterium 1): Bilanz der
+            # Stufe und Soll/Ist-Vollstaendigkeit je Anbieter
+            # (src/telco_radar/geraete_lauf.py). Seite und Soll/Ist-Waechter lesen sie.
+            git add data/state/geraete_lauf
+          fi
           python scripts/waechter_leck.py
           if git diff --cached --quiet; then
             echo "Keine Aenderung am Geraetebestand."
@@ -371,6 +401,18 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: python scripts/geraete_abdeckung_mail.py --root .
+
+      # SOLL/IST (21.11.2026, Abnahmekriterium 1): rot, wenn ein Anbieter eine
+      # Luecke ohne Grund hat oder seine Zaehlung fehlt, ohne dass ein Ausfall
+      # benannt ist. Liest nur die Lauf-Datei des Messtags
+      # (data/state/geraete_lauf/<datum>.json), die "Run geraete stage"
+      # schreibt; Bestand und Seite sind zu diesem Zeitpunkt gesichert, rot wird
+      # nur das Signal. Er verschickt nichts und ruft kein Netz.
+      - name: Soll/Ist pruefen
+        if: always() && steps.heute.outputs.fertig != 'true'
+        env:
+          PYTHONPATH: src
+        run: python -m telco_radar.geraete_soll_waechter --root . --datum "${{ steps.heute.outputs.datum }}"
 
       # DER BUENDELWAECHTER (29.09.2026) macht den Lauf ROT, wenn ein
       # Pflichtanbieter kein Buendel liefert, ein Pflichtmodell ohne belegte
