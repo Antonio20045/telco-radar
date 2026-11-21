@@ -248,3 +248,75 @@ def test_fixtures_sind_die_dateien_der_nacht():
     assert "44840854026" in eintraege[NACHT]["quelle"]
     seiten = _lade(NACHT)["seiten"]
     assert len(seiten) == 21 and {s["status"] for s in seiten} == {"nicht_besucht"}
+
+
+MODELLE = [f"modell-{i}" for i in range(1, 9)]
+
+
+def _seite(geraet: str, status: str, stoerung=None, grund=None) -> dict:
+    return {
+        "adresse": f"https://beispiel.test/{geraet}",
+        "geraet": geraet,
+        "status": status,
+        "stoerung": stoerung,
+        "grund": grund,
+        "kombinationen": [],
+    }
+
+
+def _gemischt_belegt(tmp_path: Path, rest_grund: str) -> set[str]:
+    """Eine Serverfehler-Seite, drei Seitenform-Seiten, vier nicht besuchte mit
+    ``rest_grund``; gibt die belegten Modelle zurück."""
+    seiten = [
+        _seite("modell-1", "gestoert", "serverfehler", "Abruf gestört (HTTP 502)")
+    ]
+    seiten += [
+        _seite(m, "gestoert", "seitenform", "Strukturbruch") for m in MODELLE[1:4]
+    ]
+    seiten += [_seite(m, "nicht_besucht", None, rest_grund) for m in MODELLE[4:]]
+    lauf = {
+        "format": 1,
+        "anbieter": "1und1",
+        "name": "1&1",
+        "datum": HEUTE,
+        "laufstatus": "gestoert",
+        "grund": rest_grund,
+        "seiten": seiten,
+        "uebersichten": [],
+    }
+    wurzel = _wurzel(tmp_path, **{"1und1": lauf})
+    pflicht = "pflicht_anbieter:\n  - 1&1\npflicht_modelle:\n"
+    pflicht += "".join(f"  - {m}\n" for m in MODELLE)
+    (wurzel / "config" / "geraete_abdeckung.yaml").write_text(pflicht, "utf-8")
+    return {m for (a, m) in lade_und_pruefe(wurzel).luecken if a == "1&1"}
+
+
+@pytest.mark.parametrize(
+    "rest_grund",
+    [
+        "3 Seiten in Folge mit anderer Form: Strukturbruch",
+        "Zeitbudget des Jobs erschöpft: noch 120 s",
+        "verschoben: geraete.yml läuft",
+    ],
+    ids=["formbruch", "zeitbudget", "verschoben"],
+)
+def test_nicht_besuchte_seiten_nur_beim_stopp_durch_ausfall_belegt(
+    tmp_path, rest_grund
+):
+    """Nachprüfung zu PR 197: der Ausfall gilt je Datei, belegt wurde aber jede nicht
+    gelesene Seite. Stoppte der Lauf an Formbruch, Zeitbudget oder Verschiebung,
+    bleiben die nicht besuchten Seiten Befund; belegt ist nur die Serverfehler-Seite."""
+    assert _gemischt_belegt(tmp_path, rest_grund) == {"modell-1"}
+
+
+@pytest.mark.parametrize(
+    "rest_grund",
+    [
+        "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört "
+        "(HTTP 403)",
+        "2 Seiten luden nicht: Zeitüberschreitung",
+    ],
+    ids=["sperre", "zeitueberschreitung"],
+)
+def test_stopp_durch_ausfall_belegt_die_nicht_besuchten_seiten(tmp_path, rest_grund):
+    assert _gemischt_belegt(tmp_path, rest_grund) == {"modell-1", *MODELLE[4:]}

@@ -32,6 +32,11 @@ ROTATION_GELESEN = frozenset({LAUF_GELESEN})
 ORDNER = Path("data") / "state" / "klick"
 STAND_DATEI = "klick_stand.json"
 STOERUNG_SEITE = "seitenform"
+SEITE_NICHT_BESUCHT = "nicht_besucht"
+GRUND_NACH_STOERUNG = "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4)"
+"""Stopp nach Sperre, Challenge, Browserfehler oder Serverfehlern in Folge."""
+GRUND_ZEITUEBERSCHREITUNGEN = "Seiten luden nicht"
+"""Stopp nach Seiten, die nicht luden (``"<n> Seiten luden nicht: …"``)."""
 
 
 def abruf_gestoert(status: int | None) -> str | None:

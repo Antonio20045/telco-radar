@@ -6,25 +6,27 @@ Tarifdetail-Seite HTTP 502 und las keine Seite; seine 21 Produktseiten blieben
 der Wächter (``buendel_abdeckung``) las sie aber nicht und meldete zehn Geräte dieser
 Seiten als „ohne belegte Lücke“, als hätte niemand nach ihnen gesucht.
 
-``luecken`` macht aus jeder Ergebnisdatei vom Messtag mit Ausfall je Gerät einer
-nicht ganz gelesenen Seite eine belegte Lücke ``(Anbieter, Modell)`` mit dem Grund
-``GRUND``. Das Datum trägt nur eine Datei, deren Job an diesem Tag lief; sie gilt
-nur an diesem Tag und verjährt darum von selbst. Ein
-Gerät, das ein anderer Eintrag am selben Tag gelesen hat, steht ohnehin in der
-Matrix. Nicht belegt ist, was ``ausfall`` nicht als Ausfall zählt (Seitenform,
-Strukturbruch, leer, Verschiebung, ohne Laufstatus oder Grund), und auch im Ausfall
-eine Seite, die an ihrer eigenen Form scheiterte: das ist ein Mangel der Erfassung
-und bleibt Befund. Ein Anbieter ganz ohne Bündel bleibt Befund (``anbieter_leer``).
+``luecken`` macht aus jeder Ergebnisdatei vom Messtag mit Ausfall
+(``klick_vertrag.ausfall``) je Gerät einer Seite, die der Ausfall nicht lesen ließ,
+eine belegte Lücke ``(Anbieter, Modell)`` mit dem Grund ``GRUND``: gestört nicht an
+der eigenen Form, oder nicht besucht, weil der Lauf an einer Störung oder an nicht
+ladenden Seiten stoppte. Das Datum trägt nur eine Datei, deren Job an diesem Tag lief;
+sie verjährt darum von selbst. Befund bleiben Seiten anderer Form und nicht besuchte
+nach einem Stopp an Formbruch, Zeitbudget oder Verschiebung (Nachprüfung zu PR 197),
+ebenso ein Anbieter ganz ohne Bündel (``anbieter_leer``).
 """
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from ..klick_vertrag import (
+    GRUND_NACH_STOERUNG,
+    GRUND_ZEITUEBERSCHREITUNGEN,
     LAUF_GESTOERT,
     ORDNER,
-    ROTATION_GELESEN,
+    SEITE_NICHT_BESUCHT,
     STOERUNG_SEITE,
     ausfall,
     lies_ergebnisse,
@@ -48,12 +50,22 @@ def luecken(ergebnisse: list[dict], messtag: str | None) -> dict[tuple, str]:
     return belegt
 
 
+_STOPP_DURCH_AUSFALL = re.compile(
+    rf"^(?:{re.escape(GRUND_NACH_STOERUNG)}"
+    rf"|\d+ {re.escape(GRUND_ZEITUEBERSCHREITUNGEN)})"
+)
+
+
 def _vom_ausfall(seite: dict) -> bool:
-    """Nicht gelesen, und nicht an der eigenen Form gescheitert."""
-    eigene_form = seite.get("status") == LAUF_GESTOERT and (
-        seite.get("stoerung") == STOERUNG_SEITE
-    )
-    return seite.get("status") not in ROTATION_GELESEN and not eigene_form
+    """Gestört nicht an der eigenen Form, oder nicht besucht, weil der Lauf an einem
+    Ausfall stoppte (``_STOPP_DURCH_AUSFALL``); ein Stopp an Formbruch, Zeitbudget
+    oder Verschiebung belegt nichts."""
+    status = seite.get("status")
+    if status == LAUF_GESTOERT:
+        return seite.get("stoerung") != STOERUNG_SEITE
+    if status == SEITE_NICHT_BESUCHT:
+        return bool(_STOPP_DURCH_AUSFALL.match(str(seite.get("grund") or "")))
+    return False
 
 
 def luecken_im_repo(root: Path, messtag: str | None) -> dict[tuple, str]:
