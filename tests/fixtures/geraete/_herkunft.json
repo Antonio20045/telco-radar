@@ -946,6 +946,14 @@
       "sha256_roh": "309a08fd31fb7c21f1c3775f42b05f1ee8f8b1c78f7e7657d013bd6cec89168e"
     },
     {
+      "datei": "tarifwelt_mm_detail_iphone17_256_telekom_allnet50_rate1250_abgeleitet_20261108.json",
+      "abgeleitet_aus": "tarifwelt_mm_detail_iphone17_256_telekom_allnet50_20261108.json",
+      "filter": "ABGELEITET, kein echter Abruf: byteidentische Kopie der Quelldatei, nur hardware.variants[0].monthlyPrice von 0 auf 12.5 gesetzt (Ersetzung der Bytes \"monthlyPrice\":0 im Variantenblock); tariff.monthlyPrice 29.99 und alle Kostenposten unveraendert.",
+      "zweck": "Abnahmetest tests/test_geraete_tarifwelt_rate_2111.py: eine Geraeterate in der Antwort muss als geraet_monatsrate im Buendel und in kosten_ueber ankommen statt der frueheren Konstante 0.0 (Befund regel11-2111, 21.11.2026).",
+      "bytes_abgelegt": 26230,
+      "sha256_roh": "6040d7dc69fc80be670286cf3429cb122d84527ff3226707a10c6f90bf0888af"
+    },
+    {
       "datei": "tarifwelt_mm_detail_iphone17_256_o2_unlimited_m_20261108.json",
       "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?storage=256&tfi=6a1e946e959a3938fb86c58d",
       "abgerufen_am": "2026-11-08",

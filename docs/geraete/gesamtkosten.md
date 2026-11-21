@@ -47,7 +47,7 @@ Nutzungsmonaten, damit alle Angebote über denselben Zeitraum stehen.
 | congstar (`/geraete/apple/apple-iphone-16/`) | „36 mtl. Zahlungen“, „Monatliche Kosten 20,00 €“, „Anzahlung 1,00 €“, „721,00 € Gesamtpreis“ (ebenso 24 × 30,00 € + 1 €); „Die Dauer der Gerätelaufzeit hat keine Auswirkung auf die Tariflaufzeit.“; Tarif „24 Monate Laufzeit“ oder „Ohne Laufzeit“, „Einmalige Kosten 0,00 €“ | Gerätegesamtpreis = Anzahlung + N × Rate; Tarif getrennt; ohne Laufzeit 24 Vergleichsmonate |
 | 1&1 (`/iphone-16`, Datenblock `hwdVariantsHardwarePrices`) | „24 Monate Fix 42,– €/Mon.“, „36 Monate Fix 28,– €“ (dazu der Tarifpreis der Stufe), „+ 12 Monate Flex“ als freiwillige Verlängerung; „Sofortkauf 1008,– €“ = 24 × 42 = 36 × 28; `tariff.contractduration` 24; keine einmalige Gerätezahlung außer der Bereitstellung | N × Bündelbetrag + Bereitstellung; „Flex“ und Rückgabe zählen nicht |
 | o2 (`/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-gray-details`, Browser 21.11.2026) | „Gerät monatlich: 45,00 €“, „Ratenzahlung: 24 Monate“, „Gesamtpreis Gerät: 1.081,00 €“, „Tarif monatlich: 24,99 € (Mindestlaufzeit 24 Monate)“, „Gerät Anzahlung: 1,00 €“, „einmaliger Anschlusspreis 0,00 € 39,99 €“ (durchgestrichen), „Versandkosten: 6,99 €“ | Regel wie Vodafone/Telekom; Versand 6,99 € |
-| Saturn/MediaMarkt Tarifwelt (`tarife.mediamarkt.de`) | übersprungen: Single-Page-App ohne Text im HTML. Beleg ist die Schnittstellenantwort vom 08.11.2026 (`tests/fixtures/geraete/tarifwelt_mm_productdetail_*`): `oneTimeCosts` = Gerät 1 €, „Anschlusspreis Tarif“ 39,99 €, „Versandkosten“ 5,95 €; `monthlyCosts` = „Grundpreis Tarif“; `contractTerm` 24 | Gerätepreis einmalig + 24 × Grundpreis + Anschluss + Versand; keine Geräterate (0,00 €) |
+| Saturn/MediaMarkt Tarifwelt (`tarife.mediamarkt.de`) | übersprungen: Single-Page-App ohne Text im HTML. Beleg ist die Schnittstellenantwort vom 08.11.2026 (`tests/fixtures/geraete/tarifwelt_mm_productdetail_*`): `oneTimeCosts` = Gerät 1 €, „Anschlusspreis Tarif“ 39,99 €, „Versandkosten“ 5,95 €; `monthlyCosts` = „Grundpreis Tarif“; `contractTerm` 24 | Gerätepreis einmalig + 24 × Grundpreis + Anschluss + Versand; Geräterate aus `hardware.variants[0].monthlyPrice` (bisher immer 0,00 €), fehlt sie, ist die Zeile eine Lücke |
 
 ## Felder je Anbieter
 
@@ -58,7 +58,7 @@ Nutzungsmonaten, damit alle Angebote über denselben Zeitraum stehen.
 | o2 | `geraet_zuzahlung` (Anzahlung) | `tarif_monatlich`, 24 | × 24/36 | `anschlusspreis` | 6,99 € |
 | congstar | `geraet_zuzahlung` (Anzahlung) | `tarif_monatlich`/Phasen; Bindung 24, ohne Laufzeit 24 Vergleichsmonate | × 24/36 (Tarifrabatt auf die Rate eingerechnet) | `anschlusspreis` | 4,99 € |
 | 1&1 Ein-Vertrag | `geraet_zuzahlung` | `buendel_monatlich` × 24/36 (Tarif und Gerät) | (im Bündelbetrag) | `anschlusspreis` (39,90 €) | 0 € |
-| Saturn/MediaMarkt | `geraet_zuzahlung` (Gerätepreis einmalig) | `tarif_monatlich`, 24 | 0 € | `anschlusspreis` | 5,95 € |
+| Saturn/MediaMarkt | `geraet_zuzahlung` (Gerätepreis einmalig) | `tarif_monatlich`, 24 | `geraet_monatsrate` × 24 (gelesen, bisher 0 €) | `anschlusspreis` | 5,95 € |
 
 Der Export nennt die Spalte deshalb „Gerät einmalig EUR“, nicht „Anzahlung“.
 
