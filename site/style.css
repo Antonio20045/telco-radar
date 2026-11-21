@@ -6545,12 +6545,13 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   gap:4px 18px;list-style:none;margin:0;padding:0}
 .gr-vs-z{min-width:0;overflow-wrap:anywhere}
 .gr-vs-z summary{cursor:pointer}
+.gr-vs-zahl{font:700 14px/1.2 var(--sans);color:var(--ink)}
 .gr-vs-z--ohne summary{color:var(--ink-3)}
 .gr-vs-marke{color:var(--ink-3);font-size:12px}
 .gr-vs-z--offen .gr-vs-marke{color:var(--red-text)}
 .gr-vs-luecken{margin:4px 0 4px 16px;padding:0;font-size:12px;color:var(--ink-3)}
 .gr-vs-unbenannt{color:var(--ink)}
-.gr-vs-grund,.gr-vs-extra,.gr-vs-quelle{margin:4px 0 0 16px;font-size:12px;color:var(--ink-3)}
+.gr-vs-grund,.gr-vs-extra,.gr-vs-quelle,.gr-vs-ebene{margin:4px 0 0 16px;font-size:12px;color:var(--ink-3)}
 .gr-vs-fehlt,.gr-vs-weitere{margin:4px 0 0;font-size:12px;color:var(--ink-3)}
 .gr-vs-ausfall{margin:2px 0 0 16px;font-size:12px;color:var(--red-text)}
 @media (max-width:720px){

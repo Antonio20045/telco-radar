@@ -3,8 +3,10 @@
 ``python -m telco_radar.geraete_pipeline`` (Schritt „Run geraete stage“ in
 ``.github/workflows/geraete.yml``) ruft ``main``: erst ``run_geraete_stage`` wie bisher,
 dann ``schliesse_ab``: Soll je Anbieter zählen (``geraete_soll``), Ist und Lücken
-rechnen (``geraete_vollstaendigkeit``) und Bilanz samt ``vollstaendigkeit`` in die
-Lauf-Datei schreiben (``geraete_lauf``).
+rechnen (``geraete_vollstaendigkeit``), die Angebotszählung des Messtags aus dem
+Browser einhängen (``geraete_angebot.einhaengen``; fehlt sie, „Angebot heute nicht
+gezählt“ mit Grund) und Bilanz samt ``vollstaendigkeit`` in die Lauf-Datei schreiben
+(``geraete_lauf``).
 
 Zeitbudget (CLAUDE.md Regel 8): die Tarifwelt-Stufe hält nach sich
 ``RESERVE_NACH_STUFE_SEKUNDEN`` frei; die Soll-Zählung nimmt davon nur, was über
@@ -29,6 +31,7 @@ from pathlib import Path
 from . import geraete_abruf, geraete_lauf, geraete_soll, geraete_tarifwelt
 from .analyze.klick_nachholen import nachholen_aus_umgebung
 from .analyze.tco_store import TcoDB
+from .geraete_angebot.einhaengen import haenge_ein
 from .geraete_config import lade_katalog, lade_quellen
 from .geraete_vollstaendigkeit import Signale, baue
 
@@ -54,6 +57,17 @@ def mindest_sekunden(http_cfg: dict) -> float:
     return 2 * float(http_cfg.get("timeout_seconds", 20)) + 5.0
 
 
+def signale_fuer(tco: TcoDB, bilanz: dict, heute: str) -> Signale:
+    """Was der Lauf über Ausfälle weiß; auch für den Nachtrag einer späten
+    Angebotszählung (``geraete_angebot_nachtrag``)."""
+    return Signale(
+        erfassung=dict(tco.erfassung or {}),
+        tarifwelt=dict(bilanz.get("tarifwelt") or {}),
+        tarifwelt_modelle=tuple(geraete_tarifwelt.modelle_der_stufe()),
+        ausfall=None if tco.updated == heute else AUSFALL_BESTAND,
+    )
+
+
 def schliesse_ab(
     root: Path,
     heute: str,
@@ -70,21 +84,18 @@ def schliesse_ab(
         lade_quellen(Path(root)), hole, uhr, katalog, rest, mindest
     )
     tco = TcoDB(zustand / "geraete_tco.json")
-    signale = Signale(
-        erfassung=dict(tco.erfassung or {}),
-        tarifwelt=dict(bilanz.get("tarifwelt") or {}),
-        tarifwelt_modelle=tuple(geraete_tarifwelt.modelle_der_stufe()),
-        ausfall=None if tco.updated == heute else AUSFALL_BESTAND,
-    )
+    signale = signale_fuer(tco, bilanz, heute)
     namen = {g.device_id: geraete_soll.anzeigename(g) for g in katalog.geraete}
+    buendel = list(tco.buendel())
     voll = baue(
         heute,
         uhr().isoformat(timespec="seconds"),
-        tco.buendel(),
+        buendel,
         {name: s.als_dict() for name, s in soll.items()},
         signale,
         namen,
     )
+    haenge_ein(voll, zustand, heute, buendel, signale, katalog, namen)
     for zeile in voll["anbieter"]:
         modelle = zeile["ebenen"]["modelle"]
         log.info(

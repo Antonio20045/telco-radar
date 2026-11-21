@@ -10,10 +10,11 @@
   {% else %}
   <ul class="gr-vs-liste">
     {% for z in vs.zeilen %}
-    <li class="gr-vs-z{{ ' gr-vs-z--offen' if z.offen }}{{ ' gr-vs-z--ohne' if z.ohne_soll }}" data-anbieter="{{ z.name }}"{% if z.soll is not none %} data-soll="{{ z.soll }}" data-erfasst="{{ z.erfasst }}"{% endif %} data-ist="{{ z.ist }}" data-luecken="{{ z.luecken | length }}">
+    <li class="gr-vs-z{{ ' gr-vs-z--offen' if z.offen }}{{ ' gr-vs-z--ohne' if z.ohne_soll }}" data-anbieter="{{ z.name }}"{% if z.soll is not none %} data-soll="{{ z.soll }}" data-erfasst="{{ z.erfasst }}"{% endif %} data-ist="{{ z.ist }}" data-luecken="{{ z.luecken | length }}" data-ebene="{{ z.ebene }}">
       <details>
-        <summary>{{ z.satz }}{% if z.marke %} <span class="gr-vs-marke">· {{ z.marke }}</span>{% endif %}{% if vs.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ vs.stand }}</span>{% endif %}</summary>
+        <summary>{% if z.zahl %}{{ z.vorne }}<b class="gr-vs-zahl">{{ z.zahl }}</b>{{ z.hinten }}{% else %}{{ z.satz }}{% endif %}{% if z.marke %} <span class="gr-vs-marke">· {{ z.marke }}</span>{% endif %}{% if vs.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ vs.stand }}</span>{% endif %}</summary>
         {% if z.grund %}<p class="gr-vs-grund">{{ z.grund }}</p>{% endif %}
+        {% for s in z.ebenen_saetze %}<p class="gr-vs-ebene">{{ s }}</p>{% endfor %}
         {% if z.luecken %}
         <ul class="gr-vs-luecken">
           {% for l in z.luecken %}
@@ -21,7 +22,18 @@
           {% endfor %}
         </ul>
         {% endif %}
+        {% if z.ungezaehlt %}
+        <ul class="gr-vs-luecken gr-vs-ungezaehlt">
+          {% for u in z.ungezaehlt %}<li>{% if u.url %}<a href="{{ u.url }}" rel="noopener">{{ u.name }}</a>{% else %}{{ u.name }}{% endif %}: nicht gezählt ({{ u.grund }})</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% for h in z.hinweise %}<p class="gr-vs-grund">{{ h }}</p>{% endfor %}
         {% if z.nicht_im_soll %}<p class="gr-vs-extra">{{ z.nicht_im_soll }}</p>{% endif %}
+        {% if z.extras %}
+        <ul class="gr-vs-luecken gr-vs-extras">
+          {% for e in z.extras %}<li data-schluessel="{{ e.schluessel }}"{% if not e.benannt %} class="gr-vs-unbenannt"{% endif %}>{{ e.name }}: {{ e.grund }}</li>{% endfor %}
+        </ul>
+        {% endif %}
         {% if z.quelle_url %}<p class="gr-vs-quelle">Liste: <a href="{{ z.quelle_url }}" rel="noopener">{{ z.quelle_text }}</a>{% if z.gezaehlt %}, gezählt am {{ z.gezaehlt }}{% endif %}{% if z.gleiche_quelle %} · {{ z.gleiche_quelle }}{% endif %}</p>{% endif %}
       </details>
       {% if z.ausfall %}<p class="gr-vs-ausfall">{{ z.ausfall }}</p>{% endif %}
