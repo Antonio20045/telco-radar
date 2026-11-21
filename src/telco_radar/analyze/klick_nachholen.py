@@ -13,7 +13,14 @@ Ende von ``geraete.yml`` an diesem Pfad nicht in Konflikt geraten. Ist der Stand
 alt und läuft der Klick-Tageslauf (``klick.yml``) oder ist die GitHub-Auskunft nicht
 lesbar, wartet es in Abständen (``ABSTAND_S``) höchstens ``WARTEN_HOECHSTENS_S``, aber
 nie über die Restzeit des Jobs hinaus (Regel 8: ``JOB_S`` abzüglich Vor- und Nachlauf).
-Läuft kein Klick-Lauf des Tages, bleibt es bei einem Abruf.
+Läuft kein Klick-Lauf des Tages, bleibt es bei einem Abruf. Eine GitHub-Auskunft
+„fertig“ für den gesamten Tageslauf ist dafür kein verlässlicher Schlusspunkt: ihren
+Commit schreibt erst der letzte Job ``ablegen`` (``klick.yml``), der nach allen
+Anbietern läuft, sein Push kann der Auskunft also noch nachhinken (1&1, Messlauf
+21.11.2026, Lauf 44840854026: „fertig“ stand schon, der Stand blieb noch einen
+Abruf lang beim Vortag). „Fertig“ muss sich darum einmal wiederholen, bevor es den
+noch veralteten Anbieter endgültig aufgibt; „keiner“ (kein Lauf heute) bleibt dagegen
+beim ersten Abruf.
 
 Bleibt eine Datei alt, ändert sich nichts am Merge: sie liefert nichts
 (``klick_zusammenfuehrung.GRUND_NICHT_HEUTE``), der Bestand behält die Klick-Messung mit
@@ -211,6 +218,7 @@ class Nachholen:
             "grund": None,
         }
         geholt = False
+        fertig_bestaetigt = False
         while True:
             bilanz["klicklauf"] = zustand = self.klicklauf(heute)
             try:
@@ -222,8 +230,12 @@ class Nachholen:
             bilanz["abrufe"] += 1
             geholt = dateien > 0
             bilanz["veraltet"] = veraltet(ziel, heute, geplant) if geholt else vorher
-            if not bilanz["veraltet"] or zustand in (FERTIG, KEINER):
+            if not bilanz["veraltet"] or zustand == KEINER:
                 break
+            if zustand == FERTIG:
+                if fertig_bestaetigt:
+                    break
+                fertig_bestaetigt = True
             if (gewartet := self.uhr() - beginn) + self.abstand_s > frist:
                 bilanz["grund"] = f"nach {gewartet:.0f} s nicht vom Messtag"
                 break
