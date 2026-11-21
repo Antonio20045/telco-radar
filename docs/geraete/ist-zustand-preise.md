@@ -78,7 +78,7 @@ Offline-Nachweis gegen den committeten Stand des 20.11. (Klick-Zusammenführung 
 
 | Punkt | Stand |
 |---|---|
-| Soll gegen Ist je Kombination | offen |
+| Soll gegen Ist je Kombination | Stufe 1: Modelle je Anbieter gegen dessen eigene Liste, Lauf-Datei `data/state/geraete_lauf/<datum>.json`, Wächter `geraete_soll_waechter`; Speicher und Kombinationen offen (Stufe 2, Browser) |
 | Eine Kostenformel | erledigt mit #175: `kosten_ueber` rechnet Seite, Historie, Export, Regel 11 und Belegwahl |
 | Unabhängige Gegenprobe | Teil 1 in #177: zweiter Leser im Browser |
 | Nachvollziehbarkeit je Preis | Teil 2 in #178: Beleg je Preis, Seite „Preisänderungen“ |

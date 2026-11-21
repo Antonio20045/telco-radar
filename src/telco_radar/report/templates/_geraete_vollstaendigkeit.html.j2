@@ -1,0 +1,33 @@
+{# Vollständigkeit je Anbieter (Abnahmekriterium 1, 21.11.2026): Soll aus der eigenen
+   Liste des Anbieters gegen die erfassten Modelle des Messtags. Zahlen und Gründe
+   stehen fertig in der Lauf-Datei (geraete_vollstaendigkeit.py); hier nur die Hülle.
+   Aufgeklappt: die Lücken mit Grund und die Quelle der Liste. #}
+{% if vollstaendigkeit is defined %}
+{% set vs = vollstaendigkeit(geraete.messdatum.juengster if geraete.messdatum else '') %}
+<section class="gr-vs" id="vollstaendigkeit" aria-label="Vollständigkeit je Anbieter">
+  {% if vs.fehlt %}
+  <p class="gr-vs-fehlt">{{ vs.fehlt }}</p>
+  {% else %}
+  <ul class="gr-vs-liste">
+    {% for z in vs.zeilen %}
+    <li class="gr-vs-z{{ ' gr-vs-z--offen' if z.offen }}{{ ' gr-vs-z--ohne' if z.ohne_soll }}" data-anbieter="{{ z.name }}"{% if z.soll is not none %} data-soll="{{ z.soll }}" data-erfasst="{{ z.erfasst }}"{% endif %} data-luecken="{{ z.luecken | length }}">
+      <details>
+        <summary>{{ z.satz }}{% if z.marke %} <span class="gr-vs-marke">{{ z.marke }}</span>{% endif %}{% if vs.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ vs.stand }}</span>{% endif %}</summary>
+        {% if z.grund %}<p class="gr-vs-grund">{{ z.grund }}</p>{% endif %}
+        {% if z.luecken %}
+        <ul class="gr-vs-luecken">
+          {% for l in z.luecken %}
+          <li data-schluessel="{{ l.schluessel }}"{% if not l.benannt %} class="gr-vs-unbenannt"{% endif %}>{% if l.url %}<a href="{{ l.url }}" rel="noopener">{{ l.name }}</a>{% else %}{{ l.name }}{% endif %}: {{ l.grund }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if z.nicht_im_soll %}<p class="gr-vs-extra">{{ z.nicht_im_soll }}</p>{% endif %}
+        {% if z.quelle_url %}<p class="gr-vs-quelle">Liste: <a href="{{ z.quelle_url }}" rel="noopener">{{ z.quelle_text }}</a>{% if z.gezaehlt %}, gezählt am {{ z.gezaehlt }}{% endif %}{% if z.gleiche_quelle %} · {{ z.gleiche_quelle }}{% endif %}</p>{% endif %}
+      </details>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if vs.weitere %}<p class="gr-vs-weitere">{{ vs.weitere }}</p>{% endif %}
+  {% endif %}
+</section>
+{% endif %}

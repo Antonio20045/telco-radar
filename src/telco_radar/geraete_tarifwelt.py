@@ -97,6 +97,8 @@ class Ergebnis:
             "modelle": self.modelle,
             "ungelesen": list(self.ungelesen),
             "grund": self.grund,
+            "nicht_lieferbar_liste": [list(e) for e in self.nicht_lieferbar],
+            "luecken_liste": [list(e) for e in self.luecken],
         }
 
 
