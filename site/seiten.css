@@ -4278,8 +4278,6 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   white-space:nowrap}
 .gr-pb-gp--bestaetigt{color:var(--gruen-tief);border-color:var(--gruen-tief)}
 .gr-pb-gp--bestaetigt::before{content:"✓ "}
-.gr-pb-gp--abweichend{color:var(--red-text);border-color:var(--red-text)}
-.gr-pb-gp--abweichend::before{content:"≠ "}
 .gr-pb-gp--nicht_pruefbar,.gr-pb-gp--offen{color:var(--ink-4)}
 .gr-pb-daten{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;
   margin:2px 0 10px}
@@ -4290,7 +4288,6 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pb-bild{display:block;width:240px;max-width:100%;height:auto;min-height:40px;
   background:var(--rule-2);border:1px solid var(--rule)}
 .gr-pb-bildzeile,.gr-pb-abw,.gr-pb-grund{display:block;font-size:12px;color:var(--ink-3)}
-.gr-pb-abw{color:var(--red-text)}
 @media (max-width:600px){
   .gr-pb>summary,.gr-pb-zeile{display:grid;grid-template-columns:1fr auto;gap:2px 10px}
   .gr-pb-anb{grid-column:1/-1}
@@ -4329,5 +4326,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pb>summary::-webkit-details-marker{display:none}
 .gr-pb>summary::after{content:"+";margin-left:auto;color:var(--ink-4)}
 .gr-pb[open]>summary::after{content:"–"}
+.gr-pb-gp--erfassungsluecke{color:var(--ink-2);border-color:var(--ink-3)}
+.gr-pb-gp--erfassungsluecke::before{content:"○ "}
 .pa-einmal{font-size:12px;padding:1px 7px;border:1px dashed var(--ink-4);border-radius:999px;
   color:var(--ink-2);margin-left:6px;white-space:nowrap}
