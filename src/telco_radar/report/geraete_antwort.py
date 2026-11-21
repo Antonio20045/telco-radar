@@ -48,6 +48,41 @@ def _satz_name(modell: dict) -> str:
     return f"{hersteller} {kurz}"
 
 
+FALL_ZEILEN = "zeilen"
+FALL_ALT = "alt"
+FALL_FREMD = "fremd"
+FALL_GESPERRT = "gesperrt"
+FALL_UNVOLLSTAENDIG = "unvollstaendig"
+FALL_NICHT_ERFASST = "nicht_erfasst"
+
+
+def fall(satz: dict) -> str:
+    """Welcher Satz den Block trägt - die eine Entscheidung, die Antwortsatz
+    und Leersatz teilen (Prüfer zu PR 209: der Leersatz darf weder fehlen,
+    wo der Antwortsatz keinen Grund nennt, noch ihm widersprechen). ``satz`` ist
+    der Satz eines Bandes (``zeilen``, ``alt``, ``fremd``, ``gesperrt``,
+    ``unvollstaendig``)."""
+    for name in (FALL_ZEILEN, FALL_ALT, FALL_FREMD, FALL_GESPERRT, FALL_UNVOLLSTAENDIG):
+        if satz.get(name):
+            return name
+    return FALL_NICHT_ERFASST
+
+
+def leersatz(slot: dict, fall_: str) -> str | None:
+    """Der Satz im Graphfeld eines Paares, dessen Messungen alle nicht zählen
+    (F3, 14.10.2026); `None` ohne Messungen. Nennt der Antwortsatz die Gründe
+    schon (``FALL_GESPERRT``), steht keiner doppelt; sagt er „kein Bündel
+    erfasst“, sagt der Leersatz dasselbe; sonst nennt er die Gründe."""
+    grund = notbremse.gruende([m for tage in slot.values() for m in tage.values()])
+    if not grund:
+        return None
+    if fall_ == FALL_GESPERRT:
+        return notbremse.LEERSATZ
+    if fall_ == FALL_NICHT_ERFASST:
+        return notbremse.LEERSATZ_NICHT_ERFASST
+    return notbremse.LEERSATZ_GRUND.format(grund=grund)
+
+
 def _ohne_zeilen(
     beginn: str,
     alte: list | None,
@@ -57,7 +92,15 @@ def _ohne_zeilen(
     h: int,
 ) -> str | None:
     """Der Satz eines Blocks ohne Zeile - alt, fremder Zeitraum, gesperrt,
-    unvollständig; `None`, wenn nichts davon zutrifft."""
+    unvollständig; `None`, wenn nichts davon zutrifft (``fall``)."""
+    welcher = fall(
+        {
+            FALL_ALT: alte,
+            FALL_FREMD: fremd,
+            FALL_GESPERRT: gesperrt,
+            FALL_UNVOLLSTAENDIG: unvollstaendig,
+        }
+    )
     alte = alte or []
     alt_seit = max(
         (
@@ -67,15 +110,15 @@ def _ohne_zeilen(
         ),
         default="",
     )
-    if alte:
+    if welcher == FALL_ALT:
         stand = (
             f"die letzte Messung ist vom {kurz_datum(alt_seit)}"
             if alt_seit
             else "das Abrufdatum der letzten Bündel ist unbekannt"
         )
         return f"{beginn} liegt kein aktueller Stand vor – {stand}."
-    if fremd:
-        beste_fremd = fremd[0]
+    if welcher == FALL_FREMD:
+        beste_fremd = (fremd or [])[0]
         monate = beste_fremd.get("leitzahl_monate")
         zeit = (
             zeitraum_wort([monate])
@@ -89,11 +132,13 @@ def _ohne_zeilen(
             "Über zwei Laufzeiten gibt es keinen Vergleich "
             f"(Ansicht: {zeitraum_wort([h])})."
         )
-    if gesperrt:
-        wer = _esc(", ".join(notbremse.namen(gesperrt)))
+    if welcher == FALL_GESPERRT:
+        wer = _esc(", ".join(notbremse.namen(gesperrt or [])))
         return f"{beginn} steht kein Bündel im Vergleich: {wer}."
-    if unvollstaendig:
-        wer = _esc(", ".join(dict.fromkeys(k["anbieter"] for k in unvollstaendig)))
+    if welcher == FALL_UNVOLLSTAENDIG:
+        wer = _esc(
+            ", ".join(dict.fromkeys(k["anbieter"] for k in unvollstaendig or []))
+        )
         return f"{beginn} hat kein Bündel einen vollständigen Preis: {wer}."
     return None
 

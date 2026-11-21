@@ -76,6 +76,10 @@ DELTA_PLUS = "Plus: {betrag} € günstiger mit Zweitprodukt"
 DELTA_PLUS_BIS = "Plus: bis {betrag} € günstiger mit Zweitprodukt"
 SATZ_PLUS = SATZ_BEDINGT + " Ohne Plus kostet derselbe Tarif {betrag} € im Monat mehr."
 LEERSATZ = "Keine Kurve: die Preise zählen hier nicht im Vergleich."
+LEERSATZ_GRUND = (
+    "Keine Kurve: die gemessenen Preise zählen nicht im Vergleich ({grund})."
+)
+LEERSATZ_NICHT_ERFASST = "Keine Kurve: kein Bündel erfasst."
 
 
 def _betrag(wert: float) -> str:
@@ -324,15 +328,6 @@ def gruende(karten: list) -> str:
     """„Schätzung“, „Aktion abgelaufen“, „Quarantäne“ …, je Grund einmal."""
     kurz = (z["kurz"] for k in karten if (z := zustand(k)) is not None)
     return ", ".join(dict.fromkeys(kurz))
-
-
-def leersatz(slot: dict) -> str | None:
-    """Der Satz im Graphfeld eines Paares der Zeitreihe, das nur Messungen hat,
-    die nicht zählen (F3, 14.10.2026); `None`, wenn es gar keine Messungen hat.
-    Die Gründe je Anbieter nennt der Antwortsatz darüber, nicht dieser Satz."""
-    if gruende([m for tage in slot.values() for m in tage.values()]):
-        return LEERSATZ
-    return None
 
 
 def nur_zaehlende(messungen: dict) -> dict:
