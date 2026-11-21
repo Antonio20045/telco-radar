@@ -2,15 +2,63 @@ name: Gegenprobe Gerätepreise
 
 # Liest gespeicherte Bündelpreise ein zweites Mal, unabhängig vom Sammler: ein
 # echter Browser öffnet die Produktseite, wählt wie ein Kunde und liest den
-# SICHTBAREN Preis (scripts/gegenprobe.py). Geprüft wird jede Preisänderung des
-# Tages und je Anbieter eine feste Stichprobe (gegenprobe.STICHPROBE_JE_ANBIETER).
-# Ergebnis: data/state/gegenprobe/<datum>.jsonl, Bilder im Release
-# gegenprobe-<datum>.
+# SICHTBAREN Preis (scripts/gegenprobe.py). Ziel (Abnahmekriterium 2): jedes
+# angezeigte Bündel binnen GEGENPROBE_FENSTER_TAGE = 7 gegengeprüft, jede
+# Preisänderung am Tag ihres Auftretens (src/telco_radar/gegenprobe_fenster.py).
 #
-# Läuft nach dem Gerätelauf (workflow_run, nur bei grünem Lauf) und von Hand.
-# Eigene concurrency-Gruppe ohne Abbruch (Harte Regel 9). Zeitbudget (Regel 8):
-# timeout-minutes 60 = JOB_MINUTEN in scripts/gegenprobe.py; das Skript rechnet
-# --job-frist-sekunden ab --job-start und hört PUFFER_S vor dem Timeout auf.
+# ABLAUF (Muster klick.yml)
+#   plan       scripts/gegenprobe.py --plan: JSON-Liste der Anbieter-Jobs, für die
+#              etwas fällig ist (Änderung des Tages oder Fenster läuft ab). Leer:
+#              nichts zu tun, alle weiteren Jobs entfallen (Aussteigen nur dann).
+#   gegenprobe Matrix je Job (ein Job je Host: telekom, o2, vodafone, congstar,
+#              1-1, saturn-mediamarkt für alle drei Netze), jeder mit eigener
+#              Restzeit ab JOB_START. Schreibt nur seine Teildatei
+#              teile/<job>.jsonl + .lauf.json (Artefakt gegenprobe-teil-<job>)
+#              und lädt Bilder ins Release gegenprobe-<datum>.
+#   ablegen    der EINZIGE Job, der committet: scripts/gegenprobe_ablegen.py
+#              ergänzt data/state/gegenprobe/<datum>.jsonl, schreibt die Läufe
+#              und die Bilanz data/state/gegenprobe/bilanz/<datum>.json. Fehlt
+#              die Teildatei eines geplanten Jobs (--erwartet), steht sein
+#              Anbieter als Lauf ohne Messung mit Grund in der Bilanz, nie als 0.
+# Ein zweiter Anstoß am selben Tag (nächster Gerätelauf) ergänzt: plan sieht,
+# was heute schon geöffnet wurde, und prüft nur den Rest.
+#
+# ZEIT (CLAUDE.md Regel 8)
+#   plan        timeout 10 min
+#   gegenprobe  timeout 160 min = MATRIX_JOB_MINUTEN in scripts/gegenprobe.py;
+#               --job-frist-sekunden 9000 = MATRIX_JOB_FRIST_S (PUFFER_S = 600 s
+#               für Einrichten, Bilder, Artefakt). Ein Bündel wird VORLAUF_TAGE = 2
+#               vor Ablauf fällig, also ab Tag 5: im Dauerbetrieb kommt jede Seite
+#               alle 5 Tage dran, die Last je Nacht ist Besuche / 5 (nicht / 7).
+#               Reihenfolge: früheste Frist zuerst (gegenprobe_fenster); Dauer-
+#               fehler kommen nach WIEDERHOLUNG_TAGE = 2 wieder, nicht jede Nacht,
+#               und höchstens VERDAECHTIG_JE_NACHT = 10 verdächtige Seiten je
+#               Anbieter und Nacht. Erster Lauf 1&1: 240 Übersichtsbündel (Quelle
+#               Tarif-Übersicht, nicht lesbar) = 28 Seitenbesuche, gescheitert je
+#               ~10 s (21.11. gemessen) = ~5 min, schlimmstenfalls (Ladefrist 45 s
+#               + Ruhe 15 s) 28 min; danach je Nacht höchstens 10 = ~2 min.
+#               Den Anbieter stoppt nur Sperre oder 5 Serverfehler in Folge.
+#               Gemessen 21.11.2026 (je ein Seitenbesuch lokal), Besuche aus dem
+#               Bestand:
+#                 o2        1106 x 16,6 s / 5 = 61 min
+#                           + Preisänderungen bis 230 Besuche = 64 min -> 125 min
+#                 telekom    848 x 26,8 s / 5 = 76 min (Crawl-delay 10 s < Besuch)
+#                 congstar   936 x ~20 s / 5 = 62 min (12 s gemessen, gescheitert)
+#                 saturn-mm  730 x 15,6 s / 5 = 38 min
+#                 1-1        157 x 59,3 s / 5 = 31 min
+#                 vodafone   189 x 33,1 s / 5 = 21 min
+#               150 min Frist: o2 passt auch am schweren Änderungstag mit 25 min
+#               (20 %) Luft für langsamere Läufer, Telekom mit 74 min. Vorlauf 2
+#               statt 1 lässt einen Tag Luft, wenn eine Nacht ausfällt. o2 NICHT in
+#               zwei Jobs geteilt: beide träfen denselben Host, der Abstand je Host
+#               gälte dann nur halb. Der erste Durchgang (alles überfällig) braucht
+#               bei o2, Telekom und congstar 2 bis 3 Läufe; jeder Gerätelauf
+#               (bis 3 am Tag) stößt einen an, der ergänzt.
+#   ablegen     timeout 10 min
+# GitHub-gehostete Standard-Läufer, öffentliches Repo: kostenlos.
+#
+# Läuft nach dem Gerätelauf (workflow_run, auch nach rotem Lauf, nie nach
+# abgebrochenem) und von Hand. Eigene concurrency-Gruppe ohne Abbruch (Regel 9).
 
 on:
   workflow_run:
@@ -18,78 +66,142 @@ on:
     types: [completed]
   workflow_dispatch:
 
-permissions:
-  contents: write
+permissions: {}
 
 concurrency:
   group: gegenprobe
   cancel-in-progress: false
 
 jobs:
-  gegenprobe:
+  plan:
     # Auch nach rotem Geraetelauf: rot meldet meist nur der Abdeckungswaechter am
     # Ende, Bestand und Seite sind dann schon committet. Nur ein abgebrochener
     # Lauf (cancelled) hat keinen sicheren Bestand.
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      jobs: ${{ steps.plan.outputs.jobs }}
     steps:
-      - name: Jobstart merken
-        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
-
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # Ein zweiter Anstoß am selben Tag (Gerätelauf ohne neue Messung) prüft
-      # nicht noch einmal; von Hand wird immer geprüft.
-      - name: Heute schon geprüft?
-        id: heute
-        run: |
-          stand=$(python3 -c "import json; print(json.load(open('data/state/geraete_tco.json')).get('updated',''))")
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ -f "data/state/gegenprobe/${stand}.jsonl" ]; then
-            echo "Gegenprobe für $stand liegt schon vor."
-            echo "fertig=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "fertig=false" >> "$GITHUB_OUTPUT"
-          fi
 
       - uses: actions/setup-python@v5
-        if: steps.heute.outputs.fertig != 'true'
         with:
           python-version-file: .python-version
 
       - name: Abhängigkeiten
-        if: steps.heute.outputs.fertig != 'true'
+        run: pip install -r requirements.txt
+
+      # Ohne Netz und ohne Browser: welche Anbieter-Jobs haben etwas fällig?
+      # Scheitert der Plan (Exit 2: Bestand unlesbar), ist das ein benannter
+      # Ausfall und der Job rot, nie eine leere Liste ("nichts fällig").
+      - name: Fällige Jobs
+        id: plan
+        env:
+          PYTHONPATH: src
+        run: |
+          if ! jobs=$(python scripts/gegenprobe.py --root . --plan); then
+            echo "::error title=Gegenprobe-Plan::Plan gescheitert (Bestand unlesbar?), keine Gegenprobe gelaufen"
+            exit 1
+          fi
+          echo "Fällige Jobs: $jobs"
+          echo "jobs=$jobs" >> "$GITHUB_OUTPUT"
+
+  gegenprobe:
+    needs: plan
+    if: needs.plan.outputs.jobs != '[]' && needs.plan.outputs.jobs != ''
+    runs-on: ubuntu-latest
+    # = --job-frist-sekunden 9000 unten + PUFFER_S = MATRIX_JOB_MINUTEN
+    timeout-minutes: 160
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        anbieter: ${{ fromJSON(needs.plan.outputs.jobs) }}
+    steps:
+      # Erster Schritt: ab hier zaehlt die Restzeit DIESES Jobs.
+      - name: Jobstart merken
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Abhängigkeiten
         run: |
           pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
       - name: Gegenprobe
-        if: steps.heute.outputs.fertig != 'true'
         env:
           PYTHONPATH: src
           GH_TOKEN: ${{ github.token }}
         run: |
           set -o pipefail
+          mkdir -p teile
           python scripts/gegenprobe.py --root . --hochladen \
-            --job-start "$JOB_START" --job-frist-sekunden 3000 \
-            2>&1 | tee gegenprobe.log
+            --anbieter "${{ matrix.anbieter }}" \
+            --ausgabe "teile/${{ matrix.anbieter }}.jsonl" \
+            --job-start "$JOB_START" --job-frist-sekunden 9000 \
+            2>&1 | tee "teile/${{ matrix.anbieter }}.log"
 
-      - name: Log sichern
-        if: always() && steps.heute.outputs.fertig != 'true'
+      # Nur Zeilen, Läufe und Log: keine Bilder (die liegen im Release).
+      - name: Teildatei hochladen
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gegenprobe-log-${{ github.run_id }}
-          path: gegenprobe.log
+          name: gegenprobe-teil-${{ matrix.anbieter }}
+          path: teile/
+          retention-days: 7
           if-no-files-found: warn
 
+  ablegen:
+    # Auch wenn ein Anbieter-Job scheitert: die anderen werden abgelegt.
+    needs: [plan, gegenprobe]
+    if: ${{ always() && needs.plan.result == 'success' && needs.plan.outputs.jobs != '[]' && needs.plan.outputs.jobs != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Abhängigkeiten
+        run: pip install -r requirements.txt
+
+      - name: Teildateien holen
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gegenprobe-teil-*
+          path: teile
+
+      # Der Bestand kann seit dem Plan gewachsen sein: erst holen, dann ablegen.
+      # Exit 1, wenn eine Teildatei unlesbar ist; die lesbaren sind dann abgelegt
+      # und werden unten trotzdem committet.
+      - name: Ablegen
+        env:
+          PYTHONPATH: src
+        run: |
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          python scripts/gegenprobe_ablegen.py --root . --quelle teile \
+            --erwartet '${{ needs.plan.outputs.jobs }}'
+
       - name: Commit Ergebnis
-        if: steps.heute.outputs.fertig != 'true'
+        if: ${{ !cancelled() }}
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
           git add data/state/gegenprobe
           python scripts/waechter_leck.py
           if git diff --cached --quiet; then
