@@ -1,6 +1,46 @@
 {
- "stand": "2026-11-20",
+ "stand": "2026-11-21",
  "videos": [
+  {
+   "id": "n-LwSQq3xYE",
+   "titel": "Everyone is sleeping on Gemini 4 Neon",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-21",
+   "dauer_sekunden": 3000,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "n-LwSQq3xYE.jpg"
+  },
+  {
+   "id": "jSd9seWLteg",
+   "titel": "Hyperscale Serverless Auto-Pause and Billing",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-21",
+   "dauer_sekunden": 37,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "jSd9seWLteg.jpg"
+  },
+  {
+   "id": "7_pMINxEEPU",
+   "titel": "What else could you use this for?",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-21",
+   "dauer_sekunden": 69,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "7_pMINxEEPU.jpg"
+  },
+  {
+   "id": "-u_dteck25c",
+   "titel": "Azure SQL Hyperscale Vector Search at Scale",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-21",
+   "dauer_sekunden": 31,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "-u_dteck25c.jpg"
+  },
   {
    "id": "wqNIzUmNt9M",
    "titel": "AI News: This Is The Make or Break Week!!",
@@ -30,6 +70,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "oJIuz3AFfEQ.jpg"
+  },
+  {
+   "id": "mX7wHNnsghs",
+   "titel": "How to claim your business in ChatGPT with Shopify",
+   "kanal": "OpenAI",
+   "datum": "2026-11-20",
+   "dauer_sekunden": 35,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "mX7wHNnsghs.jpg"
   },
   {
    "id": "hWQjNS8iP7M",
@@ -250,143 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "4LINhsEZEDI.jpg"
-  },
-  {
-   "id": "12mJ2DyTz2s",
-   "titel": "Bring Your Own Agent Harness",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-11-19",
-   "dauer_sekunden": 47,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "12mJ2DyTz2s.jpg"
-  },
-  {
-   "id": "w9VqhLZhRks",
-   "titel": "Preparing for Service Outages",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 27,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "w9VqhLZhRks.jpg"
-  },
-  {
-   "id": "pVc6KkjeCfU",
-   "titel": "Behind the scenes with Genie 4",
-   "kanal": "Google DeepMind",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 154,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "pVc6KkjeCfU.jpg"
-  },
-  {
-   "id": "hnpNRoKdneo",
-   "titel": "How to Use Claude with Blender",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 333,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hnpNRoKdneo.jpg"
-  },
-  {
-   "id": "hT0qW_DRFLw",
-   "titel": "The Reason No One Can Catch NVIDIA",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-18",
-   "dauer_sekunden": 98,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hT0qW_DRFLw.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-20",
-   "abgerufen": "2026-11-20"
+   "versucht": "2026-11-21",
+   "abgerufen": "2026-11-21"
   }
  },
  "error": null
