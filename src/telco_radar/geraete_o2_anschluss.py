@@ -36,11 +36,13 @@ from dataclasses import replace
 from datetime import date
 
 from . import geraete_tarifwelt
+from .analyze.geraete_pruefstatus import ist_bedingter_tarif
 from .collect.geraete import o2
 from .collect.geraete.basis import GeraeteAbrufFehler, _gleich, antwort_text
 from .collect.http import HttpFehler, SchutzAntwort
 from .geraete_abruf import hole_fuer_anbieter
 from .tco_model import Buendel
+from .tco_plus import vermerke as plus_vermerke
 
 log = logging.getLogger(__name__)
 
@@ -96,28 +98,58 @@ def _gleiches_angebot(b: Buendel, alt: dict) -> bool:
     return True
 
 
+def _messung(alt: dict) -> tuple[str, float | None]:
+    """(Messdatum, Anschlusspreis), wenn der Bestandseintrag selbst gemessen ist: an
+    seiner Seite nachgemessen oder als gewählter Tarif vom Sammler (beide ohne
+    ``herleitung``; Datum ``anschluss_gemessen_am``, sonst ``abgerufen_am``)."""
+    if alt.get("herleitung"):
+        return "", None
+    am = str(alt.get("anschluss_gemessen_am") or alt.get("abgerufen_am") or "")
+    return am, alt.get("anschlusspreis")
+
+
+def _gueltig(am: str, heute: str) -> bool:
+    alter = _tage(am, heute) if am else None
+    return alter is not None and 0 <= alter <= ANSCHLUSS_GUELTIG_TAGE
+
+
 def uebernimm(b: Buendel, alt: dict | None, heute: str) -> Buendel:
-    """Ein offenes Bündel mit dem gemessenen Anschlusspreis seines Bestandseintrags,
-    solange die Messung höchstens ``ANSCHLUSS_GUELTIG_TAGE`` alt ist und das Angebot
-    (``ANGEBOT``) dasselbe; sonst bleibt die Lücke und wird nachgemessen."""
-    if not _offen(b) or b.anschlusspreis is not None or not alt:
+    """Ein offenes Bündel mit der Messung seines Bestandseintrags, solange sie höchstens
+    ``ANSCHLUSS_GUELTIG_TAGE`` alt ist und das Angebot (``ANGEBOT``) dasselbe.
+
+    Ist der Eintrag selbst gemessen (``_messung``), ist es das Bündel bis dahin auch:
+    ohne ``herleitung``, Messdatum in ``anschluss_gemessen_am`` (Entscheidung Antonio
+    21.11.2026, o2 ohne „Plus“ zählt gemessen). Die alte Messung füllt nur, was heute
+    fehlt: ein heute gelesener Anschlusspreis (etwa 0,00 € aus der Fußnote) wird nie
+    überschrieben (Clean Code 6); nennt er denselben Betrag, ist das Bündel gemessen,
+    sonst bleibt es abgeleitet und wird nachgemessen. Ohne eigene Messung übernimmt es
+    nur einen gemessenen Anschlusspreis in seine Lücke."""
+    if not _offen(b) or not alt or not _gleiches_angebot(b, alt):
+        return b
+    am, betrag = _messung(alt)
+    if betrag is not None and _gueltig(am, heute):
+        if b.anschlusspreis is not None and not _gleich(b.anschlusspreis, betrag):
+            return b
+        return replace(
+            b, anschlusspreis=betrag, anschluss_gemessen_am=am, herleitung=""
+        )
+    if b.anschlusspreis is not None:
         return b
     am, betrag = str(alt.get("anschluss_gemessen_am") or ""), alt.get("anschlusspreis")
-    alter = _tage(am, heute) if am else None
-    if betrag is None or alter is None or not 0 <= alter <= ANSCHLUSS_GUELTIG_TAGE:
-        return b
-    if not _gleiches_angebot(b, alt):
+    if betrag is None or not _gueltig(am, heute):
         return b
     return replace(b, anschlusspreis=betrag, anschluss_gemessen_am=am)
 
 
-def _rang(b: Buendel) -> tuple[int, str]:
-    """Lücke zuerst, dann Fußnotenwerte ohne Messung, dann die ältesten Messungen."""
+def _rang(b: Buendel) -> tuple[bool, int, str]:
+    """Tarife ohne „Plus“ zuerst (nur sie zählen im Vergleich, ``ist_bedingter_tarif``),
+    darin die Lücke, dann Fußnotenwerte ohne Messung, dann die ältesten Messungen."""
+    plus = ist_bedingter_tarif(b.anbieter, b.tarif_name)
     if b.anschlusspreis is None:
-        return (0, "")
+        return (plus, 0, "")
     if not b.anschluss_gemessen_am:
-        return (1, "")
-    return (2, b.anschluss_gemessen_am)
+        return (plus, 1, "")
+    return (plus, 2, b.anschluss_gemessen_am)
 
 
 def reihenfolge(saetze: list[Buendel]) -> list[int]:
@@ -223,5 +255,6 @@ def speichere(bilanz, tco, quellen, hole, uhr, heute: str, beginn=None) -> int:
     if bilanz is None or not bilanz.buendel:
         return 0
     bilanz.buendel, _ = stufe(bilanz.buendel, tco, quellen, hole, uhr, heute, beginn)
+    bilanz.buendel = plus_vermerke(bilanz.buendel)
     neu, _ = tco.upsert_buendel(bilanz.buendel, heute)
     return neu

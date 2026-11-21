@@ -5,9 +5,10 @@ Bündel zählen. Ein Bündel mit ``herleitung`` (o2 aus Tarifsumme minus Geräte
 stand so nie auf der Anbieterseite und ist eine Schätzung. Ausgenommen sind Rechenwege,
 die eine Preisliste exakt nachrechnen (``HERLEITUNG_PREISLISTE``, 1&1-Tarifaufschlag):
 sie zählen wie gemessene. Ein Bündel, in dessen Preis eine
-abgelaufene Aktion steckt, ist veraltet. Ebenso eines, dessen Tarifpreis ein
-Zweitprodukt voraussetzt (o2 „Plus“, ``ist_bedingter_tarif``): der Vergleich nennt
-Neuvertragspreise ohne Boni, lieber fehlt der o2-Wert als ein zu niedriger. Beide
+abgelaufene Aktion steckt, ist veraltet. Ebenso eines, dessen Tarifrabatt nur mit
+aktivem Zweitprodukt gilt (o2 „Plus“, ``ist_bedingter_tarif``): der Vergleich nennt
+Neuvertragspreise ohne Bedingung, bei o2 also den Tarif ohne „Plus“ (Entscheidung
+Antonio 21.11.2026); die Plus-Zeile nennt ihren Abstand (``plus_zustand``). Beide
 bleiben als Zeile sichtbar, stellen aber weder Δ noch Referenz noch Sieger, keine
 Bewegung und keinen Günstigst-Wert; der Export nennt denselben Zustand.
 
@@ -66,11 +67,27 @@ HERLEITUNG_SATZ = {
 HERLEITUNG_SATZ_SONST = (
     "{anbieter} nennt diesen Preis nicht direkt – berechnet aus seinen Angaben."
 )
-DELTA_BEDINGT = "nur mit Zweitprodukt"
+DELTA_BEDINGT = "Rabatt nur mit Zweitprodukt"
 SATZ_BEDINGT = (
-    "Kein Abstand zur Vodafone-Referenz: der Tarifpreis gilt nur, wenn ein "
-    "zweites Produkt gebucht wird."
+    "Kein Abstand zur Vodafone-Referenz: der Rabatt im Tarifpreis gilt nur, solange "
+    "ein zweites Produkt aktiv ist."
 )
+DELTA_PLUS = "Plus: {betrag} € günstiger mit Zweitprodukt"
+SATZ_PLUS = SATZ_BEDINGT + " Ohne Plus kostet derselbe Tarif {betrag} € im Monat mehr."
+
+
+def plus_zustand(plus_vorteil: float | None) -> dict:
+    """Der Zustand eines Plus-Tarifs: mit Betrag (``tco_plus``, Feld ``plus_vorteil``
+    am Bündel) „Plus: x € günstiger mit Zweitprodukt“, sonst ``DELTA_BEDINGT``."""
+    if plus_vorteil is None:
+        return {"kurz": DELTA_BEDINGT, "satz": SATZ_BEDINGT}
+    betrag = f"{plus_vorteil:.2f}".replace(".", ",")
+    return {
+        "kurz": DELTA_PLUS.format(betrag=betrag),
+        "satz": SATZ_PLUS.format(betrag=betrag),
+    }
+
+
 DELTA_AKTION_ABGELAUFEN = "Aktion abgelaufen"
 SATZ_AKTION_ABGELAUFEN = (
     "Kein Abstand zur Vodafone-Referenz: die eingerechnete Aktion ist abgelaufen."
@@ -117,7 +134,13 @@ def felder(b: Buendel, heute: str) -> dict:
     """
     return {
         **_felder(
-            b.herleitung, b.aktionen, heute, b.pruefung, b.anbieter, b.tarif_name
+            b.herleitung,
+            b.aktionen,
+            heute,
+            b.pruefung,
+            b.anbieter,
+            b.tarif_name,
+            b.plus_vorteil,
         ),
         "herleitung_satz": herleitung_satz(b.anbieter, b.herleitung),
         "aus_preisliste": b.herleitung.strip() in HERLEITUNG_PREISLISTE,
@@ -145,6 +168,7 @@ def felder_aus_satz(satz: dict, heute: str) -> dict:
         satz.get(FELD_PRUEFUNG),
         str(satz.get("anbieter") or ""),
         str(satz.get("tarif_name") or ""),
+        satz.get("plus_vorteil"),
     )
 
 
@@ -155,6 +179,7 @@ def _felder(
     pruefung: object,
     anbieter: str = "",
     tarif_name: str = "",
+    plus_vorteil: float | None = None,
 ) -> dict:
     aktionen = list(aktionen)
     schaetzung = ist_schaetzung(herleitung)
@@ -164,6 +189,7 @@ def _felder(
     flags = {
         "schaetzung": schaetzung,
         "bedingter_tarif": ist_bedingter_tarif(anbieter, tarif_name),
+        "plus_vorteil": plus_vorteil,
         "veraltet_aktion": veraltet,
         "quarantaene": status == QUARANTAENE,
         "veraltet_pruefung": status == VERALTET,
@@ -231,7 +257,7 @@ def zustand(karte: dict) -> dict | None:
     if karte.get("schaetzung"):
         return {"kurz": DELTA_SCHAETZUNG, "satz": SATZ_SCHAETZUNG}
     if karte.get("bedingter_tarif"):
-        return {"kurz": DELTA_BEDINGT, "satz": SATZ_BEDINGT}
+        return plus_zustand(karte.get("plus_vorteil"))
     if karte.get("veraltet_aktion"):
         return {"kurz": DELTA_AKTION_ABGELAUFEN, "satz": SATZ_AKTION_ABGELAUFEN}
     gruende = [f"{g}." for g in karte.get("pruefgruende") or []]

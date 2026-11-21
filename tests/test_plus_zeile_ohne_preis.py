@@ -73,7 +73,6 @@ def test_plus_zeile_zeigt_keinen_preis_keine_rechnung_nur_den_grund():
     karte = _o2_karte(PLUS)
     assert karte["bedingter_tarif"] and karte["gesamt"] is not None
     zeile = _zeile(karte)
-    assert GRUND == "nur mit Zweitprodukt – nicht vergleichbar"
     assert GRUND in zeile
     for betrag in ("20,00", "39,99", "30,00", "1,00"):
         assert betrag not in zeile, betrag
@@ -113,7 +112,10 @@ def test_die_plus_zeile_zaehlt_nicht_fuer_vergleich_und_durchschnitt():
         heute=HEUTE,
     )["modelle"][0]
     o2 = next(k for k in modell["karten"] if k["anbieter"] == "o2")
-    assert o2["zaehlt"] is False and o2["notbremse"]["kurz"] == "nur mit Zweitprodukt"
+    assert (
+        o2["zaehlt"] is False
+        and o2["notbremse"]["kurz"] == "Rabatt nur mit Zweitprodukt"
+    )
     assert o2["delta"] is None
 
 
