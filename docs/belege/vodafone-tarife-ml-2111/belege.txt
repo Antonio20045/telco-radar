@@ -1,0 +1,73 @@
+Vodafone Mobil M und L mit Gerät - sichtbare Seite gegen Tarifschnittstelle
+Gemessen 21.11.2026, Chromium (Playwright), Kennung aus config/settings.yaml, Cookies "Alle ablehnen",
+robots.txt von www.vodafone.de erlaubt /privat/handys/ und /privat/handys-tablets-tarife/.
+
+1. SICHTBARE TARIFAUSWAHL ("Zur Tarifauswahl" -> "Wähl Dein Datenvolumen", Radio-Werte = virtualItemId)
+   Gerät (Preisklasse)                          Auswahl                                  Abfrage der Seite an glados
+   iPhone Duo                                   267 "23 GB", 268 "55 GB", 271 "Unbegrenzt"  virtualItemId=267,268,271
+   iPhone 17                                    267, 268, 271                             267,268,271
+   iPhone 16e                                   267, 268, 271                             267,268,271
+   Samsung Galaxy S26 Ultra                     267, 268, 271                             267,268,271
+   Samsung Galaxy Z Fold8                       267, 268, 271                             267,268,271
+   Samsung Galaxy A17 5G (Gerät 219,90 €)       267, 268, 271                             267,268,271
+   Google Pixel 10a                             267, 268, 271                             267,268,271
+   Xiaomi REDMI Note 17 Pro 5G                  267, 268, 271                             267,268,271
+   Fairphone 6                                  267, 268, 271                             267,268,271
+   HMD Fusion X1                                267, 268, 271                             267,268,271
+   iPhone 17, "Bist Du unter 28?" Ja            138 "26 GB", 139 "110 GB", 142 "Unbegrenzt" 138,139,142 (Young M/L 140/141 fehlen)
+   iPhone 17, "Internet & Festnetz?" Ja         267, 268, 271                             267,268,271
+   Galaxy A17 5G, "unter 28" Ja                 138, 139, 142                             138,139,142
+   iPhone 17 ?tariffId=269 (Mobil M in Adresse) 267 "Mobil XS", 268 "Mobil S", 271 "Mobil XL" 267,268,271
+   Galaxy S26 Ultra ?tariffId=270 (Mobil L)     267, 268, 271                             267,268,271
+   Kein Umschalter "weitere/alle Tarife" auf der Seite.
+   Screenshots 01-13.
+
+   Tarif zuerst: /privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html, "Wähl Dein Datenvolumen":
+   "20 GB statt 15 GB", "50 GB statt 30 GB", "Unbegrenzt", Knopf "Smartphone dazu" (Screenshot 14).
+   Kopf der Seite: "Nur bis 30. November" / "Black Week".
+   Ergebnis: Mobil M und L sind am 21.11.2026 online in keinem Weg mit Gerät für Neukunden wählbar.
+
+2. WOHER DIE AUSWAHL KOMMT
+   HTML jeder Produktseite (curl, 11 Seiten gleich: iphone-duo, iphone-17, iphone-16e, iphone-18-pro,
+   samsung-galaxy-s26-ultra, samsung-galaxy-z-fold8, samsung-galaxy-a17-5g, google-pixel-10a,
+   xiaomi-redmi-note-17-pro-5g, fairphone-6, hmd-fusion-x1):
+       var additionalPageOptions = {
+           "bntPromoHiddenSubscriptions": {
+       young: ['140', '141', ],consumer: ['269', '270', ],soho: ['270', ], },
+       var sailsPageOptions = { ... householdPortfolio: { activated: true,
+           subscriptions: { consumer: ['267', '268', '269', '270', '271'], ...
+   /simplicity/device-details/device-details.bundle.js, getTariffWithHardware:
+       h=((e,t=!1,n=window[kn])=>{const r=m_(e,t,n),o=window[xn]?.bntPromoHiddenSubscriptions,
+          i=o?.[e]||[];return r.filter(e=>!i.includes(e))})(i,l)      kn="sailsPageOptions", xn="additionalPageOptions"
+   Dieselbe Ausblendung: alle-tarife-mit-vertrag.html und handyvertrag-ohne-handy.html
+       bntPromoHiddenSubscriptions: {tariffIds:['269','270',],}
+
+3. DIE SCHNITTSTELLE HAT KEIN MERKMAL
+   GET api.vodafone.de/glados/v2/tariff/v2/hardware?hardwareId=…&businessTransaction=newContract&
+       salesChannel=Online.Consumer (ohne virtualItemId, so fragt der Adapter), 10 Geräte:
+   jede Variante: FamilyCard S/M/L/XL, Mobil XS (267), S (268), M (269), L (270), XL (271), je 12/24/36 Monate.
+   Felder je Tarif: cheapest, virtualItemId, legacyGroupId, tariffName, salesChannel, atomics[]
+   (tariffId, backendId, discount, dataVolume, prices.composition[]). Mobil M und L haben dieselben
+   Schlüssel wie XL; salesChannel überall "Online.Consumer"; kein visible/orderable/active/
+   marketingStatus/Gültigkeitsdatum. cheapest: XS und S true, M, L und XL false (also kein Merkmal).
+
+4. FOLGE IM ADAPTER (vodafone_sicht.py)
+   Einmal je Lauf wird die Tarifübersicht gelesen (sonst die erste Produktseite); Angebote mit
+   virtualItemId in bntPromoHiddenSubscriptions (consumer bzw. tariffIds) werden kein Bündel.
+   Keine Seite lesbar: alle Tarife bleiben, Laufergebnis sichtbarkeit_nicht_geprueft = ["Vodafone"]. Die 954 M/L-Zeilen werden nicht mehr
+   aufgefrischt und fallen nach ALT_AB_TAGEN = 3 aus dem Vergleich. Endet die Aktion, kommen sie zurück.
+   Gegenprobe: /privat/handys/<gerät>.html öffnen, "Zur Tarifauswahl", unter "Wähl Dein Datenvolumen"
+   die Kacheln zählen. Stehen dort vier oder fünf (zusätzlich 60 GB / 120 GB = Mobil M / L), muss der
+   nächste Lauf wieder M/L-Zeilen schreiben.
+
+5. o2 UND CONGSTAR (je 2 Geräte)
+   congstar iPhone 17, Pixel 10a: "Wähle deinen Tarif" Allnet Flat XS, S, M, L; "Wähle deine
+   Tariflaufzeit" 24 Monate / Ohne Laufzeit. Adapter (prefetchedPlans der Seite): XS, S, M, L je fest und
+   Flex. Gleich, kein Befund.
+   o2 iPhone 17 256 GB schwarz, Galaxy S26 256 GB cobalt violet: pageValue.tariff.tariffOptions nennt 12
+   Tarife (5 "Plus", 7 ohne), alle disabled=false. Sichtbar für Neukunden: 4 Kacheln (Unlimited 100,
+   Unlimited 15, 150 GB+, 50 GB+ = die Plus-Tarife); "O2 Kunden": Partnerkarten. Die Tarife ohne "Plus"
+   stehen in keiner Kachel, sind aber per Adresse ?tarif=o2-mobile-on-demand-m bestellbar ("In den
+   Warenkorb", Screenshot 21), also verkauft. Befund für einen eigenen Auftrag: Galaxy S26 256 GB hat im
+   Bestand (21.11.) nur Tarife ohne "Plus", z. B. on Demand M 53,49 €/Monat; die Standardauswahl der Seite
+   ist on Demand M Plus 44,99 €/Monat (Screenshot 20).
