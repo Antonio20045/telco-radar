@@ -85,6 +85,11 @@ class Ergebnis:
     text: str = ""
     bild: str | None = None
     bild_fehlt: str | None = None
+    bild_zeigt: list[str] | None = None
+    """Was das Bild zeigt (Gerät, Speicher, Tarif, Raten, Preis); None: vor dem
+    22.11.2026 aufgenommen, nur der Preisbereich, Inhalt nicht geprüft."""
+    bild_ohne: list[str] | None = None
+    """Was das Bild zeigen sollte und nicht zeigt (die Seite nennt es)."""
 
     def __post_init__(self) -> None:
         self._einordnen()

@@ -97,6 +97,8 @@ def pruefe(
         "text": lesung.text[: gp.TEXT_HOECHSTENS],
         "gelesen": {**gelesen, "tarif_name": sicht.tarif_name, "roh": sicht.roh},
         "bild_fehlt": lesung.bild_fehlt,
+        "bild_zeigt": lesung.bild_zeigt,
+        "bild_ohne": lesung.bild_ohne,
     }
     if anderer_tarif(satz.get("tarif_name") or "", sicht.tarif_name):
         anders = f"Die Seite zeigt einen anderen Tarif: {sicht.tarif_name}"

@@ -1,0 +1,12 @@
+{# Gegenprobe je Anbieter (Abnahmekriterien 2 und 3): angezeigte Preise in 7 Tagen
+   gegengeprüft und mit Bild der ganzen Konfiguration. Zahlen fertig aus der
+   Bilanz (geraete_gegenprobe_stand.py); ohne Bilanz die benannte Lücke. #}
+{% if gegenprobe_stand is defined %}
+{% set gs = gegenprobe_stand(geraete.messdatum.juengster if geraete.messdatum else '') %}
+<ul class="gr-gs" id="gegenprobe-stand" aria-label="Gegenprobe je Anbieter">
+  {% if gs.fehlt %}<li class="gr-gs-z gr-t-luecke">{{ gs.fehlt }}</li>{% endif %}
+  {% for z in gs.zeilen %}
+  <li class="gr-gs-z" data-anbieter="{{ z.schluessel }}" data-im-fenster="{{ z.im_fenster }}" data-angezeigt="{{ z.angezeigt }}"{% if z.mit_bild is not none %} data-mit-bild="{{ z.mit_bild }}"{% endif %} title="{{ gs.titel }}">{{ z.satz }}{% if gs.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ gs.stand }}</span>{% endif %}</li>
+  {% endfor %}
+</ul>
+{% endif %}

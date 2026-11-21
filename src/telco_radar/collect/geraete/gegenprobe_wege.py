@@ -18,11 +18,19 @@ import re
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from functools import partial
-from html import escape
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from . import gegenprobe_einsundeins as einsundeins
+from .gegenprobe_bild import (
+    GERAET,
+    RATEN,
+    SPEICHER,
+    Vorab,
+    aufnehme,
+    browserfehler,
+    lesung,
+)
 from .gegenprobe_browser import (
     FENSTER,
     KLICKFRIST_MS,
@@ -31,13 +39,11 @@ from .gegenprobe_browser import (
     Gesperrt,
     Lesung,
     NichtPruefbar,
-    bild_von,
     klicke,
     lehne_einwilligung_ab,
     mit_beleg,
     oeffne,
     ruhe,
-    sichtbares_html,
     speicher_aus_sku,
     text_von,
 )
@@ -221,7 +227,9 @@ def _vodafone(seite: Page, gruppe: list[dict], oeffnen: Oeffnen) -> Schritte:
         "div:has(input:checked) > label"
     )
     gewaehlt_text = gewaehlt.first.inner_text() if gewaehlt.count() else ""
-    produkt = text_von(seite, ("Preisübersicht", "Pro Monat", "Zur Tarifauswahl"))
+    zusammenfassung = ("Preisübersicht", "Pro Monat", "Zur Tarifauswahl")
+    produkt = text_von(seite, zusammenfassung)
+    auswahl = aufnehme(seite, erstes, zusammenfassung, (GERAET, SPEICHER, RATEN))
     weiter = seite.locator(
         "#device-details-offer-summary-card a", has_text="Zur Tarifauswahl"
     )
@@ -239,8 +247,9 @@ def _vodafone(seite: Page, gruppe: list[dict], oeffnen: Oeffnen) -> Schritte:
         for ziel in list(offen):
             name = seite.get_by_text(re.compile(rf"^\s*{re.escape(ziel)}\s+mit\b"))
             if name.count() and name.first.is_visible():
-                vorab = (
-                    f"{kopf}\n{produkt}{VODAFONE_TRENNER}{name.first.inner_text()}\n"
+                vorab = Vorab.mit(
+                    f"{kopf}\n{produkt}{VODAFONE_TRENNER}{name.first.inner_text()}\n",
+                    auswahl,
                 )
                 for b in offen.pop(ziel):
                     yield b, vorab
@@ -341,43 +350,15 @@ def lies_gruppe(
                 abbruch = fehler
                 break
             except PlaywrightFehler as fehler:
-                abbruch = NichtPruefbar(_browserfehler(fehler))
+                abbruch = NichtPruefbar(browserfehler(fehler))
                 break
             if offen.pop(b["id"], None) is not None:
-                yield b, _lesung(seite, weg, vorab, aufnehmen)
+                anker = (weg.text_anker, weg.bild_anker)
+                yield b, lesung(seite, b, anker, vorab, aufnehmen)
         for b in list(offen.values()):
             yield b, mit_beleg(abbruch, seite)
     finally:
         kontext.close()
-
-
-def _browserfehler(fehler: Exception) -> str:
-    return f"Browser: {str(fehler).splitlines()[0][:160]}"
-
-
-def _lesung(
-    seite: Page, weg: Weg, vorab: str | Exception, aufnehmen: bool
-) -> Lesung | Exception:
-    """Text und Bild des Preisbereichs nach einer Wahl, oder warum sie nicht lesbar
-    waren (``NichtPruefbar`` mit Adresse und Bild); der Besuch geht danach weiter."""
-    from playwright.sync_api import Error as PlaywrightFehler
-
-    if isinstance(vorab, Exception):
-        return mit_beleg(vorab, seite)
-    try:
-        text = vorab + "\n".join(text_von(seite, a) for a in weg.text_anker)
-        html = ""
-        if aufnehmen:
-            zeilen = "".join(f"<div>{escape(z)}</div>" for z in vorab.splitlines())
-            html = "\n".join(
-                [zeilen, *(sichtbares_html(seite, a) for a in weg.text_anker)]
-            )
-    except PlaywrightFehler as fehler:
-        return mit_beleg(NichtPruefbar(_browserfehler(fehler)), seite)
-    except NichtPruefbar as fehler:
-        return mit_beleg(fehler, seite)
-    bild, bild_fehlt = bild_von(seite, weg.bild_anker)
-    return Lesung(text, seite.url, bild, bild_fehlt, html)
 
 
 def lies(

@@ -6526,6 +6526,20 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 /* Vollstaendigkeit je Anbieter (Abnahmekriterium 1, 21.11.2026): eine
    zugeklappte Zeile je Anbieter im Raster der Messdatum-Zeile; Luecken und
    Quelle erst beim Aufklappen. Die Zahl "n von m" traegt die Zeile. */
+.gr-gs{list-style:none;margin:0 0 14px;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:2px 18px;
+  font:500 12.5px/1.35 var(--sans);color:var(--ink-2)}
+.gr-gs-z{min-width:0;overflow-wrap:anywhere}
+.gr-gs-z .gr-kk-marke{margin:0;padding:1px 4px;letter-spacing:0;white-space:nowrap}
+@media (max-width:700px){.gr-gs{grid-template-columns:minmax(0,1fr);gap:2px 0}}
+.gr-pb-zusatz{display:block;font-size:12px;margin-top:2px}
+.gr-pb-ohnebild{display:block}
+.pa-tagbeleg{min-width:0}
+.pa-vorschau{margin:2px 0 8px}
+.pa-vorschau .gr-pb-bild{width:280px;max-height:360px;object-fit:contain;
+  object-position:left top}
+.gr-pb-screenshot .gr-pb-bild{width:320px;max-height:520px;object-fit:contain;
+  object-position:left top}
 .gr-vs{margin:0 0 14px;font:500 12.5px/1.35 var(--sans);color:var(--ink-2)}
 .gr-vs-liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));
   gap:4px 18px;list-style:none;margin:0;padding:0}

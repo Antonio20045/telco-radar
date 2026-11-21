@@ -121,6 +121,10 @@ class Lesung:
     bild_fehlt: str | None = None
     html: str = ""
     """Sichtbares HTML der Textbereiche (nur mit ``aufnehmen``, für Fixtures)."""
+    bild_zeigt: list[str] | None = None
+    """Was das Bild zeigt (``gegenprobe_bild.MERKMALE``); None: nicht geprüft."""
+    bild_ohne: list[str] | None = None
+    """Was das Bild zeigen sollte, aber nicht zeigt."""
 
 
 def speicher_aus_sku(sku_id: str) -> str | None:
