@@ -6,31 +6,35 @@ Auftretens. Je Bündel gibt es zwei Größen, beide aus den Tagesdateien
 (``gegenprobe.lies_alle``) und an EINER Stelle (``Gegenproben``), gelesen von Seite,
 Fenster und Bilanz: ``letzte_gute`` ist der jüngste Besuch, der den Preis gelesen hat
 (``gegenprobe.GEPRUEFT``), ``letzter_versuch`` der jüngste geöffnete Besuch, auch ein
-belegt gescheiterter. Beide gehören zum aktuellen Preis (``zum_preis``: dasselbe Bündel
-oder dasselbe Angebot in anderer Farbe mit gleichen Gesamtkosten; ohne Gesamtkosten
-dasselbe Bündel mit denselben Einzelposten). „Im Fenster gegengeprüft“ heißt:
-``letzte_gute`` ist jünger als ``GEGENPROBE_FENSTER_TAGE``. Ein gescheiterter Versuch
-nimmt keiner guten Prüfung die Gültigkeit.
+belegt gescheiterter. Beide gehören zum aktuellen Preis (``zum_preis``: dasselbe
+Bündel oder dasselbe Angebot in anderer Farbe mit gleichen Gesamtkosten; ohne
+Gesamtkosten dasselbe Bündel mit denselben Einzelposten). „Im Fenster gegengeprüft“
+heißt: ``letzte_gute`` ist jünger als ``GEGENPROBE_FENSTER_TAGE``. Ein gescheiterter
+Versuch nimmt keiner guten Prüfung die Gültigkeit.
 
 Reihenfolge (``kandidaten``) ist EINE Regel, früheste Frist zuerst (Earliest Deadline
-First, Prüferbefund zu PR 200): Frist ist heute für eine Preisänderung des Tages, sonst
-``letzte_gute`` + Fenster, ohne gute Prüfung der Tag der ersten Anzeige (``first_seen``,
-sonst das Messdatum) + Fenster. Eine überfällige Frist zählt als heute; bei gleicher
-Frist kommt die Preisänderung zuerst, dann die ältere Frist. Ein gescheiterter Versuch
-ändert die Frist nicht. Fällig ist ein Bündel ab Frist − ``VORLAUF_TAGE``.
-Wiederholungsbremse: nach einem gescheiterten Versuch erst wieder, wenn
-``WIEDERHOLUNG_TAGE`` vergangen sind oder die Frist heute oder morgen endet (eine schon
-verstrichene Frist zählt nicht dazu); so kosten Dauerfehler nicht jede Nacht Zeit, und
-ein Zufallsfehler bekommt vor Fristende einen zweiten Versuch. Was heute zu diesem Preis
-geöffnet wurde, kommt nicht noch einmal dran: ein zweiter Lauf am selben Tag ergänzt.
-``plane`` legt die Bündel nach Seitenbesuch zusammen: ein Besuch prüft jedes noch nicht
-heute geöffnete Bündel seiner Seite mit (``ANLASS_GLEICHE_SEITE``); die Besuche laufen
-reihum über die Anbieter. ``Kandidat.bekannt_gut`` (das Bündel hatte schon einmal eine
-gute Prüfung) braucht der Schutzschalter im Lauf.
+First, Prüferbefund zu PR 200): Frist ist heute für eine Preisänderung des Tages,
+sonst ``letzte_gute`` + Fenster, ohne gute Prüfung der Tag der ersten Anzeige
+(``first_seen``, unbekannt: sofort fällig) + Fenster. Eine überfällige Frist zählt als
+heute; bei gleicher Frist kommt die Preisänderung zuerst, dann die ältere Frist. Ein
+gescheiterter Versuch ändert die Frist nicht. Fällig ist ein Bündel ab Frist −
+``VORLAUF_TAGE``. Wiederholungsbremse: nach einem gescheiterten Versuch erst wieder,
+wenn ``WIEDERHOLUNG_TAGE`` vergangen sind oder die Frist heute oder morgen endet (eine
+schon verstrichene Frist zählt nicht dazu); so kosten Dauerfehler nicht jede Nacht
+Zeit, und ein Zufallsfehler bekommt vor Fristende einen zweiten Versuch. Was heute zu
+diesem Preis geöffnet wurde, kommt nicht noch einmal dran: ein zweiter Lauf am selben
+Tag ergänzt. ``plane`` legt die Bündel nach Seitenbesuch zusammen: ein Besuch prüft
+jedes noch nicht heute geöffnete Bündel seiner Seite mit (``ANLASS_GLEICHE_SEITE``);
+die Besuche laufen reihum über die Anbieter. Ein fälliges Bündel, dessen letzter
+Versuch scheiterte, ist verdächtig (``ANLASS_WIEDERHOLUNG``): der Lauf besucht je
+Anbieter höchstens ``VERDAECHTIG_JE_NACHT`` Seiten, deren Bündel alle verdächtig sind,
+und stellt weitere zurück; nie versuchte Seiten werden immer versucht (dritter
+Prüferbefund zu PR 200: eine Serie von Fehlern sagt nichts über die nächste Seite).
 
 Anbieter-Schnitt (``job_von``): ein Job je Host, damit robots.txt und Abstand je Host
-gelten; die drei Netze von Saturn/MediaMarkt teilen ``tarife.mediamarkt.de`` und bilden
-EINEN Job ``saturn-mediamarkt``. Jeder Anbieter-Schlüssel gehört zu genau einem Job.
+gelten; die drei Netze von Saturn/MediaMarkt teilen ``tarife.mediamarkt.de`` und
+bilden EINEN Job ``saturn-mediamarkt``. Jeder Anbieter-Schlüssel gehört zu genau einem
+Job.
 """
 
 from __future__ import annotations
@@ -52,6 +56,10 @@ VORLAUF_TAGE = 2
 WIEDERHOLUNG_TAGE = 2
 """So viele Tage nach einem gescheiterten Versuch wird ein Bündel frühestens wieder
 versucht, außer seine Frist ist höchstens einen Tag entfernt."""
+VERDAECHTIG_JE_NACHT = 10
+"""So viele Besuche verdächtiger Seiten (letzter Versuch gescheitert,
+``ANLASS_WIEDERHOLUNG``) macht ein Lauf je Anbieter höchstens; weitere verdächtige
+werden zurückgestellt, alle anderen laufen weiter."""
 
 SAMMELJOBS: dict[str, tuple[str, ...]] = {
     "saturn-mediamarkt": tuple(
@@ -101,10 +109,13 @@ class Gegenproben:
         """Der jüngste geöffnete Besuch dieses Preises, auch ein gescheiterter."""
         return self.zum_preis(buendel_id, gesamt, gp.VERSUCHT, posten)
 
-    def hatte_gute(self, buendel_id: str) -> bool:
-        """Hat dieses Bündel schon einmal eine gute Prüfung gehabt (gleich welcher
-        Preis)? Seine Seite ist dann bekannt lesbar."""
-        return any(e.status in gp.GEPRUEFT for e in self._je_id.get(buendel_id, []))
+    def zuletzt_gescheitert(self, buendel_id: str) -> bool:
+        """Ist der jüngste geöffnete Besuch dieses Bündels (gleich welcher Preis)
+        gescheitert? Dann ist es verdächtig; nie versuchte und zuletzt gute nie."""
+        versuche = [
+            e for e in self._je_id.get(buendel_id, []) if e.status in gp.VERSUCHT
+        ]
+        return bool(versuche) and versuche[-1].status == gp.NICHT_PRUEFBAR
 
     def zum_preis(
         self,
@@ -165,14 +176,20 @@ def im_fenster(datum: str, letzte: str | None) -> bool:
 
 def frist(datum: str, satz: Mapping, gute: gp.Ergebnis | None) -> str:
     """Bis wann das Bündel gegengeprüft sein muss: gute Prüfung + Fenster, ohne gute
-    Prüfung erste Anzeige (``first_seen``, sonst Messdatum, sonst ``datum``) +
-    Fenster."""
-    anfang = (
-        gute.datum
-        if gute is not None
-        else str(satz.get("first_seen") or satz.get("abgerufen_am") or datum)
-    )
+    Prüfung erste Anzeige (``first_seen``) + Fenster. Ist die erste Anzeige unbekannt,
+    ist die Frist ``datum`` (sofort fällig, ``ohne_erste_anzeige``), nie „heute neu“."""
+    if gute is not None:
+        anfang = gute.datum
+    elif satz.get("first_seen"):
+        anfang = str(satz["first_seen"])
+    else:
+        return datum
     return str(date.fromisoformat(anfang[:10]) + timedelta(GEGENPROBE_FENSTER_TAGE))
+
+
+def ohne_erste_anzeige(satz: Mapping) -> bool:
+    """Fehlt ``first_seen``? Dann ist das Bündel sofort fällig (benannt im Lauf)."""
+    return not satz.get("first_seen")
 
 
 def tage_bis(datum: str, bis: str) -> int:
@@ -220,8 +237,6 @@ class Kandidat:
     anlass: str
     faellig: bool
     rang: tuple
-    bekannt_gut: bool = False
-    """Das Bündel hatte schon einmal eine gute Prüfung (``Schutzschalter``)."""
 
 
 def _streu(buendel_id: str, datum: str) -> str:
@@ -244,10 +259,14 @@ def _kandidat(
     )
     if aenderung:
         anlass = gp.ANLASS_AENDERUNG
+    elif not ist_faellig:
+        anlass = gp.ANLASS_GLEICHE_SEITE
+    elif proben.zuletzt_gescheitert(bid):
+        anlass = gp.ANLASS_WIEDERHOLUNG
     else:
-        anlass = gp.ANLASS_FENSTER if ist_faellig else gp.ANLASS_GLEICHE_SEITE
+        anlass = gp.ANLASS_FENSTER
     rang = (max(bis, datum), not aenderung, bis, stelle, _streu(bid, datum))
-    return Kandidat(bid, anlass, ist_faellig, rang, proben.hatte_gute(bid))
+    return Kandidat(bid, anlass, ist_faellig, rang)
 
 
 def kandidaten(

@@ -5,10 +5,10 @@ Das Zeitbudget eines Laufs reicht nicht immer für alle Bündel (21.11.2026: 674
 o2s 452 Änderungen nahmen alles). ``reihum`` hält die Anbieter gleichauf,
 ``gruppiere`` legt die Bündel einer Seite in einen Besuch. Am selben Tag scheiterten
 169 1&1-Besuche nacheinander an derselben Stelle („Auswahl nicht gefunden“) und
-verbrannten rund 60 % der Laufzeit: ``Schutzschalter`` beschränkt einen Anbieter nach
-``SCHUTZ_GLEICHE_FEHLER`` gescheiterten Besuchen gleicher Fehlerart in Folge auf
-bekannt lesbare Seiten, nach einer zweiten Serie oder einer Sperre schaltet er ihn ab,
-und nennt jeden Schritt mit Grund.
+verbrannten rund 60 % der Laufzeit. Eine Fehlerserie sagt aber nichts über die nächste
+Seite (dritter Prüferbefund zu PR 200): die Wiederholung gescheiterter Seiten begrenzt
+``gegenprobe_fenster.VERDAECHTIG_JE_NACHT``, den ganzen Anbieter stoppt
+``Schutzschalter`` nur bei Sperre oder gestörtem Host.
 """
 
 from __future__ import annotations
@@ -16,9 +16,9 @@ from __future__ import annotations
 import re
 from collections.abc import Callable, Iterable, Mapping
 
-SCHUTZ_GLEICHE_FEHLER = 5
-"""So viele gescheiterte Seitenbesuche gleicher Fehlerart in Folge schalten einen
-Anbieter eine Stufe herunter (``Schutzschalter``)."""
+SCHUTZ_SERVERFEHLER = 5
+"""So viele Serverfehler (5xx, Netz, Ladezeit) in Folge stoppen einen Anbieter für den
+Rest des Laufs (``Schutzschalter``)."""
 
 
 def reihum(listen: Mapping[str, list]) -> list:
@@ -49,72 +49,65 @@ def fehlerart(grund: str) -> str:
 
 
 FREI = "frei"
-NUR_BEKANNT = "nur_bekannt"
-"""Nach einer Fehlerserie: nur noch Seiten, die schon einmal gut gelesen wurden."""
 AUS = "aus"
+SERVERFEHLER = re.compile(r"HTTP 5\d\d|net::ERR_|Page\.goto: Timeout")
+"""Fehler, die für einen gestörten Host sprechen, nicht für eine einzelne Seite."""
+
+
+def ist_serverfehler(grund: str) -> bool:
+    """5xx, Netzfehler oder Ladezeitüberschreitung (nicht „Auswahl nicht gefunden“)."""
+    return SERVERFEHLER.search(grund) is not None
 
 
 class Schutzschalter:
-    """Zählt je Anbieter gescheiterte Seitenbesuche gleicher Fehlerart in Folge.
+    """Stoppt einen Anbieter für den Rest des Laufs, aber nur, wenn der Host gestört
+    ist: nach einer Sperre (Bot-Schutz, nie umgangen) sofort, nach
+    ``SCHUTZ_SERVERFEHLER`` Serverfehlern in Folge (``ist_serverfehler``). Formfehler
+    einer Seite („Auswahl nicht gefunden“) stoppen nie den Anbieter; ihre Wiederholung
+    begrenzt ``gegenprobe_fenster.VERDAECHTIG_JE_NACHT``. ``ausfaelle`` nennt den
+    Grund."""
 
-    Nach ``SCHUTZ_GLEICHE_FEHLER`` in Folge besucht der Lauf für den Rest der Nacht
-    nur noch Seiten mit einer früheren guten Prüfung (``NUR_BEKANNT``): Dauerfehler
-    neuer oder fremder Seiten kosten keine Zeit mehr, bekannt lesbare Seiten laufen
-    weiter. Scheitert auch dort eine Serie, ist der Anbieter aus (``AUS``); eine Sperre
-    schaltet ihn sofort aus. ``ausfaelle`` nennt jeden Schritt mit Grund."""
-
-    def __init__(self, grenze: int = SCHUTZ_GLEICHE_FEHLER) -> None:
+    def __init__(self, grenze: int = SCHUTZ_SERVERFEHLER) -> None:
         self.grenze = grenze
-        self._folge: dict[str, tuple[str, int]] = {}
-        self._stufe: dict[str, str] = {}
+        self._folge: dict[str, int] = {}
         self._gruende: dict[str, list[str]] = {}
 
     def stufe(self, anbieter: str) -> str:
-        """``FREI``, ``NUR_BEKANNT`` oder ``AUS``."""
-        return self._stufe.get(anbieter, FREI)
+        """``FREI`` oder ``AUS``."""
+        return AUS if anbieter in self._gruende else FREI
 
     def grund(self, anbieter: str) -> str | None:
-        """Der jüngste Grund, warum Seiten dieses Anbieters nicht mehr besucht
-        werden; None, solange er frei läuft."""
+        """Warum der Anbieter gestoppt ist; None, solange er läuft."""
         gruende = self._gruende.get(anbieter)
         return gruende[-1] if gruende else None
 
     def ausfaelle(self, anbieter: str) -> list[str]:
-        """Jede Einschränkung und jeder Ausfall dieses Anbieters in diesem Lauf."""
+        """Jeder Stopp dieses Anbieters in diesem Lauf."""
         return list(self._gruende.get(anbieter, []))
 
     def abgeschaltet(self) -> list[str]:
-        """Die Anbieter mit Einschränkung oder Ausfall."""
+        """Die gestoppten Anbieter."""
         return sorted(self._gruende)
 
     def erfolg(self, anbieter: str) -> None:
         """Ein Besuch hat gelesen: die Folge beginnt neu."""
         self._folge.pop(anbieter, None)
 
-    def _setze(self, anbieter: str, stufe: str, grund: str) -> None:
-        self._stufe[anbieter] = stufe
-        self._gruende.setdefault(anbieter, []).append(grund)
-
     def fehler(self, anbieter: str, grund: str, sofort: bool = False) -> None:
-        """Ein Besuch ist gescheitert; ``sofort`` (Sperre) schaltet ohne Folge ab."""
+        """Ein Besuch ist gescheitert; ``sofort`` (Sperre) stoppt ohne Folge."""
+        if anbieter in self._gruende:
+            return
         if sofort:
-            self._setze(
-                anbieter, AUS, f"Ausfall nach Sperre ({grund}), Rest nicht geöffnet"
-            )
+            stopp = f"Ausfall nach Sperre ({grund}), Rest nicht geöffnet"
+            self._gruende[anbieter] = [stopp]
             return
-        art = fehlerart(grund)
-        vorige, zahl = self._folge.get(anbieter, (art, 0))
-        zahl = zahl + 1 if vorige == art else 1
-        self._folge[anbieter] = (art, zahl)
-        if zahl < self.grenze:
+        if not ist_serverfehler(grund):
+            self._folge.pop(anbieter, None)
             return
-        self._folge.pop(anbieter)
-        serie = f"{zahl} Seitenbesuche in Folge gescheitert ({art})"
-        if self.stufe(anbieter) == FREI:
-            self._setze(
-                anbieter, NUR_BEKANNT, f"{serie}: nur noch bekannt lesbare Seiten"
-            )
-        elif self.stufe(anbieter) == NUR_BEKANNT:
-            self._setze(
-                anbieter, AUS, f"Ausfall: auch auf bekannt lesbaren Seiten {serie}"
-            )
+        zahl = self._folge.get(anbieter, 0) + 1
+        self._folge[anbieter] = zahl
+        if zahl >= self.grenze:
+            self._gruende[anbieter] = [
+                f"Ausfall: {zahl} Serverfehler in Folge ({fehlerart(grund)}), "
+                "Host gestört, Rest nicht geöffnet"
+            ]

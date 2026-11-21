@@ -23,6 +23,7 @@ Exit-Code 0: abgelegt; 1: eine Teildatei unlesbar (die lesbaren sind abgelegt);
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from collections import defaultdict
@@ -44,18 +45,35 @@ def fehlende(quelle: Path, erwartet: list[str], datum: str) -> list[dict]:
     da = {p.name.removesuffix(LAUF_ENDUNG) for p in quelle.rglob(f"*{LAUF_ENDUNG}")}
     return [
         dict.fromkeys(("besuche", "sekunden", "buendel"))
-        | {"datum": datum, "anbieter": s, "ausfall": GRUND_TEIL_FEHLT}
+        | {
+            "datum": datum,
+            "anbieter": s,
+            "ausfall": GRUND_TEIL_FEHLT,
+            "platzhalter": True,
+            "lauf_id": f"fehlt-{datum}-{job}-{s}",
+        }
         for job in erwartet
         if job not in da
         for s in sorted(gf.schluessel_der_jobs([job]) or ())
     ]
 
 
+def _pruefsumme(lauf_datei: Path) -> str:
+    """Prüfsumme aus Lauf- und Zeilendatei desselben Jobs."""
+    zeilen = lauf_datei.with_name(lauf_datei.name.removesuffix(LAUF_ENDUNG) + ".jsonl")
+    inhalt = lauf_datei.read_bytes() + (zeilen.read_bytes() if zeilen.exists() else b"")
+    return hashlib.sha256(inhalt).hexdigest()[:16]
+
+
 def teile(quelle: Path) -> tuple[dict[str, list], dict[str, list], list[str]]:
-    """(Zeilen je Tag, Läufe je Tag, unlesbare Dateien) aller Teildateien."""
+    """(Zeilen je Tag, Läufe je Tag, unlesbare Dateien) aller Teildateien. Ein Lauf
+    ohne ``lauf_id`` bekommt die Prüfsumme seiner Teildateien: dieselbe Teildatei
+    zweimal abgelegt zählt einmal (``gegenprobe_bilanz.fuehre_laeufe``)."""
     zeilen: dict[str, list] = defaultdict(list)
     laeufe: dict[str, list] = defaultdict(list)
     fehler: list[str] = []
+    if not quelle.is_dir():
+        return zeilen, laeufe, fehler
     for pfad in sorted(quelle.rglob("*.jsonl")):
         try:
             for e in gp.lies_tag(pfad):
@@ -64,7 +82,9 @@ def teile(quelle: Path) -> tuple[dict[str, list], dict[str, list], list[str]]:
             fehler.append(str(problem))
     for pfad in sorted(quelle.rglob(f"*{LAUF_ENDUNG}")):
         try:
-            for lauf in json.loads(pfad.read_text(encoding="utf-8")):
+            summe = _pruefsumme(pfad)
+            for stelle, lauf in enumerate(json.loads(pfad.read_text(encoding="utf-8"))):
+                lauf.setdefault("lauf_id", f"{summe}-{stelle}")
                 laeufe[str(lauf["datum"])].append(lauf)
         except (ValueError, TypeError, KeyError) as problem:
             fehler.append(f"{pfad.name}: {problem}")

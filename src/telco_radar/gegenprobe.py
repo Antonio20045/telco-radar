@@ -44,6 +44,7 @@ from .gegenprobe_zeile import ANLASS_AENDERUNG as ANLASS_AENDERUNG
 from .gegenprobe_zeile import ANLASS_FENSTER as ANLASS_FENSTER
 from .gegenprobe_zeile import ANLASS_GLEICHE_SEITE as ANLASS_GLEICHE_SEITE
 from .gegenprobe_zeile import ANLASS_STICHPROBE as ANLASS_STICHPROBE
+from .gegenprobe_zeile import ANLASS_WIEDERHOLUNG as ANLASS_WIEDERHOLUNG
 from .gegenprobe_zeile import BESTAETIGT as BESTAETIGT
 from .gegenprobe_zeile import ERFASSUNGSLUECKE as ERFASSUNGSLUECKE
 from .gegenprobe_zeile import GEPRUEFT as GEPRUEFT

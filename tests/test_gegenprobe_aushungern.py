@@ -57,7 +57,7 @@ def _zeile(satz: dict, datum: str, status: str, grund: str = "") -> gp.Ergebnis:
         anbieter=satz["anbieter"],
         status=status,
         anlass="fenster",
-        grund=grund or None,
+        grund=grund if grund else None,
         gesamt_gespeichert=bz.gesamt_von(satz),
     )
 

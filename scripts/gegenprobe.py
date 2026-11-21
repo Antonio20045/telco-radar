@@ -7,14 +7,10 @@ AUFRUF
         [--buendel ID ...] [--bilder ORDNER] [--hochladen] [--ausgabe TEIL.jsonl]
         [--job-start EPOCHE] [--job-frist-sekunden 3000]
 
-Gewählt wird nach ``gegenprobe_fenster``: jedes angezeigte Bündel binnen
-``GEGENPROBE_FENSTER_TAGE``, zuerst die Preisänderungen des Tages (Historie
-``data/state/geraete_tco_historie/<datum>.jsonl``, ``gegenprobe.auswahl``), dann die
-fälligen, nie oder am längsten nicht geprüften. Ein Seitenbesuch prüft jedes Bündel
-seiner Seite, das heute noch nicht geöffnet wurde (``gegenprobe_fenster.plane``,
-``gegenprobe_wege.seite_von``, ``lies_gruppe``). Der Leser des Anbieters
-(``gegenprobe_sicht.LESER``) liest den sichtbaren Text, ``gegenprobe.vergleiche``
-vergleicht mit dem Bestand ``geraete_tco.json``.
+Reihenfolge und Seitenbesuche: ``gegenprobe_fenster`` (früheste Frist zuerst, ein
+Besuch prüft jedes heute noch nicht geöffnete Bündel seiner Seite). Der Leser des
+Anbieters (``gegenprobe_sicht.LESER``) liest den sichtbaren Text,
+``gegenprobe.vergleiche`` vergleicht mit dem Bestand ``geraete_tco.json``.
 
 ``--anbieter`` schneidet den Lauf auf einen Job (``gegenprobe_fenster.job_von``: ein
 Job je Host, Saturn/MediaMarkt ist einer); ohne ihn läuft alles in einem Job.
@@ -30,9 +26,11 @@ Zeit (Harte Regel 8): ``--job-frist-sekunden`` ist die Restzeit des Jobs ab
 ``--job-start``; ein Seitenbesuch beginnt und ein Bündel darin folgt nur, wenn
 ``ZEIT_JE_BUENDEL_S`` davor noch Platz hat. Eine Preisänderung ohne Besuch steht als
 „nicht gegengeprüft“ mit Grund in der Datei, jedes andere offene Bündel als
-„überfällig“ in der Bilanz, nie als stilles Fehlen. Der Schutzschalter
-(``gegenprobe_reihe.Schutzschalter``) beendet einen Anbieter nach gleichen Fehlern in
-Folge oder nach einer Sperre; der Ausfall steht mit Grund in der Bilanz.
+„überfällig“ in der Bilanz, nie als stilles Fehlen. Verdächtige Seiten (letzter
+Versuch gescheitert) besucht ein Lauf je Anbieter höchstens
+``gegenprobe_fenster.VERDAECHTIG_JE_NACHT``-mal, den Rest stellt er benannt zurück. Den
+ganzen Anbieter stoppt nur eine Sperre oder eine Serie von Serverfehlern
+(``gegenprobe_reihe.Schutzschalter``); der Ausfall steht mit Grund in der Bilanz.
 
 Exit-Code 0: gelaufen (auch mit Abweichungen, das sind Befunde); 2: Eingabe unlesbar.
 """
@@ -44,6 +42,7 @@ import json
 import sys
 import tempfile
 import time
+import uuid
 from collections import defaultdict
 from collections.abc import Callable
 from datetime import UTC, date, datetime
@@ -67,7 +66,7 @@ from telco_radar.gegenprobe_pruefung import Lesen as Lesen
 from telco_radar.gegenprobe_pruefung import anderer_tarif as anderer_tarif
 from telco_radar.gegenprobe_pruefung import ohne_lauf as _ohne_lauf
 from telco_radar.gegenprobe_pruefung import pruefe as _pruefe
-from telco_radar.gegenprobe_reihe import AUS, NUR_BEKANNT, Schutzschalter, gruppiere
+from telco_radar.gegenprobe_reihe import AUS, Schutzschalter, gruppiere
 
 FEHLER_EINGABE = 2
 TCO_DATEI = Path("data") / "state" / "geraete_tco.json"
@@ -174,10 +173,10 @@ def main(argumente: list[str] | None = None) -> int:
         f"Gegenprobe {datum} (Vortag {vortag_datum}): {len(wahl)} offen, "
         f"{sum(k.faellig for k in wahl)} fällig, davon "
         f"{sum(k.anlass == gp.ANLASS_AENDERUNG for k in wahl)} Preisänderungen; "
-        f"{len(gruppen)} Seitenbesuche geplant"
+        f"{len(gruppen)} Seitenbesuche geplant; ohne erste Anzeige (sofort fällig): "
+        f"{sum(map(gf.ohne_erste_anzeige, angezeigt))}"
     )
-    bekannt = {k.buendel_id for k in wahl if k.bekannt_gut}
-    ergebnisse, bilder, laeufe = laufe(args, gruppen, saetze, datum, ua, ende, bekannt)
+    ergebnisse, bilder, laeufe = laufe(args, gruppen, saetze, datum, ua, ende)
     veroeffentliche(args, datum, ergebnisse, bilder)
     if args.ausgabe is not None:
         gp.schreibe_tag(args.ausgabe, ergebnisse)
@@ -196,7 +195,7 @@ def _seite(saetze: dict, bid: str) -> str:
     return seite_von(gp.anbieter_aus_id(bid), saetze[bid])
 
 
-def laufe(args, gruppen, saetze, datum, ua, ende, bekannt=frozenset()):
+def laufe(args, gruppen, saetze, datum, ua, ende):
     """Geht die Seitenbesuche durch (``Lauf.alle``), solange die Frist reicht. Vor
     jedem Laden gelten robots.txt und der Abstand (``tor``)."""
     from playwright.sync_api import sync_playwright
@@ -206,7 +205,6 @@ def laufe(args, gruppen, saetze, datum, ua, ende, bekannt=frozenset()):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         lauf = Lauf(args, browser, saetze, datum, ua, ende, vor_laden)
-        lauf.bekannt_gut = set(bekannt)
         try:
             lauf.alle(gruppen)
         finally:
@@ -231,8 +229,12 @@ class Lauf:
         self.ergebnisse: dict[str, gp.Ergebnis] = {}
         self.bilder: dict[str, bytes] = {}
         self.schutz = Schutzschalter()
-        self.bekannt_gut: set[str] = set()
-        """Bündel mit früherer guter Prüfung (``Kandidat.bekannt_gut``)."""
+        self.lauf_id = uuid.uuid4().hex[:12]
+        """Kennung dieses Laufs: dieselbe Teildatei zweimal abgelegt zählt einmal."""
+        self.verdaechtig: dict[str, int] = defaultdict(int)
+        """Je Anbieter besuchte verdächtige Seiten in diesem Lauf."""
+        self.zurueckgestellt: dict[str, int] = defaultdict(int)
+        """Je Anbieter verdächtige Seiten über ``VERDAECHTIG_JE_NACHT`` hinaus."""
         self.uhr: Callable[[], float] = time.monotonic
         self.zeit: dict[str, list[float]] = defaultdict(lambda: [0, 0.0, 0])
         """Je Anbieter-Schlüssel [Besuche, Sekunden, Bündel]."""
@@ -249,14 +251,17 @@ class Lauf:
 
     def besuche(self, gruppe: list[tuple[str, str]]) -> None:
         """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht.
-        Nach einer Fehlerserie nur Seiten mit früherer guter Prüfung
-        (``bekannt_gut``), nach einem Ausfall keine mehr (``Schutzschalter``)."""
+        Eine verdächtige Seite (jedes Bündel ``ANLASS_WIEDERHOLUNG``) nur bis
+        ``VERDAECHTIG_JE_NACHT`` je Anbieter, nach einem Ausfall keine mehr."""
         anlass = dict(gruppe)
         schluessel = gp.anbieter_aus_id(gruppe[0][0])
-        stufe = self.schutz.stufe(schluessel)
-        bekannt = any(bid in self.bekannt_gut for bid, _ in gruppe)
-        if stufe == AUS or (stufe == NUR_BEKANNT and not bekannt):
+        if self.schutz.stufe(schluessel) == AUS:
             return
+        if all(a == gp.ANLASS_WIEDERHOLUNG for _, a in gruppe):
+            if self.verdaechtig[schluessel] >= gf.VERDAECHTIG_JE_NACHT:
+                self.zurueckgestellt[schluessel] += 1
+                return
+            self.verdaechtig[schluessel] += 1
         aufnehmen = self.args.aufnehmen is not None
         beginn = self.uhr()
         lesungen = lies_gruppe(
@@ -333,6 +338,8 @@ class Lauf:
                 "sekunden": round(self.zeit[s][1], 1),
                 "buendel": int(self.zeit[s][2]),
                 "ausfall": _verbunden(self.schutz.ausfaelle(s)),
+                "zurueckgestellt": self.zurueckgestellt[s],
+                "lauf_id": self.lauf_id,
             }
             for s in sorted(set(self.zeit) | set(self.schutz.abgeschaltet()))
         ]

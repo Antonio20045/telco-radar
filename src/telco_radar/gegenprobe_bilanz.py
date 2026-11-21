@@ -43,7 +43,7 @@ ZAEHLER = (
     "nicht_pruefbar",
     "heute_geprueft",
 )
-MESSUNG = ("besuche", "buendel_besucht", "sekunden")
+MESSUNG = ("besuche", "buendel_besucht", "sekunden", "zurueckgestellt")
 """Was die Läufe des Tages messen; fehlt ein Lauf oder ein Wert, ist es None mit
 Grund in ``messung_fehlt``, nie 0."""
 KEIN_LAUF = "kein Lauf an diesem Tag"
@@ -117,7 +117,12 @@ def _messe(e: dict, laeufe: list[Mapping]) -> None:
     (Teildatei fehlt, Messung fehlt) macht die Summe zur benannten Lücke."""
     if not laeufe:
         return
-    werte = {"besuche": "besuche", "buendel_besucht": "buendel", "sekunden": "sekunden"}
+    werte = {
+        "besuche": "besuche",
+        "buendel_besucht": "buendel",
+        "sekunden": "sekunden",
+        "zurueckgestellt": "zurueckgestellt",
+    }
     for feld, schluessel in werte.items():
         e[feld] = 0
         for lauf in laeufe:
@@ -178,7 +183,9 @@ def zusammenfassung(
     for schluessel in list(je):
         _messe(je[schluessel], je_lauf[schluessel])
     summe = _leer()
-    _messe(summe, [dict.fromkeys(("besuche", "buendel", "sekunden"), 0)])
+    _messe(
+        summe, [dict.fromkeys(("besuche", "buendel", "sekunden", "zurueckgestellt"), 0)]
+    )
     fehlend = []
     for s, e in je.items():
         for name in ZAEHLER:
@@ -216,6 +223,37 @@ def lies_bilanz(pfad: Path) -> dict:
     return daten
 
 
+def _laufkennung(lauf: Mapping) -> str:
+    kennung = lauf.get("lauf_id")
+    if kennung:
+        return str(kennung)
+    return json.dumps(dict(lauf), sort_keys=True, ensure_ascii=False)
+
+
+def fuehre_laeufe(alt: Iterable[Mapping], neu: Iterable[Mapping]) -> list[dict]:
+    """Die Läufe des Tages ohne Doppel: derselbe Lauf (``lauf_id``) zählt einmal, auch
+    wenn seine Teildatei zweimal abgelegt wird. Ein Platzhalter „Teildatei fehlt“
+    (``platzhalter``) fällt weg, sobald danach ein gemessener Lauf desselben
+    Anbieters und Tages kommt."""
+    je: dict[str, dict] = {}
+    for lauf in [*alt, *neu]:
+        je[_laufkennung(lauf)] = dict(lauf)
+    out: list[dict] = []
+    for lauf in je.values():
+        if not lauf.get("platzhalter"):
+            schluessel = (lauf.get("datum"), lauf.get("anbieter"))
+            out = [
+                v
+                for v in out
+                if not (
+                    v.get("platzhalter")
+                    and (v.get("datum"), v.get("anbieter")) == schluessel
+                )
+            ]
+        out.append(lauf)
+    return out
+
+
 def lege_ab(
     wurzel: Path,
     datum: str,
@@ -226,7 +264,7 @@ def lege_ab(
     """Ergänzt Tagesdatei und Läufe des Tages und schreibt die Bilanz neu."""
     gp.ergaenze_tag(gp.tagesdatei(wurzel, datum), ergebnisse)
     pfad = bilanzdatei(wurzel, datum)
-    alle_laeufe = [*(lies_bilanz(pfad).get("laeufe") or []), *map(dict, laeufe)]
+    alle_laeufe = fuehre_laeufe(lies_bilanz(pfad).get("laeufe") or [], laeufe)
     proben = Gegenproben(gp.lies_alle(wurzel / gp.ORDNER).values())
     bilanz = {
         **zusammenfassung(datum, angezeigt, proben, alle_laeufe),

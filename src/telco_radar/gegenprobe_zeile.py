@@ -44,6 +44,9 @@ ANLASS_FENSTER = "fenster"
 """Das Bündel ist im Fenster fällig (nie oder vor langem gegengeprüft)."""
 ANLASS_GLEICHE_SEITE = "gleiche_seite"
 """Nicht fällig, aber auf einer Seite, die der Lauf ohnehin öffnet."""
+ANLASS_WIEDERHOLUNG = "wiederholung"
+"""Fällig, aber der letzte Versuch scheiterte: verdächtig, je Nacht begrenzt
+(``gegenprobe_fenster.VERDAECHTIG_JE_NACHT``)."""
 
 ORDNER = Path("data") / "state" / "gegenprobe"
 
