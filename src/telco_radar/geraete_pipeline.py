@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
@@ -46,7 +46,7 @@ from .analyze.geraete_store import (
 )
 from .analyze.klick_angebot import zusammenfuehren
 from .geraete_adressen import adressbilanz as _adressbilanz
-from .analyze.klick_nachholen import Nachholen, nachholen_aus_umgebung
+from .analyze.klick_nachholen import Nachholen
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
 from .analyze.tco_store import TcoDB
@@ -579,29 +579,15 @@ def run_geraete_stage(
 
 
 def main() -> None:
-    """Eigener Einstieg fuer den naechtlichen Lauf."""
-    import argparse
+    """Eigener Einstieg fuer den naechtlichen Lauf: Stufe, Soll/Ist-Zaehlung und
+    Lauf-Datei (`geraete_nachtlauf.main`)."""
+    from .geraete_nachtlauf import main as nachtlauf
 
-    from .config import load_config
-
-    p = argparse.ArgumentParser(description="Geraete- und Preisradar")
-    p.add_argument("--root", default=".")
-    p.add_argument("--frist", type=float, default=FRIST_STANDARD)
-    p.add_argument("--klick", type=Path, default=None)
-    args = p.parse_args()
-
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
-    )
-    root = Path(args.root)
-    cfg = load_config(root)
-    run_geraete_stage(
-        root,
-        cfg.settings.get("http", {}),
-        None,
-        frist_sekunden=args.frist,
-        klick=args.klick,
-        klick_nachholen=nachholen_aus_umgebung(root),
+    nachtlauf(
+        run_geraete_stage,
+        abgesichert,
+        FRIST_STANDARD,
+        lambda: datetime.now(UTC),
     )
 
 

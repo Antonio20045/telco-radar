@@ -1,0 +1,1194 @@
+{
+ "quelle": "data/state/geraete_tco.json",
+ "datum": "2026-11-21",
+ "buendel": [
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-all-net-flat-l--24m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-l",
+   "tarif_name": "1&1 All-Net-Flat L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-all-net-flat-l--36m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-l",
+   "tarif_name": "1&1 All-Net-Flat L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-all-net-flat-m--24m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-m",
+   "tarif_name": "1&1 All-Net-Flat M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-all-net-flat-m--36m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-m",
+   "tarif_name": "1&1 All-Net-Flat M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-all-net-flat-s--24m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-s",
+   "tarif_name": "1&1 All-Net-Flat S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-all-net-flat-s--36m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-s",
+   "tarif_name": "1&1 All-Net-Flat S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-on-demand-l--24m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-l",
+   "tarif_name": "1&1 Unlimited on demand L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-on-demand-l--36m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-l",
+   "tarif_name": "1&1 Unlimited on demand L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-on-demand-m--24m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-m",
+   "tarif_name": "1&1 Unlimited on demand M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-on-demand-m--36m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-m",
+   "tarif_name": "1&1 Unlimited on demand M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-on-demand-s--24m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-s",
+   "tarif_name": "1&1 Unlimited on demand S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-on-demand-s--36m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-s",
+   "tarif_name": "1&1 Unlimited on demand S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-xl--24m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-xl",
+   "tarif_name": "1&1 Unlimited XL",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--apple-iphone-16-128gb-blau--1-1-unlimited-xl--36m",
+   "sku_id": "apple-iphone-16-128gb-blau",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-xl",
+   "tarif_name": "1&1 Unlimited XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-all-net-flat-l--24m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-l",
+   "tarif_name": "1&1 All-Net-Flat L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-all-net-flat-l--36m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-l",
+   "tarif_name": "1&1 All-Net-Flat L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-all-net-flat-m--24m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-m",
+   "tarif_name": "1&1 All-Net-Flat M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-all-net-flat-m--36m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-m",
+   "tarif_name": "1&1 All-Net-Flat M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-all-net-flat-s--24m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-s",
+   "tarif_name": "1&1 All-Net-Flat S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-all-net-flat-s--36m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-s",
+   "tarif_name": "1&1 All-Net-Flat S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-on-demand-l--24m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-l",
+   "tarif_name": "1&1 Unlimited on demand L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-on-demand-l--36m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-l",
+   "tarif_name": "1&1 Unlimited on demand L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-on-demand-m--24m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-m",
+   "tarif_name": "1&1 Unlimited on demand M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-on-demand-m--36m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-m",
+   "tarif_name": "1&1 Unlimited on demand M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-on-demand-s--24m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-s",
+   "tarif_name": "1&1 Unlimited on demand S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-on-demand-s--36m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-s",
+   "tarif_name": "1&1 Unlimited on demand S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-xl--24m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-xl",
+   "tarif_name": "1&1 Unlimited XL",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-128gb-violett--1-1-unlimited-xl--36m",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-xl",
+   "tarif_name": "1&1 Unlimited XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-all-net-flat-l--24m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-l",
+   "tarif_name": "1&1 All-Net-Flat L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-all-net-flat-l--36m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-l",
+   "tarif_name": "1&1 All-Net-Flat L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-all-net-flat-m--24m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-m",
+   "tarif_name": "1&1 All-Net-Flat M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-all-net-flat-m--36m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-m",
+   "tarif_name": "1&1 All-Net-Flat M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-all-net-flat-s--24m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-s",
+   "tarif_name": "1&1 All-Net-Flat S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-all-net-flat-s--36m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-all-net-flat-s",
+   "tarif_name": "1&1 All-Net-Flat S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-on-demand-l--24m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-l",
+   "tarif_name": "1&1 Unlimited on demand L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-on-demand-l--36m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-l",
+   "tarif_name": "1&1 Unlimited on demand L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-on-demand-m--24m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-m",
+   "tarif_name": "1&1 Unlimited on demand M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-on-demand-m--36m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-m",
+   "tarif_name": "1&1 Unlimited on demand M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-on-demand-s--24m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-s",
+   "tarif_name": "1&1 Unlimited on demand S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-on-demand-s--36m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-on-demand-s",
+   "tarif_name": "1&1 Unlimited on demand S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-xl--24m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-xl",
+   "tarif_name": "1&1 Unlimited XL",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--1-1--google-pixel-10a-256gb-violett--1-1-unlimited-xl--36m",
+   "sku_id": "google-pixel-10a-256gb-violett",
+   "anbieter": "1&1",
+   "tarif_id": "11:1-1-unlimited-xl",
+   "tarif_name": "1&1 Unlimited XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-telekom-netz--apple-iphone-17-256gb-ohne-farbe--allnet-flat-100gb--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · Telekom-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:68dcf534457a239ed5b14da5",
+   "tarif_name": "Allnet Flat 100GB",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-telekom-netz--apple-iphone-17-256gb-ohne-farbe--allnet-flat-50gb--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · Telekom-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a3e48fce8ef8ed1c9722b21",
+   "tarif_name": "Allnet Flat 50GB",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-telekom-netz--apple-iphone-17-256gb-ohne-farbe--allnet-flat-50gb-440c61--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · Telekom-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a4fa953e99afc2623440c61",
+   "tarif_name": "Allnet Flat 50GB (440c61)",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-telekom-netz--apple-iphone-17-256gb-ohne-farbe--magenta-mobil-xl-5g--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · Telekom-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:5afd4e3a56b4536a4d6348d8",
+   "tarif_name": "Magenta Mobil XL 5G",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-o2-netz--apple-iphone-17-256gb-ohne-farbe--mobile-unlimited-l-promo-86c58f--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · o2-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a1e956e959a3938fb86c58f",
+   "tarif_name": "Mobile Unlimited L Promo (86c58f)",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-o2-netz--apple-iphone-17-256gb-ohne-farbe--mobile-unlimited-l-promo-86c591--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · o2-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a1e9a43959a3938fb86c591",
+   "tarif_name": "Mobile Unlimited L Promo (86c591)",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-o2-netz--apple-iphone-17-256gb-ohne-farbe--mobile-unlimited-l-promo-86c593--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · o2-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a1e9ab6959a3938fb86c593",
+   "tarif_name": "Mobile Unlimited L Promo (86c593)",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-o2-netz--apple-iphone-17-256gb-ohne-farbe--mobile-unlimited-l-promo-86c594--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · o2-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a1e9ae5959a3938fb86c594",
+   "tarif_name": "Mobile Unlimited L Promo (86c594)",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-o2-netz--apple-iphone-17-256gb-ohne-farbe--mobile-unlimited-l-promo-86c595--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · o2-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a1e9b33959a3938fb86c595",
+   "tarif_name": "Mobile Unlimited L Promo (86c595)",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-o2-netz--apple-iphone-17-256gb-ohne-farbe--mobile-unlimited-m-promo--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · o2-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a1e946e959a3938fb86c58d",
+   "tarif_name": "Mobile Unlimited M Promo",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--saturn-mediamarkt-o2-netz--apple-iphone-17-256gb-ohne-farbe--mobile-unlimited-m-promo-86c590--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Saturn/MediaMarkt · o2-Netz",
+   "tarif_id": "mediamarkt_tarifwelt:6a1e99e0959a3938fb86c590",
+   "tarif_name": "Mobile Unlimited M Promo (86c590)",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-l--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-l--36m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-m--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-m--36m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-s--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-s--36m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-xl--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-xl--36m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-xs--24m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-xs--36m",
+   "sku_id": "apple-iphone-17-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-l--24m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-l--36m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-m--24m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-m--36m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-s--24m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-s--36m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-xl--24m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-xl--36m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-xs--24m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--apple-iphone-17-512gb-ohne-farbe--magentamobil-xs--36m",
+   "sku_id": "apple-iphone-17-512gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-frost--magentamobil-l--36m",
+   "sku_id": "google-pixel-11-256gb-frost",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-20"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-frost--magentamobil-m--36m",
+   "sku_id": "google-pixel-11-256gb-frost",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-frost--magentamobil-s--36m",
+   "sku_id": "google-pixel-11-256gb-frost",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-frost--magentamobil-xl--36m",
+   "sku_id": "google-pixel-11-256gb-frost",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-20"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-frost--magentamobil-xs--36m",
+   "sku_id": "google-pixel-11-256gb-frost",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-ohne-farbe--magentamobil-l--24m",
+   "sku_id": "google-pixel-11-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-ohne-farbe--magentamobil-l--36m",
+   "sku_id": "google-pixel-11-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-ohne-farbe--magentamobil-m--24m",
+   "sku_id": "google-pixel-11-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-ohne-farbe--magentamobil-s--24m",
+   "sku_id": "google-pixel-11-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-ohne-farbe--magentamobil-xl--24m",
+   "sku_id": "google-pixel-11-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-ohne-farbe--magentamobil-xl--36m",
+   "sku_id": "google-pixel-11-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--google-pixel-11-256gb-ohne-farbe--magentamobil-xs--24m",
+   "sku_id": "google-pixel-11-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-l--36m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-l",
+   "tarif_name": "MagentaMobil L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-20"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-m--12m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 12,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-m--24m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-m--36m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-20"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-s--24m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-s--36m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-xl--36m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_name": "MagentaMobil XL",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-20"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-xs--24m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-128gb-ohne-farbe--magentamobil-xs--36m",
+   "sku_id": "samsung-galaxy-a57-128gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-256gb-ohne-farbe--magentamobil-m--12m",
+   "sku_id": "samsung-galaxy-a57-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 12,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-256gb-ohne-farbe--magentamobil-m--24m",
+   "sku_id": "samsung-galaxy-a57-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-m",
+   "tarif_name": "MagentaMobil M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-256gb-ohne-farbe--magentamobil-s--24m",
+   "sku_id": "samsung-galaxy-a57-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-256gb-ohne-farbe--magentamobil-s--36m",
+   "sku_id": "samsung-galaxy-a57-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-s",
+   "tarif_name": "MagentaMobil S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-256gb-ohne-farbe--magentamobil-xs--24m",
+   "sku_id": "samsung-galaxy-a57-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--telekom--samsung-galaxy-a57-256gb-ohne-farbe--magentamobil-xs--36m",
+   "sku_id": "samsung-galaxy-a57-256gb-ohne-farbe",
+   "anbieter": "Telekom",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_name": "MagentaMobil XS",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-l--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l",
+   "tarif_name": "Allnet Flat L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-l--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l",
+   "tarif_name": "Allnet Flat L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-l-flex--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l-flex",
+   "tarif_name": "Allnet Flat L Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-l-flex--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l-flex",
+   "tarif_name": "Allnet Flat L Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-m--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m",
+   "tarif_name": "Allnet Flat M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-m--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m",
+   "tarif_name": "Allnet Flat M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-m-flex--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m-flex",
+   "tarif_name": "Allnet Flat M Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-m-flex--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m-flex",
+   "tarif_name": "Allnet Flat M Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-s--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-mit-gb",
+   "tarif_name": "Allnet Flat S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-s--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-mit-gb",
+   "tarif_name": "Allnet Flat S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-s-flex--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-flex",
+   "tarif_name": "Allnet Flat S Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-s-flex--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-flex",
+   "tarif_name": "Allnet Flat S Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-xs--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-mit-gb",
+   "tarif_name": "Allnet Flat XS",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-xs--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-mit-gb",
+   "tarif_name": "Allnet Flat XS",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-xs-flex--24m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-flex-mit-gb",
+   "tarif_name": "Allnet Flat XS Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-xs-flex--36m",
+   "sku_id": "apple-iphone-17-256gb-weiss",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-flex-mit-gb",
+   "tarif_name": "Allnet Flat XS Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-l--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l",
+   "tarif_name": "Allnet Flat L",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-l--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l",
+   "tarif_name": "Allnet Flat L",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-l-flex--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l-flex",
+   "tarif_name": "Allnet Flat L Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-l-flex--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-l-flex",
+   "tarif_name": "Allnet Flat L Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-m--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m",
+   "tarif_name": "Allnet Flat M",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-m--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m",
+   "tarif_name": "Allnet Flat M",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-m-flex--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m-flex",
+   "tarif_name": "Allnet Flat M Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-m-flex--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-m-flex",
+   "tarif_name": "Allnet Flat M Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-s--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-mit-gb",
+   "tarif_name": "Allnet Flat S",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-s--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-mit-gb",
+   "tarif_name": "Allnet Flat S",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-s-flex--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-flex",
+   "tarif_name": "Allnet Flat S Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-s-flex--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-s-flex",
+   "tarif_name": "Allnet Flat S Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-xs--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-mit-gb",
+   "tarif_name": "Allnet Flat XS",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-xs--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-mit-gb",
+   "tarif_name": "Allnet Flat XS",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-xs-flex--24m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-flex-mit-gb",
+   "tarif_name": "Allnet Flat XS Flex",
+   "laufzeit_monate": 24,
+   "abgerufen_am": "2026-11-21"
+  },
+  {
+   "id": "buendel--congstar--apple-iphone-17-512gb-gruen--allnet-flat-xs-flex--36m",
+   "sku_id": "apple-iphone-17-512gb-gruen",
+   "anbieter": "congstar",
+   "tarif_id": "congstar:allnet-flat-xs-flex-mit-gb",
+   "tarif_name": "Allnet Flat XS Flex",
+   "laufzeit_monate": 36,
+   "abgerufen_am": "2026-11-21"
+  }
+ ]
+}

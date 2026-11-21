@@ -1,0 +1,53 @@
+{
+ "zweck": "Gespeicherte Antworten der Anbieterlisten für die Soll-Zählung und ein Auszug des Bündelbestands für die Ist-Zählung (tests/test_geraete_soll_leser.py, tests/test_geraete_vollstaendigkeit.py).",
+ "eintraege": [
+  {
+   "datei": "congstar_devices_20261121.xml.gz",
+   "url": "https://www.congstar.de/sitemap/devices.xml",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "telco_radar.geraete_abruf.hole_fuer_anbieter (robots.txt, Kennung TelcoRadar/1.0), ein Abruf",
+   "beleg": "Probeabruf der Soll-Zählung am 2026-11-21 (Stufe 1, Abnahmekriterium 1); Antwort unverändert, gzip -n -9.",
+   "gzip": true,
+   "bytes_roh": 16271,
+   "sha256_roh": "14be213dbdcd0b85082c97a28bf026e07888d334102846557f8cf02cac2f5056"
+  },
+  {
+   "datei": "einsundeins_smartphones_20261121.html.gz",
+   "url": "https://mobile.1und1.de/smartphones",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "telco_radar.geraete_abruf.hole_fuer_anbieter (robots.txt, Kennung TelcoRadar/1.0), ein Abruf",
+   "beleg": "Probeabruf der Soll-Zählung am 2026-11-21 (Stufe 1, Abnahmekriterium 1); Antwort unverändert, gzip -n -9.",
+   "gzip": true,
+   "bytes_roh": 721055,
+   "sha256_roh": "0b84e5945de89b94f80a8e92c81324a7a7e4a29f89ca258d905b37503d92a439"
+  },
+  {
+   "datei": "vodafone_hardware_20261121.json.gz",
+   "url": "https://api.vodafone.de/glados/v2/hardware/v2?businessTransaction=newContract&salesChannel=Online.Consumer",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "telco_radar.geraete_abruf.hole_fuer_anbieter (robots.txt, Kennung TelcoRadar/1.0), ein Abruf",
+   "beleg": "Probeabruf der Soll-Zählung am 2026-11-21 (Stufe 1, Abnahmekriterium 1); Antwort unverändert, gzip -n -9.",
+   "gzip": true,
+   "bytes_roh": 163846,
+   "sha256_roh": "bb2223348e474643c299a0708991294d83c90d9b50412df8024f3b3d25ad6991"
+  },
+  {
+   "datei": "o2_katalog_20261121.json.gz",
+   "url": "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "telco_radar.geraete_abruf.hole_fuer_anbieter (robots.txt, Kennung TelcoRadar/1.0), ein Abruf",
+   "beleg": "Probeabruf der Soll-Zählung am 2026-11-21 (Stufe 1, Abnahmekriterium 1); Antwort unverändert, gzip -n -9.",
+   "gzip": true,
+   "bytes_roh": 594275,
+   "sha256_roh": "edc7face47dc84bdd77ec1720eafc2f3f455db0a24506af9f98fb969f11480de"
+  },
+  {
+   "datei": "ist_auszug_20261121.json",
+   "abgeleitet_aus": "data/state/geraete_tco.json im Stand ac10a2351 (21.11.2026 06:37Z), Feld buendel",
+   "beleg": "Auszug: Telekom (iPhone 17, Pixel 11, Galaxy A57), 1&1 (iPhone 16, Pixel 10a), congstar (iPhone 17), Saturn/MediaMarkt o2- und Telekom-Netz (iPhone 17), Messtage 20. und 21.11.2026; nur die Felder id, sku_id, anbieter, tarif_id, tarif_name, laufzeit_monate, abgerufen_am.",
+   "gzip": false,
+   "bytes_roh": 41089,
+   "sha256_roh": "c0f4a36000fbe2246d7bd6385f86d5b13ebddc1dce30d6c25ac1c3259f621ec3"
+  }
+ ]
+}
