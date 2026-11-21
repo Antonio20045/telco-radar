@@ -16,7 +16,8 @@ gescheiterte Preisantwort, Strukturbruch, keine einzige angebotene Kombination),
 heißt so). Lud die Hauptseite nicht, ist er gestört mit ``stoerung`` gleich
 ``STOERUNG_ZEIT``, ohne Bot-Schutz (CLAUDE.md Regel 10). Fehlt nach bestandener
 Bot-Prüfung der Kanarienwert oder ein Element der Vorbereitung, ist er gestört mit
-``STOERUNG_SEITE``: die Seite hat eine andere Form, kein Bot-Schutz. Bot-Schutz heißt
+``STOERUNG_SEITE``: die Seite hat eine andere Form, kein Bot-Schutz; bei HTTP 5xx der
+Hauptseite mit ``STOERUNG_SERVER`` (``klick_vertrag.serverfehler``). Bot-Schutz heißt
 ``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
 (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
 soll. Gescheiterte Anfragen hält der Lauf mit Grund fest, ebenso jede Hilfsdatei, die
@@ -66,6 +67,7 @@ LAUF_GESPERRT = "gesperrt"
 LAUF_ZEITGRENZE = "zeitgrenze"
 STOERUNG_ZEIT = "zeitueberschreitung"
 STOERUNG_SEITE = "seitenform"
+STOERUNG_SERVER = "serverfehler"
 GRUND_ANDERE_FARBE = "in der vorgewählten Farbe nicht vorhanden"
 BELEG_OFFEN = "offen"
 BELEGT = "belegt"

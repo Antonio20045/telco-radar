@@ -1,0 +1,427 @@
+{
+ "anbieter": "1und1",
+ "datum": "2026-11-21",
+ "dauer_sekunden": 3.1,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false: Abruf gestört (HTTP 502)",
+ "karte": "1und1.yaml",
+ "laufstatus": "gestoert",
+ "lesefrist_tage": 1,
+ "name": "1&1",
+ "seiten": [
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/fairphone-6",
+   "geraet": "fairphone-6",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/google-pixel-11-pro",
+   "geraet": "google-pixel-11-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/google-pixel-11-pro-xl",
+   "geraet": "google-pixel-11-pro-xl",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/iphone-16-plus",
+   "geraet": "apple-iphone-16-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/iphone-17e",
+   "geraet": "apple-iphone-17e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/iphone-18-pro-max",
+   "geraet": "apple-iphone-18-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/nothing-phone-3",
+   "geraet": "nothing-phone-3",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-a17-5g",
+   "geraet": "samsung-galaxy-a17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-a57",
+   "geraet": "samsung-galaxy-a57",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-plus",
+   "geraet": "samsung-galaxy-s26-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-z-fold8",
+   "geraet": "samsung-galaxy-z-fold8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/xiaomi-17",
+   "geraet": "xiaomi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/xiaomi-17t",
+   "geraet": "xiaomi-17t",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/xiaomi-redmi-note-17-5g",
+   "geraet": "xiaomi-redmi-note-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g",
+   "geraet": "xiaomi-redmi-note-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/honor-magic-v6",
+   "geraet": "honor-magic-v6",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/motorola-moto-g77",
+   "geraet": "motorola-moto-g77",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s25-edge",
+   "geraet": "samsung-galaxy-s25-edge",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": null,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/iphone-17-pro",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/iphone-17",
+   "geraet": "apple-iphone-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  }
+ ],
+ "seitengrund": "42 Seiten aus den Übersichten (Übersicht https://mobile.1und1.de/smartphones-all-net-flat-s am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-all-net-flat-m am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-all-net-flat-l am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-s am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-m am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-l am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; Übersicht https://mobile.1und1.de/smartphones-unlimited-xl am 20.11.2026 nicht ganz gelesen (1&1-Kachel 'iPhone 18 Pro Max' ohne „€/Monat*“), keine Kacheln jünger als 7 Tage; keine Kachel, 42 Seiten des Laufs vom 20.11.2026)",
+ "ueberfaellig": [
+  "https://mobile.1und1.de/iphone-17-pro",
+  "https://mobile.1und1.de/iphone-17",
+  "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+  "https://mobile.1und1.de/fairphone-6",
+  "https://mobile.1und1.de/google-pixel-11-pro",
+  "https://mobile.1und1.de/google-pixel-11-pro-xl",
+  "https://mobile.1und1.de/iphone-16-plus",
+  "https://mobile.1und1.de/iphone-17e",
+  "https://mobile.1und1.de/iphone-18-pro-max",
+  "https://mobile.1und1.de/nothing-phone-3",
+  "https://mobile.1und1.de/samsung-galaxy-a17-5g",
+  "https://mobile.1und1.de/samsung-galaxy-a57",
+  "https://mobile.1und1.de/samsung-galaxy-s26-plus",
+  "https://mobile.1und1.de/samsung-galaxy-z-fold8",
+  "https://mobile.1und1.de/xiaomi-17",
+  "https://mobile.1und1.de/xiaomi-17t",
+  "https://mobile.1und1.de/xiaomi-redmi-note-17-5g",
+  "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g",
+  "https://mobile.1und1.de/honor-magic-v6",
+  "https://mobile.1und1.de/motorola-moto-g77",
+  "https://mobile.1und1.de/samsung-galaxy-s25-edge"
+ ],
+ "uebersichten": [
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-21T00:03:11Z"
+   },
+   "grund": "Abruf gestört (HTTP 502)",
+   "http_status": 502,
+   "kachelvorrat": {
+    "datum": "2026-11-20",
+    "kacheln": [
+     {
+      "speicher_gb": null,
+      "titel": null,
+      "url": null
+     }
+    ],
+    "tarif": "1&1 All-Net-Flat S"
+   },
+   "saetze": [],
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-21T00:03:11Z"
+     },
+     "grund": "Abruf gestört (HTTP 502)",
+     "http_status": 502,
+     "saetze_neu": 0,
+     "status": "gestoert",
+     "stoerung": null
+    }
+   ],
+   "status": "gestoert",
+   "stoerung": null,
+   "unvollstaendig": "gestoert: Abruf gestört (HTTP 502)",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "kachelvorrat": {
+    "datum": "2026-11-20",
+    "kacheln": [
+     {
+      "speicher_gb": null,
+      "titel": null,
+      "url": null
+     }
+    ],
+    "tarif": "1&1 All-Net-Flat M"
+   },
+   "saetze": [],
+   "status": "nicht_besucht",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "kachelvorrat": {
+    "datum": "2026-11-20",
+    "kacheln": [
+     {
+      "speicher_gb": null,
+      "titel": null,
+      "url": null
+     }
+    ],
+    "tarif": "1&1 All-Net-Flat L"
+   },
+   "saetze": [],
+   "status": "nicht_besucht",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "kachelvorrat": {
+    "datum": "2026-11-20",
+    "kacheln": [
+     {
+      "speicher_gb": null,
+      "titel": null,
+      "url": null
+     }
+    ],
+    "tarif": "1&1 Unlimited on demand S"
+   },
+   "saetze": [],
+   "status": "nicht_besucht",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "kachelvorrat": {
+    "datum": "2026-11-20",
+    "kacheln": [
+     {
+      "speicher_gb": null,
+      "titel": null,
+      "url": null
+     }
+    ],
+    "tarif": "1&1 Unlimited on demand M"
+   },
+   "saetze": [],
+   "status": "nicht_besucht",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "kachelvorrat": {
+    "datum": "2026-11-20",
+    "kacheln": [
+     {
+      "speicher_gb": null,
+      "titel": null,
+      "url": null
+     }
+    ],
+    "tarif": "1&1 Unlimited on demand L"
+   },
+   "saetze": [],
+   "status": "nicht_besucht",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "kachelvorrat": {
+    "datum": "2026-11-20",
+    "kacheln": [
+     {
+      "speicher_gb": null,
+      "titel": null,
+      "url": null
+     }
+    ],
+    "tarif": "1&1 Unlimited XL"
+   },
+   "saetze": [],
+   "status": "nicht_besucht",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://mobile.1und1.de/smartphones",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 502)",
+   "saetze": [],
+   "status": "nicht_besucht",
+   "vollstaendig": false
+  }
+ ],
+ "vertragsform": "ein_vertrag",
+ "zeitbudget_sekunden": 10239
+}

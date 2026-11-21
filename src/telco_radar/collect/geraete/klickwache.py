@@ -37,13 +37,14 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
-from ...klick_vertrag import abruf_gestoert
+from ...klick_vertrag import abruf_gestoert, serverfehler
 from .klickladung import LADE_HOECHSTENS_MS, Ladung
 from .klicklauf import (
     CHALLENGE_STATUS,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
     STOERUNG_SEITE,
+    STOERUNG_SERVER,
     STOERUNG_ZEIT,
     Klicklauf,
     antworttext,
@@ -59,8 +60,12 @@ SEITE_FEHLT = frozenset({404, 410})
 
 
 def form(tor: Tor) -> str | None:
-    """``STOERUNG_SEITE``, wenn die Hauptseite fehlt (``SEITE_FEHLT``)."""
-    return STOERUNG_SEITE if tor.haupt_status in SEITE_FEHLT else None
+    """``STOERUNG_SEITE``, wenn die Hauptseite fehlt (``SEITE_FEHLT``),
+    ``STOERUNG_SERVER`` bei einem Serverfehler der Hauptseite (HTTP 5xx), sonst
+    ``None`` (Bot-Schutz)."""
+    if tor.haupt_status in SEITE_FEHLT:
+        return STOERUNG_SEITE
+    return STOERUNG_SERVER if serverfehler(tor.haupt_status) else None
 
 
 if TYPE_CHECKING:

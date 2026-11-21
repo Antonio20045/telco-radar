@@ -1705,6 +1705,8 @@ anbieter:
   - schluessel: 1und1-2
     name: 1&1
     karte: 1und1
+    # Ohne eigene Tarifdetail-Seiten: der Anschlusspreis kommt aus der Datei von
+    # `1und1` desselben Tags (`klickanschluss.anschluesse_je_lauf`, 21.11.2026).
     seiten_aus_uebersicht: 1und1
 
   # Telekom alle fünf Tarife (Antonio 11.10.2026: alles, immer). Eine Produktseite zeigt

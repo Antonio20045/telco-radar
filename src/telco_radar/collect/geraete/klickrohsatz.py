@@ -46,10 +46,12 @@ blieb; sonst ist es ``None`` (unbekannt, nie leer). Ein unbekannter erneuerter T
 zählt nicht, der Katalog führt nur Neuware (Antonio, 10.10.2026).
 
 Ein Satz einer 1&1-Tarifdetail-Seite (``art`` ``anschluss``) ist kein Rohsatz: sein
-Anschlusspreis kommt auf jeden Produktseiten-Satz mit demselben Tarif-Slug, nur wenn
-die Seite gelesen ist; sonst bleibt ``anschlusspreis`` ``None``. Ein Satz eines
-1&1-Geräterasters (``art`` ``raster``) wird erst nach den Produktseiten Rohsatz, mit dem
-Speicher, den ``klickraster.raster_roh`` an ihnen misst.
+Anschlusspreis kommt auf jeden Produktseiten-Satz mit demselben Tarif, nur wenn die
+Seite am selben Tag gelesen ist, auch in der Datei eines anderen Eintrags desselben
+Anbieters (``1und1-2``, ``klickanschluss.tagesanschluesse``); sonst bleibt
+``anschlusspreis`` ``None``. Ein Satz eines 1&1-Geräterasters (``art`` ``raster``) wird
+erst nach den Produktseiten Rohsatz, mit dem Speicher, den ``klickraster.raster_roh`` an
+ihnen misst.
 """
 
 from __future__ import annotations
