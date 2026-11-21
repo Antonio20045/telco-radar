@@ -151,8 +151,12 @@ def test_luecke_ohne_gesamtkosten_findet_ihre_gegenprobe():
     )
     anderes = gp.Ergebnis(**_zeile(buendel_id=ID + "x", gesamt_gespeichert=None))
     proben = pb.Gegenproben([luecke, anderes])
-    assert proben.zum_preis(ID, None) is luecke
-    assert proben.zum_preis(ID + "y", None) is None
+    posten = dict.fromkeys(gp.FELDER)
+    assert proben.massgeblich(ID, None, posten) is luecke
+    assert proben.massgeblich(ID + "y", None, posten) is None
+    assert proben.massgeblich(ID, None) is None
+    anderer_preis = {**posten, "geraet_monatsrate": 9.5}
+    assert proben.massgeblich(ID, None, anderer_preis) is None
 
 
 def test_seite_nennt_die_gefuellte_luecke():
@@ -183,3 +187,17 @@ def test_zweiter_lauf_ergaenzt_und_ueberschreibt_keine_pruefung(tmp_path):
     gp.ergaenze_tag(pfad, spaeter)
     status = {e.buendel_id: e.status for e in gp.lies_tag(pfad)}
     assert status == {ID: "bestaetigt", ID + "b": "bestaetigt", ID + "c": "bestaetigt"}
+
+
+def test_abweichung_nennt_messtag_wenn_er_vor_dem_prueftag_liegt():
+    gespeichert = {**GESPEICHERT, "anschlusspreis": 0.0}
+    gelesen = {**GELESEN, "geraet_monatsrate": 9.5}
+    status, _, _, grund = gp.vergleiche(
+        gespeichert, gelesen, "2026-11-20", "2026-11-21"
+    )
+    assert status == gp.ABWEICHEND
+    assert grund == (
+        "Preis gemessen am 20.11.2026, Seite gelesen am 21.11.2026; "
+        "dazwischen kann er sich geändert haben"
+    )
+    assert gp.vergleiche(gespeichert, gelesen, "2026-11-21", "2026-11-21")[3] is None

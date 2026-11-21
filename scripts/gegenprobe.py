@@ -78,7 +78,7 @@ JOB_MINUTEN = 60
 PUFFER_S = 600
 """Einrichten des Läufers, Hochladen und Commit nach dem letzten Bündel."""
 JOB_FRIST_S = JOB_MINUTEN * 60 - PUFFER_S
-MATRIX_JOB_MINUTEN = 120
+MATRIX_JOB_MINUTEN = 160
 """``timeout-minutes`` eines Anbieter-Jobs der Matrix (Rechnung im Workflow-Kopf)."""
 MATRIX_JOB_FRIST_S = MATRIX_JOB_MINUTEN * 60 - PUFFER_S
 HOECHSTE_FRIST_S = max(JOB_FRIST_S, MATRIX_JOB_FRIST_S)
@@ -241,11 +241,12 @@ class Lauf:
             self.besuche(gruppe)
 
     def besuche(self, gruppe: list[tuple[str, str]]) -> None:
-        """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht; ein
-        abgeschalteter Anbieter wird nicht mehr besucht."""
+        """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht; eine
+        abgeschaltete Art (``Schutzschalter``) wird nicht mehr besucht."""
         anlass = dict(gruppe)
         schluessel = gp.anbieter_aus_id(gruppe[0][0])
-        if schluessel in self.schutz.aus:
+        art = _art(self.saetze[gruppe[0][0]])
+        if self.schutz.grund(schluessel, art):
             return
         aufnehmen = self.args.aufnehmen is not None
         beginn = self.uhr()
@@ -285,18 +286,19 @@ class Lauf:
                     break
         finally:
             lesungen.close()
-        self._buche(schluessel, beginn, zahl, gelesen_ok, fehler)
+        self._buche(schluessel, art, beginn, zahl, (gelesen_ok, fehler))
 
-    def _buche(self, schluessel, beginn, zahl, gelesen_ok, fehler) -> None:
+    def _buche(self, schluessel, art, beginn, zahl, ausgang) -> None:
+        gelesen_ok, fehler = ausgang
         zeit = self.zeit[schluessel]
         zeit[0] += 1
         zeit[1] += self.uhr() - beginn
         zeit[2] += zahl
         if gelesen_ok:
-            self.schutz.erfolg(schluessel)
+            self.schutz.erfolg(schluessel, art)
         elif fehler is not None:
             sperre = isinstance(fehler, Gesperrt)
-            self.schutz.fehler(schluessel, str(fehler), sofort=sperre)
+            self.schutz.fehler(schluessel, str(fehler), sofort=sperre, art=art)
 
     def zeilen(self, gruppen: list[list[tuple[str, str]]]) -> list[gp.Ergebnis]:
         """Die geprüften Bündel und je nicht geöffnete Preisänderung eine Zeile
@@ -307,7 +309,8 @@ class Lauf:
                 if bid in self.ergebnisse or anlass != gp.ANLASS_AENDERUNG:
                     continue
                 schluessel = gp.anbieter_aus_id(bid)
-                grund = self.schutz.aus.get(schluessel, gp.GRUND_ZEITBUDGET)
+                ausfall = self.schutz.grund(schluessel, _art(self.saetze[bid]))
+                grund = ausfall or gp.GRUND_ZEITBUDGET
                 out.append(_ohne_lauf(self.saetze[bid], anlass, self.datum, grund))
         return out
 
@@ -320,10 +323,21 @@ class Lauf:
                 "besuche": int(self.zeit[s][0]),
                 "sekunden": round(self.zeit[s][1], 1),
                 "buendel": int(self.zeit[s][2]),
-                "ausfall": self.schutz.aus.get(s),
+                "ausfall": _verbunden(self.schutz.ausfaelle(s)),
             }
-            for s in sorted(set(self.zeit) | set(self.schutz.aus))
+            for s in sorted(set(self.zeit) | {a for a, _ in self.schutz.aus})
         ]
+
+
+def _verbunden(gruende: list[str]) -> str | None:
+    """Die Ausfälle eines Anbieters als ein Text; None, wenn keiner war."""
+    return "; ".join(gruende) if gruende else None
+
+
+def _art(satz: dict) -> str:
+    """Die Art eines Bündels für den Schutzschalter: seine Herleitung (Produktseite
+    leer, Tarif-Übersicht ``tarifaufschlag_aus_tarifraster`` …)."""
+    return str(satz.get("herleitung") or "")
 
 
 def _gelesen(gelesen: Lesung | Exception, _schluessel: str, _satz: dict) -> Lesung:

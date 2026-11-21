@@ -197,3 +197,27 @@ def test_ablegen_meldet_eine_unlesbare_teildatei(tmp_path):
     (quelle / "a" / "kaputt.jsonl").write_text("{kein json\n", encoding="utf-8")
     assert ABLEGEN.main(["--root", str(tmp_path), "--quelle", str(quelle)]) == 1
     assert gp.lies_tag(gp.tagesdatei(tmp_path, TAG))[0].buendel_id == O2[0]["id"]
+
+
+def test_seite_und_bilanz_lesen_dieselbe_gegenprobe():
+    """Vor 3 Tagen bestätigt, gestern belegt gescheitert: die Seite zeigt den
+    jüngsten Besuch, die Bilanz zählt denselben (nicht prüfbar, nicht im Fenster)."""
+    proben = gf.Gegenproben(
+        [
+            _probe(O2[0], "2026-11-18", gp.BESTAETIGT),
+            _probe(O2[0], "2026-11-20", gp.NICHT_PRUEFBAR),
+        ]
+    )
+    gezeigt = proben.massgeblich(O2[0]["id"], gb.gesamt_von(O2[0]), O2[0])
+    assert gezeigt is not None and gezeigt.status == gp.NICHT_PRUEFBAR
+    o2 = gb.zusammenfassung(TAG, [O2[0]], proben, [])["anbieter"]["o2"]
+    assert (o2["im_fenster"], o2["nicht_pruefbar"], o2["ueberfaellig"]) == (0, 1, 1)
+
+
+def test_fehlende_messung_im_lauf_bleibt_eine_luecke():
+    laeufe = [
+        {"datum": TAG, "anbieter": "o2", "besuche": 2, "sekunden": None, "buendel": 3}
+    ]
+    o2 = gb.zusammenfassung(TAG, O2, gf.Gegenproben(), laeufe)["anbieter"]["o2"]
+    assert (o2["besuche"], o2["sekunden"], o2["sekunden_je_besuch"]) == (2, None, None)
+    assert o2["buendel_je_besuch"] == 1.5

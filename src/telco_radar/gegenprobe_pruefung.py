@@ -102,7 +102,9 @@ def pruefe(
         anders = f"Die Seite zeigt einen anderen Tarif: {sicht.tarif_name}"
         ergebnis = gp.Ergebnis(**basis, **extra, status=gp.NICHT_PRUEFBAR, grund=anders)
         return ergebnis, lesung
-    status, abweichungen, _, befund = gp.vergleiche(basis["gespeichert"], gelesen)
+    status, abweichungen, _, befund = gp.vergleiche(
+        basis["gespeichert"], gelesen, satz.get("abgerufen_am"), datum
+    )
     nicht_gelesen = [
         f for f in gp.FELDER if satz.get(f) is not None and f not in gelesen
     ]

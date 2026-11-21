@@ -3,9 +3,10 @@
 ``zusammenfassung`` zählt je Anbieter-Schlüssel über die angezeigten Bündel
 (``angezeigte``: frisch nach ``report.geraete_tco_karten.ist_frisch``, derselben
 Definition wie die Seite): wie viele im Fenster gegengeprüft sind
-(``gegenprobe_fenster.im_fenster`` über ``Gegenproben.zum_preis``, wie die Seite die
-Gegenprobe eines Preises findet), mit welchem Status, wie viele überfällig sind und
-wie viele davon nicht prüfbar mit welchem Grund (``gegenprobe_reihe.fehlerart``).
+(``gegenprobe_fenster.im_fenster`` über ``Gegenproben.massgeblich``, dieselbe Zeile,
+die die Seite als Gegenprobe des Preises zeigt), mit welchem Status, wie viele
+überfällig sind und wie viele davon nicht prüfbar mit welchem Grund
+(``gegenprobe_reihe.fehlerart``).
 Dazu aus den Läufen des Tages Seitenbesuche, Sekunden je Besuch, Bündel je Besuch und
 jeder Ausfall (Schutzschalter, Sperre) mit Grund. Anteile rechnet nur dieses Modul;
 wer sie zeigt oder prüft, liest die Felder der Datei
@@ -19,6 +20,7 @@ Derselbe Weg für den einzelnen Job und für das Ablegen der Teildateien einer M
 from __future__ import annotations
 
 import json
+import logging
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from pathlib import Path
@@ -28,6 +30,8 @@ from .analyze.geraete_pruefstatus import buendel_aus_satz
 from .gegenprobe_fenster import GEGENPROBE_FENSTER_TAGE, Gegenproben, im_fenster
 from .gegenprobe_reihe import fehlerart
 from .tco_model import kosten_ueber
+
+log = logging.getLogger(__name__)
 
 BILANZ_ORDNER = gp.ORDNER / "bilanz"
 FORMAT = 1
@@ -44,10 +48,14 @@ ZAEHLER = (
 
 
 def gesamt_von(satz: Mapping) -> float | None:
-    """Gesamtkosten eines Satzes über ``kosten_ueber`` (None bei Lücke oder Unfug)."""
+    """Gesamtkosten eines Satzes über ``kosten_ueber``; None bei Lücke, bei einem
+    unlesbaren Satz None mit Protokoll (der Preis ist dann seine Einzelposten)."""
     try:
         return kosten_ueber(buendel_aus_satz(satz)).gesamt
-    except (TypeError, ValueError, KeyError):
+    except (TypeError, ValueError, KeyError) as fehler:
+        log.warning(
+            "Gegenprobe: Gesamtkosten von %s unlesbar: %s", satz.get("id"), fehler
+        )
         return None
 
 
@@ -80,12 +88,16 @@ def _abschluss(e: dict) -> dict:
     e["pruefbar"] = pruefbar
     e["anteil_im_fenster"] = _anteil(e["im_fenster"], pruefbar)
     e["anteil_bestaetigt"] = _anteil(e[gp.BESTAETIGT], pruefbar)
-    besuche = e["besuche"]
-    e["sekunden_je_besuch"] = round(e["sekunden"] / besuche, 1) if besuche else None
-    e["buendel_je_besuch"] = (
-        round(e["buendel_besucht"] / besuche, 2) if besuche else None
-    )
+    e["sekunden_je_besuch"] = _je(e["sekunden"], e["besuche"], 1)
+    e["buendel_je_besuch"] = _je(e["buendel_besucht"], e["besuche"], 2)
     return e
+
+
+def _je(menge: float | None, besuche: float | None, stellen: int) -> float | None:
+    """Menge je Besuch; None ohne Besuch oder ohne gemessene Menge."""
+    if menge is None or not besuche:
+        return None
+    return round(menge / besuche, stellen)
 
 
 def _leer() -> dict:
@@ -97,25 +109,26 @@ def _leer() -> dict:
     }
 
 
+def _plus(a: float | None, b: float | None) -> float | None:
+    """Summe zweier Messwerte; fehlt einer (None), ist die Summe nicht gemessen."""
+    return None if a is None or b is None else a + b
+
+
 def _zaehle(e: dict, datum: str, satz: Mapping, gegenproben: Gegenproben) -> None:
     bid = str(satz["id"])
     preis = gesamt_von(satz)
     e["angezeigt"] += 1
-    probe = gegenproben.zum_preis(bid, preis, gp.GEPRUEFT)
-    if probe is not None and im_fenster(datum, probe.datum):
+    probe = gegenproben.massgeblich(bid, preis, satz)
+    if probe is None or not im_fenster(datum, probe.datum):
+        e["ueberfaellig"] += 1
+    elif probe.status in gp.GEPRUEFT:
         e["im_fenster"] += 1
         e[probe.status] += 1
         e["heute_geprueft"] += int(probe.datum == datum)
-        return
-    e["ueberfaellig"] += 1
-    versuch = gegenproben.zum_preis(bid, preis, gp.VERSUCHT)
-    if (
-        versuch is not None
-        and versuch.status == gp.NICHT_PRUEFBAR
-        and im_fenster(datum, versuch.datum)
-    ):
+    else:
+        e["ueberfaellig"] += 1
         e["nicht_pruefbar"] += 1
-        e["gruende"][fehlerart(versuch.grund or "")] += 1
+        e["gruende"][fehlerart(probe.grund or "")] += 1
 
 
 def zusammenfassung(
@@ -135,15 +148,19 @@ def zusammenfassung(
         if lauf.get("datum") != datum:
             continue
         e = je[str(lauf["anbieter"])]
-        e["besuche"] += int(lauf.get("besuche") or 0)
-        e["buendel_besucht"] += int(lauf.get("buendel") or 0)
-        e["sekunden"] += float(lauf.get("sekunden") or 0.0)
+        for feld, wert in (
+            ("besuche", lauf.get("besuche")),
+            ("buendel_besucht", lauf.get("buendel")),
+            ("sekunden", lauf.get("sekunden")),
+        ):
+            e[feld] = _plus(e[feld], wert)
         if lauf.get("ausfall"):
             e["ausfall"].append(str(lauf["ausfall"]))
     summe = _leer()
     for e in je.values():
-        for name in (*ZAEHLER, "sekunden"):
-            summe[name] += e[name]
+        for name in ZAEHLER:
+            summe[name] = _plus(summe[name], e[name])
+        summe["sekunden"] = _plus(summe["sekunden"], e["sekunden"])
         summe["gruende"].update(e["gruende"])
         summe["ausfall"] += e["ausfall"]
     anbieter = {

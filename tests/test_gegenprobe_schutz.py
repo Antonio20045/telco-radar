@@ -35,10 +35,12 @@ def test_gleiche_fehler_in_folge_schalten_ab():
     schutz = Schutzschalter()
     for n in range(SCHUTZ_GLEICHE_FEHLER - 1):
         schutz.fehler("1-1", f"Auswahl nicht gefunden: {n} GB")
-    assert "1-1" not in schutz.aus
+    assert schutz.grund("1-1") is None
     schutz.fehler("1-1", "Auswahl nicht gefunden: 1 TB")
-    assert "Auswahl nicht gefunden" in schutz.aus["1-1"]
-    assert f"{SCHUTZ_GLEICHE_FEHLER} Seitenbesuche" in schutz.aus["1-1"]
+    grund = schutz.grund("1-1")
+    assert grund is not None and "Auswahl nicht gefunden" in grund
+    assert f"{SCHUTZ_GLEICHE_FEHLER} Seitenbesuche" in grund
+    assert schutz.grund("1-1", "tarifaufschlag_aus_tarifraster") is None
 
 
 def test_erfolg_oder_andere_fehlerart_beginnt_die_folge_neu():
@@ -54,8 +56,9 @@ def test_erfolg_oder_andere_fehlerart_beginnt_die_folge_neu():
 
 def test_sperre_schaltet_sofort_ab():
     schutz = Schutzschalter()
-    schutz.fehler("telekom", "HTTP 403", sofort=True)
-    assert "Sperre" in schutz.aus["telekom"]
+    schutz.fehler("telekom", "HTTP 403", sofort=True, art="x")
+    for art in ("", "x", "andere"):
+        assert "Sperre" in (schutz.grund("telekom", art) or "")
 
 
 class _Args:

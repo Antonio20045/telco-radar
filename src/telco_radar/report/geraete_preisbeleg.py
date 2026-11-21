@@ -246,7 +246,7 @@ class Preisbelege:
             or _ohne_teile(karte.get("rechnung")),
             gesamt=karte.get("gesamt"),
             bild=bild,
-            gegenprobe=self.gegenproben.zum_preis(
+            gegenprobe=self.gegenproben.massgeblich(
                 karte.get("buendel_id") or "", karte.get("gesamt")
             ),
             buendel_id=karte.get("buendel_id") or "",

@@ -5,9 +5,9 @@ Das Zeitbudget eines Laufs reicht nicht immer für alle Bündel (21.11.2026: 674
 o2s 452 Änderungen nahmen alles). ``reihum`` hält die Anbieter gleichauf,
 ``gruppiere`` legt die Bündel einer Seite in einen Besuch. Am selben Tag scheiterten
 169 1&1-Besuche nacheinander an derselben Stelle („Auswahl nicht gefunden“) und
-verbrannten rund 60 % der Laufzeit: ``Schutzschalter`` beendet einen Anbieter nach
-``SCHUTZ_GLEICHE_FEHLER`` gescheiterten Besuchen gleicher Art in Folge, nach einer
-Sperre sofort, und nennt den Grund als Ausfall.
+verbrannten rund 60 % der Laufzeit: ``Schutzschalter`` beendet eine Art von Bündeln
+eines Anbieters nach ``SCHUTZ_GLEICHE_FEHLER`` gescheiterten Besuchen gleicher
+Fehlerart in Folge, nach einer Sperre den ganzen Anbieter, und nennt den Grund.
 """
 
 from __future__ import annotations
@@ -16,8 +16,8 @@ import re
 from collections.abc import Callable, Iterable, Mapping
 
 SCHUTZ_GLEICHE_FEHLER = 5
-"""So viele gescheiterte Seitenbesuche gleicher Fehlerart in Folge beenden einen
-Anbieter für den Rest des Laufs."""
+"""So viele gescheiterte Seitenbesuche gleicher Fehlerart in Folge beenden eine Art
+von Bündeln eines Anbieters für den Rest des Laufs."""
 
 
 def reihum(listen: Mapping[str, list]) -> list:
@@ -48,28 +48,45 @@ def fehlerart(grund: str) -> str:
 
 
 class Schutzschalter:
-    """Zählt je Anbieter gescheiterte Seitenbesuche in Folge; ``aus`` nennt je
-    abgeschaltetem Anbieter den Grund (ein benannter Ausfall, kein stilles Leer)."""
+    """Zählt je Anbieter und Art gescheiterte Seitenbesuche in Folge und schaltet die
+    Art ab, die scheitert; eine Sperre schaltet den ganzen Anbieter ab. Die Art ist,
+    was die Bündel eines Besuchs gemeinsam haben (``herleitung``: Produktseite oder
+    Tarif-Übersicht); Bündel anderer Art desselben Anbieters laufen weiter. ``grund``
+    nennt je abgeschalteter Art den Ausfall (benannt, kein stilles Leer)."""
 
     def __init__(self, grenze: int = SCHUTZ_GLEICHE_FEHLER) -> None:
         self.grenze = grenze
-        self._folge: dict[str, tuple[str, int]] = {}
-        self.aus: dict[str, str] = {}
+        self._folge: dict[tuple[str, str], tuple[str, int]] = {}
+        self.aus: dict[tuple[str, str | None], str] = {}
+        """(Anbieter, Art) → Grund; Art None heißt: der ganze Anbieter (Sperre)."""
 
-    def erfolg(self, anbieter: str) -> None:
-        """Ein Besuch hat gelesen: die Folge beginnt neu."""
-        self._folge.pop(anbieter, None)
+    def grund(self, anbieter: str, art: str = "") -> str | None:
+        """Warum Bündel dieser Art nicht mehr geöffnet werden; None: sie laufen."""
+        return self.aus.get((anbieter, None)) or self.aus.get((anbieter, art))
 
-    def fehler(self, anbieter: str, grund: str, sofort: bool = False) -> None:
+    def ausfaelle(self, anbieter: str) -> list[str]:
+        """Jeder Ausfall dieses Anbieters in diesem Lauf."""
+        return [g for (a, _), g in sorted(self.aus.items(), key=str) if a == anbieter]
+
+    def erfolg(self, anbieter: str, art: str = "") -> None:
+        """Ein Besuch hat gelesen: die Folge dieser Art beginnt neu."""
+        self._folge.pop((anbieter, art), None)
+
+    def fehler(
+        self, anbieter: str, grund: str, sofort: bool = False, art: str = ""
+    ) -> None:
         """Ein Besuch ist gescheitert; ``sofort`` (Sperre) schaltet ohne Folge ab."""
-        art = fehlerart(grund)
-        vorige, zahl = self._folge.get(anbieter, (art, 0))
-        zahl = zahl + 1 if vorige == art else 1
-        self._folge[anbieter] = (art, zahl)
         if sofort:
-            self.aus[anbieter] = f"Ausfall nach Sperre ({grund}), Rest nicht geöffnet"
-        elif zahl >= self.grenze:
-            self.aus[anbieter] = (
-                f"Ausfall: {zahl} Seitenbesuche in Folge gescheitert ({art}), "
-                "Rest nicht geöffnet"
+            self.aus[(anbieter, None)] = (
+                f"Ausfall nach Sperre ({grund}), Rest nicht geöffnet"
+            )
+            return
+        fehler = fehlerart(grund)
+        vorige, zahl = self._folge.get((anbieter, art), (fehler, 0))
+        zahl = zahl + 1 if vorige == fehler else 1
+        self._folge[(anbieter, art)] = (fehler, zahl)
+        if zahl >= self.grenze:
+            self.aus[(anbieter, art)] = (
+                f"Ausfall ({art or 'Produktseite'}): {zahl} Seitenbesuche in Folge "
+                f"gescheitert ({fehler}), Rest dieser Art nicht geöffnet"
             )

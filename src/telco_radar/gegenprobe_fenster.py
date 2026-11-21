@@ -6,12 +6,16 @@ Auftretens. „Zuletzt gegengeprüft“ steht nicht am Bündel, sondern folgt au
 Tagesdateien (``gegenprobe.lies_alle``) über ``Gegenproben.zum_preis``: dieselbe
 Stelle, an der die Seite die Gegenprobe eines Preises findet (dasselbe Bündel oder
 dasselbe Angebot in anderer Farbe mit gleichen Gesamtkosten; ein Bündel ohne
-Gesamtkosten nur seine eigene Prüfung ohne Gesamtkosten). Nur eine gelesene Seite
-zählt (``gegenprobe.GEPRUEFT``); ein geänderter Preis ist wieder ungeprüft.
+Gesamtkosten nur seine eigene Prüfung mit denselben Einzelposten). Maßgeblich ist für
+Seite, Fenster und Bilanz dieselbe Zeile (``Gegenproben.massgeblich``): der jüngste
+geöffnete Besuch dieses Preises. Nur eine gelesene Seite (``gegenprobe.GEPRUEFT``)
+zählt als Gegenprobe im Fenster; ein geänderter Preis ist wieder ungeprüft.
 
 Reihenfolge eines Laufs (``kandidaten``): (a) die Preisänderungen des Tages in der
 Folge von ``gegenprobe.auswahl``, (b) die fälligen Bündel, nie geprüfte zuerst, dann
-die älteste Prüfung, bei Gleichstand der ältere Fehlversuch. Fällig ist ein Bündel
+die älteste Prüfung, (c) Bündel, deren letzter Besuch belegt scheiterte
+(``nicht_pruefbar``), ältester Versuch zuerst: sie verdrängen nie ein prüfbares
+Bündel (Prüferbefund zu PR 200, Aushungern), (d) nicht fällige. Fällig ist ein Bündel
 ``VORLAUF_TAGE`` vor Ablauf seines Fensters. Was heute zu diesem Preis schon geöffnet
 wurde, kommt nicht noch einmal dran: ein zweiter Lauf am selben Tag ergänzt.
 ``plane`` legt die Bündel nach Seitenbesuch zusammen: ein Besuch prüft jedes noch
@@ -48,9 +52,6 @@ SAMMELJOBS: dict[str, tuple[str, ...]] = {
 }
 """Anbieter-Schlüssel, die einen Host teilen und darum einen Job bilden."""
 
-GEZEIGT = tuple(s for s in gp.STATUS if s != gp.NICHT_GEGENGEPRUEFT)
-"""Was die Seite als Gegenprobe eines Preises zeigt: nie eine nicht geöffnete Seite."""
-
 SPEICHER_MUSTER = re.compile(r"^(.*?-\d+(?:gb|tb))(?:-.*)?$")
 _ZUSTAND = re.compile(r"-(refurbished|gebraucht|erneuert|b-ware)$")
 
@@ -80,15 +81,35 @@ class Gegenproben:
             self._je_id[e.buendel_id].append(e)
             self._je_angebot[angebot(e.buendel_id)].append(e)
 
+    def massgeblich(
+        self, buendel_id: str, gesamt: float | None, posten: Mapping | None = None
+    ) -> gp.Ergebnis | None:
+        """DIE Gegenprobe eines Preises für Seite, Fenster und Bilanz: der jüngste
+        geöffnete Besuch (gelesen oder belegt gescheitert), nie eine nicht geöffnete
+        Zeile."""
+        return self.zum_preis(buendel_id, gesamt, gp.VERSUCHT, posten)
+
     def zum_preis(
-        self, buendel_id: str, gesamt: float | None, nur: Sequence[str] = GEZEIGT
+        self,
+        buendel_id: str,
+        gesamt: float | None,
+        nur: Sequence[str] = gp.VERSUCHT,
+        posten: Mapping | None = None,
     ) -> gp.Ergebnis | None:
         """Die jüngste Gegenprobe dieses Preises mit einem Status aus ``nur``:
         dasselbe Bündel oder dasselbe Angebot in anderer Farbe, mit gleichen
-        Gesamtkosten; ohne Gesamtkosten nur dasselbe Bündel, ebenfalls ohne."""
+        Gesamtkosten. Ohne Gesamtkosten ist der Preis seine Einzelposten
+        (``posten``, ``gegenprobe.FELDER``): nur dasselbe Bündel mit denselben
+        gespeicherten Posten; ohne ``posten`` gibt es dann keine."""
         if gesamt is None:
+            if posten is None:
+                return None
             for e in reversed(self._je_id.get(buendel_id, [])):
-                if e.status in nur and e.gesamt_gespeichert is None:
+                if (
+                    e.status in nur
+                    and e.gesamt_gespeichert is None
+                    and not gp.geaendert(e.gespeichert, posten)
+                ):
                     return e
             return None
         for liste in (
@@ -110,13 +131,6 @@ class Gegenproben:
             if e.datum == datum:
                 return e
         return None
-
-    def letzter_versuch(self, buendel_id: str) -> str | None:
-        """Der Tag des letzten geöffneten Besuchs dieses Bündels (auch gescheitert)."""
-        tage = [
-            e.datum for e in self._je_id.get(buendel_id, []) if e.status in gp.VERSUCHT
-        ]
-        return max(tage, default=None)
 
 
 def alter_tage(datum: str, letzte: str | None) -> int | None:
@@ -169,6 +183,20 @@ def _streu(buendel_id: str, datum: str) -> str:
     return hashlib.sha256(f"{datum}|{buendel_id}".encode()).hexdigest()[:12]
 
 
+def _im_fenster(datum: str, bid: str, probe: gp.Ergebnis | None) -> Kandidat:
+    """Rang eines Bündels ohne Preisänderung: fällig (1), belegt gescheitert (2,
+    hinter jedem fälligen prüfbaren), nicht fällig (3)."""
+    letzte = probe.datum if probe is not None else None
+    if probe is not None and probe.status == gp.NICHT_PRUEFBAR:
+        return Kandidat(bid, gp.ANLASS_FENSTER, True, (2, letzte, _streu(bid, datum)))
+    ist_faellig = faellig(datum, letzte)
+    anlass = gp.ANLASS_FENSTER if ist_faellig else gp.ANLASS_GLEICHE_SEITE
+    klasse = 1 if ist_faellig else 3
+    return Kandidat(
+        bid, anlass, ist_faellig, (klasse, letzte or "", _streu(bid, datum))
+    )
+
+
 def kandidaten(
     datum: str,
     angezeigt: Iterable[Mapping],
@@ -185,25 +213,13 @@ def kandidaten(
         bid = str(satz["id"])
         if nur is not None and gp.anbieter_aus_id(bid) not in nur:
             continue
-        preis = gesamt(satz)
-        versucht = gegenproben.zum_preis(bid, preis, gp.VERSUCHT)
-        if versucht is not None and versucht.datum == datum:
+        probe = gegenproben.massgeblich(bid, gesamt(satz), satz)
+        if probe is not None and probe.datum == datum:
             continue
         if bid in stelle:
             out.append(Kandidat(bid, gp.ANLASS_AENDERUNG, True, (0, stelle[bid])))
-            continue
-        probe = gegenproben.zum_preis(bid, preis, gp.GEPRUEFT)
-        letzte = probe.datum if probe is not None else None
-        ist_faellig = faellig(datum, letzte)
-        anlass = gp.ANLASS_FENSTER if ist_faellig else gp.ANLASS_GLEICHE_SEITE
-        rang = (
-            1 if ist_faellig else 2,
-            0,
-            letzte or "",
-            gegenproben.letzter_versuch(bid) or "",
-            _streu(bid, datum),
-        )
-        out.append(Kandidat(bid, anlass, ist_faellig, rang))
+        else:
+            out.append(_im_fenster(datum, bid, probe))
     return sorted(out, key=lambda k: k.rang)
 
 

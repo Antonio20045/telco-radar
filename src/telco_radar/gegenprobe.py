@@ -174,8 +174,15 @@ def luecken_von(gespeichert: Mapping, gelesen: Mapping) -> list[dict]:
     return teile_auf(_gegenueber(gespeichert, gelesen))[1]
 
 
+def _de(iso: str) -> str:
+    return f"{iso[8:10]}.{iso[5:7]}.{iso[:4]}"
+
+
 def vergleiche(
-    gespeichert: Mapping, gelesen: Mapping
+    gespeichert: Mapping,
+    gelesen: Mapping,
+    gemessen_am: str | None = None,
+    pruefdatum: str | None = None,
 ) -> tuple[str, list[dict], list[str], str | None]:
     """(Status, Abweichungen, nicht gelesene Posten des Rechenwegs, Grund).
 
@@ -184,12 +191,20 @@ def vergleiche(
     Bestand ihn als Lücke, ist das eine ``erfassungsluecke`` (``luecken_von``), keine
     Abweichung. ``bestaetigt`` heißt: jeder Posten des Rechenwegs
     (``rechenweg_felder``) ist gelesen und gleich; fehlt einer, ist es ``teilweise``
-    mit den geprüften und den nicht gelesenen Posten im Grund.
+    mit den geprüften und den nicht gelesenen Posten im Grund. Liegt die Messung
+    (``gemessen_am``) vor dem Prüftag, nennt eine Abweichung beide Tage: der Anbieter
+    kann den Preis dazwischen geändert haben (Telekom Pixel 10a, 20./21.11.2026).
     """
     abweichungen, luecken = teile_auf(_gegenueber(gespeichert, gelesen))
     noetig = rechenweg_felder(gespeichert)
     fehlt = [f for f in noetig if gelesen.get(f) is None]
     if abweichungen:
+        if gemessen_am and pruefdatum and gemessen_am < pruefdatum:
+            grund = (
+                f"Preis gemessen am {_de(gemessen_am)}, Seite gelesen am "
+                f"{_de(pruefdatum)}; dazwischen kann er sich geändert haben"
+            )
+            return ABWEICHEND, abweichungen, fehlt, grund
         return ABWEICHEND, abweichungen, fehlt, None
     geprueft = [f for f in FELDER if gelesen.get(f) is not None]
     if not geprueft:
