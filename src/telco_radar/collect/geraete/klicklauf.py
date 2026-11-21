@@ -50,6 +50,7 @@ from ...klick_vertrag import CHALLENGE_STATUS as CHALLENGE_STATUS
 from ...klick_vertrag import FEHLER_AB_STATUS as FEHLER_AB_STATUS
 from ...klick_vertrag import LAUF_GELESEN, abruf_gestoert
 from ...klick_vertrag import LAUF_GESTOERT as LAUF_GESTOERT
+from ...klick_vertrag import STOERUNG_SEITE as STOERUNG_SEITE
 from .klickecho import Befund, Variante
 from .klickkarte import WERTFELDER
 from .klicktext import Buendelwerte, Preiswerte
@@ -66,7 +67,6 @@ BEFUND = "befund"
 LAUF_GESPERRT = "gesperrt"
 LAUF_ZEITGRENZE = "zeitgrenze"
 STOERUNG_ZEIT = "zeitueberschreitung"
-STOERUNG_SEITE = "seitenform"
 STOERUNG_SERVER = "serverfehler"
 GRUND_ANDERE_FARBE = "in der vorgewählten Farbe nicht vorhanden"
 BELEG_OFFEN = "offen"

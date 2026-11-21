@@ -51,6 +51,7 @@ from ...klick_vertrag import FRISCHEGRENZE_TAGE as FRISCHEGRENZE_TAGE
 from ...klick_vertrag import LESEFRIST_TAGE as LESEFRIST_TAGE
 from ...klick_vertrag import ORDNER as ORDNER
 from ...klick_vertrag import ROTATION_GELESEN as ROTATION_GELESEN
+from ...klick_vertrag import SEITE_NICHT_BESUCHT as SEITE_NICHT_BESUCHT
 from ...klick_vertrag import STAND_DATEI as STAND_DATEI
 from ...klick_vertrag import ganz_gelesen as ganz_gelesen
 from ...klick_vertrag import lies_ergebnisse as lies_ergebnisse
@@ -77,7 +78,6 @@ log = logging.getLogger(__name__)
 
 LAUF_LEER = "leer"
 LAUF_NICHT_GELESEN = "nicht_gelesen"
-SEITE_NICHT_BESUCHT = "nicht_besucht"
 GELESENE_SEITEN = frozenset({LAUF_GELESEN, LAUF_ZEITGRENZE})
 OHNE_SPERRE = frozenset({STOERUNG_ZEIT, STOERUNG_SEITE, STOERUNG_SERVER})
 GRUND_NICHTS_ERFASST = "keine Kombination erfasst"

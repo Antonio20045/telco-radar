@@ -12,13 +12,21 @@ AUFRUF
     PYTHONPATH=src python scripts/klick_tageslauf.py --anbieter o2 --ausgabe klick
         [--stand data/state/klick/klick_stand.json] [--job-frist-sekunden 10800]
         [--job-start EPOCHE] [--root .] [--chromium PFAD] [--ohne-parallelpruefung]
+        [--rot-bei-ausfall]
     PYTHONPATH=src python scripts/klick_tageslauf.py --plan
 
 ``--job-start`` ist der Start des Jobs in Sekunden seit 1970 (``date +%s`` im ersten
 Schritt); mit ``--job-frist-sekunden`` ergibt er die Restzeit (CLAUDE.md Regel 8).
 ``--plan`` gibt die Schlüssel aller Anbieter mit Karte als JSON-Liste aus (Matrix),
-ohne Netz. Ein gestörter Anbieter ist ein Ergebnis, kein Fehler: Exit-Code 0; 2 heißt,
-die Auswahl oder die Konfiguration ist falsch.
+ohne Netz. 2 heißt, die Auswahl oder die Konfiguration ist falsch.
+
+Ausfall (``klick_vertrag.ausfall``: gestört durch Sperre, Serverfehler, Zeit oder
+Browser, etwa 0 Seiten nach HTTP 502 am 21.11.2026; nicht Seitenform, Strukturbruch,
+leer oder Verschiebung): die Ergebnisdatei ist trotzdem
+geschrieben, die Ausgabe nennt ihn als ``::error``-Zeile der Actions-Zusammenfassung,
+und mit ``--rot-bei-ausfall`` endet der Lauf mit ``FEHLER_AUSFALL`` (3), damit der Job
+nicht grün aussieht. Ohne Schalter Exit-Code 0: solange ``geraete.yml`` nur nach einem
+grünen Klick-Lauf startet, hielte ein roter Job den Gerätelauf aller Anbieter an.
 
 Zu jedem erfassten Preis liegt danach ein verkleinertes WebP in ``<ausgabe>/belege/``
 (``belegbild``); ``klick.yml`` lädt den Ordner als Artefakt und
@@ -73,8 +81,10 @@ from telco_radar.collect.geraete.klickziele import (
     lade_ziele,
     waehle,
 )
+from telco_radar.klick_vertrag import ausfall
 
 FEHLER_AUSWAHL = 2
+FEHLER_AUSFALL = 3
 
 
 def _uhr() -> datetime:
@@ -92,6 +102,7 @@ def main(argumente: list[str] | None = None) -> int:
     parser.add_argument("--plan", action="store_true")
     parser.add_argument("--chromium", type=Path)
     parser.add_argument("--ohne-parallelpruefung", action="store_true")
+    parser.add_argument("--rot-bei-ausfall", action="store_true")
     args = parser.parse_args(argumente)
     beginn = time.time()
     try:
@@ -114,9 +125,10 @@ def main(argumente: list[str] | None = None) -> int:
     lage = lade_karte(args.root / KARTEN, ziel.kartenschluessel)
     ziel_datei = args.ausgabe / f"{ziel.schluessel}.json"
     if lage.karte is None:
-        schreibe(ziel_datei, _ohne_karte(ziel.schluessel, ziel.name, heute, lage))
+        daten = _ohne_karte(ziel.schluessel, ziel.name, heute, lage)
+        schreibe(ziel_datei, daten)
         print(f"{ziel.schluessel}: {LAUF_NICHT_GELESEN} ({lage.grund})")
-        return 0
+        return endcode(daten, args.rot_bei_ausfall)
     stand = lies_stand(
         args.root / ORDNER / STAND_DATEI if args.stand is None else args.stand
     )
@@ -152,7 +164,16 @@ def main(argumente: list[str] | None = None) -> int:
     print(
         f"{ziel.schluessel}: {daten['laufstatus']}{grund}, {daten['dauer_sekunden']} s"
     )
-    return 0
+    return endcode(daten, args.rot_bei_ausfall)
+
+
+def endcode(daten: dict, rot_bei_ausfall: bool) -> int:
+    """0 ohne Ausfall; sonst die ``::error``-Zeile, mit Schalter ``FEHLER_AUSFALL``."""
+    grund = ausfall(daten)
+    if grund is None:
+        return 0
+    print(f"::error title=Klick-Ausfall {daten.get('anbieter')}::{grund}")
+    return FEHLER_AUSFALL if rot_bei_ausfall else 0
 
 
 def _mit_bildern(crawle, ordner: Path):

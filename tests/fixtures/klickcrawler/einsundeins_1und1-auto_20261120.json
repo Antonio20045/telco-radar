@@ -1,0 +1,55 @@
+{
+ "anbieter": "1und1-auto",
+ "datum": "2026-11-20",
+ "dauer_sekunden": 53.1,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "https://mobile.1und1.de/iphone-duo: Vorbereitung: #no-incentive nicht gefunden",
+ "karte": "1und1.yaml",
+ "laufstatus": "gestoert",
+ "lesefrist_tage": 1,
+ "name": "1&1",
+ "seiten": [
+  {
+   "adresse": "https://mobile.1und1.de/iphone-duo",
+   "geraet": "apple-iphone-duo",
+   "gescheitert": 0,
+   "grund": "Vorbereitung: #no-incentive nicht gefunden",
+   "http_status": 200,
+   "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 55,
+    "beendet": 53,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "api.1und1.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 29.0,
+    "takte_ms": 3450,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 3
+  }
+ ],
+ "ueberfaellig": [
+  "https://mobile.1und1.de/iphone-duo"
+ ],
+ "uebersichten": [],
+ "vertragsform": "ein_vertrag",
+ "zeitbudget_sekunden": 10249
+}
