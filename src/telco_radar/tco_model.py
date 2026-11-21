@@ -458,8 +458,7 @@ class Buendel:
     Es gibt hier bewusst KEIN `preis_ohne_vertrag`. Der Gesamtbetrag der Geraeteraten
     ist eine Ratenzahlung und keine Kassenzahl; ihn in dasselbe Feld zu schreiben wie
     einen Barpreis war der Befund, mit dem dieses Vorhaben angefangen hat (o2,
-    03.09.2026: 721,00 EUR standen in derselben Spalte wie freenets 949,00 EUR
-    Barpreis).
+    03.09.2026: 721,00 EUR in derselben Spalte wie freenets Barpreis 949,00 EUR).
     """
 
     sku_id: str = ""
@@ -475,6 +474,7 @@ class Buendel:
     geraet_monatsrate: Optional[float] = None
     laufzeit_monate: Optional[int] = None
     anschlusspreis: Optional[float] = None
+    anschluss_gemessen_am: str = ""
     rabatte: list[Rabatt] = field(default_factory=list)
     aktionen: list[Aktion] = field(default_factory=list)
     quelle_url: str = ""

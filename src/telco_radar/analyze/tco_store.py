@@ -86,7 +86,7 @@ from ..tco_model import (
     sim_only_id,
 )
 from .tco_beleg import beleg_widerspricht, beleglink_der_zeile
-from .tco_buendel import KLICKFELDER
+from .tco_buendel import OPTIONALE_FELDER
 
 log = logging.getLogger(__name__)
 
@@ -334,7 +334,7 @@ class TcoDB:
                 neu += 1
             gesehen.add(bid)
             self._schreibe_messung(eintrag, satz, _MESSFELDER)
-            for f in KLICKFELDER:
+            for f in OPTIONALE_FELDER:
                 eintrag.pop(f, None)
                 eintrag.update({f: getattr(satz, f)} if getattr(satz, f) else {})
             eintrag["rabatte"] = [asdict(r) for r in satz.rabatte]

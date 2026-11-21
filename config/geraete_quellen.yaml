@@ -795,7 +795,11 @@ anbieter:
     # (CLAUDE.md Regel 8). Befund 16.11.2026: das Budget des Tageslaufs
     # (--frist 1500) deckt diesen Bedarf nicht, deshalb fehlten von rund
     # 2.500 o2-Preisen am 14./15.11. je rund 1.100.
-    sammelbedarf_sekunden: 1140
+    # Gemessen 21.11.2026 (Gerätelauf 44858465074): 206 Abrufe in 801 s
+    # (03:10:33–03:23:54, 3,9 s je Abruf). Die Nachmessung offener
+    # Anschlusspreise läuft nicht hier, sondern nach der Tarifwelt-Stufe in
+    # der Restzeit des Jobs (`geraete_o2_anschluss`).
+    sammelbedarf_sekunden: 820
     kopfzeilen:
       # Der Endpunkt weist diesen Medientyp in der Nutzlast von /e-shop/
       # selbst aus. Mit `Accept: application/json` antwortet er mit einer

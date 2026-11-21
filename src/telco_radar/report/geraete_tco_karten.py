@@ -562,8 +562,7 @@ def aktionen_der_karte(b: Buendel, heute: str = "") -> tuple[list, Optional[dict
     zum 29.09." ist am 30.09. keine Auskunft mehr, sondern eine falsche.
     Der Ueberhang ist die groesste NICHT eingerechnete Aktion mit Betrag -
     die Zahl, um die das Angebot unter einer Bedingung noch sinkt. Eine
-    eingerechnete Aktion hat keinen Ueberhang: sie steckt schon in der
-    Leitzahl."""
+    eingerechnete Aktion hat keinen Ueberhang: sie steckt schon in der Leitzahl."""
     liste = []
     for a in b.aktionen:
         if not a.gilt_am(heute):
@@ -605,8 +604,8 @@ def _karte(
     Diese Funktion addiert keinen Euro. Die Kernzahl ist `kosten_ueber` ueber H
     (Datenkonzept Geraete 5.3: 12/24 Raten 24 Monate, 36 Raten 36, 1&1 sein Vertrag),
     ihre Summanden `rechnung`; fehlt ein Posten, steht die benannte Luecke. `laufzeit`
-    und `leitzahl_monate` sind H, `heute` entscheidet die Frische (`ist_frisch`),
-    `quelle_art` allein `vom_crawler` (Hinweis neben dem Beleg der Zeile)."""
+    und `leitzahl_monate` sind H, `heute` die Frische (`ist_frisch`), `quelle_art`
+    `vom_crawler` und `anschluss_gemessen_am` ein Datum neben dem Beleg der Zeile."""
     from . import geraete_laufzeit
 
     frisch = ist_frisch(b.abgerufen_am, heute, b.herleitung)
@@ -677,6 +676,7 @@ def _karte(
         "aktion_ueberhang": aktion_ueberhang,
         "quelle_url": b.quelle_url,
         "abgerufen_am": b.abgerufen_am,
+        "anschluss_gemessen_am": b.anschluss_gemessen_am,
         "vom_crawler": b.quelle_art == QUELLE_KLICK,
         "beleg_id": b.beleg_id,
         "tarif_quelle_url": (tarif or {}).get("dokument_url", ""),

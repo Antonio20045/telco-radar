@@ -105,6 +105,10 @@ log = logging.getLogger(__name__)
 ZUSATZKARTEN = {"vodafone": ("FamilyCard", "Red+")}
 KLICKFELDER = ("quelle_art", "beleg_id", "beleg_status")
 """Kennzeichen eines Klick-Satzes (`klickrohsatz`); ein Adaptersatz hat sie nicht."""
+OPTIONALE_FELDER = (*KLICKFELDER, "anschluss_gemessen_am")
+"""Felder, die nur dastehen, wenn sie gesetzt sind; `anschluss_gemessen_am` ist das
+Messdatum eines aus dem Bestand übernommenen Anschlusspreises
+(`geraete_o2_anschluss`)."""
 """Namensanfaenge von Zusatzkarten je Anbieter (normalisierter Name): Vodafone nennt
 die FamilyCard selbst "FamilyCard-Zusatzkarte" (Promo-Seite, Hinweis in
 `config/geraete_quellen.yaml`), Red+ ist Vodafones Zusatzkartenfamilie. Eine

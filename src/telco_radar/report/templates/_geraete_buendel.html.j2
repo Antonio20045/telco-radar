@@ -468,6 +468,8 @@
       class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
       if k.abgerufen_am %} · {{ 'vom Crawler abgelesen' if k.vom_crawler else
       'abgerufen' }} {{ k.abgerufen_am | date_de }}{% endif
+      %}{% if k.anschluss_gemessen_am and k.anschluss_gemessen_am != k.abgerufen_am
+      %} · Anschlusspreis vom {{ k.anschluss_gemessen_am | date_de }}{% endif
       %}{% if k.tarif_quelle_url %} · <a href="{{ k.tarif_quelle_url }}"
       rel="nofollow noopener" target="_blank">Tarifbeleg</a>{% endif %}</p>{% endif %}
 

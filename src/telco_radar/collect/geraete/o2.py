@@ -81,7 +81,7 @@ from functools import partial
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
-from .o2_anschluss import ADRESSE, abgeleiteter_anschluss, fussnoten_tragen
+from .o2_anschluss import abgeleiteter_anschluss, fussnoten_tragen
 from .o2_referenz import Referenzstand, belegadresse, modellname, tarife_aus
 from .o2_referenz import gleicher_slug
 from .ratenlaufzeit import katalog_mit_phasen, o2_phasen, ratenzahl_im_knopf
@@ -581,7 +581,7 @@ def saetze_aus_konfiguration(
         name = _tarifname(option, pv)
         satz = _rohsatz(basis, g, name, ref["slug"], tarif_rate, anschluss, url)
         satz["tarif_phasen"] = o2_phasen(pv, _link(option), g, tarif_rate, z)
-        satz["herleitung"], satz[ADRESSE] = HERLEITUNG_TARIFSUMME, _link(option)
+        satz["herleitung"] = HERLEITUNG_TARIFSUMME
         out.append(satz)
         _zaehle(z, "abgeleitet")
     return out
