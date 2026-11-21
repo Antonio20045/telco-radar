@@ -83,22 +83,44 @@ def o2_geraet(html: str) -> dict:
 O2_TARIFUEBERSICHT = "https://www.o2online.de/tarife/"
 
 
+def _ist_handy_link(tag: Tag) -> bool:
+    return (
+        tag.name == "a"
+        and "tarif=" in str(tag.get("href") or "")
+        and _text(tag) == "Handy hinzufügen"
+    )
+
+
+def _kartenname(link: Tag, slug: str) -> str | None:
+    """Der sichtbare Name der Kachel um den Link („O2 Mobile on Demand M“); „Plus“
+    kommt aus dem Link der Kachel selbst dazu, wenn die Kachel es nicht schreibt."""
+    karte = link
+    while karte.parent is not None and len(karte.parent.find_all(_ist_handy_link)) == 1:
+        karte = karte.parent
+    teile = list(karte.stripped_strings)
+    for i in range(len(teile) - 3):
+        if teile[i] == "O" and teile[i + 1] == "2":
+            name = f"O2 {teile[i + 2]} {teile[i + 3]}"
+            if slug.endswith("-plus") and "plus" not in name.lower():
+                name += " Plus"
+            return name
+    return None
+
+
 def o2_tarifuebersicht(html: str) -> list[Option]:
-    """Tarifübersicht: je Tarifkachel der Link „Handy hinzufügen“ (``/e-shop?tarif=
-    <slug>``), ein sichtbarer Kaufweg mit Gerät neben der Produktseite (Befund
-    21.11.2026, ``berichte/o2-nicht-plus.md``). Wert ist der Slug, Text ein lesbarer
-    Name daraus; die Kachel nennt keinen vollständigen Tarifnamen."""
+    """Tarifübersicht: je Kachel mit „Handy hinzufügen“ (``/e-shop?tarif=<slug>``)
+    der sichtbare Tarifname (Text) und der Slug (Wert); ein sichtbarer Kaufweg mit
+    Gerät neben der Produktseite (Befund 21.11.2026, ``berichte/o2-nicht-plus.md``).
+    Eine Kachel ohne lesbaren Namen ist ein Fehler, kein Raten aus dem Slug."""
     gesehen: dict[str, Option] = {}
-    for a in _soup(html).find_all("a", href=re.compile(r"[?&]tarif=")):
-        if _text(a) != "Handy hinzufügen":
-            continue
+    for a in _soup(html).find_all(_ist_handy_link):
         treffer = re.search(r"[?&]tarif=([a-z0-9-]+)", str(a.get("href") or ""))
-        if treffer:
-            slug = treffer.group(1)
-            name = " ".join(
-                w.upper() if w == "o2" else w.capitalize() for w in slug.split("-")
-            )
-            gesehen.setdefault(slug, Option(name, slug))
+        if treffer is None:
+            continue
+        name = _kartenname(a, treffer.group(1))
+        if name is None:
+            raise LeserFehler(f"o2: Kachel ohne Tarifnamen ({treffer.group(1)})")
+        gesehen.setdefault(treffer.group(1), Option(name, treffer.group(1)))
     if not gesehen:
         raise LeserFehler("o2: keine Tarifkachel mit „Handy hinzufügen“")
     return list(gesehen.values())

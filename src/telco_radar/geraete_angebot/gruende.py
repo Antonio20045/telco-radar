@@ -48,6 +48,8 @@ class ZeilenSoll:
     unvollstaendig: list[str] = field(default_factory=list)
     namen: dict[str, str] = field(default_factory=dict)
     kachelmodelle: set[str] = field(default_factory=set)
+    gelesen: set[str] = field(default_factory=set)
+    teilweise_gelesen: set[str] = field(default_factory=set)
 
 
 def _teile(schluessel: str) -> tuple[str, str, str]:

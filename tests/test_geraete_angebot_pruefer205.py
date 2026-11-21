@@ -68,9 +68,11 @@ def test_ist_ohne_soll_darf_nicht_vollstaendig_heissen(tmp_path):
     assert k["nicht_im_soll_zahl"] == 16 and k["soll"] == k["erfasst"]
     cong = _zeile(voll, "congstar")
     assert "vollständig" not in cong["marke"]
-    assert "16 Preise ohne Angebot auf der Seite" in cong["marke"]
+    assert "16 Preise, die der Anbieter so nicht anbietet" in cong["marke"]
     befunde = waechter.pruefe({"datum": TAG, "vollstaendigkeit": voll}, TAG)
-    assert any("16 erfasste Preise ohne Angebot auf der Seite" in b for b in befunde)
+    assert any(
+        "16 erfasste Preise, die der Anbieter so nicht anbietet" in b for b in befunde
+    )
 
 
 def test_zwei_verschiedene_tarife_mit_mit_im_namen_werden_nicht_zusammengelegt():

@@ -16,15 +16,9 @@ Laufzeit, ohne Farbe: ``buendel_angebot.angebot_ohne_farbe``).
 Soll, nicht im Ist) und ``nicht_im_soll`` (im Ist, nicht im Soll; ausgewiesen, nicht
 verschluckt). Ein Soll, das nicht zu zählen ist, ist ``None`` mit ``soll_grund``.
 
-**Gründe** einer Lücke kommen aus vorhandenen Signalen (``Signale``): Katalog, Paket
-mit Zubehör, Erfassungsvermerke des Laufs (``TcoDB.erfassung``: „1&1 nicht erfasst:
-Lesen gestört (HTTP 502 …)“), Bestand nicht gespeichert, Tarifwelt-Stufe (Zeitbudget,
-Modellliste, nicht lieferbar, Netz). Ohne Signal heißt die Lücke ``UNBENANNT``, und
-genau das macht den Wächter rot.
-
-**Stufe 2** (Kombinationen im Browser) hängt sich über ``SichtbareAuswahl`` und
-``haenge_kombinationen_ein`` an; bis dahin ist das Kombinations-Soll ``None`` mit
-``GRUND_STUFE2``.
+**Gründe** kommen aus Signalen (``Signale``: Katalog, Paket, Erfassungsvermerke,
+Tarifwelt-Stufe); ohne Signal heißt die Lücke ``UNBENANNT`` (Wächter rot). **Stufe 2**
+(Browser) hängt sich über ``SichtbareAuswahl``/``haenge_kombinationen_ein`` an.
 """
 
 from __future__ import annotations
@@ -342,25 +336,27 @@ def haenge_kombinationen_ein(
     ausgenommen: Iterable[str] = (),
     quelle: dict | None = None,
     grund_extra: Callable[[str], str] | None = None,
+    soll_dazu: Iterable[str] = (),
+    nicht_verglichen: dict[str, str] | None = None,
 ) -> dict:
     """Setzt das Kombinations-Soll eines Anbieters aus den Seiten des Browser-Zählers
     (Stufe 2) und rechnet Lücken und ``unbenannt`` neu; Ist aus ``buendel`` wie oben.
 
-    ``grund(schluessel)`` nennt je Lücke den Grund aus den Signalen
-    (``geraete_angebot.einhaengen``); ohne ihn gilt der Ausfallvermerk des Anbieters,
-    sonst ``UNBENANNT``. ``ausgenommen`` sind Modelle, deren Seite nicht gezählt
-    wurde: ihr Ist fällt aus dem Vergleich, statt als „nicht im Soll“ zu erscheinen.
-    ``grund_extra(schluessel)`` benennt einen erfassten Preis ohne Angebot auf der
-    Seite; ohne Grund zählt er in ``nicht_im_soll_unbenannt`` (Wächter rot)."""
+    ``grund(k)`` benennt eine Lücke (sonst Ausfallvermerk oder ``UNBENANNT``),
+    ``grund_extra(k)`` einen erfassten Preis, den die Seite nicht anbietet (sonst
+    ``nicht_im_soll_unbenannt``, Wächter rot). Aus dem Vergleich fallen das Ist der
+    Modelle in ``ausgenommen`` (Auswahl nicht gelesen) und die Schlüssel in
+    ``nicht_verglichen`` (mit Grund); ``soll_dazu`` sind bestätigte Angebote eines
+    zweiten Kaufwegs (``geraete_angebot.kaufwege``)."""
     seiten = [a for a in auswahlen if a.anbieter == anbieter]
     zeile = next(z for z in voll["anbieter"] if z["name"] == anbieter)
-    weg = set(ausgenommen)
+    weg, offen = set(ausgenommen), dict(nicht_verglichen or {})
     ist = {
         k
         for k in ist_zaehlung(buendel, voll["datum"]).get(anbieter, Ist()).kombinationen
-        if modell_der_kombination(k) not in weg
+        if modell_der_kombination(k) not in weg and k not in offen
     }
-    soll = set().union(*(a.schluessel() for a in seiten)) if seiten else set()
+    soll = set().union(set(soll_dazu), *(a.schluessel() for a in seiten))
     ebene = _ebene(len(soll) if seiten else None, None, len(ist))
     ohne = 0
     if not seiten:
@@ -382,6 +378,10 @@ def haenge_kombinationen_ein(
             nicht_im_soll=extras[:LISTE_HOECHSTENS],
             nicht_im_soll_zahl=len(extra),
             nicht_im_soll_unbenannt=sum(1 for e in extras if not e["benannt"]),
+            nicht_verglichen=[_luecke(k, k, "", g) for k, g in sorted(offen.items())][
+                :LISTE_HOECHSTENS
+            ],
+            nicht_verglichen_zahl=len(offen),
             quelle=quelle
             or {
                 "art": "browser_auswahl",

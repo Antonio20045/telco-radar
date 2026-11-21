@@ -162,7 +162,8 @@ def test_uebersicht_ohne_zahl_braucht_den_beleg(tmp_path):
     mit.uebersicht_ende = "Nachladen bis zum Ende (2-mal), danach kein Knopf mehr"
     zeilen, voll = base._voll(tmp_path, [mit], _katalog())
     assert zeilen["congstar"]["angebot"]["uebersicht"]["vollstaendig"] is True
-    assert _zeile(voll, "congstar")["marke"] == "vollständig"
+    assert _zeile(voll, "congstar")["marke"].endswith("· vollständig")
+    assert _zeile(voll, "congstar")["satz"] == "congstar: 1 von 1 Geräten gezählt"
 
 
 def test_ungelesene_auswahl_einer_seite_ist_nicht_vollstaendig(tmp_path):

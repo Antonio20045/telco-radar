@@ -31,26 +31,22 @@ from pathlib import Path
 from .. import geraete_angebot as ga
 from ..geraete_model import erkenne_geraet
 from ..geraete_tarifschluessel import (
-    NUMMER,
-    PREIS,
     grundtarif,
     mit_preis,
-    ohne_variante,
 )
 from ..geraete_vollstaendigkeit import (
     Ist,
     SichtbareAuswahl,
-    _ebene,
-    _luecke,
-    _modell_ebene,
     haenge_kombinationen_ein,
     ist_zaehlung,
     modell_der_kombination,
 )
 from ..models import normalize_url
 from . import kaufwege
+from .ebenen import AUSWAHL_OFFEN, geraete_zahl, modell_ebene, speicher_ebene
 from .gruende import ZeilenSoll, grund_der_luecke, grund_ohne_angebot
 from .lesen import ist_smartphone, speicher_segment
+from .namen import benenne, ist_tarifnamen
 
 ANGEBOT_FEHLT = "Angebot heute nicht gezählt"
 ART_UEBERSICHT = "browser_uebersicht"
@@ -131,6 +127,21 @@ def _auswahl(zeile: str, modell: str, seite: ga.Seite, z: ga.Zaehlung, netz=None
     )
 
 
+def _ins_soll(soll: ZeilenSoll, seite: ga.Seite, schluessel: str, auswahl, katalog):
+    _modell(soll, seite.titel, seite.url, False, katalog)
+    soll.auswahlen.append(auswahl)
+    namen = [o.text for o in seite.tarife] + [
+        str(k[1]) for k in seite.kombinationen or ()
+    ]
+    soll.tarifnamen.update({grundtarif(n): n for n in namen})
+    soll.speicher |= {f"{schluessel}-{s}" for s in auswahl.speicher}
+    for tarif, monate in seite.ausgeschlossen:
+        soll.ausgeschlossen[(schluessel, grundtarif(tarif), int(monate))] = tarif
+    soll.unvollstaendig += [f"{seite.titel}: {u}" for u in seite.unvollstaendig]
+    if seite.unvollstaendig:
+        soll.teilweise_gelesen.add(schluessel)
+
+
 def soll_aus(z: ga.Zaehlung, katalog) -> dict[str, ZeilenSoll]:
     """Das Soll je Anbieterzeile aus einer Zählung."""
     anbieter = ga.ANBIETER[z.schluessel]
@@ -151,7 +162,9 @@ def soll_aus(z: ga.Zaehlung, katalog) -> dict[str, ZeilenSoll]:
         ] or [(None, je[anbieter.name])]
         for netz, soll in ziele:
             schluessel = modell_von(seite.titel, seite.url, katalog)[0]
-            if seite.status != ga.GELESEN:
+            if seite.status == ga.GELESEN:
+                soll.gelesen.add(schluessel)
+            else:
                 soll.nicht_gezaehlt.append(
                     {
                         "schluessel": schluessel,
@@ -170,75 +183,8 @@ def soll_aus(z: ga.Zaehlung, katalog) -> dict[str, ZeilenSoll]:
             )
             if netz is not None and not auswahl.schluessel():
                 continue
-            _modell(soll, seite.titel, seite.url, False, katalog)
-            soll.auswahlen.append(auswahl)
-            namen = [o.text for o in seite.tarife] + [
-                str(k[1]) for k in seite.kombinationen or ()
-            ]
-            soll.tarifnamen.update({grundtarif(n): n for n in namen})
-            soll.speicher |= {f"{schluessel}-{s}" for s in auswahl.speicher}
-            for tarif, monate in seite.ausgeschlossen:
-                soll.ausgeschlossen[(schluessel, grundtarif(tarif), int(monate))] = (
-                    tarif
-                )
-            soll.unvollstaendig += [f"{seite.titel}: {u}" for u in seite.unvollstaendig]
+            _ins_soll(soll, seite, schluessel, auswahl, katalog)
     return je
-
-
-def _speicher_ebene(soll: ZeilenSoll, ist: Ist, grund) -> dict:
-    ist_ms = {
-        m
-        for m in ist.modell_speicher
-        if m in soll.speicher or m.rsplit("-", 1)[0] in soll.modelle
-    }
-    ebene = _ebene(len(soll.speicher), None, len(ist_ms))
-    fehlend = sorted(soll.speicher - ist.modell_speicher)
-    extra = sorted(ist_ms - soll.speicher)
-    ebene.update(
-        erfasst=len(soll.speicher & ist.modell_speicher),
-        luecken=[_luecke(k, k, "", grund(k + "--")) for k in fehlend][
-            :LISTE_HOECHSTENS
-        ],
-        luecken_zahl=len(fehlend),
-        nicht_im_soll=[{"schluessel": k, "name": k} for k in extra][:LISTE_HOECHSTENS],
-        nicht_im_soll_zahl=len(extra),
-    )
-    return ebene
-
-
-def _euro(betrag: str) -> str:
-    return betrag.replace(".", ",")
-
-
-def lesbar(schluessel: str, soll: ZeilenSoll) -> tuple[str, str]:
-    """(Name, Adresse) einer Lücke: „Samsung Galaxy S26 · 512 GB · Mobil XS · 24
-    Monate“ statt des Schlüssels; Adresse ist die Modellseite."""
-    teile = schluessel.split("--")
-    modell = modell_der_kombination(schluessel)
-    info = soll.modelle.get(modell or "") or {}
-    ms = teile[0]
-    speicher = ms[len(modell) + 1 :] if modell else ""
-    gb = speicher.removesuffix("gb")
-    stuecke = [info.get("name") or soll.namen.get(modell or "") or ms]
-    if gb.isdigit():
-        stuecke.append(f"{int(gb) // 1024} TB" if int(gb) >= 1024 else f"{gb} GB")
-    if len(teile) > 2 and teile[1]:
-        rest, _, nummer = teile[1].partition(NUMMER)
-        tarif, _, preis = rest.partition(PREIS)
-        name = soll.tarifnamen.get(tarif, tarif)
-        if preis:
-            geraet, _, monat = preis.partition("-")
-            name += f" ({_euro(geraet)} € + {_euro(monat)} €/Monat)"
-        stuecke.append(f"{name} ({nummer}.)" if nummer else name)
-        stuecke.append(f"{teile[2].removesuffix('m')} Monate")
-    return " · ".join(stuecke), str(info.get("url") or "")
-
-
-def _benenne(ebene: dict, soll: ZeilenSoll) -> None:
-    for eintrag in [*ebene["luecken"], *ebene["nicht_im_soll"]]:
-        eintrag["name"], url = lesbar(eintrag["schluessel"], soll)
-        if "url" in eintrag:
-            eintrag["url"] = url
 
 
 def _ohne_auswahl(zeile: dict, z: ga.Zaehlung, soll: ZeilenSoll, ist: Ist) -> None:
@@ -309,23 +255,30 @@ def _ohne(ist: Ist, modelle: set[str]) -> Ist:
 
 def _zeile(voll, zeile, z, soll: ZeilenSoll, buendel, signale, ist_je, namen) -> None:
     name = zeile["name"]
-    gezaehlt = {a.modell for a in soll.auswahlen}
-    ohne_seite = (set(soll.modelle) | soll.kachelmodelle) - gezaehlt
-    weg = ({n["schluessel"] for n in soll.nicht_gezaehlt} | ohne_seite) - gezaehlt
     soll.namen = dict(namen)
-    for b in buendel:
-        b = b if isinstance(b, dict) else vars(b)
-        if b.get("anbieter") == name and b.get("tarif_name"):
-            kern_name = ohne_variante(grundtarif(str(b["tarif_name"])))[0]
-            soll.tarifnamen.setdefault(kern_name, str(b["tarif_name"]).split(" (")[0])
+    ist_tarifnamen(soll, buendel, name)
+    voll_ist = ist_je.get(name, Ist())
+    gezaehlt = {a.modell for a in soll.auswahlen}
+    weg = voll_ist.modelle - gezaehlt
+    ist = _ohne(voll_ist, weg)
+    offen = {
+        k: AUSWAHL_OFFEN
+        for k in voll_ist.kombinationen
+        if modell_der_kombination(k) in soll.teilweise_gelesen
+    }
+    dazu: set[str] = set()
     herkunft = None
     if z.schluessel == "o2":
-        herkunft = kaufwege.ergaenze(z, soll, buendel, name)
-    voll_ist = ist_je.get(name, Ist())
-    ist = _ohne(voll_ist, weg)
+        dazu, extra_offen, herkunft = kaufwege.vergleiche(
+            z, soll.auswahlen, voll_ist.kombinationen
+        )
+        offen.update(extra_offen)
+        if z.tarifuebersicht is None:
+            soll.unvollstaendig.append(
+                z.tarifuebersicht_grund or kaufwege.NICHT_GEPRUEFT
+            )
     grund = grund_der_luecke(name, soll, ist, signale, ist_je)
     ganz, beleg = ga.uebersicht_pruefung(z)
-    ist_modelle = ist if z.schluessel == "tarifwelt" else voll_ist
     zeile["soll_quelle"] = {
         "art": ART_UEBERSICHT,
         "quelle": z.uebersicht,
@@ -333,14 +286,12 @@ def _zeile(voll, zeile, z, soll: ZeilenSoll, buendel, signale, ist_je, namen) ->
         "gezaehlt_um": z.gezaehlt_von,
         "genannt": z.genannt,
     }
-    for schluessel, info in soll.modelle.items():
-        if info["im_katalog"] and schluessel in namen:
-            info["name"] = namen[schluessel]
-    stufe1 = {"modelle": list(soll.modelle.values())}
-    zeile["ebenen"]["modelle"] = _modell_ebene(
-        name, stufe1, ist_modelle, signale, ist_je, namen
+    ohne_kachel = voll_ist.modelle - soll.kachelmodelle - set(soll.modelle)
+    ist_modelle = (
+        _ohne(voll_ist, weg - ohne_kachel) if z.schluessel == "tarifwelt" else voll_ist
     )
-    zeile["ebenen"]["modell_speicher"] = _speicher_ebene(soll, ist, grund)
+    modell_ebene(zeile, soll, ist_modelle, ganz, (name, signale, ist_je, namen))
+    zeile["ebenen"]["modell_speicher"] = speicher_ebene(soll, ist, grund)
     haenge_kombinationen_ein(
         voll,
         name,
@@ -351,17 +302,20 @@ def _zeile(voll, zeile, z, soll: ZeilenSoll, buendel, signale, ist_je, namen) ->
         grund_extra=grund_ohne_angebot(soll),
         ausgenommen=weg,
         quelle={"art": ART_AUSWAHL, "gezaehlt_um": z.gezaehlt_bis or z.gezaehlt_von},
+        soll_dazu=dazu,
+        nicht_verglichen=offen,
     )
     if not soll.auswahlen:
         _ohne_auswahl(zeile, z, soll, ist)
-    _benenne(zeile["ebenen"]["kombinationen"], soll)
-    _benenne(zeile["ebenen"]["modell_speicher"], soll)
+    benenne(zeile["ebenen"]["kombinationen"], soll)
+    benenne(zeile["ebenen"]["modell_speicher"], soll)
     zeile["angebot"] = {
         "status": z.laufstatus,
         "grund": z.grund,
         "messtag": z.messtag,
         "gezaehlt_von": z.gezaehlt_von,
         "gezaehlt_bis": z.gezaehlt_bis,
+        "geraete": geraete_zahl(z, soll),
         "nicht_gezaehlt": soll.nicht_gezaehlt[:LISTE_HOECHSTENS],
         "nicht_gezaehlt_zahl": len(soll.nicht_gezaehlt),
         "uebersicht": {

@@ -1,82 +1,90 @@
 """Zweiter sichtbarer Kaufweg bei o2: Tarifübersicht -> „Handy hinzufügen“.
 
 Antonio, 21.11.2026: die Geräteseite zeigt nur, was ein Kunde bei o2 selbst wählen
-und kaufen kann. Das sind die Tarifkacheln der Produktseite UND die Tarife der
-Tarifübersicht (https://www.o2online.de/tarife/) mit „Handy hinzufügen“
-(``/e-shop?tarif=<slug>``; Befund ``berichte/o2-nicht-plus.md``: so ist z. B. „O2 Mobile
-Unlimited L“ ohne Plus mit Gerät buchbar). Der o2-Sammler bildet Bündel nach derselben
-Definition; das Soll hier zählt beide Wege und nennt die Herkunft (``art``).
+und kaufen kann: die Tarifkacheln der Produktseite UND die Tarife der Tarifübersicht
+(https://www.o2online.de/tarife/) mit „Handy hinzufügen“ (Befund
+``berichte/o2-nicht-plus.md``). Der o2-Sammler bildet Bündel nach derselben
+Definition.
 
-Die Tarifübersicht nennt je Tarif nur den Slug. Den Namen, unter dem die Messung ihn
-führt, liefert die Adresse des gemessenen Bündels (``quelle_url`` mit ``tarif=<slug>``):
-dieselbe Kennung, kein Namensraten. Ohne gemessenes Bündel bleibt der Slug der
-Schlüssel; die Kombination wird dann eine sichtbare Lücke. Laufzeiten und Speicher
-sind die der Produktseite (Annahme, benannt in ``herkunft``). Fällt die Übersicht aus,
-gilt nur die Produktseite, der Ausfall steht in ``unvollstaendig``.
+Identität (Prüfung PR 205, Runde 3): Der Tarifname kommt von der Kachel der Übersicht
+selbst (``lesen_seiten.o2_tarifuebersicht``), nie aus dem Bestand. Ein gemessener
+Tarif gehört zu einer Kachel, wenn sein Grundtarif ihr gleicht oder nur „mit …“
+anhängt (``passt``); passt er zu mehreren, ist er „nicht eindeutig zuordenbar“.
+
+Der zweite Weg nennt weder Speicher noch Laufzeit und nicht, welche Geräte er führt.
+Darum gibt er kein Soll für den Lückenzähler vor: ein gemessener Preis eines gelesenen
+Geräts, dessen Tarif auf der Produktseite fehlt, aber zu einer Kachel passt, gilt als
+angeboten (``soll_dazu``, Ebene Modell × Tarif bestätigt; Speicher/Laufzeit dieses
+Kaufwegs nicht gezählt). Fällt die Übersicht aus, werden solche Preise nicht
+verglichen („Kaufweg Tarifübersicht heute nicht geprüft“), nie als „nicht angeboten“
+gezählt.
 """
 
 from __future__ import annotations
 
-import dataclasses
-import re
-from collections.abc import Iterable
+from collections import Counter
 
 from .. import geraete_angebot as ga
-from ..geraete_tarifschluessel import grundtarif
-from .gruende import ZeilenSoll
+from ..geraete_tarifschluessel import grundtarif, kern, ohne_variante
+from ..geraete_vollstaendigkeit import modell_der_kombination
+from .gruende import NICHT_EINDEUTIG
 from .lesen_seiten import O2_TARIFUEBERSICHT
 
 ART_PRODUKTSEITE = "browser_auswahl"
 ART_TARIFUEBERSICHT = "browser_tarifuebersicht"
-ANNAHME = "Speicher und Laufzeiten wie auf der Produktseite"
+NICHT_GEPRUEFT = "Kaufweg Tarifübersicht heute nicht geprüft"
+NICHT_GEZAEHLT = "Speicher/Laufzeit für diesen Kaufweg nicht gezählt"
 
 
-def slug_namen(buendel: Iterable, zeile: str) -> dict[str, str]:
-    """Slug -> Grundtarif der Messung, aus ``quelle_url`` der Bündel dieser Zeile."""
-    namen: dict[str, str] = {}
-    for b in buendel:
-        b = b if isinstance(b, dict) else vars(b)
-        treffer = re.search(r"[?&]tarif=([a-z0-9-]+)", str(b.get("quelle_url") or ""))
-        if b.get("anbieter") == zeile and treffer and b.get("tarif_name"):
-            namen.setdefault(treffer.group(1), grundtarif(str(b["tarif_name"])))
-    return namen
+def passt(ist_tarif: str, karte: str) -> bool:
+    """Gehört der gemessene Grundtarif zur Kachel? Gleich, oder Kachel + „mit …“."""
+    return ist_tarif == karte or ist_tarif.startswith(karte + "-mit-")
 
 
-def _erweitert(auswahl, tarife: list[str]):
-    if auswahl.kombinationen is None:
-        alle = tuple(dict.fromkeys([*auswahl.tarife, *tarife]))
-        return dataclasses.replace(auswahl, tarife=alle)
-    paare = dict.fromkeys((s, n) for s, _, n in auswahl.kombinationen)
-    dazu = tuple((s, t, n) for s, n in paare for t in tarife)
-    vorhanden = set(auswahl.kombinationen)
-    neu = tuple(k for k in dazu if k not in vorhanden)
-    return dataclasses.replace(auswahl, kombinationen=auswahl.kombinationen + neu)
+def _tarif(schluessel: str) -> str:
+    return ohne_variante(kern(schluessel.split("--")[1]))[0]
 
 
-def ergaenze(z: ga.Zaehlung, soll: ZeilenSoll, buendel: list, zeile: str) -> dict:
-    """Erweitert die Auswahl jeder gezählten o2-Seite um die Tarife der Übersicht;
-    gibt die Herkunft je Weg zurück (für die Lauf-Datei)."""
-    herkunft: dict = {
+def vergleiche(
+    z: ga.Zaehlung, auswahlen: list, ist_kombis: set[str]
+) -> tuple[set[str], dict[str, str], dict]:
+    """(bestätigte Angebote des zweiten Wegs, nicht verglichene Preise mit Grund,
+    Herkunft je Weg) für die gemessenen Preise der gelesenen Geräte."""
+    soll = set().union(*(a.schluessel() for a in auswahlen)) if auswahlen else set()
+    auf_seite: dict[str, set[str]] = {}
+    for a in auswahlen:
+        auf_seite.setdefault(a.modell, set()).update(_tarif(k) for k in a.schluessel())
+    karten = {grundtarif(o.text): o for o in z.tarifuebersicht or ()}
+    dazu: set[str] = set()
+    offen: dict[str, str] = {}
+    treffer: Counter[str] = Counter()
+    for k in sorted(ist_kombis - soll):
+        modell = modell_der_kombination(k)
+        tarif = _tarif(k)
+        if modell not in auf_seite or tarif in auf_seite[modell]:
+            continue
+        if z.tarifuebersicht is None:
+            offen[k] = NICHT_GEPRUEFT
+            continue
+        passende = [c for c in karten if passt(tarif, c)]
+        if len(passende) == 1:
+            dazu.add(k)
+            treffer[passende[0]] += 1
+        elif passende:
+            offen[k] = NICHT_EINDEUTIG
+    herkunft = {
         "produktseite": {"art": ART_PRODUKTSEITE},
         "tarifuebersicht": {
             "art": ART_TARIFUEBERSICHT,
             "quelle": O2_TARIFUEBERSICHT,
-            "tarife": None,
             "grund": z.tarifuebersicht_grund,
-            "annahme": ANNAHME,
+            "hinweis": NICHT_GEZAEHLT,
+            "tarife": None
+            if z.tarifuebersicht is None
+            else [
+                {"name": o.text, "slug": o.wert, "gemessen": treffer[c]}
+                for c, o in karten.items()
+            ],
         },
     }
-    if z.tarifuebersicht is None:
-        grund = z.tarifuebersicht_grund or "Tarifübersicht nicht gelesen"
-        soll.unvollstaendig.append(grund)
-        herkunft["tarifuebersicht"]["grund"] = grund
-        return herkunft
-    namen = slug_namen(buendel, zeile)
-    tarife = []
-    for option in z.tarifuebersicht:
-        schluessel = namen.get(option.wert, grundtarif(option.wert))
-        soll.tarifnamen.setdefault(schluessel, option.text)
-        tarife.append(schluessel)
-    soll.auswahlen = [_erweitert(a, tarife) for a in soll.auswahlen]
-    herkunft["tarifuebersicht"]["tarife"] = [o.wert for o in z.tarifuebersicht]
-    return herkunft
+    return dazu, offen, herkunft

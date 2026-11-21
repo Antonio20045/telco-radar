@@ -309,7 +309,8 @@ def test_ungezaehlte_seite_faellt_aus_dem_vergleich(tmp_path, katalog):
     k = zeilen["Telekom"]["ebenen"]["kombinationen"]
     assert k["soll"] == 10
     assert not [e for e in k["nicht_im_soll"] if "pixel-11" in e["schluessel"]]
-    assert [e for e in k["nicht_im_soll"] if "galaxy-a57" in e["schluessel"]]
+    assert not [e for e in k["nicht_im_soll"] if "galaxy-a57" in e["schluessel"]]
+    assert zeilen["Telekom"]["angebot"]["geraete"] == {"soll": 2, "gezaehlt": 1}
 
 
 def test_ohne_gezaehlte_seite_fehlt_das_soll_benannt(tmp_path, katalog):

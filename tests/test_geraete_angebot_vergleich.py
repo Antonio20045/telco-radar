@@ -102,8 +102,9 @@ def _voll_mit_angeboten() -> dict:
             "nicht_gezaehlt_zahl": 0,
             "uebersicht": {
                 "vollstaendig": True,
-                "beleg": "Übersicht nennt 1, gelesen 1",
+                "beleg": "Übersicht nennt 45, gelesen 45",
             },
+            "geraete": {"soll": 45, "gezaehlt": 1},
         }
     return {"vollstaendigkeit": voll}
 
@@ -113,8 +114,8 @@ def test_die_zeile_nennt_angebote_als_wichtigste_zahl():
     telekom = seite.zeilen(lauf, TAG)["zeilen"][0]
     k = lauf["vollstaendigkeit"]["anbieter"][0]["ebenen"]["kombinationen"]
     assert (k["soll"], k["erfasst"], k["luecken_zahl"]) == (8, 4, 4)
-    assert telekom["satz"] == "Telekom: 4 von 8 Angeboten erfasst"
-    assert telekom["marke"] == "4 Lücken"
+    assert telekom["satz"] == "Telekom: 1 von 45 Geräten gezählt"
+    assert telekom["marke"] == "dort 4 von 8 Angeboten erfasst · 4 Lücken"
     assert telekom["ebene"] == "angebote"
     assert {lu["grund"] for lu in telekom["luecken"]} == {
         "Bei Telekom nur mit 256 GB gelesen (21.11.2026)"
@@ -128,12 +129,19 @@ def test_angebotszeile_gegenprobe_und_tausendertrenner():
     k = anders["vollstaendigkeit"]["anbieter"][0]["ebenen"]["kombinationen"]
     k.update(soll=1262, erfasst=1240, luecken_zahl=22)
     satz = seite.zeilen(anders, TAG)["zeilen"][0]
-    assert satz["satz"] == "Telekom: 1 240 von 1 262 Angeboten erfasst"
-    assert satz["marke"] == "22 Lücken"
+    assert satz["marke"] == "dort 1 240 von 1 262 Angeboten erfasst · 22 Lücken"
     k.update(soll=1262, erfasst=1262, luecken_zahl=0)
-    assert seite.zeilen(anders, TAG)["zeilen"][0]["marke"] == "vollständig"
-    anders["vollstaendigkeit"]["anbieter"][0]["angebot"]["nicht_gezaehlt_zahl"] = 3
-    assert seite.zeilen(anders, TAG)["zeilen"][0]["marke"] == "3 Geräte nicht gezählt"
+    assert "vollständig" not in seite.zeilen(anders, TAG)["zeilen"][0]["marke"]
+    angebot = anders["vollstaendigkeit"]["anbieter"][0]["angebot"]
+    angebot["geraete"] = {"soll": 1045, "gezaehlt": 1045}
+    zeile = seite.zeilen(anders, TAG)["zeilen"][0]
+    assert zeile["satz"] == "Telekom: 1 045 von 1 045 Geräten gezählt"
+    assert zeile["marke"].endswith("· vollständig")
+    k.update(nicht_im_soll_zahl=7)
+    assert seite.zeilen(anders, TAG)["zeilen"][0]["marke"] == (
+        "dort 1 262 von 1 262 Angeboten erfasst"
+        " · 7 Preise, die der Anbieter so nicht anbietet"
+    )
 
 
 def test_fehlt_die_zaehlung_heute_sagt_die_zeile_es_mit_grund():
@@ -172,8 +180,8 @@ def test_gerenderte_seite_zeigt_die_angebotszeile_aus_der_lauf_datei(tmp_path):
     k = lauf["vollstaendigkeit"]["anbieter"][0]["ebenen"]["kombinationen"]
     assert li["data-ebene"] == "angebote"
     assert (li["data-soll"], li["data-erfasst"]) == (str(k["soll"]), str(k["erfasst"]))
-    assert li.select_one(".gr-vs-zahl").get_text() == f"{k['erfasst']} von {k['soll']}"
+    assert li.select_one(".gr-vs-zahl").get_text() == "1 von 45"
     assert li.summary.get_text(" ", strip=True) == (
-        "Telekom: 4 von 8 Angeboten erfasst · 4 Lücken"
+        "Telekom: 1 von 45 Geräten gezählt · dort 4 von 8 Angeboten erfasst · 4 Lücken"
     )
     assert len(li.select(".gr-vs-luecken li")) == k["luecken_zahl"]

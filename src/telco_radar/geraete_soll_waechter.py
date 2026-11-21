@@ -67,8 +67,8 @@ def _zeile(zeile: dict) -> list[str]:
             if not e.get("benannt")
         ]
         befunde.append(
-            f"{name}: {ohne} erfasste Preise ohne Angebot auf der Seite, ohne Grund: "
-            + ", ".join(beispiele[:6])
+            f"{name}: {ohne} erfasste Preise, die der Anbieter so nicht anbietet, "
+            "ohne Grund: " + ", ".join(beispiele[:6])
         )
     return befunde
 

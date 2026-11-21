@@ -58,14 +58,18 @@ HEUTE_NICHT = "Angebot heute nicht gezählt"
 NICHT_GEZAEHLT_SEITEN = {1: "1 Gerät nicht gezählt"}
 NICHT_GEZAEHLT_VIELE = "{n} Geräte nicht gezählt"
 EBENE_SATZ = "{titel}: {erfasst} von {soll} erfasst"
-EXTRA_ANGEBOTE = "{n} erfasste Preise stehen nicht in der Auswahl der Seite"
-OHNE_ANGEBOT = "{n} Preise ohne Angebot auf der Seite"
+EXTRA_ANGEBOTE = "Preise, die der Anbieter so nicht anbietet ({n}):"
+OHNE_ANGEBOT = "{n} Preise, die der Anbieter so nicht anbietet"
+GERAETE = " Geräten gezählt"
+DORT = "dort {erfasst} von {soll} Angeboten erfasst"
+NICHT_VERGLICHEN = "{n} Preise nicht verglichen ({grund})"
+KONKURRENZ_OFFEN = "Überschneidung mit anderen Läufen nicht prüfbar"
 UEBERSICHT_OFFEN = "Übersicht nicht ganz gelesen"
 AUSWAHL_OFFEN = "Auswahl nicht ganz gelesen"
 LUECKEN_ZEIGEN = 40
 """Höchstzahl gezeigter Lücken je Anbieter; die Zahl steht immer vollständig."""
 EXTRAS_ZEIGEN = 12
-"""Beispiele erfasster Preise ohne Angebot auf der Seite; die Zahl steht vollständig."""
+"""Beispiele erfasster Preise, die der Anbieter so nicht anbietet."""
 
 
 def zahl(n: int | None) -> str:
@@ -113,40 +117,73 @@ def _kaufwege(herkunft: dict | None) -> str:
     return KAUFWEGE.format(n=len(tarife)) if tarife else ""
 
 
+def _hinweise(angebot: dict, k: dict) -> list[str]:
+    uebersicht = angebot.get("uebersicht") or {}
+    gruende: dict[str, int] = {}
+    for e in k.get("nicht_verglichen") or ():
+        gruende[str(e.get("grund"))] = gruende.get(str(e.get("grund")), 0) + 1
+    konkurrenz = str(angebot.get("konkurrenz") or "")
+    return [
+        x
+        for x in (
+            ""
+            if uebersicht.get("vollstaendig")
+            else str(uebersicht.get("beleg") or UEBERSICHT_OFFEN),
+            *list(angebot.get("unvollstaendig") or ())[:LUECKEN_ZEIGEN],
+            *(NICHT_VERGLICHEN.format(n=zahl(n), grund=g) for g, n in gruende.items()),
+            KONKURRENZ_OFFEN if konkurrenz.startswith("Prüfung auf parallele") else "",
+        )
+        if x
+    ]
+
+
+def _angebot_marken(z: dict, k: dict, geraete: dict) -> list[str]:
+    angebot = z.get("angebot") or {}
+    uebersicht = angebot.get("uebersicht") or {}
+    extra = k.get("nicht_im_soll_zahl")
+    marken = [
+        x
+        for x in (
+            DORT.format(erfasst=zahl(k.get("erfasst")), soll=zahl(k.get("soll"))),
+            _luecken(k.get("luecken_zahl")),
+            OHNE_ANGEBOT.format(n=zahl(extra)) if extra else "",
+            "" if uebersicht.get("vollstaendig") else UEBERSICHT_OFFEN,
+            AUSWAHL_OFFEN if angebot.get("unvollstaendig") else "",
+        )
+        if x
+    ]
+    ganz = (
+        len(marken) == 1
+        and not z.get("ausfall")
+        and k.get("erfasst") == k.get("soll")
+        and geraete.get("soll") is not None
+        and geraete.get("gezaehlt") == geraete.get("soll")
+    )
+    return [*marken, VOLLSTAENDIG] if ganz else marken
+
+
 def angebot_zeile(z: dict) -> dict:
-    """Die Anzeige einer Anbieterzeile mit Angebotszählung (Stufe 2)."""
+    """Die Anzeige einer Anbieterzeile mit Angebotszählung (Stufe 2): wichtigste Zahl
+    ist, wie viele Geräte gezählt wurden („1 von 45 Geräten gezählt · dort 20 von 20
+    Angeboten erfasst“); „vollständig“ nur, wenn alle Geräte der ganz gelesenen
+    Übersicht gezählt sind und erfasst = Soll, ohne Preise, die nicht angeboten
+    werden."""
     ebenen = z.get("ebenen") or {}
     k = ebenen["kombinationen"]
     angebot = z.get("angebot") or {}
     ausfall = str(z.get("ausfall") or "")
-    ungezaehlt = angebot.get("nicht_gezaehlt_zahl")
     extra = k.get("nicht_im_soll_zahl")
-    uebersicht = angebot.get("uebersicht") or {}
-    teilweise = list(angebot.get("unvollstaendig") or ())
-    marken = [
-        x
-        for x in (
-            _luecken(k.get("luecken_zahl")),
-            _nicht_gezaehlt(ungezaehlt),
-            OHNE_ANGEBOT.format(n=zahl(extra)) if extra else "",
-            "" if uebersicht.get("vollstaendig") else UEBERSICHT_OFFEN,
-            AUSWAHL_OFFEN if teilweise else "",
-        )
-        if x
-    ]
-    if not marken and not ausfall and k.get("erfasst") == k.get("soll"):
-        marken = [VOLLSTAENDIG]
+    geraete = angebot.get("geraete") or {}
+    marken = _angebot_marken(z, k, geraete)
     luecken = list(k.get("luecken") or ())
     quelle = z.get("soll_quelle") or {}
-    zahlen = f"{zahl(k.get('erfasst'))} von {zahl(k.get('soll'))}"
+    zahlen = f"{zahl(geraete.get('gezaehlt'))} von {zahl(geraete.get('soll'))}"
     return {
         "name": z["name"],
         "vorne": f"{z['name']}: ",
         "zahl": zahlen,
-        "hinten": " Angeboten erfasst",
-        "satz": SATZ_ANGEBOTE.format(
-            name=z["name"], erfasst=zahl(k.get("erfasst")), soll=zahl(k.get("soll"))
-        ),
+        "hinten": GERAETE,
+        "satz": f"{z['name']}: {zahlen}{GERAETE}",
         "ohne_soll": False,
         "soll": k.get("soll"),
         "erfasst": k.get("erfasst"),
@@ -170,16 +207,7 @@ def angebot_zeile(z: dict) -> dict:
         "extras": [_lesbare_luecke(e) for e in (k.get("nicht_im_soll") or ())][
             :EXTRAS_ZEIGEN
         ],
-        "hinweise": [
-            x
-            for x in (
-                str(uebersicht.get("beleg") or "")
-                if not uebersicht.get("vollstaendig")
-                else "",
-                *teilweise[:LUECKEN_ZEIGEN],
-            )
-            if x
-        ],
+        "hinweise": _hinweise(angebot, k),
         "quelle_text": "Übersicht und Auswahl im Browser",
         "quelle_url": quelle.get("quelle") or "",
         "gleiche_quelle": "",

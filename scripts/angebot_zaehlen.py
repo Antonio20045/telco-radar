@@ -59,6 +59,8 @@ JOB_MINUTEN_STANDARD = 50
 PUFFER_S = 300
 """Einrichtung (Python, Chromium) und Schreiben nach dem Zählen."""
 PUFFER_SPERRE_S = 180
+WARTENDE_STATUS = ("in_progress", "queued", "waiting", "requested", "pending")
+"""Läufe in diesen Zuständen besuchen den Host gleich oder gerade (GitHub-Status)."""
 SERIENFEHLER = 3
 """So viele gestörte Seiten in Folge beenden den Anbieter („Schutzschalter“)."""
 
@@ -116,7 +118,7 @@ def gh_abfrage() -> Callable[[str], int] | None:
 
     def abfrage(workflow: str) -> int:
         zahl = 0
-        for status in ("in_progress", "queued"):
+        for status in WARTENDE_STATUS:
             pfad = f"repos/{repo}/actions/workflows/{workflow}/runs?status={status}"
             try:
                 aus = subprocess.run(
