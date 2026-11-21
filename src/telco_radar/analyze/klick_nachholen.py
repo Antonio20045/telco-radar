@@ -6,14 +6,20 @@ Dateien „vom 09.11.“, übernahm kein Klick-Bündel, und die Klick-Anbieter (
 über Klick) blieben den ganzen Tag auf dem Vortag. Gleiches am 07. und 08.11.
 
 ``Nachholen`` prüft vor dem Merge, ob jede Klick-Datei der geplanten Anbieter vom
-Messtag ist. Wenn nicht, holt es den neuesten Stand NUR von ``klick_vertrag.ORDNER`` von
-``origin/<Zweig>`` (``git fetch`` und ``git archive`` in einen Wegwerfordner): der
-Arbeitsbaum und der Index bleiben unberührt, darum kann der ``git pull --rebase`` am
-Ende von ``geraete.yml`` an diesem Pfad nicht in Konflikt geraten. Ist der Stand noch
-alt und läuft der Klick-Tageslauf (``klick.yml``) oder ist die GitHub-Auskunft nicht
-lesbar, wartet es in Abständen (``ABSTAND_S``) höchstens ``WARTEN_HOECHSTENS_S``, aber
-nie über die Restzeit des Jobs hinaus (Regel 8: ``JOB_S`` abzüglich Vor- und Nachlauf).
-Läuft kein Klick-Lauf des Tages, bleibt es bei einem Abruf.
+Messtag ist UND wirklich etwas gemessen hat. Eine Datei von heute, deren Laufstatus
+``gestoert`` ist und die keine einzige Seite ganz gelesen hat (``klick_vertrag.
+ganz_gelesen``, 0 Seiten), zählt dabei wie eine veraltete Datei: ein Abruf, der sofort
+scheitert (etwa HTTP 502), lieferte sonst gar nichts, und das Datum allein hätte ihn
+als „vom Messtag“ durchgehen lassen (1&1, 21.11.2026: ``gestoert``, 0 Seiten, Datei
+trotzdem von heute). Wenn nicht, holt es den neuesten Stand NUR von
+``klick_vertrag.ORDNER`` von ``origin/<Zweig>`` (``git fetch`` und ``git archive`` in
+einen Wegwerfordner): der Arbeitsbaum und der Index bleiben unberührt, darum kann der
+``git pull --rebase`` am Ende von ``geraete.yml`` an diesem Pfad nicht in Konflikt
+geraten. Ist der Stand noch alt und läuft der Klick-Tageslauf (``klick.yml``) oder ist
+die GitHub-Auskunft nicht lesbar, wartet es in Abständen (``ABSTAND_S``) höchstens
+``WARTEN_HOECHSTENS_S``, aber nie über die Restzeit des Jobs hinaus (Regel 8: ``JOB_S``
+abzüglich Vor- und Nachlauf). Läuft kein Klick-Lauf des Tages, bleibt es bei einem
+Abruf.
 
 Bleibt eine Datei alt, ändert sich nichts am Merge: sie liefert nichts
 (``klick_zusammenfuehrung.GRUND_NICHT_HEUTE``), der Bestand behält die Klick-Messung mit
@@ -39,7 +45,13 @@ from pathlib import Path, PurePosixPath
 from ..collect import http
 from ..collect.geraete.klickparallel import API, API_VARIABLE, REPO_VARIABLE, hole
 from ..collect.geraete.klickziele import geplante_anbieter
-from ..klick_vertrag import ORDNER, STAND_DATEI, lies_ergebnisse
+from ..klick_vertrag import (
+    LAUF_GESTOERT,
+    ORDNER,
+    STAND_DATEI,
+    ganz_gelesen,
+    lies_ergebnisse,
+)
 from .klick_zusammenfuehrung import alter_tage, klickordner
 
 log = logging.getLogger(__name__)
@@ -74,25 +86,34 @@ Uhr = Callable[[], float]
 
 
 def veraltet(ordner: Path, heute: str, geplant: list[str] | None) -> list[str]:
-    """Die Anbieter, deren Klick-Datei fehlt oder nicht vom Messtag ist.
+    """Die Anbieter, deren Klick-Datei fehlt, nicht vom Messtag ist, oder deren Lauf
+    gestört ohne eine einzige ganz gelesene Seite endete.
 
     Ohne Liste der geplanten Anbieter zählen die Dateien im Ordner. Hat ein
-    Anbieter mehrere Dateien (Shards), genügt eine alte. Eine Datei „nach heute“
-    ist nicht veraltet.
+    Anbieter mehrere Dateien (Shards), genügt eine alte oder leer gestörte. Eine
+    Datei „nach heute“ ist nicht veraltet. Eine Datei von heute mit Laufstatus
+    ``gestoert`` und 0 Seiten (``klick_vertrag.ganz_gelesen``) zählt wie eine
+    veraltete: ein sofort gescheiterter Abruf (etwa HTTP 502) lieferte nichts, auch
+    wenn das Datum „heute“ heißt (CLAUDE.md §5 „Scheitern ist kein leeres Ergebnis“).
     """
     dateien, _ = lies_ergebnisse(ordner)
-    alter: dict[str, list[int | None]] = {}
+    stand: dict[str, list[tuple[int | None, bool]]] = {}
     for d in dateien:
-        alter.setdefault(str(d.get("name")), []).append(
-            alter_tage(d.get("datum"), heute)
+        alter = alter_tage(d.get("datum"), heute)
+        leer_gestoert = d.get("laufstatus") == LAUF_GESTOERT and not ganz_gelesen(
+            d.get("seiten") or []
         )
-    namen = list(dict.fromkeys(geplant if geplant is not None else sorted(alter)))
-    return [n for n in namen if _veraltet(alter.get(n))]
+        stand.setdefault(str(d.get("name")), []).append((alter, leer_gestoert))
+    namen = list(dict.fromkeys(geplant if geplant is not None else sorted(stand)))
+    return [n for n in namen if _veraltet(stand.get(n))]
 
 
-def _veraltet(alter: list[int | None] | None) -> bool:
-    """Fehlt die Datei, ist ein Datum unlesbar oder liegt eine Datei vor heute?"""
-    return not alter or any(a is None or a > 0 for a in alter)
+def _veraltet(stand: list[tuple[int | None, bool]] | None) -> bool:
+    """Fehlt die Datei, ist ein Datum unlesbar, liegt eine Datei vor heute, oder
+    endete ein Lauf von heute gestört ohne eine einzige ganz gelesene Seite?"""
+    return not stand or any(
+        alter is None or alter > 0 or leer_gestoert for alter, leer_gestoert in stand
+    )
 
 
 def git_im_repo(root: Path) -> Git:
