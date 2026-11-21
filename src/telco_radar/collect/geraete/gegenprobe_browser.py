@@ -78,9 +78,37 @@ _SICHTBAR_JS = """(el) => {
 class Gesperrt(RuntimeError):
     """Der Anbieter hat den Abruf abgelehnt (Bot-Schutz); nicht umgehen."""
 
+    seite: str = ""
+    """Die Adresse, die der Browser zuletzt zeigte (``mit_beleg``)."""
+    bild: bytes | None = None
+    """Bild des Fensters beim Scheitern (``mit_beleg``)."""
+
 
 class NichtPruefbar(RuntimeError):
     """Der Kundenweg kam nicht bis zum Preis; die Nachricht nennt den Grund."""
+
+    seite: str = ""
+    """Die Adresse, die der Browser zuletzt zeigte (``mit_beleg``)."""
+    bild: bytes | None = None
+    """Bild des Fensters beim Scheitern (``mit_beleg``)."""
+
+
+def mit_beleg(fehler: Exception, seite: Page) -> Exception:
+    """Hängt an ``Gesperrt``/``NichtPruefbar`` einmal Adresse und Bild des Fensters,
+    damit „nicht prüfbar“ zeigt, was der Browser sah (21.11.2026: 169 leere Zeilen).
+    Ohne geladene Seite (``about:blank``) bleibt beides leer."""
+    from playwright.sync_api import Error as PlaywrightFehler
+
+    if not isinstance(fehler, (Gesperrt, NichtPruefbar)) or fehler.seite:
+        return fehler
+    try:
+        if not seite.url.startswith("http"):
+            return fehler
+        fehler.seite = seite.url
+        fehler.bild = als_webp(seite.screenshot(timeout=KLICKFRIST_MS))
+    except PlaywrightFehler as problem:
+        log.info("Gegenprobe: kein Bild zum Fehler %s: %s", fehler, problem)
+    return fehler
 
 
 @dataclass

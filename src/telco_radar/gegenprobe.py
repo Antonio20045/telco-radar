@@ -1,55 +1,74 @@
-"""Unabhängige Gegenprobe gespeicherter Bündelpreise: Auswahl, Vergleich, Ablage.
+"""Unabhängige Gegenprobe gespeicherter Bündelpreise: Vergleich und Tagesdatei.
 
 Der Sammler liest Preise aus Schnittstellenantworten (JSON). Die Gegenprobe liest sie
-ein zweites Mal auf anderem Weg: ein echter Browser öffnet die Produktseite, wählt
-wie ein Kunde und liest den SICHTBAREN Text des Preisbereichs
-(``collect.geraete.gegenprobe_browser``, Leser je Anbieter in
+ein zweites Mal im echten Browser: Produktseite öffnen, wählen wie ein Kunde, den
+SICHTBAREN Text des Preisbereichs lesen (``collect.geraete.gegenprobe_wege``, Leser in
 ``collect.geraete.gegenprobe_sicht``). Dieses Modul hält, was Skript, Workflow und
-Seite teilen: welche Bündel ein Tag prüft (``auswahl``), wie gelesene und
-gespeicherte Werte verglichen werden (``vergleiche``) und die Tagesdatei
-``data/state/gegenprobe/<datum>.jsonl`` (``lies_tag``, ``schreibe_tag``).
+Seite teilen: den Vergleich (``vergleiche``), die Preisänderung (``aenderungen``) und
+die Tagesdatei ``data/state/gegenprobe/<datum>.jsonl``. Welche Bündel ein Lauf prüft,
+steht in ``gegenprobe_fenster``, die Bilanz je Anbieter in ``gegenprobe_bilanz``.
 
 Status einer Prüfung (``STATUS``):
 
-- ``bestaetigt``: jeder Posten des Rechenwegs ist auf der Seite gelesen und gleich
-  dem gespeicherten Wert;
-- ``teilweise``: was die Seite zeigt, stimmt, aber ein Posten des Rechenwegs ist
-  nicht gelesen (``grund`` nennt geprüfte und fehlende);
-- ``abweichend``: mindestens ein gelesener Posten weicht ab oder fehlt im Bestand,
-  beide Werte stehen in ``abweichungen``;
-- ``nicht_pruefbar``: die Seite war nicht lesbar oder ein Pflichtposten fehlt; ``grund``
-  nennt es (Sperre, Zeitbudget, Tarif nicht wählbar, …).
+- ``bestaetigt``: jeder Posten des Rechenwegs ist gelesen und gleich dem Bestand;
+- ``teilweise``: das Gelesene stimmt, ein Posten des Rechenwegs ist nicht gelesen
+  (``grund`` nennt geprüfte und fehlende);
+- ``abweichend``: ein gelesener Posten widerspricht einem gespeicherten WERT; beide
+  stehen in ``abweichungen``;
+- ``erfassungsluecke``: kein Widerspruch, aber der Bestand führt einen Posten als
+  Lücke (None), den die Seite nennt (``luecken``); keine Preisabweichung;
+- ``nicht_pruefbar``: die Seite war geöffnet, aber nicht lesbar; ``grund`` belegt es
+  (Sperre, Auswahl nicht gefunden, anderer Tarif, …), ``seite`` und ``bild`` zeigen,
+  was der Browser sah;
+- ``nicht_gegengeprueft``: die Seite wurde in diesem Lauf nicht geöffnet (Zeitbudget,
+  Ausfall des Anbieters); ``grund`` nennt es. Das ist kein Befund über den Preis.
 
 Was der Anbieter auf diesem Weg nicht zeigt, steht in ``nicht_gelesen`` und ist keine
-Bestätigung. Ein gespeicherter Wert ``None``, den die Seite nennt, ist eine Abweichung.
-Eine Preisänderung ist ein geänderter Posten gegenüber der letzten Messung davor
-(``aenderungen``), dieselbe Definition für Auswahl und Seite.
+Bestätigung. Eine Preisänderung ist ein geänderter Posten gegenüber der letzten
+Messung davor (``aenderungen``), dieselbe Definition für Auswahl und Seite.
 """
 
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
 import random
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
 
 from .gegenprobe_reihe import reihum
+from .gegenprobe_zeile import ABWEICHEND as ABWEICHEND
+from .gegenprobe_zeile import ANLASS_AENDERUNG as ANLASS_AENDERUNG
+from .gegenprobe_zeile import ANLASS_FENSTER as ANLASS_FENSTER
+from .gegenprobe_zeile import ANLASS_GLEICHE_SEITE as ANLASS_GLEICHE_SEITE
+from .gegenprobe_zeile import ANLASS_STICHPROBE as ANLASS_STICHPROBE
+from .gegenprobe_zeile import BESTAETIGT as BESTAETIGT
+from .gegenprobe_zeile import ERFASSUNGSLUECKE as ERFASSUNGSLUECKE
+from .gegenprobe_zeile import GEPRUEFT as GEPRUEFT
+from .gegenprobe_zeile import GRUND_GESPERRT as GRUND_GESPERRT
+from .gegenprobe_zeile import GRUND_KEIN_LESER as GRUND_KEIN_LESER
+from .gegenprobe_zeile import GRUND_ROBOTS as GRUND_ROBOTS
+from .gegenprobe_zeile import GRUND_ZEITBUDGET as GRUND_ZEITBUDGET
+from .gegenprobe_zeile import NICHT_GEGENGEPRUEFT as NICHT_GEGENGEPRUEFT
+from .gegenprobe_zeile import NICHT_PRUEFBAR as NICHT_PRUEFBAR
+from .gegenprobe_zeile import ORDNER as ORDNER
+from .gegenprobe_zeile import STATUS as STATUS
+from .gegenprobe_zeile import TEILWEISE as TEILWEISE
+from .gegenprobe_zeile import VERSUCHT as VERSUCHT
+from .gegenprobe_zeile import Ergebnis as Ergebnis
+from .gegenprobe_zeile import GegenprobeFehler as GegenprobeFehler
+from .gegenprobe_zeile import als_zeile as als_zeile
+from .gegenprobe_zeile import ergaenze_tag as ergaenze_tag
+from .gegenprobe_zeile import lies_alle as lies_alle
+from .gegenprobe_zeile import lies_tag as lies_tag
+from .gegenprobe_zeile import schreibe_tag as schreibe_tag
+from .gegenprobe_zeile import tagesdatei as tagesdatei
+from .gegenprobe_zeile import teile_auf as teile_auf
+from .versandkosten import versand_fuer
 
 log = logging.getLogger(__name__)
-
-BESTAETIGT = "bestaetigt"
-TEILWEISE = "teilweise"
-ABWEICHEND = "abweichend"
-NICHT_PRUEFBAR = "nicht_pruefbar"
-STATUS = (BESTAETIGT, TEILWEISE, ABWEICHEND, NICHT_PRUEFBAR)
-
-ANLASS_AENDERUNG = "preisaenderung"
-ANLASS_STICHPROBE = "stichprobe"
 
 STICHPROBE_JE_ANBIETER = 5
 """So viele unveränderte Bündel prüft ein Tag je Anbieter zu den Änderungen dazu."""
@@ -57,7 +76,6 @@ STICHPROBE_JE_ANBIETER = 5
 TOLERANZ_EUR = 0.005
 """Zwei Beträge gelten als gleich, wenn sie auf den Cent gleich sind."""
 
-ORDNER = Path("data") / "state" / "gegenprobe"
 RELEASE_PREFIX = "gegenprobe-"
 REPO = "Antonio20045/telco-radar"
 TEXT_HOECHSTENS = 4000
@@ -66,11 +84,6 @@ TEXT_HOECHSTENS = 4000
 ABSTAND_STUNDEN = 6
 """Liegen Messung und Gegenprobe weiter auseinander, kann sich der Preis dazwischen
 geändert haben; eine Abweichung sagt das dazu (sie bleibt eine Abweichung)."""
-
-GRUND_ZEITBUDGET = "Zeitbudget des Laufs erschöpft, nicht geöffnet"
-GRUND_KEIN_LESER = "Für diesen Anbieter gibt es noch keinen Kundenweg"
-GRUND_GESPERRT = "Seite gesperrt (Bot-Schutz), nicht umgangen"
-GRUND_ROBOTS = "robots.txt erlaubt den Abruf nicht"
 
 BETRAGSFELDER = (
     "tarif_monatlich",
@@ -82,6 +95,10 @@ BETRAGSFELDER = (
 GANZZAHLFELDER = ("laufzeit_monate",)
 FELDER = BETRAGSFELDER + GANZZAHLFELDER
 """Die Posten eines Bündels, die eine Gegenprobe lesen kann (Namen wie im Bestand)."""
+VERSAND = "versand"
+VERGLEICHSFELDER = (*FELDER, VERSAND)
+"""Was ``vergleiche`` gegenüberstellt: die Posten und der Versand, den die Seite in die
+Gesamtkosten rechnet (gespeichert: ``config/versandkosten.yaml``)."""
 
 
 FELDNAMEN = {
@@ -91,6 +108,7 @@ FELDNAMEN = {
     "anschlusspreis": "Anschlusspreis",
     "buendel_monatlich": "Monatsbetrag Tarif und Gerät",
     "laufzeit_monate": "Zahl der Raten",
+    VERSAND: "Versand",
 }
 """Die Namen der Posten auf der Seite (laienverständlich)."""
 
@@ -115,47 +133,6 @@ class Sichtwerte:
     def werte(self) -> dict[str, float | int]:
         """Die gelesenen Posten (ohne None) unter den Namen des Bestands."""
         return {f: getattr(self, f) for f in FELDER if getattr(self, f) is not None}
-
-
-@dataclass
-class Ergebnis:
-    """Eine Gegenprobe eines Bündels an einem Tag (eine Zeile der Tagesdatei)."""
-
-    datum: str
-    buendel_id: str
-    anbieter: str
-    status: str
-    anlass: str
-    geprueft_um: str | None = None
-    gemessen_um: str | None = None
-    """Ende des Messlaufs, der den geprüften Preis las (``geraete_tco.json``), oder
-    None, wenn der Lauf es nicht festhielt."""
-    grund: str | None = None
-    sku_id: str = ""
-    tarif_name: str = ""
-    laufzeit_monate: int | None = None
-    seite: str = ""
-    gelesen: dict = field(default_factory=dict)
-    gespeichert: dict = field(default_factory=dict)
-    abweichungen: list[dict] = field(default_factory=list)
-    nicht_gelesen: list[str] = field(default_factory=list)
-    gesamt_gespeichert: float | None = None
-    gesamt_gelesen: float | None = None
-    text: str = ""
-    bild: str | None = None
-    bild_fehlt: str | None = None
-
-    def __post_init__(self) -> None:
-        if self.status not in STATUS:
-            raise ValueError(f"unbekannter Status {self.status!r}")
-        if self.status in (NICHT_PRUEFBAR, TEILWEISE) and not self.grund:
-            raise ValueError("nicht prüfbar ohne Grund")
-        if self.status == ABWEICHEND and not self.abweichungen:
-            raise ValueError("abweichend ohne abweichenden Posten")
-
-
-class GegenprobeFehler(ValueError):
-    """Eine Tagesdatei ist unlesbar (Zeile genannt)."""
 
 
 def gleich(a: float | int, b: float | int) -> bool:
@@ -183,23 +160,33 @@ def _namen(felder: Iterable[str]) -> str:
     return ", ".join(FELDNAMEN.get(f, f) for f in felder)
 
 
+def _gegenueber(gespeichert: Mapping, gelesen: Mapping) -> list[dict]:
+    return [
+        {"feld": f, "gespeichert": gespeichert.get(f), "gelesen": gelesen[f]}
+        for f in VERGLEICHSFELDER
+        if gelesen.get(f) is not None
+        and (gespeichert.get(f) is None or not gleich(gespeichert[f], gelesen[f]))
+    ]
+
+
+def luecken_von(gespeichert: Mapping, gelesen: Mapping) -> list[dict]:
+    """Die Posten, die der Bestand als Lücke führt und die Seite nennt."""
+    return teile_auf(_gegenueber(gespeichert, gelesen))[1]
+
+
 def vergleiche(
     gespeichert: Mapping, gelesen: Mapping
 ) -> tuple[str, list[dict], list[str], str | None]:
     """(Status, Abweichungen, nicht gelesene Posten des Rechenwegs, Grund).
 
-    Verglichen wird jeder Posten aus ``FELDER``, den die Seite zeigt. Weicht er ab
-    oder fehlt er im Bestand (gespeichert None, Seite nennt ihn), ist das Bündel
-    ``abweichend``. ``bestaetigt`` heißt: jeder Posten des Rechenwegs
+    Verglichen wird jeder Posten aus ``VERGLEICHSFELDER``, den die Seite zeigt.
+    Widerspricht er einem gespeicherten Wert, ist das Bündel ``abweichend``. Führt der
+    Bestand ihn als Lücke, ist das eine ``erfassungsluecke`` (``luecken_von``), keine
+    Abweichung. ``bestaetigt`` heißt: jeder Posten des Rechenwegs
     (``rechenweg_felder``) ist gelesen und gleich; fehlt einer, ist es ``teilweise``
     mit den geprüften und den nicht gelesenen Posten im Grund.
     """
-    abweichungen = [
-        {"feld": f, "gespeichert": gespeichert.get(f), "gelesen": gelesen[f]}
-        for f in FELDER
-        if gelesen.get(f) is not None
-        and (gespeichert.get(f) is None or not gleich(gespeichert[f], gelesen[f]))
-    ]
+    abweichungen, luecken = teile_auf(_gegenueber(gespeichert, gelesen))
     noetig = rechenweg_felder(gespeichert)
     fehlt = [f for f in noetig if gelesen.get(f) is None]
     if abweichungen:
@@ -207,6 +194,8 @@ def vergleiche(
     geprueft = [f for f in FELDER if gelesen.get(f) is not None]
     if not geprueft:
         return NICHT_PRUEFBAR, [], fehlt, "Kein Preis auf der Seite gelesen"
+    if luecken:
+        return ERFASSUNGSLUECKE, [], fehlt, None
     if fehlt:
         grund = f"Bestätigt: {_namen(geprueft)}; nicht gelesen: {_namen(fehlt)}"
         return TEILWEISE, [], fehlt, grund
@@ -234,8 +223,11 @@ def abstand_stunden(gemessen_um: str | None, geprueft_um: str | None) -> float |
 
 
 def gespeicherte_werte(buendel: Mapping) -> dict:
-    """Die vergleichbaren Posten eines Bestandssatzes (None bleibt stehen)."""
-    return {f: buendel.get(f) for f in FELDER}
+    """Die vergleichbaren Posten eines Bestandssatzes (None bleibt stehen) und der
+    Versand, den die Gesamtkosten für diesen Anbieter rechnen (unbelegt: None)."""
+    werte = {f: buendel.get(f) for f in FELDER}
+    werte[VERSAND] = versand_fuer(str(buendel.get("anbieter") or "")).betrag
+    return werte
 
 
 def geaendert(heute: Mapping, vorher: Mapping) -> bool:
@@ -355,45 +347,3 @@ def release_tag(datum: str) -> str:
 def bild_url(datum: str, datei: str) -> str:
     """Die öffentliche Adresse eines hochgeladenen Bilds."""
     return f"https://github.com/{REPO}/releases/download/{release_tag(datum)}/{datei}"
-
-
-def tagesdatei(wurzel: Path, datum: str) -> Path:
-    """``data/state/gegenprobe/<datum>.jsonl`` unter ``wurzel``."""
-    return wurzel / ORDNER / f"{datum}.jsonl"
-
-
-def als_zeile(ergebnis: Ergebnis) -> str:
-    """Eine Zeile der Tagesdatei."""
-    return json.dumps(asdict(ergebnis), ensure_ascii=False, sort_keys=True)
-
-
-def schreibe_tag(pfad: Path, ergebnisse: Iterable[Ergebnis]) -> None:
-    """Schreibt die Tagesdatei neu (ein Lauf je Tag ersetzt den vorigen)."""
-    pfad.parent.mkdir(parents=True, exist_ok=True)
-    pfad.write_text("".join(als_zeile(e) + "\n" for e in ergebnisse), encoding="utf-8")
-
-
-def lies_tag(pfad: Path) -> list[Ergebnis]:
-    """Ergebnisse einer Tagesdatei; [] ohne Datei, ``GegenprobeFehler`` bei Unfug."""
-    if not pfad.exists():
-        return []
-    out: list[Ergebnis] = []
-    for nummer, zeile in enumerate(pfad.read_text(encoding="utf-8").splitlines(), 1):
-        if not zeile.strip():
-            continue
-        try:
-            out.append(Ergebnis(**json.loads(zeile)))
-        except (TypeError, ValueError) as fehler:
-            raise GegenprobeFehler(f"{pfad.name} Zeile {nummer}: {fehler}") from fehler
-    return out
-
-
-def lies_alle(ordner: Path) -> dict[tuple[str, str], Ergebnis]:
-    """Alle Ergebnisse je (Bündel-Schlüssel, Datum); unlesbare Dateien werfen."""
-    out: dict[tuple[str, str], Ergebnis] = {}
-    if not ordner.is_dir():
-        return out
-    for pfad in sorted(ordner.glob("*.jsonl")):
-        for e in lies_tag(pfad):
-            out[(e.buendel_id, e.datum)] = e
-    return out

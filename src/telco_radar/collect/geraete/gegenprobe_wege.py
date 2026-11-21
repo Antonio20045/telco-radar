@@ -34,6 +34,7 @@ from .gegenprobe_browser import (
     bild_von,
     klicke,
     lehne_einwilligung_ab,
+    mit_beleg,
     oeffne,
     ruhe,
     sichtbares_html,
@@ -343,14 +344,9 @@ def lies_gruppe(
                 abbruch = NichtPruefbar(_browserfehler(fehler))
                 break
             if offen.pop(b["id"], None) is not None:
-                yield (
-                    b,
-                    vorab
-                    if isinstance(vorab, Exception)
-                    else _lesung(seite, weg, vorab, aufnehmen),
-                )
+                yield b, _lesung(seite, weg, vorab, aufnehmen)
         for b in list(offen.values()):
-            yield b, abbruch
+            yield b, mit_beleg(abbruch, seite)
     finally:
         kontext.close()
 
@@ -359,11 +355,15 @@ def _browserfehler(fehler: Exception) -> str:
     return f"Browser: {str(fehler).splitlines()[0][:160]}"
 
 
-def _lesung(seite: Page, weg: Weg, vorab: str, aufnehmen: bool) -> Lesung | Exception:
+def _lesung(
+    seite: Page, weg: Weg, vorab: str | Exception, aufnehmen: bool
+) -> Lesung | Exception:
     """Text und Bild des Preisbereichs nach einer Wahl, oder warum sie nicht lesbar
-    waren (``NichtPruefbar``); der Seitenbesuch geht danach weiter."""
+    waren (``NichtPruefbar`` mit Adresse und Bild); der Besuch geht danach weiter."""
     from playwright.sync_api import Error as PlaywrightFehler
 
+    if isinstance(vorab, Exception):
+        return mit_beleg(vorab, seite)
     try:
         text = vorab + "\n".join(text_von(seite, a) for a in weg.text_anker)
         html = ""
@@ -373,9 +373,9 @@ def _lesung(seite: Page, weg: Weg, vorab: str, aufnehmen: bool) -> Lesung | Exce
                 [zeilen, *(sichtbares_html(seite, a) for a in weg.text_anker)]
             )
     except PlaywrightFehler as fehler:
-        return NichtPruefbar(_browserfehler(fehler))
+        return mit_beleg(NichtPruefbar(_browserfehler(fehler)), seite)
     except NichtPruefbar as fehler:
-        return fehler
+        return mit_beleg(fehler, seite)
     bild, bild_fehlt = bild_von(seite, weg.bild_anker)
     return Lesung(text, seite.url, bild, bild_fehlt, html)
 

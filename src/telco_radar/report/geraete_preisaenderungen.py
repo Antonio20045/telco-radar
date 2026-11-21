@@ -225,12 +225,12 @@ OFFEN = "offen"
 def _bilanz(aenderungen: list[dict]) -> dict[str, int]:
     """Wie viele Änderungen des Tages die Gegenprobe bestätigt, nur teilweise
     bestätigt, verwirft, nicht prüfen konnte und wie viele ungeprüft blieben
-    (``OFFEN``: ohne Gegenprobe oder mit „Zeitbudget erschöpft“)."""
-    out = {status: 0 for status in gp.STATUS}
+    (``OFFEN``: ohne Gegenprobe oder nicht geöffnet, ``gp.NICHT_GEGENGEPRUEFT``)."""
+    out = {status: 0 for status in gp.STATUS if status != gp.NICHT_GEGENGEPRUEFT}
     out[OFFEN] = 0
     for a in aenderungen:
         g = a["neu"]["beleg"]["gegenprobe"]
-        if g is None or g["grund"] == gp.GRUND_ZEITBUDGET:
+        if g is None or g["status"] == gp.NICHT_GEGENGEPRUEFT:
             out[OFFEN] += 1
         else:
             out[g["status"]] += 1

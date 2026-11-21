@@ -162,6 +162,7 @@ def test_gegenprobe_des_tages_steht_am_beleg_und_in_der_bilanz(tmp_path):
         gp.BESTAETIGT: 0,
         gp.TEILWEISE: 0,
         gp.ABWEICHEND: 1,
+        gp.ERFASSUNGSLUECKE: 0,
         gp.NICHT_PRUEFBAR: 0,
         "offen": 0,
     }

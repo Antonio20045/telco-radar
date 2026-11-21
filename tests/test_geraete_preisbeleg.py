@@ -182,13 +182,15 @@ def test_teilweise_bestaetigt_heisst_so():
 
 
 def test_luecke_im_bestand_steht_als_fehlend():
+    """Eine gefüllte Lücke ist seit 21.11.2026 eine Erfassungslücke, keine
+    Abweichung; die Seite nennt sie weiter mit beiden Werten."""
     e = _ergebnis(
         status=gp.ABWEICHEND,
         abweichungen=[{"feld": "anschlusspreis", "gespeichert": None, "gelesen": 39.9}],
     )
-    assert pb.gegenprobe_anzeige(e)["abweichungen"] == [
-        "Anschlusspreis: gespeichert fehlt, Seite 39,90 €"
-    ]
+    anzeige = pb.gegenprobe_anzeige(e)
+    assert anzeige["luecken"] == ["Anschlusspreis: gespeichert fehlt, Seite 39,90 €"]
+    assert (anzeige["status"], anzeige["abweichungen"]) == (gp.ERFASSUNGSLUECKE, [])
 
 
 def test_abweichung_nennt_beide_werte_auf_der_seite():

@@ -34,6 +34,11 @@ SATZ = {
 }
 
 
+VERSAND = 9.98
+"""Versand bei Vodafone laut ``config/versandkosten.yaml``; die Seite nennt ihn auch
+(seit 21.11.2026 verglichen, darum rechnet dieses Modul mit dem echten Versand)."""
+
+
 def _text(rate="57", angebot="76,95", tarif="Mobil XS"):
     return (
         f"Gewählt: 24 Raten\nPreisübersicht\nEinmal\n1 €\nPro Monat\n{rate} €\n"
@@ -60,7 +65,9 @@ def test_gleiche_seite_ist_bestaetigt_mit_derselben_summe():
     ergebnis, lesung = _pruefe(_lesen())
     assert ergebnis.status == gp.BESTAETIGT
     assert ergebnis.gesamt_gelesen == ergebnis.gesamt_gespeichert
-    assert ergebnis.gesamt_gespeichert == pytest.approx(1 + 24 * 19.95 + 24 * 57)
+    assert ergebnis.gesamt_gespeichert == pytest.approx(
+        1 + 24 * 19.95 + 24 * 57 + VERSAND
+    )
     assert lesung.bild == b"RIFF"
     assert ergebnis.gelesen["roh"]["Angebotspreis (Rate + Tarif)"] == "76,95 €"
 
@@ -69,7 +76,7 @@ def test_abweichende_rate_nennt_beide_werte_und_summen():
     ergebnis, _ = _pruefe(_lesen(_text(rate="60", angebot="79,95")))
     assert ergebnis.status == gp.ABWEICHEND
     assert {a["feld"] for a in ergebnis.abweichungen} == {"geraet_monatsrate"}
-    assert ergebnis.gesamt_gelesen == pytest.approx(1 + 24 * 19.95 + 24 * 60)
+    assert ergebnis.gesamt_gelesen == pytest.approx(1 + 24 * 19.95 + 24 * 60 + VERSAND)
     assert ergebnis.gesamt_gelesen != ergebnis.gesamt_gespeichert
 
 
@@ -154,9 +161,11 @@ def test_historie_ohne_vortag(tmp_path):
 
 
 def test_ohne_lauf_steht_der_grund_in_der_zeile():
+    """Nicht geöffnet heißt „nicht gegengeprüft“, nicht „nicht prüfbar“ (bis
+    21.11.2026 stand hier ``NICHT_PRUEFBAR``; ``test_gegenprobe_status``)."""
     e = SKRIPT._ohne_lauf(SATZ, gp.ANLASS_AENDERUNG, "2026-11-20", gp.GRUND_ZEITBUDGET)
     assert (e.status, e.grund, e.anlass) == (
-        gp.NICHT_PRUEFBAR,
+        gp.NICHT_GEGENGEPRUEFT,
         gp.GRUND_ZEITBUDGET,
         gp.ANLASS_AENDERUNG,
     )

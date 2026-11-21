@@ -72,11 +72,16 @@ def test_abweichung_geht_vor_fehlendem_posten():
     assert [a["feld"] for a in abw] == ["geraet_monatsrate"]
 
 
-def test_luecke_im_bestand_die_die_seite_nennt_ist_eine_abweichung():
+def test_luecke_im_bestand_die_die_seite_nennt_ist_eine_erfassungsluecke():
+    """Bis 21.11.2026 hieß das „abweichend“ (65 o2-Zeilen); eine gefüllte Lücke ist
+    kein Wertwiderspruch (``test_gegenprobe_status``)."""
     gespeichert = {**GESPEICHERT, "anschlusspreis": None}
-    status, abw, _, _ = gp.vergleiche(gespeichert, _gelesen(anschlusspreis=39.95))
-    assert status == gp.ABWEICHEND
-    assert abw == [{"feld": "anschlusspreis", "gespeichert": None, "gelesen": 39.95}]
+    gelesen = _gelesen(anschlusspreis=39.95)
+    status, abw, _, _ = gp.vergleiche(gespeichert, gelesen)
+    assert (status, abw) == (gp.ERFASSUNGSLUECKE, [])
+    assert gp.luecken_von(gespeichert, gelesen) == [
+        {"feld": "anschlusspreis", "gespeichert": None, "gelesen": 39.95}
+    ]
 
 
 def test_null_posten_braucht_keine_lesung():

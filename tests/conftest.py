@@ -303,6 +303,7 @@ _MIT_ECHTEM_VERSAND = (
     "/orakel/",
     "/golden/",
     "test_versandkosten",
+    "test_gegenprobe_skript",
     "test_seiten_zahlen",
     "test_geraete_adapter_tarifwelt",
     "test_geraete_tarifwelt_",
