@@ -180,6 +180,37 @@ def test_stand_kommt_waehrend_des_wartens(tmp_path):
     assert bilanz["klick"]["ersetzt"] == 1
 
 
+def test_fertig_wartet_einmal_nach_bevor_es_aufgibt(tmp_path):
+    """1&1, Messlauf 21.11.2026 (Lauf 44840854026): die erste Seite gab HTTP 502, der
+    Klick-Lauf endete „gestoert, 0 Seiten“. GitHub meldete den Tageslauf schon als
+    „fertig“, bevor der Commit des letzten Jobs (``ablegen``, läuft nach allen
+    Anbietern) auf ``origin`` lag - ohne die Ausnahme hier gab das Nachholen sofort
+    auf (ein Abruf, kein Warten), obwohl der frische Stand einen Abruf später kam."""
+    aufbau = Aufbau(tmp_path)
+    uhr = Uhr({1: aufbau.bot_legt_ab})
+
+    bilanz = _lauf(aufbau, _nachholen(aufbau, uhr, FERTIG))
+
+    nachholen = bilanz["klick"]["nachholen"]
+    assert (nachholen["abrufe"], uhr.schlaefe) == (2, 1)
+    assert nachholen["veraltet"] == [] and nachholen["klicklauf"] == FERTIG
+    assert bilanz["klick"]["ersetzt"] == 1
+
+
+def test_fertig_bestaetigt_sich_einmal_bevor_es_endgueltig_aufgibt(tmp_path):
+    """Ändert sich nach dem einen zusätzlichen Abruf nichts, gibt „fertig“ auf - anders
+    als bei einem laufenden Klick-Lauf wartet es nicht die volle Frist aus."""
+    aufbau = Aufbau(tmp_path)
+    uhr = Uhr()
+
+    bilanz = _lauf(aufbau, _nachholen(aufbau, uhr, FERTIG))
+
+    nachholen = bilanz["klick"]["nachholen"]
+    assert (nachholen["abrufe"], uhr.schlaefe) == (2, 1)
+    assert nachholen["veraltet"] == ["o2"]
+    assert bilanz["klick"]["ersetzt"] == 0
+
+
 def test_stand_bleibt_alt_dann_gilt_kein_klickpreis_als_heute(tmp_path):
     """Der Klick-Lauf liefert nichts mehr: das Warten endet nach der Frist, Klick-Datei
     und Bestand bleiben beim Vortag. Kein Klick-Bündel trägt das heutige Datum, der
@@ -204,12 +235,13 @@ def test_stand_bleibt_alt_dann_gilt_kein_klickpreis_als_heute(tmp_path):
     assert not [b for b in _klick_buendel(aufbau.root) if b["abgerufen_am"] == HEUTE]
 
 
-@pytest.mark.parametrize("zustand", [KEINER, FERTIG])
-def test_ohne_laufenden_klicklauf_bleibt_es_bei_einem_abruf(tmp_path, zustand):
+def test_ohne_klicklauf_heute_bleibt_es_bei_einem_abruf(tmp_path):
+    """„Keiner“ heißt: heute lief gar kein Klick-Lauf, kein Push kann noch kommen -
+    anders als bei „fertig“ lohnt sich hier kein zweiter Versuch."""
     aufbau = Aufbau(tmp_path)
     uhr = Uhr()
 
-    bilanz = _lauf(aufbau, _nachholen(aufbau, uhr, zustand))
+    bilanz = _lauf(aufbau, _nachholen(aufbau, uhr, KEINER))
 
     assert uhr.schlaefe == 0
     assert bilanz["klick"]["nachholen"]["abrufe"] == 1
