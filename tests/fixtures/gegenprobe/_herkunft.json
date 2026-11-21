@@ -66,6 +66,17 @@
       "gzip": false,
       "bytes_roh": 1385,
       "sha256_roh": "0762707d42d4bcc57d584ff441387b0b23a1d71eaa878673fb4705224066ae53"
+    },
+    {
+      "datei": "1-1-tarifauswahl.html",
+      "url": "https://mobile.1und1.de/samsung-galaxy-s26",
+      "abgerufen_am": "2026-11-21",
+      "buendel_id": "buendel--1-1--samsung-galaxy-s26-256gb-schwarz--1-1-unlimited-xl--36m",
+      "werkzeug": "scripts/gegenprobe.py --aufnehmen (Chromium, sichtbare Knoten des Preisbereichs ohne Attribute)",
+      "beleg": "Lokaler Gegenprobe-Lauf vom 2026-11-21 (Shop seit 20.11.2026): Produktseite 256 GB, 36 Monate Fix, Weiter zur Tarifauswahl, Kachel Unlimited XL, Preisübersicht der Leiste; Status bestaetigt.",
+      "gzip": false,
+      "bytes_roh": 1386,
+      "sha256_roh": "fa16a84ae0117446409b41e6033ee0eedda3fb320fbc6de2807f5c9406bdcd55"
     }
   ]
 }

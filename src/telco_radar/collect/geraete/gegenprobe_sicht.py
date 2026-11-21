@@ -231,7 +231,9 @@ def vodafone(text: str) -> Sichtwerte:
 
 
 def einsundeins(text: str) -> Sichtwerte:
-    """1&1-Produktseite, Preisübersicht: Geräterate (erster Betrag „€/Mon.“),
+    """1&1, Preisübersicht der Preisleiste (seit 20.11.2026 auf der Tarifauswahl nach
+    Wahl der Kachel; Fixture ``1-1-tarifauswahl.html``): Geräterate (erster Betrag
+    „€/Mon.“),
     Ratenzahlung Hardware (N Monate), Tarifname und Tarifpreis der Kachel, „Monatliche
     Gesamtkosten“ (ein Betrag für Tarif und Gerät) und, wenn sichtbar, der
     Anschlusspreis. Geräterate und Tarif stehen als Nachweis in ``roh`` (der Bestand
