@@ -29,11 +29,12 @@ genau das macht den Wächter rot.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 
 from .analyze.buendel_angebot import angebot_ohne_farbe, modell_und_speicher
 from .geraete_soll import SATURN_NETZE
+from .geraete_tarifschluessel import nummeriert, vergleich_eintrag
 
 ERWARTET = ("Telekom", "Vodafone", "o2", "1&1", "congstar", *SATURN_NETZE)
 EBENEN = ("modelle", "modell_speicher", "kombinationen")
@@ -72,6 +73,7 @@ class Ist:
     tarife: set = field(default_factory=set)
     laufzeiten: set = field(default_factory=set)
     kombinationen: set = field(default_factory=set)
+    kombi_roh: set = field(default_factory=set)
 
     def zahlen(self) -> dict:
         """Die Zählung als Zahlen."""
@@ -108,7 +110,7 @@ def _nimm(ist: Ist, b: dict) -> None:
         ist.laufzeiten.add(b["laufzeit_monate"])
     kombi = kombi_schluessel(str(b.get("id") or ""))
     if kombi is not None:
-        ist.kombinationen.add(kombi)
+        ist.kombi_roh.add(kombi)
 
 
 def ist_zaehlung(buendel: Iterable, datum: str) -> dict[str, Ist]:
@@ -120,6 +122,8 @@ def ist_zaehlung(buendel: Iterable, datum: str) -> dict[str, Ist]:
         if not name or b.get("abgerufen_am") != datum:
             continue
         _nimm(je.setdefault(name, Ist()), b)
+    for ist in je.values():
+        ist.kombinationen = nummeriert(vergleich_eintrag(k) for k in ist.kombi_roh)
     return je
 
 
@@ -313,43 +317,63 @@ class SichtbareAuswahl:
         return {f"{self.modell}-{s}--{t}--{n}m" for s, t, n in auswahl}
 
 
+def modell_der_kombination(schluessel: str) -> str | None:
+    """Katalog-ID am Anfang eines Kombinationsschlüssels."""
+    return modell_und_speicher(schluessel.split("--")[0] + "-")[0]
+
+
 def haenge_kombinationen_ein(
     voll: dict,
     anbieter: str,
     auswahlen: Iterable[SichtbareAuswahl],
     buendel: Iterable,
     signale: Signale,
+    grund: Callable[[str], str] | None = None,
+    ausgenommen: Iterable[str] = (),
+    quelle: dict | None = None,
 ) -> dict:
     """Setzt das Kombinations-Soll eines Anbieters aus den Seiten des Browser-Zählers
-    (Stufe 2) und rechnet Lücken und ``unbenannt`` neu; Ist aus ``buendel`` wie oben."""
+    (Stufe 2) und rechnet Lücken und ``unbenannt`` neu; Ist aus ``buendel`` wie oben.
+
+    ``grund(schluessel)`` nennt je Lücke den Grund aus den Signalen
+    (``geraete_angebot.einhaengen``); ohne ihn gilt der Ausfallvermerk des Anbieters,
+    sonst ``UNBENANNT``. ``ausgenommen`` sind Modelle, deren Seite nicht gezählt
+    wurde: ihr Ist fällt aus dem Vergleich, statt als „nicht im Soll“ zu erscheinen."""
     seiten = [a for a in auswahlen if a.anbieter == anbieter]
     zeile = next(z for z in voll["anbieter"] if z["name"] == anbieter)
-    ist = ist_zaehlung(buendel, voll["datum"]).get(anbieter, Ist()).kombinationen
+    weg = set(ausgenommen)
+    ist = {
+        k
+        for k in ist_zaehlung(buendel, voll["datum"]).get(anbieter, Ist()).kombinationen
+        if modell_der_kombination(k) not in weg
+    }
     soll = set().union(*(a.schluessel() for a in seiten)) if seiten else set()
     ebene = _ebene(len(soll) if seiten else None, None, len(ist))
-    grund = UNBENANNT
+    ohne = 0
     if not seiten:
         ebene["soll_grund"] = GRUND_STUFE2
     else:
         vermerk = signale.erfassung.get(anbieter) or signale.ausfall
-        if vermerk:
-            grund = str(vermerk)
+        fest = str(vermerk) if vermerk else UNBENANNT
         fehlend, extra = sorted(soll - ist), sorted(ist - soll)
+        gruende = {k: (grund(k) if grund else fest) for k in fehlend}
+        ohne = sum(1 for g in gruende.values() if g == UNBENANNT)
         ebene.update(
             erfasst=len(soll & ist),
-            luecken=[_luecke(k, k, "", grund) for k in fehlend][:LISTE_HOECHSTENS],
+            luecken=[_luecke(k, k, "", gruende[k]) for k in fehlend][:LISTE_HOECHSTENS],
             luecken_zahl=len(fehlend),
             nicht_im_soll=[{"schluessel": k, "name": k} for k in extra][
                 :LISTE_HOECHSTENS
             ],
             nicht_im_soll_zahl=len(extra),
-            quelle={
+            quelle=quelle
+            or {
                 "art": "browser_auswahl",
                 "gezaehlt_um": max(a.gezaehlt_um for a in seiten),
             },
         )
     zeile["ebenen"]["kombinationen"] = ebene
     zeile["unbenannt"] = _unbenannt(zeile)
-    if ebene["luecken_zahl"] and grund == UNBENANNT:
-        zeile["unbenannt"] += ebene["luecken_zahl"] - len(ebene["luecken"])
+    gelistet = sum(1 for lu in ebene["luecken"] if not lu["benannt"])
+    zeile["unbenannt"] += ohne - gelistet
     return voll

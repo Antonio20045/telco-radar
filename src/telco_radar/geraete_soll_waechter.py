@@ -19,6 +19,10 @@ im Workflow aus dem Schritt „Heute schon gemessen?“ (``--datum``); ohne ``--
 * ein unabhängiges Soll (``gleiche_quelle_wie_sammler`` falsch) ein erfasstes Modell
   nicht kennt (``nicht_im_soll``): dann zählt die Liste nicht, was angeboten wird.
 
+Stufe 2 (``geraete_angebot.einhaengen``): eine Lücke der Angebotszählung ohne Grund
+ist ``unbenannt`` und rot wie oben; eine fehlende Zählung des Tages ist benannt
+(„Angebot heute nicht gezählt: …“) und bleibt grün.
+
 Ein benannter Ausfall (Soll nicht zählbar mit Grund, Lücke mit Grund) bleibt grün und
 steht in der Ausgabe. Rein lesend, ohne Netz.
 """
@@ -78,9 +82,19 @@ def uebersicht(lauf: dict | None) -> list[str]:
     """Je Anbieter eine Zeile für das Log (Modellebene)."""
     zeilen = []
     for z in ((lauf or {}).get("vollstaendigkeit") or {}).get("anbieter") or ():
-        m = z["ebenen"]["modelle"]
-        if m["soll"] is None:
-            zeilen.append(f"{z['name']}: Soll nicht zählbar ({m['soll_grund']})")
+        m, k = z["ebenen"]["modelle"], z["ebenen"]["kombinationen"]
+        if k["soll"] is not None:
+            zeilen.append(
+                f"{z['name']}: {k['erfasst']} von {k['soll']} Angeboten erfasst, "
+                f"{k['luecken_zahl']} Lücken, {k['nicht_im_soll_zahl']} nicht im Soll, "
+                f"{(z.get('angebot') or {}).get('nicht_gezaehlt_zahl')} Seiten "
+                "nicht gezählt"
+            )
+        elif m["soll"] is None:
+            zeilen.append(
+                f"{z['name']}: Soll nicht zählbar "
+                f"({m['soll_grund']}; {k['soll_grund']})"
+            )
         else:
             zeilen.append(
                 f"{z['name']}: {m['erfasst']} von {m['soll']} Modellen erfasst, "

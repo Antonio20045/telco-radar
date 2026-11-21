@@ -1,0 +1,305 @@
+{
+ "zweck": "DOM-Schnappschüsse echter Anbieterseiten vom 21.11.2026 für die Leser der Angebotszählung (tests/test_geraete_angebot.py).",
+ "eintraege": [
+  {
+   "datei": "telekom_uebersicht.html.gz",
+   "url": "https://www.telekom.de/shop/geraete/smartphones",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach nach „Weitere Geräte anzeigen“ (einmal), Banner „Nur erforderliche“; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 323529,
+   "sha256_roh": "929f95ae79a03d0c7b133563ca77ee711d54bf8fa765d557c1000b06022558d9"
+  },
+  {
+   "datei": "vodafone_uebersicht.html.gz",
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-smartphones.html",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach nach dreimal „Mehr Smartphones anzeigen“; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 301308,
+   "sha256_roh": "e63b34a86d6ccc435a482d13be0d126e92c4566688eda60ebecd8bc311ba199c"
+  },
+  {
+   "datei": "o2_uebersicht_alle.html.gz",
+   "url": "https://www.o2online.de/e-shop/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Filter „Alle“, bis zum Ende gescrollt (36 von 91 Kacheln geladen); Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 455436,
+   "sha256_roh": "0c0cbc66a8ea21cb4e0331fe2a23c62352965946f6b9e7e41ece0db46275af6f"
+  },
+  {
+   "datei": "einsundeins_uebersicht.html.gz",
+   "url": "https://mobile.1und1.de/smartphones",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach geladen; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 442642,
+   "sha256_roh": "9f81fe49bc0087119d65a1a25e5b5d6f1dbee8b492b6444c64155f241114ab0f"
+  },
+  {
+   "datei": "congstar_uebersicht.html.gz",
+   "url": "https://www.congstar.de/geraete/handy/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach geladen; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 282284,
+   "sha256_roh": "9bfea660ad7686ef5abb77bf727784b00124e5596a04a88f702d5323f7746c51"
+  },
+  {
+   "datei": "tarifwelt_uebersicht.html.gz",
+   "url": "https://tarife.mediamarkt.de/smartphones/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach geladen; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 1324479,
+   "sha256_roh": "f9cb61863780a44d28912cab8b4e4e01bdaab941c260280d82b98a41c46a7499"
+  },
+  {
+   "datei": "vodafone_iphone17pro.html.gz",
+   "url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Produktseite geladen; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 440222,
+   "sha256_roh": "5fe66718e38bf3e2c94f4f030b3e21f624b5cfdfc4d3105d7c707e994eb9b732"
+  },
+  {
+   "datei": "vodafone_iphone17pro_tarifauswahl.html.gz",
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach nach „Zur Tarifauswahl“ (vorgewählt Mobil XL); Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 181213,
+   "sha256_roh": "1bb7c3fff1f6b07e4e876dd3245f57c0e08f29363c87e40449db4b8d4799b362"
+  },
+  {
+   "datei": "o2_iphone17pro.html.gz",
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-cosmic-orange-details",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Produktseite geladen; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 251352,
+   "sha256_roh": "9d85607741f56e22a57730c9ed7094b05518532fcb4b9a356964808796112775"
+  },
+  {
+   "datei": "einsundeins_iphone17pro.html.gz",
+   "url": "https://mobile.1und1.de/iphone-17-pro",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Produktseite geladen; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 180152,
+   "sha256_roh": "461e01801664fcc01f05f6253f2e7b5350286aa0d1d9fd86426a825aebff4c39"
+  },
+  {
+   "datei": "congstar_iphone17.html.gz",
+   "url": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Produktseite geladen (512 GB „nicht vorhanden“); Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 207899,
+   "sha256_roh": "c81add37433012e636fd9847c514146b8f18ade237913ce3f024db11acfd42cf"
+  },
+  {
+   "datei": "telekom_iphone17pro_tarifdialog.html.gz",
+   "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Dialog „Tarif ändern“ offen; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 183026,
+   "sha256_roh": "fe181d7dab82aea851f407f5696de97336126024e4f0ef39904e56188f64f6e2"
+  },
+  {
+   "datei": "tarifwelt_iphone17pro.html.gz",
+   "url": "https://tarife.mediamarkt.de/smartphones/apple/iphone-17-pro/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Produktseite geladen (512 GB in Deep Blue nicht verfügbar); Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 127563,
+   "sha256_roh": "fefefc8889f81c7ef1f0dcd8c3a504d673f46942866503bf6ade8f1364e6ccaf"
+  },
+  {
+   "datei": "tarifwelt_iphone17pro_dialog.html.gz",
+   "url": "https://tarife.mediamarkt.de/smartphones/apple/iphone-17-pro/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Dialog „Tarif ändern“ ohne Netzfilter; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 331335,
+   "sha256_roh": "d55b23de4198be226bd9aacdbdea8f9dc1b99f9ace643907cd8f379de133462d"
+  },
+  {
+   "datei": "tarifwelt_iphone17pro_dialog_telekom.html.gz",
+   "url": "https://tarife.mediamarkt.de/smartphones/apple/iphone-17-pro/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "Playwright-Chromium, Kennung Browser + TelcoRadar/1.0, ein Abruf bei der Erkundung für die Angebotszählung",
+   "beleg": "DOM nach Dialog „Tarif ändern“, Netzfilter Telekom; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 237967,
+   "sha256_roh": "fcf622d9777dbcedd8ebfa066c9cf74b2bb519418616912baf00dc8726db6825"
+  },
+  {
+   "datei": "telekom_galaxy_s26.html.gz",
+   "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-256-gb?tariffId=MF_17791&tariffCategoryId=smartphone-tarife&installmentValue=23.5&instalmentId=36",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Produktseite geladen (vorgewählt MagentaMobil M); Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 141321,
+   "sha256_roh": "b49a0c3510181f05b05426e8ca3845b361d118a80b22fdbc656dcaec124d11b6"
+  },
+  {
+   "datei": "telekom_galaxy_s26_tarifdialog.html.gz",
+   "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-256-gb?tariffId=MF_17791&tariffCategoryId=smartphone-tarife&installmentValue=23.5&instalmentId=36",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Dialog „Tarif ändern“ offen; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 184721,
+   "sha256_roh": "516fb8804d89860e8122f1520cf482d8d7022b7ddd0b60befd9cadf548c5d379"
+  },
+  {
+   "datei": "telekom_galaxy_s26_xs.html.gz",
+   "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-256-gb?tariffId=MF_17779&tariffCategoryId=smartphone-tarife&installmentValue=26&instalmentId=36&paymentPlan=",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach nach Wahl MagentaMobil XS; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 141247,
+   "sha256_roh": "845a3d9a77fdef5487e6fdc7516c76784101e998702b5ef3ea704f5d6a6dc0ad"
+  },
+  {
+   "datei": "telekom_pixel10a_xl.html.gz",
+   "url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/obsidian-128-gb?tariffId=MF_17803&tariffCategoryId=smartphone-tarife&installmentValue=6&instalmentId=36&paymentPlan=",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach nach Wahl MagentaMobil XL: nur Einmalpreis; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 141707,
+   "sha256_roh": "c3b3e6767befed6a5ea56b3521d0203a48605f8294c2ef58914e6d5bf6d6395d"
+  },
+  {
+   "datei": "vodafone_galaxy_s26.html.gz",
+   "url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Produktseite geladen; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 350001,
+   "sha256_roh": "ff740429b9e5a2e2f822cf2b85823a6358146fc78cfebc9d59c9c0674d1e31f8"
+  },
+  {
+   "datei": "vodafone_galaxy_s26_tarif_xs.html.gz",
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Tarifauswahl, Kachel 267 gewählt; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 249773,
+   "sha256_roh": "e8e1cc5f20b5c6b450eb18548037ff9a5028c8c663ff45016f59b458cff26bf7"
+  },
+  {
+   "datei": "vodafone_pixel10a.html.gz",
+   "url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Produktseite mit Tarifwahl, 256 GB ausgegraut; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 341704,
+   "sha256_roh": "86a04b83112334066e2fce4a91ab190afb8c916b35f5dd523390004407a130c3"
+  },
+  {
+   "datei": "o2_galaxy_s26.html.gz",
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Produktseite geladen; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 260527,
+   "sha256_roh": "40bb9d55e31250d15d852acd3c0c2f5f4f1d2846e5b9158e31f6d45887b83c4b"
+  },
+  {
+   "datei": "o2_galaxy_s26_512gb.html.gz",
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach nach Wahl 512 GB; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 260529,
+   "sha256_roh": "2cd364c48529072cba9bf320c8b3f2f2d451b01dd523f3c9d7eed7ef276a0349"
+  },
+  {
+   "datei": "einsundeins_galaxy_s26.html.gz",
+   "url": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Produktseite geladen; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 206910,
+   "sha256_roh": "148eedb958d8ce2b52a60def4238e37629e8030bdd4d05a0ef9b0d61e96f3d10"
+  },
+  {
+   "datei": "einsundeins_galaxy_s26_tarifauswahl.html.gz",
+   "url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=//mobile.1und1.de/samsung-galaxy-s26&optionalPrecedingDocuments=//mobile.1und1.de/samsung-galaxy-s26&addFlowStates=tradeInAvailable,brandSamsung,samsungS26Series,watchAvailable,strapsAvailable,askWatch,askHeadphones&traceId=87ad3fb7-c2b9-418b-9083-2277e42a5abc",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach nach „Weiter zur Tarifauswahl“; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 225893,
+   "sha256_roh": "d9256c17ff25cee4b8ac92d7aa0efb0f1a327ba241749f781cc3e9b7d848095d"
+  },
+  {
+   "datei": "congstar_galaxy_s26.html.gz",
+   "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Produktseite geladen; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 207118,
+   "sha256_roh": "812fad3358363b2949cf53d2c58612c7f3b5688771166b7b7cd79f31a92b9eeb"
+  },
+  {
+   "datei": "congstar_galaxy_s26_xs_flex.html.gz",
+   "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?planId=544",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Kachel 15 GB, „Ohne Laufzeit“ gewählt; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 206945,
+   "sha256_roh": "e9d67a62b78060c0a6e16a869573e0b1be8cf94f894e88199714ea45b25645df"
+  },
+  {
+   "datei": "tarifwelt_galaxy_s26_dialog_256.html.gz",
+   "url": "https://tarife.mediamarkt.de/smartphones/samsung/galaxy-s26/?farbe=black&speicher=256&ogi=66868692b87d976eef0a0b7b&ofi=6ae2ef58903654b324c7f473&tfi=6adb25e82c8ed2c5770e722a&hwi=699432f4fe928c18b04eaf38_HW110719-1",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Dialog „Tarif ändern“ 256 GB ohne Netzfilter; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 412335,
+   "sha256_roh": "10f0f12eb92552da041de898e573490ba8461f954381af13b3eac39c629a6543"
+  },
+  {
+   "datei": "tarifwelt_galaxy_s26_o2_256.html.gz",
+   "url": "https://tarife.mediamarkt.de/smartphones/samsung/galaxy-s26/?farbe=black&speicher=256&ogi=66868692b87d976eef0a0b7b&ofi=6ae2ef58903654b324c7f473&tfi=6adb25e82c8ed2c5770e722a&hwi=699432f4fe928c18b04eaf38_HW110719-1",
+   "abgerufen_am": "2026-11-21",
+   "werkzeug": "scripts/angebot_zaehlen.py --aufnehmen (Sitzung.html), Messlauf mit zwei Modellseiten je Anbieter",
+   "beleg": "DOM nach Netzfilter o2, 256 GB; Skripte, Stile, Bilder im Browser entfernt (Sitzung._SCHLANK_JS), sonst unverändert, gzip -9.",
+   "gzip": true,
+   "bytes_roh": 247338,
+   "sha256_roh": "4b51630c5b3aa6f01f25abc7566078efe135a6ce32bf9a7ffdec42aaf62dfa86"
+  }
+ ]
+}

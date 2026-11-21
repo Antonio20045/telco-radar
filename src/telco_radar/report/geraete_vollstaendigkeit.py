@@ -14,6 +14,13 @@ Zahl trägt (Prüfung PR 201):
 
 Ohne Lauf-Datei (alter Stand) entsteht die Seite trotzdem und sagt, dass für den
 Messtag keine Zählung vorliegt; eine unlesbare Datei ist zusätzlich ein Ausfall.
+
+Stufe 2 (Angebotszählung im Browser, ``geraete_angebot``): trägt die Ebene
+``kombinationen`` ein Soll der Art „browser_auswahl“, ist sie die Zeile: „Telekom:
+1 240 von 1 262 Angeboten erfasst · 22 Lücken“; Modelle und Speicher stehen im
+aufgeklappten Teil. „vollständig“ nur, wenn alle Angebote erfasst sind, keine Seite
+ungezählt blieb und kein Ausfall vermerkt ist. Fehlt die Zählung des Tages, sagt die
+Marke „Angebot heute nicht gezählt“, der Grund steht darunter.
 """
 
 from __future__ import annotations
@@ -45,6 +52,103 @@ ART = {
 GLEICHE_QUELLE = "dieselbe Liste liest auch die Messung"
 NICHT_IM_SOLL = "{n} erfasste Modelle stehen nicht in dieser Liste"
 WEITERE = "Speicher und Tarife werden noch nicht gegengezählt."
+ART_AUSWAHL = "browser_auswahl"
+SATZ_ANGEBOTE = "{name}: {erfasst} von {soll} Angeboten erfasst"
+HEUTE_NICHT = "Angebot heute nicht gezählt"
+NICHT_GEZAEHLT_SEITEN = {1: "1 Gerät nicht gezählt"}
+NICHT_GEZAEHLT_VIELE = "{n} Geräte nicht gezählt"
+EBENE_SATZ = "{titel}: {erfasst} von {soll} erfasst"
+EXTRA_ANGEBOTE = "{n} erfasste Angebote stehen nicht in der Auswahl der Seite"
+LUECKEN_ZEIGEN = 40
+"""Höchstzahl gezeigter Lücken je Anbieter; die Zahl steht immer vollständig."""
+
+
+def zahl(n: int | None) -> str:
+    """„1 262“ mit schmalem geschütztem Leerzeichen als Tausendertrenner."""
+    return "" if n is None else f"{n:,}".replace(",", "\u202f")
+
+
+def _ist_angebot(z: dict) -> bool:
+    k = (z.get("ebenen") or {}).get("kombinationen") or {}
+    return (
+        k.get("soll") is not None and (k.get("quelle") or {}).get("art") == ART_AUSWAHL
+    )
+
+
+def _nicht_gezaehlt(n: int | None) -> str:
+    if not n:
+        return ""
+    return NICHT_GEZAEHLT_SEITEN.get(n, NICHT_GEZAEHLT_VIELE.format(n=n))
+
+
+def _ebene_satz(titel: str, e: dict) -> str:
+    if e.get("soll") is None:
+        return ""
+    satz = EBENE_SATZ.format(
+        titel=titel, erfasst=zahl(e.get("erfasst")), soll=zahl(e.get("soll"))
+    )
+    luecken = _luecken(e.get("luecken_zahl"))
+    return f"{satz} · {luecken}" if luecken else satz
+
+
+OHNE_GRUND = "ohne benannten Grund"
+
+
+def _lesbare_luecke(luecke: dict) -> dict:
+    if luecke.get("benannt"):
+        return luecke
+    return {**luecke, "grund": OHNE_GRUND}
+
+
+def angebot_zeile(z: dict) -> dict:
+    """Die Anzeige einer Anbieterzeile mit Angebotszählung (Stufe 2)."""
+    ebenen = z.get("ebenen") or {}
+    k = ebenen["kombinationen"]
+    angebot = z.get("angebot") or {}
+    ausfall = str(z.get("ausfall") or "")
+    ungezaehlt = angebot.get("nicht_gezaehlt_zahl")
+    marken = [
+        x for x in (_luecken(k.get("luecken_zahl")), _nicht_gezaehlt(ungezaehlt)) if x
+    ]
+    if not marken and not ausfall and k.get("erfasst") == k.get("soll"):
+        marken = [VOLLSTAENDIG]
+    luecken = list(k.get("luecken") or ())
+    extra = k.get("nicht_im_soll_zahl")
+    quelle = z.get("soll_quelle") or {}
+    zahlen = f"{zahl(k.get('erfasst'))} von {zahl(k.get('soll'))}"
+    return {
+        "name": z["name"],
+        "vorne": f"{z['name']}: ",
+        "zahl": zahlen,
+        "hinten": " Angeboten erfasst",
+        "satz": SATZ_ANGEBOTE.format(
+            name=z["name"], erfasst=zahl(k.get("erfasst")), soll=zahl(k.get("soll"))
+        ),
+        "ohne_soll": False,
+        "soll": k.get("soll"),
+        "erfasst": k.get("erfasst"),
+        "ist": k.get("ist"),
+        "grund": "",
+        "marke": " · ".join(marken),
+        "ausfall": ausfall,
+        "offen": any(not lu.get("benannt") for lu in luecken),
+        "luecken": [_lesbare_luecke(lu) for lu in luecken[:LUECKEN_ZEIGEN]],
+        "ebenen_saetze": [
+            s
+            for s in (
+                _ebene_satz("Modelle", ebenen.get("modelle") or {}),
+                _ebene_satz("Speicher", ebenen.get("modell_speicher") or {}),
+            )
+            if s
+        ],
+        "ungezaehlt": list(angebot.get("nicht_gezaehlt") or ())[:LUECKEN_ZEIGEN],
+        "nicht_im_soll": EXTRA_ANGEBOTE.format(n=zahl(extra)) if extra else "",
+        "quelle_text": "Übersicht und Auswahl im Browser",
+        "quelle_url": quelle.get("quelle") or "",
+        "gleiche_quelle": "",
+        "gezaehlt": _kurz(str((k.get("quelle") or {}).get("gezaehlt_um") or "")),
+        "ebene": "angebote",
+    }
 
 
 def _kurz(iso: str) -> str:
@@ -78,6 +182,8 @@ def _satz(name: str, m: dict, gleich: bool) -> str:
 
 def zeile(z: dict) -> dict:
     """Die Anzeige einer Anbieterzeile aus der Lauf-Datei."""
+    if _ist_angebot(z):
+        return angebot_zeile(z)
     m = (z.get("ebenen") or {}).get("modelle") or {}
     quelle = z.get("soll_quelle") or {}
     gleich = quelle.get("gleiche_quelle_wie_sammler") is not False
@@ -85,6 +191,12 @@ def zeile(z: dict) -> dict:
     ohne_soll = m.get("soll") is None
     luecken = list(m.get("luecken") or ())
     extra = m.get("nicht_im_soll_zahl")
+    fehlt = (z.get("angebot") or {}).get("status") == "fehlt"
+    marken = _marken(m, gleich, ausfall)
+    if fehlt:
+        marken = [x for x in marken if x != NICHT_GEZAEHLT] + [HEUTE_NICHT]
+    marke = " · ".join(marken)
+    k_grund = ((z.get("ebenen") or {}).get("kombinationen") or {}).get("soll_grund")
     return {
         "name": z["name"],
         "satz": _satz(z["name"], m, gleich),
@@ -92,8 +204,8 @@ def zeile(z: dict) -> dict:
         "soll": m.get("soll"),
         "erfasst": m.get("erfasst"),
         "ist": m.get("ist"),
-        "grund": m.get("soll_grund") if ohne_soll else "",
-        "marke": " · ".join(_marken(m, gleich, ausfall)),
+        "grund": k_grund if fehlt else (m.get("soll_grund") if ohne_soll else ""),
+        "marke": marke,
         "ausfall": ausfall,
         "offen": any(not lu.get("benannt") for lu in luecken),
         "luecken": luecken,
@@ -102,6 +214,9 @@ def zeile(z: dict) -> dict:
         "quelle_url": quelle.get("quelle") or "",
         "gleiche_quelle": GLEICHE_QUELLE if quelle and gleich else "",
         "gezaehlt": _kurz(str(quelle.get("gezaehlt_um") or "")),
+        "ebenen_saetze": [],
+        "ungezaehlt": [],
+        "ebene": "modelle",
     }
 
 
@@ -115,11 +230,12 @@ def zeilen(lauf: dict | None, stichtag: str, unlesbar: bool = False) -> dict:
     if voll.get("fehler"):
         return {"fehlt": GESCHEITERT, "stand": "", "zeilen": [], "weitere": ""}
     datum = str(voll.get("datum") or "")
+    alle = list(voll.get("anbieter") or ())
     return {
         "fehlt": "",
         "stand": STAND.format(kurz=_kurz(datum)) if datum != stichtag else "",
-        "zeilen": [zeile(z) for z in voll.get("anbieter") or ()],
-        "weitere": WEITERE,
+        "zeilen": [zeile(z) for z in alle],
+        "weitere": "" if any(_ist_angebot(z) for z in alle) else WEITERE,
     }
 
 
