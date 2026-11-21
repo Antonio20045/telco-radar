@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from collections.abc import Callable
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -86,6 +87,13 @@ SIEHE_ANDERE = 303
 SEITEN_FRIST_MS = 30000
 ABRUF_FRIST_MS = SEITEN_FRIST_MS
 WARTE_TAKT_MS = 50
+HOECHSTE_VERSUCHE = 3
+"""Erster Versuch plus zwei Wiederholungen bei 5xx-, Netzwerk- oder Zeitfehlern."""
+WARTEZEITEN_S = (5.0, 15.0, 30.0)
+"""Wartezeit vor dem n-ten Wiederholungsversuch (steigend, CLAUDE.md Regel 4)."""
+TRANSIENTER_STATUS_AB = 500
+TRANSIENTER_STATUS_BIS = 599
+"""Nur 5xx gilt als vorübergehend; 403, 429 und jeder andere 4xx wiederholt nie."""
 GRUND_ZU_VIELE = f"mehr als {HOECHSTE_UMLEITUNGEN} Umleitungen"
 LESENDE_METHODEN = frozenset({"GET", "HEAD"})
 SEITENAUFRUF = "document"
@@ -253,16 +261,62 @@ class Tor:
             self.stoerung = grund
 
     def _hole(self, route: Route, ziel: str, methode: str) -> APIResponse | None:
+        """Holt die Antwort; ein vorübergehender Fehler (5xx, Netzwerk, Zeitgrenze)
+        wiederholt den Abruf (``HOECHSTE_VERSUCHE``, Wartezeit ``WARTEZEITEN_S``).
+
+        Kein Zusatzversuch bei 403, 429 oder jedem anderen 4xx (CLAUDE.md Regel 4:
+        Bot-Schutz wird nicht umgangen): nur eine Antwort ab ``TRANSIENTER_STATUS_AB``
+        gilt als vorübergehend.
+        """
         try:
-            return route.fetch(
-                url=ziel, method=methode, max_redirects=0, timeout=ABRUF_FRIST_MS
-            )
-        except PlaywrightFehler as fehler:
-            self._scheitere(route, ziel, kurz(fehler))
+            for versuch in range(HOECHSTE_VERSUCHE):
+                letzter = versuch == HOECHSTE_VERSUCHE - 1
+                try:
+                    antwort = route.fetch(
+                        url=ziel,
+                        method=methode,
+                        max_redirects=0,
+                        timeout=ABRUF_FRIST_MS,
+                    )
+                except PlaywrightFehler as fehler:
+                    kurzgrund = kurz(fehler)
+                    erneut = not letzter and self._versuche_erneut(
+                        ziel, versuch, kurzgrund
+                    )
+                    if erneut:
+                        continue
+                    self._scheitere(route, ziel, kurzgrund)
+                    return None
+                status = antwort.status
+                transient = TRANSIENTER_STATUS_AB <= status <= TRANSIENTER_STATUS_BIS
+                if not letzter and transient:
+                    grund = f"Abruf gestört (HTTP {antwort.status})"
+                    if self._versuche_erneut(ziel, versuch, grund):
+                        continue
+                return antwort
             return None
         finally:
             self._unterwegs.discard(host_von(ziel))
             self.schleuse.erledigt(ziel)
+
+    def _versuche_erneut(self, ziel: str, versuch: int, grund: str) -> bool:
+        """Wartet ``WARTEZEITEN_S[versuch]`` und meldet, ob ein neuer Versuch lohnt."""
+        if self.geschlossen:
+            return False
+        wartezeit = WARTEZEITEN_S[min(versuch, len(WARTEZEITEN_S) - 1)]
+        log.warning(
+            "Klick-Crawler: %s, Versuch %d/%d gescheitert (%s), erneut in %g s",
+            ziel,
+            versuch + 1,
+            HOECHSTE_VERSUCHE,
+            grund,
+            wartezeit,
+        )
+        if self.warte is not None:
+            self.warte(wartezeit * 1000)
+        else:
+            time.sleep(wartezeit)
+        return True
 
     def _pruefe_hauptseite(self, route: Route, antwort: APIResponse) -> bool:
         """Wahr, wenn die Hauptseite in den Browser darf; Bot-Schutz bricht sie ab."""
