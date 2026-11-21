@@ -242,6 +242,10 @@ anbieter:
       # 20.11.2026 nicht mehr hier: sie lesen sich seit dem Shop-Umbau nicht mehr, und
       # jede Produktseite liest alle sieben Tarife selbst (Tarifauswahl im Bestellweg).
       - https://mobile.1und1.de/smartphones
+    # Übersichten NACH den Produktseiten: drei HTTP 502 der Tarifdetail-Seiten in Folge
+    # beenden den Eintrag (`klickwiederholung`); davor gelesen kosteten sie alle
+    # Geräteseiten (21.11.2026), danach nur den Anschlusspreis.
+    uebersichten_zuletzt: true
     # Seiten (seit 20.11.2026) aus den Kacheln der Geräteübersicht des letzten
     # abgelegten Laufs (data/state/klick/1und1.json, `klickliste_kacheln`): je Gerät
     # der Produktlink wörtlich, neue Modelle kommen ohne Handarbeit (Xiaomi 18 Pro).
@@ -257,7 +261,9 @@ anbieter:
     # `1und1` auf der ersten HTTP 502 und las keine; alle 308 Sätze dieses Eintrags
     # standen ohne Anschlusspreis, also ohne Gesamtkosten. Die Tarifauswahl der
     # Produktseiten nennt ihn nicht. Was einer der beiden am Tag liest, gilt für
-    # beide (`klickanschluss.tagesanschluesse`); ein anderer Tag zählt nie.
+    # beide (`klickanschluss.tagesanschluesse`); ein anderer Tag zählt nie. Wie bei
+    # `1und1` nach den Produktseiten: ein Ausfall kostet nur den Anschlusspreis.
+    uebersichten_zuletzt: true
     uebersichten:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false

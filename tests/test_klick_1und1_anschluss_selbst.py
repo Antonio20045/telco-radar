@@ -7,7 +7,7 @@ Tarifdetail-Seite je Tarif. Die Tarifauswahl, die ``1und1-2`` liest, zeigt ihn n
 die Kachel nennt keine Einmalzahlung, die Preisübersicht braucht einen POST. Die
 Produktseite nennt nur „erstatten wir Ihnen den Bereitstellungspreis“ ohne Betrag
 (Abruf 21.11.2026). Die Tarifdetail-Seiten las aber nur ``1und1``, und der bekam HTTP
-502. Mit #184 teilen sich die Einträge den Anschluss eines Tags; fällt der eine aus,
+502. Mit PR 184 teilen sich die Einträge den Anschluss eines Tags; fällt der eine aus,
 fehlt er trotzdem allen. Erwartet:
 
 - jeder 1&1-Eintrag liest alle Tarifdetail-Seiten selbst;
@@ -23,6 +23,7 @@ Gegenprobe: ohne gelesene Tarifdetail-Seite bleibt der Anschlusspreis ``None``
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -31,8 +32,24 @@ from klickergebnisse import WURZEL
 
 from telco_radar.analyze.klick_erfassung import erfassungsgruende
 from telco_radar.analyze.klick_zusammenfuehrung import fuehre_zusammen
+from telco_radar.collect.geraete.klickanschluss import (
+    TAGESANSCHLUESSE,
+    tagesanschluesse,
+)
+from telco_radar.collect.geraete.klickkarte import lade_klickkarte
+from telco_radar.collect.geraete.klicklauf import (
+    LAUF_GESTOERT,
+    STOERUNG_SERVER,
+    Klicklauf,
+)
 from telco_radar.collect.geraete.klickrohsatz import ausbeute
-from telco_radar.collect.geraete.klickziele import TAGESDATEI, lade_ziele
+from telco_radar.collect.geraete.klicktageslauf import fahre
+from telco_radar.collect.geraete.klickwiederholung import Wiederholung
+from telco_radar.collect.geraete.klickziele import (
+    TAGESDATEI,
+    Seitenziel,
+    lade_ziele,
+)
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report.geraete_tco_karten import geraet_aus_sku
 
@@ -120,3 +137,165 @@ def test_kein_geraet_heisst_nicht_im_angebot(katalog):
     gruende = erfassungsgruende(zug.bilanz)
 
     assert not [s for s in gruende.values() if "nicht im Angebot" in s]
+
+
+class _Uhr:
+    def __init__(self) -> None:
+        self.jetzt = 0.0
+
+    def __call__(self) -> float:
+        return self.jetzt
+
+
+def _fahre_mit_502_am_detail_endpunkt(schluessel: str) -> dict:
+    """Wie am 21.11.: jede Tarifdetail-Seite 502, jede Produktseite erreichbar."""
+    ziel = {z.schluessel: z for z in lade_ziele(lese_wurzel(), TAGESDATEI, None)}[
+        schluessel
+    ]
+    seiten = tuple(
+        Seitenziel(g, None, f"https://mobile.1und1.de/{g}")
+        for g in ("apple-iphone-17", "google-pixel-10a", "samsung-galaxy-s26")
+    )
+    ziel = replace(ziel, seiten=seiten)
+    karte = lade_klickkarte(lese_wurzel() / "config" / "klickkarten" / "1und1.yaml")
+    uhr = _Uhr()
+
+    def schlafe(sekunden: float) -> None:
+        uhr.jetzt += sekunden
+
+    def crawle(seite, _ende):
+        uhr.jetzt += 60
+        return Klicklauf("1&1", seite.adresse)
+
+    def lies(adresse, _ende):
+        uhr.jetzt += 3
+        teil = {
+            "adresse": adresse,
+            "status": LAUF_GESTOERT,
+            "grund": "Abruf gestört (HTTP 502)",
+            "stoerung": STOERUNG_SERVER,
+        }
+        return {**teil, "seiten": [teil], "saetze": [], "vollstaendig": False}
+
+    crawler, leser = Wiederholung(uhr, schlafe).um(crawle, lies)
+    return fahre(
+        ziel,
+        karte,
+        "1und1.yaml",
+        crawler,
+        HEUTE,
+        10**6,
+        gelesen={},
+        uhr=uhr,
+        schlafe=schlafe,
+        lies_uebersicht=leser,
+    )
+
+
+@pytest.mark.parametrize("schluessel", ["1und1", "1und1-2"])
+def test_detail_endpunkt_mit_502_kostet_keine_geraeteseite(schluessel):
+    """Prüfer zu PR 199: liest ein Eintrag die Tarifdetail-Seiten zuerst, beenden drei
+    502 in Folge (``HOECHSTE_SERVERFEHLER_IN_FOLGE``) den Eintrag vor jeder
+    Produktseite. Der Ausfall des Detail-Endpunkts kostet nur den Anschlusspreis."""
+    daten = _fahre_mit_502_am_detail_endpunkt(schluessel)
+
+    assert [s["status"] for s in daten["seiten"]] == ["gelesen"] * 3
+    tarifdetail = [u for u in daten["uebersichten"] if "chosenTariff=" in u["adresse"]]
+    assert len(tarifdetail) == 7
+    assert {u["status"] for u in tarifdetail} <= {"gestoert", "nicht_besucht"}
+
+
+def _anschluss_datei(preise: dict[str, float], datum: str = HEUTE) -> dict:
+    """Die echten Tarifdetail-Sätze der Nacht mit den Preisen ``preise`` je Slug."""
+    daten = _lade(TARIFDETAIL)
+    uebersichten = [
+        {
+            **u,
+            "saetze": [
+                {**s, "anschlusspreis": preise[s["tarif_slug"]]} for s in u["saetze"]
+            ],
+        }
+        for u in daten["uebersichten"]
+    ]
+    return {**daten, "datum": datum, "uebersichten": uebersichten}
+
+
+def _slugs() -> list[str]:
+    return [
+        s["tarif_slug"] for u in _lade(TARIFDETAIL)["uebersichten"] for s in u["saetze"]
+    ]
+
+
+def test_verschiedene_preise_je_tarif_landen_beim_richtigen_tarif(katalog):
+    """Die Fixture hat für alle sieben Tarife 39,90 €; eine Vertauschung fiele dort
+    nicht auf. Hier trägt jeder Tarif seinen eigenen Betrag."""
+    preise = {slug: 10.0 * (i + 1) for i, slug in enumerate(_slugs())}
+    namen = {
+        s["tarif_name"]: preise[s["tarif_slug"]]
+        for u in _lade(TARIFDETAIL)["uebersichten"]
+        for s in u["saetze"]
+    }
+    zug = fuehre_zusammen(
+        [],
+        [_lade(NACHT), {**_lade(ZWEITER), **_teil(_anschluss_datei(preise))}],
+        katalog,
+        HEUTE,
+        lambda s: geraet_aus_sku(s, katalog),
+    )
+    saetze = [s for s in zug.rohsaetze if s["anbieter"] == "1&1"]
+
+    assert len(saetze) == 28 and len(set(namen.values())) == 7
+    assert {(s["tarif_name"], s["anschlusspreis"]) for s in saetze} == set(
+        namen.items()
+    )
+
+
+def _teil(daten: dict) -> dict:
+    return {"uebersichten": daten["uebersichten"]}
+
+
+@pytest.mark.parametrize("umgekehrt", [False, True])
+def test_zwei_lesungen_eines_tags_widersprechen_sich_benannte_luecke(umgekehrt, caplog):
+    """Prüfer zu PR 199: 39,90 € in ``1und1``, 49,90 € in ``1und1-2`` am selben Tag gab
+    bisher still den Wert der zuletzt gelesenen Datei."""
+    eins = _anschluss_datei(dict.fromkeys(_slugs(), 39.9))
+    zwei = {**_anschluss_datei(dict.fromkeys(_slugs(), 39.9)), "anbieter": "1und1-2"}
+    zwei["uebersichten"][0]["saetze"][0]["anschlusspreis"] = 49.9
+    s_slug = zwei["uebersichten"][0]["saetze"][0]["tarif_slug"]
+    s_name = zwei["uebersichten"][0]["saetze"][0]["tarif_name"]
+    reihe = [zwei, eins] if umgekehrt else [eins, zwei]
+
+    ergebnis = tagesanschluesse(eins, reihe)
+
+    assert ergebnis[s_slug] is None and ergebnis[s_name] is None
+    assert {k: v for k, v in ergebnis.items() if v is not None} == {
+        k: 39.9 for k in ergebnis if k not in (s_slug, s_name)
+    }
+    assert "zwei Lesungen widersprechen sich: 39.90/49.90" in caplog.text
+
+
+def test_widerspruch_ist_eine_benannte_luecke_der_ausbeute(katalog):
+    from telco_radar.collect.geraete.klickrohsatz import LUECKE_ANSCHLUSS_WIDERSPRUCH
+
+    eins = _anschluss_datei(dict.fromkeys(_slugs(), 39.9))
+    zwei = {**_lade(ZWEITER), **_teil(_anschluss_datei(dict.fromkeys(_slugs(), 49.9)))}
+
+    zug = fuehre_zusammen(
+        [], [eins, zwei], katalog, HEUTE, lambda s: geraet_aus_sku(s, katalog)
+    )
+    saetze = [s for s in zug.rohsaetze if s["anbieter"] == "1&1"]
+
+    assert len(saetze) == 28 and {s["anschlusspreis"] for s in saetze} == {None}
+    assert (
+        ausbeute(
+            {**zwei, TAGESANSCHLUESSE: tagesanschluesse(zwei, [eins, zwei])}, katalog
+        ).luecken[LUECKE_ANSCHLUSS_WIDERSPRUCH]
+        == 28
+    )
+
+
+def test_gleiche_lesungen_zweier_eintraege_sind_ein_wert():
+    eins = _anschluss_datei(dict.fromkeys(_slugs(), 39.9))
+    zwei = {**eins, "anbieter": "1und1-2"}
+
+    assert set(tagesanschluesse(eins, [eins, zwei]).values()) == {39.9}

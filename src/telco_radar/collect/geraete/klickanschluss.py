@@ -23,6 +23,7 @@ anderer Tag zählt nie: was heute nicht gelesen ist, bleibt ``None``.
 
 from __future__ import annotations
 
+import logging
 import re
 from collections.abc import Iterable
 from urllib.parse import parse_qs, urlsplit
@@ -33,7 +34,9 @@ from .klickergebnis import GELESENE_SEITEN
 from .klickkartentypen import EIN_VERTRAG
 
 ART_ANSCHLUSS = "anschluss"
+GRUND_WIDERSPRUCH = "zwei Lesungen widersprechen sich"
 TAGESANSCHLUESSE = "anschluesse_des_tags"
+log = logging.getLogger(__name__)
 _NAME = re.compile(r'class="tariff-detail__heading">\s*<h2>([^<]+)</h2>')
 
 
@@ -56,7 +59,7 @@ def anschluss_saetze(text: str, adresse: str) -> list[dict]:
     ]
 
 
-def anschluesse(daten: dict) -> dict[str, float]:
+def anschluesse(daten: dict) -> dict[str, float | None]:
     """Anschlusspreis je Tarif-Slug und je Tarifname aus den heute gelesenen
     Tarifdetail-Seiten einer Ergebnisdatei, nur bei ``ein_vertrag``. Der Name trägt,
     wo die Kachel den Tarif mit Namen nennt (Nachweis ``tarifname``, 1&1 seit
@@ -83,14 +86,26 @@ def anschluesse(daten: dict) -> dict[str, float]:
     return {**je_name, **je_slug}
 
 
-def tagesanschluesse(daten: dict, alle: Iterable[dict]) -> dict[str, float]:
+def tagesanschluesse(daten: dict, alle: Iterable[dict]) -> dict[str, float | None]:
     """Anschlusspreise des Anbieters und Tags von ``daten`` aus allen Ergebnisdateien
-    ``alle``: was eine Datei gelesen hat, gilt für jede desselben Anbieters und Tags."""
+    ``alle``: was eine Datei gelesen hat, gilt für jede desselben Anbieters und Tags.
+    Lesen zwei Dateien für denselben Tarif verschiedene Beträge, ist er ``None`` mit
+    ``GRUND_WIDERSPRUCH`` im Protokoll, nie der Betrag der zuletzt gelesenen Datei."""
     tag = (daten.get("name"), daten.get("datum"))
-    je_tarif: dict[str, float] = {}
+    gelesen: dict[str, set[float]] = {}
     for andere in alle:
         if (andere.get("name"), andere.get("datum")) == tag:
-            je_tarif.update(anschluesse(andere))
+            for tarif, betrag in anschluesse(andere).items():
+                if betrag is not None:
+                    gelesen.setdefault(tarif, set()).add(betrag)
+    je_tarif: dict[str, float | None] = {}
+    for tarif, betraege in gelesen.items():
+        if len(betraege) == 1:
+            je_tarif[tarif] = next(iter(betraege))
+            continue
+        je_tarif[tarif] = None
+        zahlen = "/".join(f"{b:.2f}" for b in sorted(betraege))
+        log.warning("1&1-Anschluss %s: %s: %s", tarif, GRUND_WIDERSPRUCH, zahlen)
     return je_tarif
 
 
