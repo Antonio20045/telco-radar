@@ -12,26 +12,6 @@
    "sha256_roh": "14be213dbdcd0b85082c97a28bf026e07888d334102846557f8cf02cac2f5056"
   },
   {
-   "datei": "telekom_sitemap_20261121.xml.gz",
-   "url": "https://www.telekom.de/content/robots/sitemap",
-   "abgerufen_am": "2026-11-21",
-   "werkzeug": "telco_radar.geraete_abruf.hole_fuer_anbieter (robots.txt, Kennung TelcoRadar/1.0), ein Abruf",
-   "beleg": "Probeabruf der Soll-Zählung am 2026-11-21 (Stufe 1, Abnahmekriterium 1); Antwort unverändert, gzip -n -9.",
-   "gzip": true,
-   "bytes_roh": 197423,
-   "sha256_roh": "7ed4002e0b41d8918bae0d2bd8475e14739aa7585c43fe397baf390dbf0e6aa7"
-  },
-  {
-   "datei": "tarifwelt_sitemap_20261121.xml.gz",
-   "url": "https://tarife.mediamarkt.de/sitemap.xml",
-   "abgerufen_am": "2026-11-21",
-   "werkzeug": "telco_radar.geraete_abruf.hole_fuer_anbieter (robots.txt, Kennung TelcoRadar/1.0), ein Abruf",
-   "beleg": "Probeabruf der Soll-Zählung am 2026-11-21 (Stufe 1, Abnahmekriterium 1); Antwort unverändert, gzip -n -9.",
-   "gzip": true,
-   "bytes_roh": 28075,
-   "sha256_roh": "9462fd397577669e27551fae8c77c32ce9230e72bbeb6bc2c7e22d3284202505"
-  },
-  {
    "datei": "einsundeins_smartphones_20261121.html.gz",
    "url": "https://mobile.1und1.de/smartphones",
    "abgerufen_am": "2026-11-21",

@@ -201,7 +201,7 @@ def _modell_ebene(
     extra = sorted(ist.modelle - set(je))
     ebene.update(
         erfasst=len(set(je) & ist.modelle),
-        luecken=luecken,
+        luecken=unterscheidbar(luecken),
         luecken_zahl=len(luecken),
         nicht_im_soll=[{"schluessel": k, "name": namen.get(k, k)} for k in extra][
             :LISTE_HOECHSTENS
@@ -209,6 +209,19 @@ def _modell_ebene(
         nicht_im_soll_zahl=len(extra),
     )
     return ebene
+
+
+def unterscheidbar(luecken: list[dict]) -> list[dict]:
+    """Zwei Lücken mit gleichem Namen (dasselbe Gerät unter zwei Adressen) bekommen
+    den letzten Teil ihrer Adresse in Klammern dazu."""
+    zahl: dict[str, int] = {}
+    for luecke in luecken:
+        zahl[luecke["name"]] = zahl.get(luecke["name"], 0) + 1
+    for luecke in luecken:
+        if zahl[luecke["name"]] > 1 and luecke["url"]:
+            teil = luecke["url"].rstrip("/").rsplit("/", 2)[-2:]
+            luecke["name"] = f"{luecke['name']} ({'/'.join(teil)})"
+    return luecken
 
 
 def _unbenannt(zeile: dict) -> int:
@@ -224,7 +237,7 @@ def zeile_fuer(name: str, soll: dict | None, ist_je: dict, signale: Signale, nam
     """Die Zeile eines Anbieters mit allen drei Ebenen."""
     ist = ist_je.get(name, Ist())
     quelle = None
-    if soll is not None:
+    if soll is not None and soll.get("art") is not None:
         quelle = {
             k: soll.get(k)
             for k in ("art", "quelle", "gleiche_quelle_wie_sammler", "gezaehlt_um")

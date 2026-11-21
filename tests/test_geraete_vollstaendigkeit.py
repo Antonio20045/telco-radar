@@ -56,11 +56,11 @@ def _auszug() -> list[dict]:
     return daten["buendel"]
 
 
-def _soll(*modelle, art="sitemap", grund=None) -> dict:
+def _soll(*modelle, art="sitemap", grund=None, gleich=False) -> dict:
     return {
         "art": art,
         "quelle": "https://beispiel.invalid/liste",
-        "gleiche_quelle_wie_sammler": False,
+        "gleiche_quelle_wie_sammler": gleich,
         "gezaehlt_um": f"{TAG}T03:00:00+00:00",
         "grund": grund,
         "speicher_grund": "Die Liste des Anbieters nennt keine Speichergrößen",
@@ -223,7 +223,7 @@ def test_waechter_gruen_bei_benannten_luecken_und_nicht_zaehlbarem_soll(
     tmp_path, capsys
 ):
     soll = {
-        "1&1": _soll(("apple-iphone-17",)),
+        "1&1": _soll(("apple-iphone-17",), gleich=True),
         "Telekom": _soll(
             grund="Schutzantwort des Anbieters (HTTP 403), nicht umgangen"
         ),
@@ -244,16 +244,59 @@ def test_waechter_rot_bei_unbenannter_luecke(tmp_path, capsys):
 def test_waechter_rot_wenn_ein_anbieter_fehlt_oder_die_datei(tmp_path):
     voll = _voll({})
     voll["anbieter"] = [z for z in voll["anbieter"] if z["name"] != "o2"]
-    assert waechter.pruefe({"vollstaendigkeit": voll}, TAG) == ["o2: keine Zählung"]
+    lauf = {"datum": TAG, "vollstaendigkeit": voll}
+    assert waechter.pruefe(lauf, TAG) == ["o2: keine Zählung"]
     assert waechter.main(["--root", str(_schreibe(tmp_path, None))]) == 1
-    kaputt = {"vollstaendigkeit": {"fehler": "Zählung gescheitert: OSError: voll"}}
+    kaputt = {
+        "datum": TAG,
+        "vollstaendigkeit": {"fehler": "Zählung gescheitert: OSError: voll"},
+    }
     assert waechter.pruefe(kaputt, TAG) == ["Zählung gescheitert: OSError: voll"]
+
+
+def test_waechter_liest_genau_den_messtag_eine_vortagsdatei_ist_rot(tmp_path, capsys):
+    """Prüfung PR 201: fehlt die Datei des Messtags, darf eine ältere nicht grün
+    machen; trägt die Datei ein anderes Datum, ebenso nicht."""
+    voll = _voll({"1&1": _soll(("apple-iphone-16",), gleich=True)})
+    wurzel = _schreibe(tmp_path, voll)
+    assert waechter.main(["--root", str(wurzel), "--datum", TAG]) == 0
+    assert waechter.main(["--root", str(wurzel), "--datum", "2026-11-22"]) == 1
+    assert "keine Lauf-Datei für den Messtag 2026-11-22" in capsys.readouterr().out
+    lauf = {"datum": "2026-11-20", "vollstaendigkeit": voll}
+    assert waechter.pruefe(lauf, TAG) == [
+        f"Lauf-Datei trägt den 2026-11-20, Messtag ist {TAG}"
+    ]
+
+
+def test_waechter_meldet_erfasste_modelle_ausserhalb_eines_unabhaengigen_solls():
+    unabhaengig = _voll({"Telekom": _soll(("apple-iphone-17",))})
+    lauf = {"datum": TAG, "vollstaendigkeit": unabhaengig}
+    assert waechter.pruefe(lauf, TAG) == [
+        "Telekom: 2 erfasste Modelle fehlen im unabhängigen Soll"
+    ]
+    gleich = _voll({"Telekom": _soll(("apple-iphone-17",), gleich=True)})
+    assert waechter.pruefe({"datum": TAG, "vollstaendigkeit": gleich}, TAG) == []
+
+
+def test_gleichnamige_luecken_sind_unterscheidbar():
+    soll = _soll(
+        ("https://a.invalid/leica/leitzphone", False),
+        ("https://a.invalid/xiaomi/leitzphone", False),
+    )
+    for m in soll["modelle"]:
+        m["name"] = "Leica Leitzphone"
+    luecken = _zeilen(_voll({"congstar": soll}))["congstar"]["ebenen"]["modelle"]
+    namen = sorted(lu["name"] for lu in luecken["luecken"])
+    assert namen == [
+        "Leica Leitzphone (leica/leitzphone)",
+        "Leica Leitzphone (xiaomi/leitzphone)",
+    ]
 
 
 def test_waechter_rot_wenn_ein_soll_ohne_grund_fehlt():
     voll = _voll({})
     voll["anbieter"][0]["ebenen"]["modell_speicher"]["soll_grund"] = None
-    assert waechter.pruefe({"vollstaendigkeit": voll}, TAG) == [
+    assert waechter.pruefe({"datum": TAG, "vollstaendigkeit": voll}, TAG) == [
         "Telekom: Soll modell_speicher fehlt ohne benannten Grund"
     ]
 
@@ -294,14 +337,23 @@ def _buendel(anbieter: str, tag: str) -> dict:
     }
 
 
+CONGSTAR_AUSFALL = "congstar nicht erfasst: Lesen gestört (21.11.2026)"
+
+
 def _lauf_fuer_seite(tag: str) -> dict:
+    """Telekom: unabhängiges Soll mit einer Lücke; o2: unabhängig und ganz erfasst;
+    1&1: Liste, die auch die Messung liest; congstar: ganz erfasst, aber mit
+    Ausfallvermerk; Vodafone: kein Soll."""
     soll = {
         "Telekom": _soll(("apple-iphone-17-pro",), ("google-pixel-10",)),
         "Vodafone": _soll(grund="Abruf gescheitert (HTTP 502)"),
         "o2": _soll(("apple-iphone-17-pro",)),
+        "1&1": _soll(("apple-iphone-17-pro",), gleich=True),
+        "congstar": _soll(("apple-iphone-17-pro",)),
     }
-    buendel = [_buendel("Telekom", tag), _buendel("o2", tag)]
-    voll = baue(tag, f"{tag}T04:00:00+00:00", buendel, soll, _signale())
+    buendel = [_buendel(n, tag) for n in ("Telekom", "o2", "1&1", "congstar")]
+    signale = _signale(erfassung={"congstar": CONGSTAR_AUSFALL})
+    voll = baue(tag, f"{tag}T04:00:00+00:00", buendel, soll, signale)
     return {"bilanz": {}, "vollstaendigkeit": voll}
 
 
@@ -320,6 +372,10 @@ def _vs(site: Path) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser").select_one("#vollstaendigkeit")
 
 
+def _summary(li) -> str:
+    return li.summary.get_text(" ", strip=True)
+
+
 def test_die_seite_zeigt_je_anbieter_die_zahl_aus_der_lauf_datei(seite_mit_lauf):
     block = _vs(seite_mit_lauf)
     lauf = _lauf_fuer_seite(SEITE_HEUTE)["vollstaendigkeit"]
@@ -328,21 +384,49 @@ def test_die_seite_zeigt_je_anbieter_die_zahl_aus_der_lauf_datei(seite_mit_lauf)
     for z in lauf["anbieter"]:
         m = z["ebenen"]["modelle"]
         li = zeilen[z["name"]]
-        text = li.summary.get_text(" ", strip=True)
+        assert li["data-ist"] == str(m["ist"])
         if m["soll"] is None:
-            assert text.startswith(f"{z['name']}: Angebot nicht zählbar"), text
+            assert _summary(li).startswith(f"{z['name']}: {m['ist']} Modelle erfasst")
             assert "data-soll" not in li.attrs
         else:
             assert li["data-soll"] == str(m["soll"])
             assert li["data-erfasst"] == str(m["erfasst"])
-            assert text.startswith(f"{z['name']}: {m['erfasst']} von {m['soll']}"), text
-    assert zeilen["Telekom"].summary.get_text(" ", strip=True).endswith("1 Lücke")
-    assert zeilen["o2"].summary.get_text(" ", strip=True).endswith("vollständig")
+            assert _summary(li).startswith(
+                f"{z['name']}: {m['erfasst']} von {m['soll']} Modellen"
+            )
+    assert _summary(zeilen["Telekom"]) == "Telekom: 1 von 2 Modellen erfasst · 1 Lücke"
+    assert _summary(zeilen["o2"]) == "o2: 1 von 1 Modellen erfasst · vollständig"
+    assert _summary(zeilen["1&1"]) == (
+        "1&1: 1 von 1 Modellen der Anbieterliste erfasst · Liste nicht unabhängig"
+    )
+    assert _summary(zeilen["Vodafone"]) == (
+        "Vodafone: 0 Modelle erfasst · Angebot noch nicht gezählt"
+    )
     assert "Abruf gescheitert (HTTP 502)" in zeilen["Vodafone"].get_text(
         " ", strip=True
     )
-    assert "100" not in zeilen["Vodafone"].summary.get_text()
     assert "Stand vom" not in block.get_text()
+
+
+def test_die_seite_nennt_den_ausfallvermerk_und_sagt_dann_nicht_vollstaendig(
+    seite_mit_lauf,
+):
+    """Prüfung PR 201 (``test_seite_sagt_vollstaendig_trotz_ausfallvermerk``)."""
+    li = _vs(seite_mit_lauf).select_one('li.gr-vs-z[data-anbieter="congstar"]')
+    assert "vollständig" not in _summary(li)
+    ausfall = li.select_one(".gr-vs-ausfall")
+    assert ausfall is not None and ausfall.get_text(strip=True) == CONGSTAR_AUSFALL
+    assert li.select_one("details").find(class_="gr-vs-ausfall") is None
+
+
+def test_vollstaendig_nur_bei_unabhaengigem_soll_ohne_luecke_und_ohne_ausfall():
+    lauf = _lauf_fuer_seite(SEITE_HEUTE)
+    je = {z["name"]: z for z in seite.zeilen(lauf, SEITE_HEUTE)["zeilen"]}
+    assert je["o2"]["marke"] == "vollständig"
+    assert je["1&1"]["marke"] == "Liste nicht unabhängig"
+    assert je["congstar"]["marke"] == ""
+    assert je["congstar"]["ausfall"] == CONGSTAR_AUSFALL
+    assert je["Vodafone"]["marke"] == "Angebot noch nicht gezählt"
 
 
 def test_die_seitenzeile_folgt_der_datei_gegenprobe():

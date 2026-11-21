@@ -10,9 +10,9 @@
   {% else %}
   <ul class="gr-vs-liste">
     {% for z in vs.zeilen %}
-    <li class="gr-vs-z{{ ' gr-vs-z--offen' if z.offen }}{{ ' gr-vs-z--ohne' if z.ohne_soll }}" data-anbieter="{{ z.name }}"{% if z.soll is not none %} data-soll="{{ z.soll }}" data-erfasst="{{ z.erfasst }}"{% endif %} data-luecken="{{ z.luecken | length }}">
+    <li class="gr-vs-z{{ ' gr-vs-z--offen' if z.offen }}{{ ' gr-vs-z--ohne' if z.ohne_soll }}" data-anbieter="{{ z.name }}"{% if z.soll is not none %} data-soll="{{ z.soll }}" data-erfasst="{{ z.erfasst }}"{% endif %} data-ist="{{ z.ist }}" data-luecken="{{ z.luecken | length }}">
       <details>
-        <summary>{{ z.satz }}{% if z.marke %} <span class="gr-vs-marke">{{ z.marke }}</span>{% endif %}{% if vs.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ vs.stand }}</span>{% endif %}</summary>
+        <summary>{{ z.satz }}{% if z.marke %} <span class="gr-vs-marke">· {{ z.marke }}</span>{% endif %}{% if vs.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ vs.stand }}</span>{% endif %}</summary>
         {% if z.grund %}<p class="gr-vs-grund">{{ z.grund }}</p>{% endif %}
         {% if z.luecken %}
         <ul class="gr-vs-luecken">
@@ -24,6 +24,7 @@
         {% if z.nicht_im_soll %}<p class="gr-vs-extra">{{ z.nicht_im_soll }}</p>{% endif %}
         {% if z.quelle_url %}<p class="gr-vs-quelle">Liste: <a href="{{ z.quelle_url }}" rel="noopener">{{ z.quelle_text }}</a>{% if z.gezaehlt %}, gezählt am {{ z.gezaehlt }}{% endif %}{% if z.gleiche_quelle %} · {{ z.gleiche_quelle }}{% endif %}</p>{% endif %}
       </details>
+      {% if z.ausfall %}<p class="gr-vs-ausfall">{{ z.ausfall }}</p>{% endif %}
     </li>
     {% endfor %}
   </ul>

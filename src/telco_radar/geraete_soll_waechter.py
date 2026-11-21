@@ -3,16 +3,21 @@
 Aufruf (Schritt „Soll/Ist pruefen“ in ``.github/workflows/geraete.yml``, vor
 „Buendelabdeckung pruefen“)::
 
-    PYTHONPATH=src python -m telco_radar.geraete_soll_waechter --root .
+    PYTHONPATH=src python -m telco_radar.geraete_soll_waechter --root . \
+        --datum "${{ steps.heute.outputs.datum }}"
 
-Gelesen wird nur die Lauf-Datei des Messtags (``geraete_lauf``; Messtag ist ``updated``
-der Bündeldatei, ``--datum`` überschreibt). Rot (Exit 1), wenn
+Gelesen wird genau die Lauf-Datei des Messtags (``geraete_lauf``). Der Messtag kommt
+im Workflow aus dem Schritt „Heute schon gemessen?“ (``--datum``); ohne ``--datum``
+(lokal) ist er ``updated`` der Bündeldatei. Rot (Exit 1), wenn
 
-* es für den Messtag keine Lauf-Datei gibt oder sie unlesbar ist,
+* es für den Messtag keine Lauf-Datei gibt, sie unlesbar ist oder ein anderes Datum
+  trägt (eine Datei vom Vortag macht nie grün),
 * die Zählung als Ganzes gescheitert ist (``vollstaendigkeit.fehler``),
 * ein erwarteter Anbieter (``geraete_vollstaendigkeit.ERWARTET``) keine Zeile hat,
 * eine Ebene weder ein Soll noch einen benannten Grund trägt,
-* ein Anbieter eine unbenannte Lücke hat.
+* ein Anbieter eine unbenannte Lücke hat,
+* ein unabhängiges Soll (``gleiche_quelle_wie_sammler`` falsch) ein erfasstes Modell
+  nicht kennt (``nicht_im_soll``): dann zählt die Liste nicht, was angeboten wird.
 
 Ein benannter Ausfall (Soll nicht zählbar mit Grund, Lücke mit Grund) bleibt grün und
 steht in der Ausgabe. Rein lesend, ohne Netz.
@@ -44,6 +49,10 @@ def _zeile(zeile: dict) -> list[str]:
     if zeile.get("unbenannt") or unbenannt:
         zahl = max(int(zeile.get("unbenannt") or 0), len(unbenannt))
         befunde.append(f"{name}: {zahl} Lücken ohne Grund: {', '.join(unbenannt[:12])}")
+    quelle = zeile.get("soll_quelle") or {}
+    extra = ((zeile.get("ebenen") or {}).get("modelle") or {}).get("nicht_im_soll_zahl")
+    if quelle.get("gleiche_quelle_wie_sammler") is False and extra:
+        befunde.append(f"{name}: {extra} erfasste Modelle fehlen im unabhängigen Soll")
     return befunde
 
 
@@ -51,6 +60,8 @@ def pruefe(lauf: dict | None, datum: str) -> list[str]:
     """Die roten Befunde zur Lauf-Datei ``lauf`` des Messtags ``datum``."""
     if lauf is None:
         return [f"keine Lauf-Datei für den Messtag {datum}"]
+    if lauf.get("datum") != datum:
+        return [f"Lauf-Datei trägt den {lauf.get('datum')}, Messtag ist {datum}"]
     voll = lauf.get("vollstaendigkeit")
     if not isinstance(voll, dict):
         return [f"Lauf-Datei {datum} ohne Vollständigkeit"]

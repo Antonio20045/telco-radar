@@ -21,11 +21,17 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.geraete_soll import (
+    GRUND_SATURN,
+    GRUND_TELEKOM,
+    GRUND_ZEIT,
     QUELLEN,
+    RESERVE_SEKUNDEN,
     SATURN_NETZE,
+    SEKUNDEN_JE_ABRUF,
     Fund,
     leser,
     ordne_zu,
@@ -69,32 +75,6 @@ def test_congstar_gegenprobe_eine_adresse_weniger():
         "<loc>https://www.congstar.de/geraete/apple/apple-iphone-17/</loc>", ""
     )
     assert len(leser.congstar_sitemap(weniger)) == 38
-
-
-def test_telekom_sitemap_ein_fund_je_produkt_ohne_uhren_und_tablets():
-    funde = leser.telekom_sitemap(_text("telekom_sitemap_20261121.xml.gz"))
-    adressen = {f.url for f in funde}
-    assert "https://www.telekom.de/shop/geraet/apple/apple-iphone-17" in adressen
-    assert not any("/apple-iphone-17/" in a for a in adressen)
-    assert not any("watch" in a or "ipad" in a or "-tv" in a for a in adressen)
-    assert len(funde) == 49
-    s26plus = next(f for f in funde if f.url.endswith("samsung-galaxy-s26plus"))
-    assert s26plus.titel == "samsung galaxy s26 plus"
-
-
-def test_tarifwelt_sitemap_fuehrt_aktionsseiten_auf_ein_modell():
-    funde = leser.tarifwelt_sitemap(_text("tarifwelt_sitemap_20261121.xml.gz"))
-    modelle = ordne_zu(funde, _katalog())
-    seiten = [f.url.rsplit("/", 1)[1] for f in funde if "/apple/iphone-17" in f.url]
-    iphone = [s for s in seiten if "pro" not in s and s != "iphone-17e"]
-    assert iphone == [
-        "iphone-17",
-        "iphone-17-aktion",
-        "iphone-17-apple-adapter",
-        "iphone-17-online-bonus",
-    ]
-    assert "apple-iphone-17" in modelle
-    assert not any("scooter" in f.url or "watch" in f.url for f in funde)
 
 
 def test_einsundeins_kacheln():
@@ -143,8 +123,6 @@ def test_o2_katalog_mit_folgeseite_ist_nicht_zaehlbar():
     "lies",
     [
         leser.congstar_sitemap,
-        leser.telekom_sitemap,
-        leser.tarifwelt_sitemap,
         leser.einsundeins_kacheln,
         leser.vodafone_liste,
         leser.o2_katalog,
@@ -207,7 +185,7 @@ def test_zaehle_traegt_art_quelle_und_zeit():
 )
 def test_scheitern_ist_kein_soll_null(status, schutz, teil):
     soll = zaehle(
-        _quelle("Telekom"), _hole(status, "kaputt", schutz), {}, JETZT, _katalog()
+        _quelle("Vodafone"), _hole(status, "kaputt", schutz), {}, JETZT, _katalog()
     )
     assert soll.modelle is None
     assert soll.als_dict()["modelle"] is None
@@ -224,7 +202,8 @@ def test_ohne_restzeit_wird_nichts_abgerufen_und_der_grund_steht_da():
     soll = zaehle_alle(None, hole, lambda: _Uhr(), _katalog(), lambda: 10.0, 45.0)
     assert abrufe == []
     assert set(soll) == {"Telekom", "Vodafone", "o2", "1&1", "congstar", *SATURN_NETZE}
-    assert all(s.modelle is None and "Zeitbudget" in s.grund for s in soll.values())
+    assert all(soll[q.zeilen[0]].grund == GRUND_ZEIT for q in QUELLEN)
+    assert all(s.modelle is None for s in soll.values())
 
 
 class _Uhr:
@@ -232,10 +211,59 @@ class _Uhr:
         return JETZT
 
 
-def test_saturn_netze_teilen_eine_sitemap():
-    quelle = _quelle(SATURN_NETZE[0])
-    assert quelle.zeilen == SATURN_NETZE
-    assert quelle.url == "https://tarife.mediamarkt.de/sitemap.xml"
+def test_telekom_und_saturn_haben_in_stufe_1_kein_soll_und_keinen_abruf():
+    """Prüfung PR 201: die Telekom-Sitemap führte 14 Modelle, die die Übersicht als
+    nicht im Angebot zeigt, und ließ 21 angebotene weg; die Tarifwelt-Sitemap nennt
+    kein Netz. Beides ist kein Soll; Stufe 2 zählt im Browser."""
+    abrufe = []
+
+    def hole(url, *a, **k):
+        abrufe.append(url)
+        return _Antwort((404, ""))
+
+    soll = zaehle_alle(None, hole, lambda: _Uhr(), _katalog(), lambda: 0.0, 45.0)
+    assert soll["Telekom"].modelle is None
+    assert soll["Telekom"].grund == GRUND_TELEKOM
+    assert soll["Telekom"].als_dict()["art"] is None
+    for netz in SATURN_NETZE:
+        assert soll[netz].modelle is None
+        assert soll[netz].grund == GRUND_SATURN
+    assert not [a for a in abrufe if "telekom" in a or "mediamarkt" in a]
+    assert {q.zeilen[0] for q in QUELLEN} == {"Vodafone", "o2", "1&1", "congstar"}
+
+
+def test_die_soll_reserve_traegt_alle_quellen_nach_dem_stufenende():
+    """Prüfung PR 201: die Tarifwelt-Stufe nimmt jede frei gewordene Zeit. Nach ihrem
+    Ende und 15 s Nacharbeit (gemessen) muss die Restzeit für jede Quelle reichen."""
+    from telco_radar import geraete_nachtlauf as nacht
+    from telco_radar import geraete_tarifwelt as tw
+
+    ende = tw.JOB_FRIST_SEKUNDEN - tw.VORLAUF_SEKUNDEN - tw.RESERVE_NACH_STUFE_SEKUNDEN
+    assert tw.stufen_frist(ende) == 0.0
+    rest = nacht.rest_sekunden(ende + 15.0)
+    assert rest // nacht.mindest_sekunden({}) >= len(QUELLEN)
+    assert len(QUELLEN) * SEKUNDEN_JE_ABRUF == RESERVE_SEKUNDEN
+
+
+def test_ein_abruf_passt_in_die_sekunden_je_abruf():
+    einstellungen = yaml.safe_load(
+        (Path(__file__).parents[1] / "config" / "settings.yaml").read_text("utf-8")
+    )
+    from telco_radar import geraete_nachtlauf as nacht
+
+    assert nacht.mindest_sekunden(einstellungen["http"]) <= SEKUNDEN_JE_ABRUF
+
+
+def test_ein_kleingeschriebener_titel_wird_lesbar():
+    assert leser.lesbar("apple iphone 13 refurbished basic") == (
+        "Apple iPhone 13 Refurbished Basic"
+    )
+    assert leser.lesbar("HMD Fusion X1") == "HMD Fusion X1"
+    modell = ordne_zu(
+        [Fund("leica leitzphone powered by xiaomi", "https://x.invalid/leica")],
+        _katalog(),
+    )["https://x.invalid/leica"]
+    assert modell.name == "Leica Leitzphone Powered By Xiaomi"
 
 
 def test_das_soll_paket_laedt_keinen_parser_des_sammlers():

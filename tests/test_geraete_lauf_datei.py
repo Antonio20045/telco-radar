@@ -60,12 +60,10 @@ def _netz(antworten: dict[str, str]):
 
 
 ANTWORTEN = {
-    "https://www.telekom.de/content/robots/sitemap": "telekom_sitemap_20261121.xml.gz",
     "https://api.vodafone.de/glados": "vodafone_hardware_20261121.json.gz",
     "https://www.o2online.de/e-shop/rest": "o2_katalog_20261121.json.gz",
     "https://mobile.1und1.de/smartphones": "einsundeins_smartphones_20261121.html.gz",
     "https://www.congstar.de/sitemap": "congstar_devices_20261121.xml.gz",
-    "https://tarife.mediamarkt.de/sitemap": "tarifwelt_sitemap_20261121.xml.gz",
 }
 
 
@@ -99,8 +97,12 @@ def test_der_nachtlauf_schreibt_die_lauf_datei_mit_bilanz_und_vollstaendigkeit(
     z = _zeilen(lauf["vollstaendigkeit"])
     assert list(z)[: len(ERWARTET)] == ERWARTET
     assert z["Telekom"]["ist"]["buendel"] == 42
-    assert z["Telekom"]["soll_quelle"]["art"] == "sitemap"
-    assert z["Telekom"]["soll_quelle"]["gleiche_quelle_wie_sammler"] is False
+    assert z["Telekom"]["soll_quelle"] is None
+    assert z["Telekom"]["ebenen"]["modelle"]["soll"] is None
+    assert z["Telekom"]["ebenen"]["modelle"]["soll_grund"] == (
+        "wird in Stufe 2 im Browser aus der Übersicht gezählt"
+    )
+    assert z["Telekom"]["ebenen"]["modelle"]["ist"] == 3
     assert z["Vodafone"]["soll_quelle"]["art"] == "uebersicht_api"
     assert z["1&1"]["soll_quelle"]["art"] == "uebersichtsseite"
     einsundeins = z["1&1"]["ebenen"]["modelle"]
@@ -108,7 +110,9 @@ def test_der_nachtlauf_schreibt_die_lauf_datei_mit_bilanz_und_vollstaendigkeit(
     gruende = {lu["grund"] for lu in einsundeins["luecken"]}
     assert STOERUNG in gruende
     assert gruende <= {STOERUNG, "beim Anbieter gelistet, nicht im Katalog"}
-    assert (
-        z[ERWARTET[5]]["soll_quelle"]["quelle"]
-        == "https://tarife.mediamarkt.de/sitemap.xml"
-    )
+    for netz in ERWARTET[5:]:
+        assert z[netz]["ebenen"]["modelle"]["soll"] is None
+        assert z[netz]["ebenen"]["modelle"]["soll_grund"].startswith(
+            "Soll je Netz nicht zählbar (Sitemap ohne Netz)"
+        )
+    assert z["1&1"]["soll_quelle"]["gleiche_quelle_wie_sammler"] is True

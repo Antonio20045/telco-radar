@@ -9,10 +9,7 @@ mit dem Code des Sammlers liest, fände dessen Fehler nie.
 Was die Listen hergeben, ist am 21.11.2026 je einmal abgerufen und geprüft
 (Fixtures unter ``tests/fixtures/geraete_soll/``):
 
-* congstar ``/sitemap/devices.xml`` und Telekom ``/content/robots/sitemap``: Adressen
-  je Produkt; die Telekom-Sitemap nennt Farbe und Speicher nur für einen Teil der
-  Varianten (iPhone 18 Pro nur 256 GB), Speicher zählt sie darum nicht.
-* Saturn/MediaMarkt ``tarife.mediamarkt.de/sitemap.xml``: Modellseiten ohne Netz.
+* congstar ``/sitemap/devices.xml``: eine Adresse je Produkt, ohne Speicher.
 * 1&1 ``/smartphones``: eine Kachel je Gerät (``form.hardware-box``) ohne Speicher.
 * Vodafone: die Geräteliste der Schnittstelle der Übersichtsseite (``hardwareType``).
 * o2: der Gerätekatalog der Shop-Schnittstelle; ein Eintrag „… mit <Zubehör>“ ist ein
@@ -67,7 +64,10 @@ NICHT_SMARTPHONE_ANFANG = ("airpods", "buds", "ipad", "kids", "tab", "watch")
 """Wortanfänge mit Modellnummer dahinter („buds4“, „watch9“, „tablet“)."""
 
 KATALOG_ANFRAGE = re.compile(r"(\d)(plus)\b|(pro)(plus)\b")
-"""Telekom schreibt „s26plus“ und „proplus“ zusammen; der Katalog trennt."""
+"""Adressen schreiben „s26plus“ und „proplus“ zusammen; der Katalog trennt."""
+
+SCHREIBWEISE = {"iphone": "iPhone", "ipad": "iPad", "5g": "5G"}
+"""Wörter, die ``lesbar`` nicht einfach groß schreibt."""
 
 _LOC = re.compile(r"<loc>\s*([^<\s]+)\s*</loc>")
 _KACHEL = re.compile(r'<form class="hardware-box[^"]*"(.*?)</form>', re.S)
@@ -116,6 +116,15 @@ def titel_aus_slug(slug: str) -> str:
     )
 
 
+def lesbar(titel: str) -> str:
+    """Ein Titel aus einer Adresse in Kleinschrift („apple iphone 13 refurbished
+    basic“) wird lesbar („Apple iPhone 13 Refurbished Basic“); ein Titel mit
+    Großbuchstaben bleibt, wie die Quelle ihn schreibt."""
+    if titel != titel.lower():
+        return titel
+    return " ".join(SCHREIBWEISE.get(w, w.capitalize()) for w in titel.split())
+
+
 def _ohne_duplikat(funde: list[Fund]) -> list[Fund]:
     if not funde:
         raise LeserFehler("Liste ohne einen Eintrag")
@@ -133,36 +142,6 @@ def congstar_sitemap(text: str) -> list[Fund]:
         if len(teile) != 3 or teile[0] != "geraete" or not ist_smartphone(teile[2]):
             continue
         funde.append(Fund(titel_aus_slug(teile[2]), ort))
-    return _ohne_duplikat(funde)
-
-
-def telekom_sitemap(text: str) -> list[Fund]:
-    """``/shop/geraet/<marke>/<produkt>[/<variante>]``: ein Fund je Produkt."""
-    funde = []
-    for ort in _orte(text):
-        teile = [t for t in urlsplit(ort).path.split("/") if t]
-        if len(teile) < 4 or teile[:2] != ["shop", "geraet"]:
-            continue
-        marke, produkt = teile[2], teile[3]
-        if not ist_smartphone(f"{marke}-{produkt}"):
-            continue
-        adresse = f"https://www.telekom.de/shop/geraet/{marke}/{produkt}"
-        funde.append(Fund(titel_aus_slug(produkt), adresse))
-    return _ohne_duplikat(funde)
-
-
-def tarifwelt_sitemap(text: str) -> list[Fund]:
-    """``/smartphones/<marke>/<modell>`` der Tarifwelt; Aktionsseiten desselben
-    Modells führen über den Katalog zum selben Schlüssel."""
-    funde = []
-    for ort in _orte(text):
-        teile = [t for t in urlsplit(ort).path.split("/") if t]
-        if len(teile) != 3 or teile[0] != "smartphones":
-            continue
-        marke, modell = teile[1], teile[2]
-        if not ist_smartphone(f"{marke}-{modell}"):
-            continue
-        funde.append(Fund(titel_aus_slug(f"{marke}-{modell}"), ort))
     return _ohne_duplikat(funde)
 
 

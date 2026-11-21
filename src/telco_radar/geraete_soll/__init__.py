@@ -1,18 +1,24 @@
-"""Soll-Zählung des Geräteradars: was bietet der Anbieter am Messtag selbst an?
+"""Soll-Zählung des Geräteradars, Stufe 1: die Modellliste des Anbieters.
 
 Abnahmekriterium 1 (Antonio, 21.11.2026): je Anbieter eine tägliche Soll/Ist-Zählung.
-Dieses Paket zählt das Soll, getrennt vom Sammler: eigene Adressen (``QUELLEN``), ein
-eigener Abruf je Quelle über den robots.txt-treuen Weg (``geraete_abruf``), eigene
-Leser (``leser``). Es importiert keinen Parser und keinen Adapter aus
-``collect.geraete`` (Test ``test_geraete_soll_leser``); aus ``collect`` nur ``http``.
-Wie unabhängig ein Soll ist, steht an jeder Zahl: ``art`` (sitemap,
-uebersichtsseite, uebersicht_api), ``quelle`` (Adresse), ``gezaehlt_um`` und
+Dieses Paket zählt, getrennt vom Sammler, was eine Liste des Anbieters an Modellen
+führt: eigene Adressen (``QUELLEN``), ein Abruf je Quelle über den robots.txt-treuen
+Weg (``geraete_abruf``), eigene Leser (``leser``). Es importiert keinen Parser und
+keinen Adapter aus ``collect.geraete`` (Test ``test_geraete_soll_leser``); aus
+``collect`` nur ``http``. An jeder Zahl stehen ``art``, ``quelle``, ``gezaehlt_um`` und
 ``gleiche_quelle_wie_sammler``.
 
-Stufe 1 zählt Modelle. Speicher nennt keine der Listen vollständig (``speicher_grund``),
-Kombinationen (Speicher × Tarif × Laufzeit) zählt Stufe 2 im Browser
-(``geraete_vollstaendigkeit.SichtbareAuswahl``). Ein Soll, das nicht zu zählen ist,
-ist ``None`` mit Grund, nie 0 und nie das Ist.
+Alle vier Listen dieser Stufe (Vodafone, o2, 1&1, congstar) liest auch der Sammler;
+sie zeigen also, ob die Messung ihre eigene Liste ganz abgearbeitet hat, nicht, was der
+Anbieter unabhängig davon anbietet. Ein unabhängiges Soll zählt Stufe 2 im Browser aus
+der sichtbaren Übersicht (``geraete_vollstaendigkeit.SichtbareAuswahl``). Telekom und
+Saturn/MediaMarkt haben in dieser Stufe kein Soll (``OHNE_SOLL``): die Telekom-Sitemap
+führte am 21.11.2026 14 Modelle, die die Übersicht als nicht im Angebot zeigt, und ließ
+21 angebotene weg; die Tarifwelt-Sitemap nennt kein Netz. Ein Soll, das nicht zu zählen
+ist, ist ``None`` mit Grund, nie 0 und nie das Ist.
+
+Zeitbudget (CLAUDE.md Regel 8): ``RESERVE_SEKUNDEN`` (Quellen × ``SEKUNDEN_JE_ABRUF``)
+hält die Tarifwelt-Stufe nach sich frei (``geraete_tarifwelt.RESERVE_NACH_STUFE``).
 """
 
 from __future__ import annotations
@@ -38,7 +44,14 @@ ART_API = "uebersicht_api"
 KENNUNG = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 GRUND_ZEIT = "Zeitbudget des Laufs erschöpft, Liste nicht abgerufen"
 SPEICHER_FEHLT = "Die Liste des Anbieters nennt keine Speichergrößen"
-SPEICHER_TEILWEISE = "Die Sitemap nennt nicht jede Speichergröße"
+GRUND_TELEKOM = "wird in Stufe 2 im Browser aus der Übersicht gezählt"
+GRUND_SATURN = (
+    "Soll je Netz nicht zählbar (Sitemap ohne Netz); Stufe 2 zählt die "
+    "Tarifwelt-Übersicht je Netz im Browser"
+)
+SEKUNDEN_JE_ABRUF = 45.0
+"""Höchstdauer eines Abrufs: robots.txt und Liste je ein Timeout
+(``http.timeout_seconds`` in ``config/settings.yaml``, 20 s), plus 5 s."""
 SATURN_NETZE = (
     "Saturn/MediaMarkt · Telekom-Netz",
     "Saturn/MediaMarkt · Vodafone-Netz",
@@ -61,15 +74,6 @@ class Quelle:
 
 
 QUELLEN: tuple[Quelle, ...] = (
-    Quelle(
-        ("Telekom",),
-        "Telekom",
-        "https://www.telekom.de/content/robots/sitemap",
-        ART_SITEMAP,
-        False,
-        _leser.telekom_sitemap,
-        SPEICHER_TEILWEISE,
-    ),
     Quelle(
         ("Vodafone",),
         "Vodafone",
@@ -104,15 +108,16 @@ QUELLEN: tuple[Quelle, ...] = (
         True,
         _leser.congstar_sitemap,
     ),
-    Quelle(
-        SATURN_NETZE,
-        "MediaMarkt/Saturn Tarifwelt",
-        "https://tarife.mediamarkt.de/sitemap.xml",
-        ART_SITEMAP,
-        False,
-        _leser.tarifwelt_sitemap,
-    ),
 )
+
+OHNE_SOLL: dict[str, str] = {
+    "Telekom": GRUND_TELEKOM,
+    **{netz: GRUND_SATURN for netz in SATURN_NETZE},
+}
+"""Anbieterzeilen ohne Soll in Stufe 1, mit Grund (Modulkopf)."""
+
+RESERVE_SEKUNDEN = len(QUELLEN) * SEKUNDEN_JE_ABRUF
+"""Zeit, die nach der Tarifwelt-Stufe für alle Soll-Abrufe frei bleibt."""
 
 
 @dataclass
@@ -131,9 +136,9 @@ class SollModell:
 class Soll:
     """Das Soll einer Quelle; ``modelle`` ``None`` heißt nicht zählbar (``grund``)."""
 
-    art: str
-    quelle: str
-    gleiche_quelle_wie_sammler: bool
+    art: str | None
+    quelle: str | None
+    gleiche_quelle_wie_sammler: bool | None
     gezaehlt_um: str
     speicher_grund: str
     modelle: dict[str, SollModell] | None = None
@@ -176,7 +181,7 @@ def ordne_zu(funde: list[Fund], katalog: Katalog) -> dict[str, SollModell]:
             schluessel = geraet.device_id
             name = anzeigename(geraet)
         else:
-            schluessel, name = normalize_url(fund.url), fund.titel
+            schluessel, name = normalize_url(fund.url), _leser.lesbar(fund.titel)
         alt = modelle.get(schluessel)
         if alt is None:
             modelle[schluessel] = SollModell(
@@ -261,4 +266,7 @@ def zaehle_alle(
             soll = zaehle(quelle, gebremst, kopf, jetzt, katalog)
         for zeile in quelle.zeilen:
             ergebnis[zeile] = soll
+    jetzt = uhr().isoformat(timespec="seconds")
+    for zeile, grund in OHNE_SOLL.items():
+        ergebnis[zeile] = Soll(None, None, None, jetzt, grund, grund=grund)
     return ergebnis

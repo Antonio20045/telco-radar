@@ -6520,6 +6520,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-vs-unbenannt{color:var(--ink)}
 .gr-vs-grund,.gr-vs-extra,.gr-vs-quelle{margin:4px 0 0 16px;font-size:12px;color:var(--ink-3)}
 .gr-vs-fehlt,.gr-vs-weitere{margin:4px 0 0;font-size:12px;color:var(--ink-3)}
+.gr-vs-ausfall{margin:2px 0 0 16px;font-size:12px;color:var(--red-text)}
 @media (max-width:720px){
   .gr-vs-liste{grid-template-columns:minmax(0,1fr);gap:2px 0}
 }
