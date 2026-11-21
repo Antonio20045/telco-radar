@@ -19,6 +19,12 @@ alles liegen und das Manifest lässt das Paar aus. ``--nur-lesen`` löscht nicht
 Manifest, dass es nicht erneuert wurde (Handarbeit und Notweg); die Seite nennt den
 Grund als Ausfall.
 
+Bilder der Gegenprobe (``gegenprobe-*``, ``gegenprobe_ablage``): gelöscht wird nur, was
+nicht in ``data/state/gegenprobe/verlinkt.json`` steht (``gegenprobe_belege``: die Seite
+zeigt es nicht mehr) und älter als ``MINDEST_TAGE`` ist, mit eigenem Budget
+``GEGENPROBE_LOESCH_S``. Was bleibt, steht im Manifest unter ``gegenprobe``; ohne
+lesbare oder frische Verweisliste wird nichts gelöscht.
+
 Frist und Exit-Code: Der Schritt in ``geraete.yml`` hat 5 min und darf den Commit
 des Messtags nie sperren, und die Workflow-Datei bleibt, wie sie ist. Deshalb hält
 das Skript selbst ``GESAMT_FRIST_S`` ein: Das Timeout jedes ``gh``-Aufrufs ist die
@@ -70,6 +76,17 @@ from telco_radar.beleg_veraltet import (
     ohne_stellen,
     streitpaare,
 )
+from telco_radar.gegenprobe_ablage import (
+    SCHLUESSEL as GEGENPROBE,
+)
+from telco_radar.gegenprobe_ablage import (
+    GhGegenprobe,
+    Plan,
+    als_abschnitt,
+    plane,
+)
+from telco_radar.gegenprobe_ablage import raeume_auf as raeume_gegenprobe_auf
+from telco_radar.gegenprobe_belege import MINDEST_TAGE, lies_verlinkt
 from telco_radar.klick_vertrag import ORDNER as KLICK_ORDNER
 from telco_radar.klick_vertrag import lies_ergebnisse
 
@@ -87,6 +104,11 @@ bleibt liegen, heißt „aufgeschoben (Zeit)“ und kommt im nächsten Lauf dran
 44858465074: fünf abgelaufene Releases mit je bis zu 900 Bildern, ``gh release
 delete`` antwortet seit dem 20.11.2026 jedes Mal mit HTTP 502 (gemessen 43 s je
 Release mit drei Versuchen); ohne Budget kostete das jeden Lauf die ganze Frist."""
+GEGENPROBE_LOESCH_S = 40.0
+"""Löschbudget für Gegenprobe-Bilder nach dem der Klick-Belege; der Rest kommt am
+nächsten Tag dran (ein Release ohne verlinktes Bild ist ein Aufruf)."""
+VERWEIS_HOECHSTENS_TAGE = 2
+"""Ist ``verlinkt.json`` älter, löscht dieser Lauf keine Gegenprobe-Bilder."""
 OK = 0
 FEHLER_FRIST_ODER_LAUF = (
     GhFehler,
@@ -177,7 +199,48 @@ def entscheide_veraltete(anhaenge: dict[str, list[str]], gh: Releases) -> Veralt
         return Veraltet(offen=sorted("/".join(p) for p in paare))
 
 
-def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | None:
+def gegenprobe_plan(root: Path, heute: date, gh: Releases | None) -> Plan | None:
+    """Was von den Gegenprobe-Bildern gelöscht wird und was bleibt; None, wenn die
+    Releases nicht lesbar sind (dann kein Abschnitt im Manifest, nichts gelöscht)."""
+    if gh is None:
+        return None
+    try:
+        anhaenge = gh.anhaenge()
+    except GhFehler as fehler:
+        print(f"::error::Gegenprobe-Bilder: Releases nicht lesbar: {fehler}")
+        return None
+    try:
+        verweis = lies_verlinkt(root)
+    except ValueError as fehler:
+        print(f"::error::Gegenprobe-Bilder: Verweisliste unlesbar: {fehler}")
+        verweis = None
+    if verweis is None or (heute - verweis[0]).days > VERWEIS_HOECHSTENS_TAGE:
+        print("Gegenprobe-Bilder: keine frische Verweisliste, nichts gelöscht")
+        return Plan([], [], {t: list(n) for t, n in anhaenge.items()})
+    return plane(anhaenge, verweis[1], heute, MINDEST_TAGE)
+
+
+def loesche_gegenprobe(plan: Plan | None, gh: Releases | None) -> list[str]:
+    """Löscht nach ``plan`` mit ``GEGENPROBE_LOESCH_S``; gibt die Fehler zurück."""
+    if plan is None or gh is None:
+        return []
+    ende = time.monotonic() + GEGENPROBE_LOESCH_S
+    bilanz = raeume_gegenprobe_auf(plan, gh, lambda: time.monotonic() < ende)
+    print(
+        f"Gegenprobe-Bilder: {len(bilanz.releases_geloescht)} Releases und "
+        f"{bilanz.assets_geloescht} Bilder gelöscht, {bilanz.ausgelassen} "
+        "aufgeschoben (Zeit)"
+    )
+    return bilanz.fehler
+
+
+def erneuere(
+    root: Path,
+    heute: date,
+    nur_lesen: bool,
+    gh: Releases,
+    gh_gegenprobe: Releases | None = None,
+) -> str | None:
     """Liest, räumt auf, schreibt das Manifest; gibt den Ausfallgrund zurück oder
     ``None``.
 
@@ -203,6 +266,9 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
     manifest = baue_manifest(
         ohne_stellen(anhaenge, veraltet.loeschen), heute, lies_folgen(ergebnisse)
     )
+    plan = gegenprobe_plan(root, heute, gh_gegenprobe)
+    if plan is not None:
+        manifest[GEGENPROBE] = als_abschnitt(heute, plan.bleibt)
     schreibe(root / MANIFEST_DATEI, manifest)
     bilanz, geloescht = Bilanz(), 0
     if not nur_lesen:
@@ -222,6 +288,7 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
                     geloescht += 1
                 except GhFehler as fehler:
                     bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
+            bilanz.fehler += loesche_gegenprobe(plan, gh_gegenprobe)
         except Gesamtfrist as fehler:
             bilanz.fehler.append(f"Löschen abgebrochen: {fehler}")
     gross = sum(1 for b in manifest["belege"] if b["gross"])
@@ -268,10 +335,13 @@ def main(
         vermerke_ausfall(args.root, args.melde_ausfall, heute)
         return OK
     ende = time.monotonic() + GESAMT_FRIST_S - SCHREIB_RESERVE_S
-    gh = gh or Gh(lauf_mit_wiederholung(runner_mit_frist(ende, lauf=lauf)))
+    gh_gegenprobe = None
+    if gh is None:
+        runner = lauf_mit_wiederholung(runner_mit_frist(ende, lauf=lauf))
+        gh, gh_gegenprobe = Gh(runner), GhGegenprobe(runner)
     try:
         with wachhund(GESAMT_FRIST_S):
-            grund = erneuere(args.root, heute, args.nur_lesen, gh)
+            grund = erneuere(args.root, heute, args.nur_lesen, gh, gh_gegenprobe)
     except (Gesamtfrist, *FEHLER_FRIST_ODER_LAUF) as fehler:
         grund = f"{type(fehler).__name__}: {fehler}"
     if grund:

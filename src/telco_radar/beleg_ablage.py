@@ -127,7 +127,10 @@ def runner_mit_frist(
 
 
 class Gh:
-    """Die Release-Aufrufe der GitHub-CLI; ``runner`` ist im Test austauschbar."""
+    """Die Release-Aufrufe der GitHub-CLI (``runner`` im Test austauschbar); welche
+    Releases sie liest, sagt ``_schema`` (``gegenprobe_ablage``: die Gegenprobe)."""
+
+    _schema = staticmethod(ist_beleg_tag)
 
     def __init__(self, runner: Runner = _lauf, repo: str = REPO) -> None:
         self._runner, self._repo = runner, repo
@@ -147,10 +150,8 @@ class Gh:
         return fertig.stdout or ""
 
     def _releases(self, feld: str, jq: str) -> dict[str, Any]:
-        """Je Belege-Release das ``feld``, das ``jq`` aus dem Release bildet.
-
-        Eine Zeile JSON je Release (``--paginate`` mit ``--jq``), damit seitenweises
-        Lesen kein Listenende zerreißt; ``GhFehler`` bei Lese- und Formatfehlern."""
+        """Je Release im Schema ``feld`` aus ``jq``, eine JSON-Zeile je Release (Listen
+        reißen beim Blättern nicht); ``GhFehler`` bei Lese- und Formatfehlern."""
         argv = ["api", "--paginate", f"repos/{self._repo}/releases?per_page=100"]
         ausgabe = self._gh(*argv, "--jq", f".[] | {{tag: .tag_name, {feld}: {jq}}}")
         ergebnis: dict[str, Any] = {}
@@ -162,7 +163,7 @@ class Gh:
                 tag, wert = str(eintrag["tag"]), eintrag[feld]
             except (ValueError, KeyError, TypeError) as fehler:
                 raise GhFehler(f"gh api: Antwort unlesbar: {fehler}") from fehler
-            if ist_beleg_tag(tag):
+            if self._schema(tag):
                 ergebnis[tag] = wert
         return ergebnis
 
