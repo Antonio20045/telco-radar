@@ -9,8 +9,11 @@ die Zeitreihe (``geraete_rechenweg._buendel_aus_messung``); das eingefrorene ``g
 der Historie stammt bis 19.11.2026 aus einer anderen Formel und zählt hier nicht.
 
 Jede Änderung trägt den Beleg beider Tage (``geraete_preisbeleg.beleg``): Quelle,
-gelesen am, Rechenweg, Screenshot (Messung des Tages, sonst das Bild der Gegenprobe)
-und Gegenprobe des Tages. Fehlt etwas, sagt der Beleg es.
+Messzeit, Rohwerte, Rechenweg, Konfigurationsbild und Gegenprobe. Der neue Preis zeigt
+die Gegenprobe seines Tages (``gegenprobe_belege.neuer_preis``), der alte die letzte
+gute Prüfung des alten Preises davor (``alter_preis``), beide mit ihrem Bild, solange
+es aufbewahrt wird (``gegenprobe_belege.aufbewahrt``). Fehlt etwas, sagt der
+Beleg es mit Grund.
 """
 
 from __future__ import annotations
@@ -20,11 +23,14 @@ import io
 import logging
 import shutil
 from collections.abc import Callable
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from .. import gegenprobe as gp
+from .. import gegenprobe_belege as gbel
 from .. import tco_historie
 from ..analyze.beleg_position import lies_buendel
+from ..gegenprobe_ablage import Liste
 from ..tco_model import kosten_ueber
 from . import anbieter_farben
 from .geraete_preisbeleg import Gegenproben, angebot, beleg, datum_de
@@ -107,9 +113,13 @@ def _tag(
     satz: dict,
     stand: dict,
     tarife: dict,
-    gegenproben: Gegenproben,
+    probe: gp.Ergebnis | None,
     bild: dict | None,
+    belege: Belegkontext,
+    ohne_probe: str,
 ) -> dict:
+    """Ein Tag einer Änderung: Gesamtkosten und Beleg mit ``probe`` (Gegenprobe des
+    Tages bzw. letzte gute des alten Preises) und dem Klick-Bild als Zusatz."""
     gesamt, schritte = _kosten(satz, stand, tarife)
     datum = satz.get("datum") or ""
     return {
@@ -122,9 +132,23 @@ def _tag(
             schritte=schritte,
             gesamt=gesamt,
             bild=bild,
-            gegenprobe=gegenproben.am(satz["id"], datum),
+            gegenprobe=probe,
+            posten=satz,
+            liste=belege.liste,
+            datum=belege.datum,
+            ohne_probe=ohne_probe,
         ),
     }
+
+
+@dataclass(frozen=True)
+class Belegkontext:
+    """Was die Belege eines Änderungstags teilen: Liste der aufbewahrten Bilder,
+    Stand der Seite und Tag der Änderung."""
+
+    liste: Liste | None
+    datum: str
+    tag: str
 
 
 def aufbereiten(
@@ -133,6 +157,7 @@ def aufbereiten(
     gegenproben: Gegenproben,
     zeilenbild: Callable[[dict], dict | None],
     tarife: dict | None = None,
+    liste: Liste | None = None,
 ) -> list[dict]:
     """Die Tage mit Änderungen, jüngster zuerst; je Tag die Änderungen, größte zuerst.
 
@@ -143,6 +168,10 @@ def aufbereiten(
     Tarif, Raten, Farbe und das Bild der heutigen Messung über ``zeilenbild``).
     """
     bestand = {b["id"]: b for b in lies_buendel(state_dir / BESTAND) if b.get("id")}
+    stand = max(
+        (str(b.get("abgerufen_am") or "") for b in bestand.values()), default=""
+    )
+    kontext = Belegkontext(liste, stand, "")
     zuletzt: dict = {}
     tage: list[dict] = []
     offen: dict[str, tuple[dict, dict]] = {}
@@ -164,6 +193,7 @@ def aufbereiten(
                 tarife,
                 gegenproben,
                 zeilenbild,
+                replace(kontext, tag=tag),
             )
             offen[satz["id"]] = (eintrag, dict(vorher))
             aenderungen.append(eintrag)
@@ -182,7 +212,9 @@ def aufbereiten(
     return sorted(tage, key=lambda t: t["datum"], reverse=True)
 
 
-def _aenderung(satz, vorher, bestand, karten, tarife, gegenproben, zeilenbild) -> dict:
+def _aenderung(
+    satz, vorher, bestand, karten, tarife, gegenproben, zeilenbild, kontext
+) -> dict:
     bid = satz["id"]
     stand = _stand(bid, bestand)
     karte = karten.get(bid) or karten.get(angebot(bid))
@@ -195,8 +227,11 @@ def _aenderung(satz, vorher, bestand, karten, tarife, gegenproben, zeilenbild) -
                 "datum": gefunden["datum"],
                 "art": "Messung",
             }
-    alt = _tag(vorher, stand, tarife, gegenproben, None)
-    neu = _tag(satz, stand, tarife, gegenproben, bild)
+    tag = kontext.tag
+    alt_probe = gbel.alter_preis(gegenproben, vorher, tag)
+    neu_probe = gbel.neuer_preis(gegenproben, satz, tag)
+    alt = _tag(vorher, stand, tarife, alt_probe, None, kontext, gbel.GRUND_KEIN_ALTER)
+    neu = _tag(satz, stand, tarife, neu_probe, bild, kontext, gbel.GRUND_KEIN_NEUER)
     delta = (
         round(neu["gesamt"] - alt["gesamt"], 2)
         if neu["gesamt"] is not None and alt["gesamt"] is not None
@@ -293,6 +328,7 @@ def seiten(env, geraete: dict, site_dir: Path) -> dict[Path, str]:
             belege.gegenproben,
             belege.zeilenbild,
             geraete.get("tarife") or {},
+            getattr(belege, "liste", None),
         )
     except (OSError, ValueError, KeyError, TypeError) as fehler:
         log.error("Preisänderungen nicht aufbereitbar: %s", fehler)

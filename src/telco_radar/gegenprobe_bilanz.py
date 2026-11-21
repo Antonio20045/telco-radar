@@ -7,13 +7,16 @@ Definition wie die Seite): wie viele im Fenster gegengeprüft sind
 die die Seite als Gegenprobe des Preises zeigt), mit welchem Status, wie viele
 überfällig sind und wie viele davon nicht prüfbar mit welchem Grund
 (``gegenprobe_reihe.fehlerart``).
+Dazu ``mit_bild``: wie viele davon ein Bild der ganzen Konfiguration haben
+(``gegenprobe_belege.bild_ganz``, dasselbe Bild, das die Seite am Preis zeigt).
 Dazu aus den Läufen des Tages Seitenbesuche, Sekunden je Besuch, Bündel je Besuch und
 jeder Ausfall (Schutzschalter, Sperre) mit Grund. Anteile rechnet nur dieses Modul;
 wer sie zeigt oder prüft, liest die Felder der Datei
 ``data/state/gegenprobe/bilanz/<datum>.json``.
 
 ``lege_ab`` ist der Abschluss jedes Laufs: Zeilen in die Tagesdatei ergänzen
-(``gegenprobe.ergaenze_tag``), die Läufe des Tages fortschreiben, Bilanz neu rechnen.
+(``gegenprobe.ergaenze_tag``), die Läufe des Tages fortschreiben, Bilanz neu rechnen
+und die verlinkten Bilder schreiben (``gegenprobe_belege.verlinkte``).
 Derselbe Weg für den einzelnen Job und für das Ablegen der Teildateien einer Matrix.
 """
 
@@ -26,7 +29,9 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 
 from . import gegenprobe as gp
+from . import tco_historie
 from .analyze.geraete_pruefstatus import buendel_aus_satz
+from .gegenprobe_belege import bild_ganz, schreibe_verlinkt, verlinkte
 from .gegenprobe_fenster import GEGENPROBE_FENSTER_TAGE, Gegenproben, im_fenster
 from .gegenprobe_reihe import fehlerart
 from .tco_model import kosten_ueber
@@ -34,6 +39,7 @@ from .tco_model import kosten_ueber
 log = logging.getLogger(__name__)
 
 BILANZ_ORDNER = gp.ORDNER / "bilanz"
+HISTORIE = Path("data") / "state" / "geraete_tco_historie.jsonl"
 FORMAT = 1
 ZAEHLER = (
     "angezeigt",
@@ -42,6 +48,7 @@ ZAEHLER = (
     "ueberfaellig",
     "nicht_pruefbar",
     "heute_geprueft",
+    "mit_bild",
 )
 MESSUNG = ("besuche", "buendel_besucht", "sekunden", "zurueckgestellt")
 """Was die Läufe des Tages messen; fehlt ein Lauf oder ein Wert, ist es None mit
@@ -149,6 +156,7 @@ def _zaehle(e: dict, datum: str, satz: Mapping, gegenproben: Gegenproben) -> Non
         e["im_fenster"] += 1
         e[gute.status] += 1
         e["heute_geprueft"] += int(gute.datum == datum)
+        e["mit_bild"] += int(bild_ganz(gute))
         return
     e["ueberfaellig"] += 1
     versuch = gegenproben.letzter_versuch(bid, preis, satz)
@@ -223,6 +231,18 @@ def lies_bilanz(pfad: Path) -> dict:
     return daten
 
 
+def juengste(ordner: Path, stichtag: str = "") -> tuple[str, dict] | None:
+    """(Tag, Bilanz) der jüngsten Bilanzdatei in ``ordner`` (``BILANZ_ORDNER``) bis
+    ``stichtag`` (ohne: die jüngste); None ohne Datei, ``GegenprobeFehler`` bei einer
+    unlesbaren."""
+    dateien = sorted(
+        p for p in ordner.glob("*.json") if not stichtag or p.stem <= stichtag
+    )
+    if not dateien:
+        return None
+    return dateien[-1].stem, lies_bilanz(dateien[-1])
+
+
 def _laufkennung(lauf: Mapping) -> str:
     """Ein Eintrag je Lauf UND Anbieter (ein Sammeljob hat mehrere Anbieter)."""
     kennung = lauf.get("lauf_id")
@@ -272,4 +292,8 @@ def lege_ab(
     pfad.parent.mkdir(parents=True, exist_ok=True)
     text = json.dumps(bilanz, ensure_ascii=False, indent=1, sort_keys=True)
     pfad.write_text(text + "\n", encoding="utf-8")
+    tage = tco_historie.tage(wurzel / HISTORIE)
+    schreibe_verlinkt(
+        wurzel, datum, verlinkte(datum, angezeigt, gesamt_von, proben, tage)
+    )
     return bilanz
