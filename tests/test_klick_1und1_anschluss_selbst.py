@@ -169,6 +169,9 @@ def _fahre_mit_502_am_detail_endpunkt(schluessel: str) -> dict:
 
     def lies(adresse, _ende):
         uhr.jetzt += 3
+        if "chosenTariff=" not in adresse:
+            teil = {"adresse": adresse, "status": "gelesen", "grund": None}
+            return {**teil, "seiten": [teil], "saetze": [], "vollstaendig": True}
         teil = {
             "adresse": adresse,
             "status": LAUF_GESTOERT,
@@ -203,6 +206,18 @@ def test_detail_endpunkt_mit_502_kostet_keine_geraeteseite(schluessel):
     tarifdetail = [u for u in daten["uebersichten"] if "chosenTariff=" in u["adresse"]]
     assert len(tarifdetail) == 7
     assert {u["status"] for u in tarifdetail} <= {"gestoert", "nicht_besucht"}
+
+
+def test_geraeteliste_vor_den_tarifdetail_seiten_bleibt_lesbar():
+    """Prüfer zu PR 199: ``/smartphones`` (die Liste, aus der ``seiten_aus_uebersicht``
+    die Seiten beider 1&1-Einträge bildet) stand hinter den Tarifdetail-Seiten; drei
+    502 dort ließen sie ``nicht_besucht``, die Kacheln alterten. Reihenfolge jetzt:
+    Produktseiten, Geräteliste, Tarifdetail-Seiten."""
+    daten = _fahre_mit_502_am_detail_endpunkt("1und1")
+
+    liste = [u for u in daten["uebersichten"] if u["adresse"].endswith("/smartphones")]
+    assert [u["status"] for u in liste] == ["gelesen"]
+    assert daten["uebersichten"][0] is liste[0]
 
 
 def _anschluss_datei(preise: dict[str, float], datum: str = HEUTE) -> dict:

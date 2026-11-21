@@ -229,6 +229,13 @@ anbieter:
     # demselben Tarif (Pitch 2, Schnitt 3; seit 20.11.2026 über den Namen der Kachel,
     # Unlimited XL heißt dort `…-xl-mvl`, hier `…-xl-ovl`).
     uebersichten:
+      # Die Geräteübersicht: je Kachel der Produktlink (`klickraster.liste_saetze`),
+      # daraus die Seiten beider 1&1-Einträge (`seiten_aus_uebersicht`, ab dem Lauf
+      # danach); vor den Tarifdetail-Seiten, damit drei 502 dort sie nicht kosten.
+      # Die sieben Geräteraster (smartphones-all-net-flat-s …) stehen seit
+      # 20.11.2026 nicht mehr hier: sie lesen sich seit dem Shop-Umbau nicht mehr, und
+      # jede Produktseite liest alle sieben Tarife selbst (Tarifauswahl im Bestellweg).
+      - https://mobile.1und1.de/smartphones
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false
@@ -236,15 +243,10 @@ anbieter:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
-      # Die Geräteübersicht: je Kachel der Produktlink (`klickraster.liste_saetze`),
-      # daraus die Seiten beider 1&1-Einträge (`seiten_aus_uebersicht`, ab dem Lauf
-      # danach). Die sieben Geräteraster (smartphones-all-net-flat-s …) stehen seit
-      # 20.11.2026 nicht mehr hier: sie lesen sich seit dem Shop-Umbau nicht mehr, und
-      # jede Produktseite liest alle sieben Tarife selbst (Tarifauswahl im Bestellweg).
-      - https://mobile.1und1.de/smartphones
-    # Übersichten NACH den Produktseiten: drei HTTP 502 der Tarifdetail-Seiten in Folge
-    # beenden den Eintrag (`klickwiederholung`); davor gelesen kosteten sie alle
-    # Geräteseiten (21.11.2026), danach nur den Anschlusspreis.
+    # Übersichten NACH den Produktseiten, erst die Geräteliste, dann die
+    # Tarifdetail-Seiten: drei HTTP 502 dort in Folge beenden den Eintrag
+    # (`klickwiederholung`); zuerst gelesen kosteten sie alle Geräteseiten
+    # (21.11.2026), zuletzt nur den Anschlusspreis.
     uebersichten_zuletzt: true
     # Seiten (seit 20.11.2026) aus den Kacheln der Geräteübersicht des letzten
     # abgelegten Laufs (data/state/klick/1und1.json, `klickliste_kacheln`): je Gerät

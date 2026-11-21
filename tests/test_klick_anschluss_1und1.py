@@ -110,7 +110,7 @@ def test_tagesdatei_1und1_hat_sieben_uebersichten():
     anbieter = lade_quellen(wurzel).nach_name("1&1")
     klick = [e.url for e in anbieter.klick_einstiege if e.kind == "klick"]
 
-    assert einsundeins.uebersichten[:7] == DETAILS
+    assert einsundeins.uebersichten[-7:] == DETAILS
     assert tuple(klick[:7]) == DETAILS
 
 
