@@ -1,12 +1,10 @@
 """Abdeckung der Bündel: welcher Anbieter liefert welches Gerät in welchem
 Tarif, und was ist seit dem letzten Messtag weggefallen oder gesprungen.
 
-Der ältere Wächter (`GeraeteDB.ausfall_alarme`) schlägt nur an, wenn ein
-Anbieter GESTERN noch lieferte. Die Telekom lieferte seit dem 15.09.2026
-kein Bündel mehr, und kein Lauf wurde rot: wer schon ausgefallen ist, fällt
-diesem Vergleich nie wieder auf. Diese Prüfung misst deshalb gegen eine feste
-Pflichtliste (`config/geraete_abdeckung.yaml`), nicht gegen den Vortag, und
-sie misst die Bündel, aus denen die Leitzahl „Kosten über 24 Monate“ entsteht.
+Der ältere Wächter (`GeraeteDB.ausfall_alarme`) schlägt nur an, wenn ein Anbieter
+GESTERN noch lieferte (Telekom ab 15.09.2026 ohne Bündel, kein Lauf wurde rot).
+Diese Prüfung misst gegen eine feste Pflichtliste (`config/geraete_abdeckung.yaml`)
+die Bündel, aus denen die Leitzahl „Kosten über 24 Monate“ entsteht.
 
 Sechs Befundarten, jede für sich rot:
 
@@ -26,12 +24,12 @@ Sechs Befundarten, jede für sich rot:
 * ``luecke_abgelaufen`` eine belegte Lücke ist über ihr Ablaufdatum ``bis``
                         hinaus (Messtag > ``bis``): neu prüfen oder streichen
 
-Eine belegte Lücke (Anbieter führt das Gerät nicht, Anbieter nicht
-erreichbar) ist kein Befund, sie steht aber mit ihrem Grund in der Matrix.
-Jede trägt ``geprueft`` und ``bis``, höchstens ``LUECKE_MAX_TAGE`` Tage nach
-``geprueft``: eine Ausnahme verjährt, sie wird nicht vergessen. Ist ein Bündel
-für eine belegte Lücke wieder da, ist die Ausnahme überholt: das ist kein
-Befund, aber eine laute Warnung (``Abdeckung.warnungen``).
+Eine belegte Lücke (Anbieter führt das Gerät nicht, nicht erreichbar) ist kein
+Befund, steht aber mit Grund in der Matrix. Jede trägt ``geprueft`` und ``bis``
+(höchstens ``LUECKE_MAX_TAGE`` Tage danach): sie verjährt. Ist ihr Bündel wieder da,
+ist sie überholt: eine laute Warnung (``Abdeckung.warnungen``). Belegt ist auch ein
+Gerät, dessen Seite ein Klick-Lauf am Messtag wegen Ausfalls nicht las
+(``klick_ausfall``, 21.11.2026).
 """
 
 from __future__ import annotations
@@ -48,6 +46,7 @@ from .. import abdeckung_pflicht as pflichten
 from .. import rechenweise, tco_historie
 from ..geraete_model import normalisiere
 from .buendel_angebot import angebot_ohne_farbe, modell_und_speicher
+from .klick_ausfall import luecken_im_repo
 from .kombi_frische import frisch_im_bestand
 
 KOMBI_VERLUST_ANTEIL = 0.10
@@ -349,6 +348,8 @@ def lade_und_pruefe(root: Path) -> Abdeckung:
     if tco_historie.vorhanden(pfad):
         historie = [json.loads(z) for z in tco_historie.zeilen(pfad) if z.strip()]
     pflicht = lade_pflicht(root / "config" / "geraete_abdeckung.yaml")
+    ausfall = luecken_im_repo(root, tco.get("updated"))
+    pflicht["luecken"] = {**ausfall, **pflicht["luecken"]}
     return pruefe(tco, historie, pflicht)
 
 

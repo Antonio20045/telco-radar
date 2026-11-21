@@ -42,6 +42,7 @@ from collections.abc import Callable, Mapping
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
+from ...klick_vertrag import GRUND_NACH_STOERUNG, GRUND_ZEITUEBERSCHREITUNGEN
 from .basis import GeraeteAbrufFehler
 from .klick_vorrang import VORRANG_GERAETE
 from .klickcrawler import klicke_durch
@@ -85,10 +86,8 @@ RESERVE_S = 8 * 60
 MINDESTZEIT_SEITE_S = 3 * 60
 ZEIT_JE_SEITE_S = 25 * 60
 GRUND_BUDGET = "Zeitbudget des Jobs erschöpft"
-GRUND_NACH_STOERUNG = "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4)"
 GRUND_PARALLEL = "verschoben"
 HOECHSTE_ZEITUEBERSCHREITUNGEN = 2
-GRUND_ZEITUEBERSCHREITUNGEN = "Seiten luden nicht"
 HOECHSTE_SEITENFORMEN_IN_FOLGE = 3
 VORRANG_TARIF = "tariffId=MF_17791"
 GRUND_SEITENFORMEN = "Seiten in Folge mit anderer Form"
