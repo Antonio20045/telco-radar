@@ -38,6 +38,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from .gegenprobe_reihe import reihum
+
 log = logging.getLogger(__name__)
 
 BESTAETIGT = "bestaetigt"
@@ -312,28 +314,32 @@ def auswahl(
     vorher: Iterable[Mapping],
     je_anbieter: int = STICHPROBE_JE_ANBIETER,
 ) -> list[tuple[str, str]]:
-    """Die Bündel, die ``datum`` prüft: (Bündel-Schlüssel, Anlass), Änderungen zuerst.
+    """Die Bündel, die ``datum`` prüft: (Bündel-Schlüssel, Anlass) in Prüfreihenfolge.
 
     ``heute`` sind die Historienzeilen des Tages, ``vorher`` je Bündel die letzte
-    Messung davor (``letzte_messungen``). Jede Änderung nach ``aenderungen`` kommt dran,
-    die größte zuerst (``gewicht``); dazu je Anbieter ``je_anbieter`` unveränderte,
-    zufällig, aber je Datum und Anbieter fest (Zufall aus „Datum|Anbieter“).
+    Messung davor (``letzte_messungen``). Jede Änderung nach ``aenderungen`` kommt dran;
+    dazu je Anbieter ``je_anbieter`` unveränderte, zufällig, aber je Datum und Anbieter
+    fest (Zufall aus „Datum|Anbieter“). Fair, weil das Zeitbudget nicht immer reicht
+    (``gegenprobe_reihe``): zuerst jede Stichprobe reihum, dann die Änderungen reihum
+    über die Anbieter, je Anbieter die größte zuerst (``gewicht``).
     """
     tag = gemessen(heute, datum)
     alt = {z["id"]: z for z in vorher if z.get("id")}
     geaenderte = sorted(aenderungen(tag, alt), key=lambda p: (-gewicht(*p), p[0]["id"]))
-    gewaehlt = [(z["id"], ANLASS_AENDERUNG) for z, _ in geaenderte]
-    schon = {bid for bid, _ in gewaehlt}
+    aenderung: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for zeile, _ in geaenderte:
+        aenderung[anbieter_aus_id(zeile["id"])].append((zeile["id"], ANLASS_AENDERUNG))
+    schon = {zeile["id"] for zeile, _ in geaenderte}
     ruhig: dict[str, list[str]] = defaultdict(list)
     for bid in tag:
         if bid not in schon:
             ruhig[anbieter_aus_id(bid)].append(bid)
-    for anbieter in sorted(ruhig):
-        kandidaten = sorted(ruhig[anbieter])
+    stichprobe: dict[str, list[tuple[str, str]]] = {}
+    for anbieter, kandidaten in ruhig.items():
         zufall = random.Random(f"{datum}|{anbieter}")
-        stichprobe = zufall.sample(kandidaten, min(je_anbieter, len(kandidaten)))
-        gewaehlt += [(bid, ANLASS_STICHPROBE) for bid in sorted(stichprobe)]
-    return gewaehlt
+        gezogen = zufall.sample(sorted(kandidaten), min(je_anbieter, len(kandidaten)))
+        stichprobe[anbieter] = [(bid, ANLASS_STICHPROBE) for bid in sorted(gezogen)]
+    return reihum(stichprobe) + reihum(aenderung)
 
 
 def kennung(buendel_id: str, datum: str) -> str:

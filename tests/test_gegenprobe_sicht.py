@@ -236,6 +236,25 @@ def test_einsundeins_liest_sichtbaren_anschlusspreis():
     assert sicht.einsundeins(text).anschlusspreis == 39.9
 
 
+def test_einsundeins_tarifauswahl_seit_dem_umbau(chromium):
+    """Preisübersicht auf der Tarifauswahl vom 21.11.2026 (Galaxy S26, 256 GB, 36
+    Monate Fix, Unlimited XL): 24,– € Gerät + 35,99 € Tarif = 59,99 €."""
+    seite = chromium.new_page()
+    try:
+        seite.set_content((FIXTURES / "1-1-tarifauswahl.html").read_text("utf-8"))
+        s = sicht.einsundeins(seite.inner_text("body"))
+    finally:
+        seite.close()
+    assert s.werte() == {"buendel_monatlich": 59.99, "laufzeit_monate": 36}
+    assert s.tarif_name == "1&1 Unlimited XL"
+    assert (s.roh["Gerät monatlich"], s.roh["Tarif monatlich (Kachel)"]) == (
+        "24,00 €",
+        "35,99 €",
+    )
+    gespeichert = {"buendel_monatlich": 59.99, "laufzeit_monate": 36}
+    assert gp.vergleiche(gespeichert, s.werte())[0] == gp.BESTAETIGT
+
+
 def test_jeder_anbieter_mit_weg_hat_einen_leser():
     from telco_radar.collect.geraete.gegenprobe_wege import WEGE
 
