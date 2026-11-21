@@ -121,8 +121,37 @@ def gleicher_slug(referenz: dict, g: dict) -> bool:
     return eigen is not None and eigen["slug"] == g["slug"]
 
 
-def _zaehle(z: dict, name: str) -> None:
-    z[name] = int(z.get(name, 0)) + 1
+def angeboten(option) -> bool:
+    """Bietet o2 diese Tarifoption zum Gerät an? Jede `pdp:TariffOptionValue` trägt
+    `disabled`; die Seite rendert damit den Knopf ihrer Tarifauswahl. Eine Option mit
+    `disabled: true` ist kein Angebot: kein Bündel, keine Probe, im Bestand altert sie.
+    Ohne das Feld (ältere Mitschnitte) gilt sie als angeboten. Gemessen 21.11.2026:
+    2.230 von 2.230 Optionen aus 190 Antworten `false` (test_o2_tarifabdeckung)."""
+    return isinstance(option, dict) and option.get("disabled") is not True
+
+
+def angebotene(pv: dict, z: dict) -> list[dict]:
+    """Die angebotenen Tarifoptionen einer Antwort (`angeboten`). Zählt `angeboten`
+    und, falls o2 welche sperrt, `nicht_angeboten`; mit `erfasst` ergibt sich die
+    Abdeckung je Lauf (`o2.saetze_aus_konfiguration`)."""
+    tarif = pv.get("tariff") or {}
+    alle = [o for o in tarif.get("tariffOptions") or [] if isinstance(o, dict)]
+    optionen = [o for o in alle if angeboten(o)]
+    _zaehle(z, "angeboten", len(optionen))
+    if len(alle) > len(optionen):
+        _zaehle(z, "nicht_angeboten", len(alle) - len(optionen))
+    return optionen
+
+
+def erfasst(z: dict, optionen: list, saetze: list) -> list:
+    """Gibt `saetze` zurück und zählt die angebotenen Optionen ohne Satz
+    (`nicht_erfasst`); 0 heißt: jeder angebotene Tarif ist ein Bündel."""
+    _zaehle(z, "nicht_erfasst", len(optionen) - len(saetze))
+    return saetze
+
+
+def _zaehle(z: dict, name: str, n: int = 1) -> None:
+    z[name] = int(z.get(name, 0)) + n
 
 
 class Referenzstand:
@@ -160,7 +189,9 @@ class Referenzstand:
         self._durchlaeufe += 1
         durchlauf: list = [start]
         for option in (start.get("tariff") or {}).get("tariffOptions") or []:
-            if option.get("selected") or not self._link(option):
+            if option.get("selected") or not angeboten(option):
+                continue
+            if not self._link(option):
                 continue
             if not self._weiter():
                 durchlauf.append(None)
@@ -280,6 +311,7 @@ class Referenzstand:
             and geraet not in ungelesen
             and len(ungelesen) < PROBEN_JE_ANZEIGE
             and not option.get("selected")
+            and angeboten(option)
             and self._link(option)
             and anzeigen.count(anzeige) == 1
         )
