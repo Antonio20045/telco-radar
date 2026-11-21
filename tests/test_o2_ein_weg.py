@@ -32,4 +32,4 @@ def test_keine_o2_seite_im_klick_tageslauf():
 
 
 def test_gegenprobe_die_anderen_klick_anbieter_bleiben():
-    assert {"Vodafone", "Telekom", "1&1", "congstar"} <= set(geplante_anbieter(WURZEL))
+    assert {"Vodafone", "Telekom", "1&1"} <= set(geplante_anbieter(WURZEL))

@@ -27,18 +27,26 @@ Die Seite füllt Lücken mit Werten bis drei Tage alt. Darum sieht 1&1 dort voll
 
 Gemessen am Geräte-Lauf 44728882384 (20.11.2026, Abrufe und Zeiten aus dem Log), am Klick-Lauf 44657948984 (`data/state/klick/*.json`) und am Bestand `data/state/geraete_tco.json` (Zeilen mit `abgerufen_am` 20.11.2026). Regel: Es bleibt der Weg, der mehr gemessene Zeilen in weniger Zeit liefert. Ein Weg fällt nur weg, wenn dadurch keine Zeile des 20.11. verloren geht.
 
-| Anbieter | Preisweg | Zweiter Weg | Beleg 20.11.2026 |
+| Anbieter | Preisweg | Zweiter Weg | Beleg 20./21.11.2026 |
 |---|---|---|---|
 | Vodafone | Adapter `vodafone_api` | Klick nur Beleg und Gegenprobe | 2385 von 2385 Zeilen aus dem Adapter (96 Abrufe). Klick: 437 Sätze, 0 ersetzt, 0 ohne Gegenstück |
 | Telekom | Klick (12 Jobs, Seiten aus den Übersichtskacheln) | HTTP-Adapter `telekom_kategorie`: Barpreise ohne Vertrag (10 Geräte) und einzelne Bündel | 264 von 271 Zeilen Klick, 7 nur Adapter (Pixel 10a, Galaxy A56 EE). Adapter: 18 Abrufe in 151 s, zwei davon bekamen die Challenge-Seite |
 | o2 | Adapter `o2_katalog` (seit 21.11.2026) | keiner, Klick-Jobs entfernt | Siehe unten. Lokaler Lauf 21.11.: 2233 Bündel aus 209 Abrufen in 545 s (190 gemessen, 2040 abgeleitet). Klick 21.11.: 523 Kombinationen in rund 24 700 s Jobzeit |
-| congstar | **offen**: Klick-Werte, Adapter liefert jeden Schlüssel mit | – | Adapter: 920 Rohsätze in 110 s. Klick: 712 Sätze in 2177 s, alle mit Adapter-Gegenstück. Bestand: 624 Klick-, 181 Adapter-Zeilen |
-| 1&1 | Klick (Tarifauswahl, #176) | keiner, Adapter entfernt | 4 Zeilen (Klick-Lauf vor #176 gestört) |
+| congstar | Adapter `congstar_next` (seit 21.11.2026) | keiner, Klick-Job entfernt | Siehe unten. Lokaler Lauf 21.11.: 920 Bündel in 89 s. Klick 21.11.: 712 Kombinationen in 2150 s, jede mit Adapter-Gegenstück und denselben Werten |
+| 1&1 | Klick (Tarifauswahl, #176) | keiner, Adapter entfernt | 21.11.: 308 Sätze aus 21 Seiten (`1und1-2`); `1und1` nach HTTP 502 der ersten Tarifdetail-Seite ohne jede Seite. Seitenliste und iPhone Duo siehe unten |
 | Saturn/MediaMarkt | Tarifwelt-Stufe | keiner, Platzhalter-Adapter entfernt | 159 Zeilen, 204 Abrufe in 473 s |
 
-Warum congstar offen bleibt:
+**congstar (21.11.2026).** Belegt an den Klick-Dateien der Nacht (Klick-Lauf 44840854026, `data/state/klick/congstar*.json`), an einem lokalen Adapterlauf am selben Tag (ehrliche Kennung, robots.txt) und an der sichtbaren Seite im Browser:
 
-- **congstar:** Nach der Regel bleibt der Adapter (mehr Zeilen, ein Zwanzigstel der Zeit, jede Klick-Zeile hat ein Adapter-Gegenstück). Die Umstellung ändert aber Werte und Belege von 624 Zeilen: sie tragen heute Klick-Werte mit Screenshot. Ob die Adapter-Werte gleich sind, zeigt erst ein Lauf mit Klick als reinem Beleg. Das lässt sich nicht offline nachweisen und gehört deshalb nicht in denselben Schritt.
+- **Werte.** Alle 712 Klick-Kombinationen haben ein Adapter-Gegenstück. Anzahlung, Rate, Tarifpreis, Anschluss, Listenpreis und Preisphasen sind in allen 712 gleich, 0 abweichend. Einziger Unterschied: die Tarifbindung (24 Monate, Flex 0) nannte nur der Klick. Der Adapter liest sie seitdem selbst (`minimumContractDuration` je Tarif).
+- **Sichtbare Seite.** Stichprobe von 10 Kombinationen (5 feste Tarife, 5 Flex, 10 Geräte) im Browser mit Tarif und Raten aus der Adresse: Rate, Anzahlung, Gesamtpreis, Tarifpreis, „Einmalige Kosten“ und Laufzeit („24 Monate Laufzeit“ bzw. „Ohne Laufzeit (mtl. kündbar)“) in allen 10 wie im Adapter.
+- **Zeilen.** Gleicher Abrufstand, alter Stand (Klick ersetzt) gegen neuen (nur Adapter): 920 gegen 920 Bündel, IDs gleich, je Tarif und Laufzeit gleich viele (16 Gruppen, je 57 oder 58), Gesamtkosten in allen 920 gleich. Anders sind nur Bindung (jetzt auch bei den Adapterzeilen), die Phasenschreibweise und der Beleglink: statt der Klick-Adresse mit `planId` die Produktseite.
+- **Vorrang.** Eine Klick-Messung im Bestand hat nur noch Vorrang, wenn ihr Anbieter im Klick-Tagesplan steht. Ohne diese Regel wären in den zwei Nächten nach der Umstellung alle 712 congstar-Bündel (und die o2-Bündel mit Klick-Eintrag vom 20./21.11.) der älteren Klick-Messung gewichen. Die congstar-Preisgrenze (`klick_preisgrenze`) und die Ausnahme für belegte eingerechnete Aktionen in `klick_vollstaendig` galten nur congstar und sind entfernt.
+
+**iPhone Duo (21.11.2026, Browser, ehrliche Kennung).**
+
+- **1&1 führt das Duo.** `https://mobile.1und1.de/smartphones` hat die Kachel „iPhone Duo“ (ab 62,99 €/Monat mit All-Net-Flat S), `/iphone-duo` die Produktseite (256 GB bis 2048 GB, 24 und 36 Monate). Keine belegte Lücke. Ursache der fehlenden Seite: die Geräteübersicht war noch nie ganz gelesen, also gab es keine Kachel. Der Rückfall „Seiten des Laufs“ las nur `1und1.json` (42 Seiten am 20.11., 21 für den 22.11.), und weil er Seiten lieferte, leitete `klickliste_auto` für 1&1 nichts ab. Jetzt zählen die Seiten aller Einträge der Quelle, und bei Seiten nur aus dem Rückfall ergänzt `klickliste_auto` fehlende Modelle (Plan 22.11.: 42 Seiten und `1und1-auto` mit dem Duo).
+- **Vodafone zeigt Mobil M und L nicht.** Die Tarifauswahl der Produktseite (`/privat/handys/iphone-duo.html`, „Zur Tarifauswahl“) bietet drei Datenvolumen: 23 GB (XS), 55 GB (S), Unbegrenzt (XL), beim iPhone 17 ebenso (`docs/belege/vodafone-duo-tarife-2111/`). Die Tarifschnittstelle nennt für das Duo weiter Mobil XS bis XL mit Preisen; der Klick las am 21.11. nur die Tarife 267, 268 und 271 (XS, S, XL). Die gespeicherten Duo-Zeilen für XS, S und XL stimmen mit der Seite (XL, 36 Raten: 289 € und 87,45 €/Monat). Die Zeilen für Mobil M und L (bei allen Vodafone-Geräten, 954 am 21.11.) sind Angebote der Schnittstelle, die die Seite heute nicht zur Auswahl stellt. Ob sie wegfallen, ist offen.
 
 **o2 (21.11.2026).** Belegt an den Klick-Ergebnissen der Nacht (Gerätelauf 44858465074, Klick-Lauf 44840854026) und an zwei lokalen Adapterläufen am selben Tag (ehrliche Kennung, robots.txt, 2 s Abstand):
 
@@ -62,7 +70,7 @@ Offline-Nachweis gegen den committeten Stand des 20.11. (Klick-Zusammenführung 
 ### 3. Was bewusst bleibt
 
 - **Telekom-HTTP-Adapter:** Er ist nicht tot. Er liefert täglich die Barpreise ohne Vertrag (10 Geräte) und am 20.11. sieben Bündel, die der Klick nicht hat.
-- **Die Klick-Zusammenführung** (`analyze/klick_*`): Sie wird gebraucht, solange congstar und Telekom zwei Wege haben. Bei congstar gilt weiter die Preisgrenze (`ANBIETER_PREISGRENZE`).
+- **Die Klick-Zusammenführung** (`analyze/klick_*`): Sie wird gebraucht, solange Telekom zwei Wege hat (Klick und HTTP-Adapter für Barpreise und einzelne Bündel). Vorrang einer Klick-Messung gilt nur für Anbieter im Klick-Tagesplan.
 - **Historie:** `data/state/geraete_tco_historie.jsonl` bleibt eingefroren, neue Messtage stehen im Tagesordner, `tco_historie` liest beides. Das ist eine Ablage und kein zweiter Weg; Daten werden nie gekürzt.
 
 ### 4. Übrige Punkte des Zielbilds

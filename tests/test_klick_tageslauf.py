@@ -169,12 +169,11 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
         "telekom-9",
         "telekom-10",
         "telekom-11",
-        "congstar",
     ]
     for ziel in ziele.values():
         karte = WURZEL / "config" / "klickkarten" / f"{ziel.kartenschluessel}.yaml"
         assert karte.is_file()
-    assert not [z for z in ziele.values() if z.name == "o2"]
+    assert not [z for z in ziele.values() if z.name in ("o2", "congstar")]
     telekom = _seiten_von(ziele, "Telekom")
     assert len(telekom) == len(set(telekom)) == 238
     vodafone = _seiten_von(ziele, "Vodafone")
@@ -228,7 +227,6 @@ def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
         "telekom-9",
         "telekom-10",
         "telekom-11",
-        "congstar",
     ]
     zwei = ["--root", str(lese_wurzel()), "--anbieter", "vodafone,telekom"]
     assert skript.main(zwei) == 2

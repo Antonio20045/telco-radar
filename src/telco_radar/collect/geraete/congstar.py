@@ -72,23 +72,12 @@ in derselben Groessenordnung, nie um den Faktor, den ein versteckter
 Tarifzwang verursachen wuerde). Wer diese Zahlen spaeter nachpruefen will,
 findet hier den Grund, warum das noetig bleibt.
 
-DIE PRODUKTSEITE IST IHR EIGENER QUELLLINK
---------------------------------------------
-Anders als bei Vodafone (Schnittstelle getrennt von der Menschenseite)
-IST die abgerufene Seite hier schon die Seite, die ein Mensch aufruft - die
-Sitemap nennt `https://www.congstar.de/geraete/<hersteller>/<modell>/`
-direkt, und genau diese Adresse steht als Quelllink an der Listung. Kein
-`urljoin` gegen eine API-Basis noetig, also auch keine Chance auf die
-Vodafone-Falle vom 29.08.2026 ("150 Links auf `api.vodafone.de/privat/…`").
+DIE PRODUKTSEITE IST IHR EIGENER QUELLLINK: die Sitemap nennt
+`https://www.congstar.de/geraete/<hersteller>/<modell>/`, und genau diese Adresse
+steht als Quelllink an Listung und Buendel (kein `urljoin` gegen eine API-Basis).
 
-ROBOTS.TXT
-----------
-Wird ueber den bestehenden `RobotsWaechter` geprueft wie bei jedem anderen
-Anbieter (`sammle_anbieter` in `collect/geraete/__init__.py`) - dieser
-Adapter umgeht ihn nicht und bringt keine eigene Pruefung mit. Fuer diese
-Messrunde liegt keine gespeicherte robots.txt vor; ein Host ohne robots.txt
-(HTTP 404) ist im Web der Normalfall und bedeutet "keine Regeln", nicht
-"nicht anfassen" - dieselbe Lehre wie bei api.vodafone.de.
+ROBOTS.TXT prueft der `RobotsWaechter` wie bei jedem Anbieter (`sammle_anbieter`);
+dieser Adapter umgeht ihn nicht und bringt keine eigene Pruefung mit.
 
 DER BUENDELKATALOG: DIE TARIFFSEITE, NICHT DIE GERAETESEITE (B3, 08.09.2026)
 -----------------------------------------------------------------------------
@@ -803,6 +792,13 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
     return out
 
 
+def _bindung(plan: dict) -> int | None:
+    """`minimumContractDuration`: 24 fest, 0 Flex („Ohne Laufzeit“); sonst Lücke."""
+    wert = plan.get("minimumContractDuration")
+    ok = isinstance(wert, int) and not isinstance(wert, bool) and wert >= 0
+    return wert if ok else None
+
+
 def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
     """Die Buendel-Rohsaetze EINER PlanVariant (Tarif oder Flex) ueber alle
     ihre Geraete, Speichergroessen und Ratenlaufzeiten."""
@@ -859,6 +855,7 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
                         "tarif_name": tarif_name,
                         "tarif_slug": tarif_slug,
                         "tarif_monatlich": tarif_monatlich,
+                        "tarif_bindung_monate": _bindung(plan),
                         "geraet_zuzahlung": form["zuzahlung"],
                         "geraet_monatsrate": form["rate"],
                         "anschlusspreis": anschluss,

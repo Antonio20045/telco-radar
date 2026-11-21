@@ -71,13 +71,12 @@
 #   Telekom            Klick (12 Jobs)          HTTP-Adapter: Barpreis  264 Klick
 #                                               und einzelne Bündel       7 Adapter
 #   o2                 Adapter o2_katalog       keiner (seit 21.11.)   2233 Adapter
-#   congstar           offen: Klick-Werte,      –                       624 Klick
-#                      Adapter deckt jeden                              181 Adapter
-#                      Schlüssel
+#   congstar           Adapter congstar_next    keiner (seit 21.11.)    920 Adapter
 #   1&1                Klick (methode klick)    keiner                    4
 #   Saturn/MediaMarkt  Tarifwelt-Stufe          keiner                  159
 # Ein Weg fällt nur weg, wenn dadurch keine Zeile des Messtags verloren geht;
-# bei congstar trägt der Klick heute Belege und Werte. o2: am 21.11.2026 hatte der
+# congstar: am 21.11.2026 hatte jede der 712 Klick-Zeilen ein Adapter-Gegenstück mit
+# denselben Werten (die Tarifbindung liest der Adapter seitdem selbst). o2: am 21.11.2026 hatte der
 # Klick 26 Zeilen ohne Adapter-Gegenstück; 18 davon liefert der Adapter seit diesem
 # Stand selbst (Gratis-Zugabe, eigene Geräteaktion), 8 waren eine erneuerte Seite,
 # die der Klick als Neuware las.
@@ -955,7 +954,7 @@ anbieter:
   # ---------------------------------------------------------- im Telekom-Netz
   - name: congstar
     typ: discount
-    erfassung: adapter+klick
+    erfassung: adapter
     netz: Telekom
     gruppe: Deutsche Telekom
     rang: 10

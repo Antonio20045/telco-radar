@@ -45,6 +45,7 @@ import copy
 import json
 import logging
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -77,12 +78,22 @@ class Kachelseiten:
     seiten: list[dict] = field(default_factory=list)
     datum: str | None = None
     luecken: list[str] = field(default_factory=list)
+    rueckfall: bool = False
+    """Die Seiten sind die besuchten Seiten der Läufe, nicht Kacheln: die Liste kann
+    so nicht wachsen, ``klickliste_auto`` ergänzt fehlende Modelle."""
 
 
-def lies_kachelseiten(root: Path, schluessel: str, katalog: Katalog) -> Kachelseiten:
+def lies_kachelseiten(
+    root: Path,
+    schluessel: str,
+    katalog: Katalog,
+    geschwister: Sequence[str] = (),
+) -> Kachelseiten:
     """Die Seiten aus ``data/state/klick/<schluessel>.json``; fehlt die Datei oder ist
     sie unlesbar, keine Seite und die Lücke mit Grund (nie eine Ausnahme: der Plan
-    der übrigen Anbieter hängt nicht an dieser Datei)."""
+    der übrigen Anbieter hängt nicht an dieser Datei). ``geschwister`` sind die
+    übrigen Einträge derselben Quelle; ihre Dateien zählen nur im Rückfall ohne
+    Kachel (``_seiten_des_laufs``)."""
     pfad = root / ORDNER / f"{schluessel}.json"
     try:
         daten = json.loads(pfad.read_text(encoding="utf-8"))
@@ -94,14 +105,28 @@ def lies_kachelseiten(root: Path, schluessel: str, katalog: Katalog) -> Kachelse
         return Kachelseiten(luecken=[f"{pfad.name}: nicht lesbar ({fehler})"])
     if not isinstance(daten, dict):
         return Kachelseiten(luecken=[f"{pfad.name}: keine Zuordnung"])
-    return seiten_aus_kacheln(daten, katalog)
+    weitere = [_lies(root / ORDNER / f"{g}.json") for g in geschwister]
+    return seiten_aus_kacheln(daten, katalog, [w for w in weitere if w is not None])
 
 
-def seiten_aus_kacheln(daten: dict, katalog: Katalog) -> Kachelseiten:
+def _lies(pfad: Path) -> dict | None:
+    """Eine Geschwisterdatei; fehlt sie oder ist sie unlesbar, zählt sie nicht."""
+    try:
+        daten = json.loads(pfad.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as fehler:
+        log.info("Seiten des Laufs: %s nicht lesbar (%s)", pfad.name, fehler)
+        return None
+    return daten if isinstance(daten, dict) else None
+
+
+def seiten_aus_kacheln(
+    daten: dict, katalog: Katalog, weitere: Sequence[dict] = ()
+) -> Kachelseiten:
     """Je Produkt und Tarif eine Seite aus den Kacheln jeder Übersicht: der ganz
     gelesenen, sonst ihres Vorrats (``fuehre_vorrat``), wenn er höchstens
     ``VORRAT_HOECHSTALTER_TAGE`` älter als die Datei ist; jede nicht ganz gelesene
-    Übersicht ist eine benannte Lücke."""
+    Übersicht ist eine benannte Lücke. Ohne jede Kachel die besuchten Seiten dieser
+    Datei und der ``weitere`` (Geschwister derselben Quelle)."""
     ergebnis = Kachelseiten(datum=daten.get("datum"))
     je_seite: dict[tuple[str, str], dict] = {}
     for uebersicht in daten.get("uebersichten") or []:
@@ -120,19 +145,31 @@ def seiten_aus_kacheln(daten: dict, katalog: Katalog) -> Kachelseiten:
         je_seite[s] for s in sorted(je_seite, key=lambda s: (je_seite[s]["geraet"], s))
     ]
     if not ergebnis.seiten:
-        ergebnis.seiten = _seiten_des_laufs(daten, katalog, ergebnis.luecken)
+        ergebnis.seiten = _seiten_des_laufs(
+            [daten, *weitere], katalog, ergebnis.luecken
+        )
+        ergebnis.rueckfall = bool(ergebnis.seiten)
     return ergebnis
 
 
-def _seiten_des_laufs(daten: dict, katalog: Katalog, luecken: list[str]) -> list[dict]:
+def _seiten_des_laufs(
+    dateien: list[dict], katalog: Katalog, luecken: list[str]
+) -> list[dict]:
     """Rückfall ohne jede Kachel (erster Lauf nach der Umstellung, Übersicht und
-    Vorrat fehlen): die Produktseiten, die die Datei selbst besucht hat, Adresse und
-    Gerät wörtlich; die Lücke nennt es."""
-    seiten = []
-    for seite in daten.get("seiten") or []:
+    Vorrat fehlen): die Produktseiten, die die Dateien dieser Quelle besucht haben,
+    Adresse und Gerät wörtlich, jede Adresse einmal; die Lücke nennt es. Alle
+    Einträge der Quelle zählen: nur die erste Datei hieße, die Liste halbiert sich mit
+    jedem Lauf (1&1, 21.11.2026: 42 Seiten am 20.11., 21 für den 22.11.)."""
+    daten = dateien[0]
+    seiten: list[dict] = []
+    gesehen: set[str] = set()
+    for seite in (s for d in dateien for s in d.get("seiten") or []):
         adresse, geraet = str(seite.get("adresse") or ""), seite.get("geraet")
         if _produkt_und_tarif(adresse) is None or katalog.nach_id(str(geraet)) is None:
             continue
+        if adresse in gesehen:
+            continue
+        gesehen.add(adresse)
         gb = seite.get("speicher_gb")
         seiten.append({"geraet": geraet, "speicher_gb": gb, "url": adresse})
     if seiten:
