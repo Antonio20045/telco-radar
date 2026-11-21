@@ -266,8 +266,8 @@ def test_alter_preis_zeigt_das_bild_seiner_letzten_guten_pruefung(tmp_path):
 def test_bild_nach_der_aufbewahrungsfrist_ist_benannte_luecke():
     from telco_radar.gegenprobe_belege import AUFBEWAHRUNG_TAGE, GRUND_ALT
 
-    alt = _probe("2026-08-01", 16.0, f"{RELEASES}/gegenprobe-2026-08-01-o2/x.webp")
+    alt = _probe("2026-06-01", 16.0, f"{RELEASES}/gegenprobe-2026-06-01-o2/x.webp")
     bild, grund = pb.konfig(alt, None, "2026-09-11")
     assert bild is None and grund == GRUND_ALT
-    assert str(AUFBEWAHRUNG_TAGE) in grund
-    assert pb.konfig(alt, None, "2026-08-31")[0]["url"] == alt.bild
+    assert grund == f"Bild nach {AUFBEWAHRUNG_TAGE} Tagen nicht aufbewahrt"
+    assert pb.konfig(alt, None, "2026-08-30")[0]["url"] == alt.bild

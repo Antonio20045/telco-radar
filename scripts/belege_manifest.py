@@ -23,7 +23,8 @@ Bilder der Gegenprobe (``gegenprobe-*``, ``gegenprobe_ablage``): gelöscht wird 
 nicht in ``data/state/gegenprobe/verlinkt.json`` steht (``gegenprobe_belege``: die Seite
 zeigt es nicht mehr) und älter als ``MINDEST_TAGE`` ist, mit eigenem Budget
 ``GEGENPROBE_LOESCH_S``. Was bleibt, steht im Manifest unter ``gegenprobe``; ohne
-lesbare oder frische Verweisliste wird nichts gelöscht.
+lesbare, frische und plausible Verweisliste (``gegenprobe_ablage.unplausibel``: nicht
+leer, nennt die meisten jungen Bilder) wird nichts gelöscht.
 
 Frist und Exit-Code: Der Schritt in ``geraete.yml`` hat 5 min und darf den Commit
 des Messtags nie sperren, und die Workflow-Datei bleibt, wie sie ist. Deshalb hält
@@ -84,6 +85,7 @@ from telco_radar.gegenprobe_ablage import (
     Plan,
     als_abschnitt,
     plane,
+    unplausibel,
 )
 from telco_radar.gegenprobe_ablage import raeume_auf as raeume_gegenprobe_auf
 from telco_radar.gegenprobe_belege import MINDEST_TAGE, lies_verlinkt
@@ -214,9 +216,13 @@ def gegenprobe_plan(root: Path, heute: date, gh: Releases | None) -> Plan | None
     except ValueError as fehler:
         print(f"::error::Gegenprobe-Bilder: Verweisliste unlesbar: {fehler}")
         verweis = None
+    bleibt = Plan([], [], {t: list(n) for t, n in anhaenge.items()})
     if verweis is None or (heute - verweis[0]).days > VERWEIS_HOECHSTENS_TAGE:
         print("Gegenprobe-Bilder: keine frische Verweisliste, nichts gelöscht")
-        return Plan([], [], {t: list(n) for t, n in anhaenge.items()})
+        return bleibt
+    if grund := unplausibel(anhaenge, verweis[1], heute):
+        print(f"::warning::Gegenprobe-Bilder: {grund}, nichts gelöscht")
+        return bleibt
     return plane(anhaenge, verweis[1], heute, MINDEST_TAGE)
 
 

@@ -1,34 +1,39 @@
 """Konfigurationsbild der Gegenprobe: Gerät, gewählte Optionen und Preis in einem Bild.
 
 Abnahmekriterium 3 (Antonio, 21.11.2026): je angezeigtem Preis ein Screenshot der
-Anbieterseite mit genau dieser Konfiguration. Der Preisbereich allein (bis 21.11.2026)
-zeigt bei keinem Anbieter Gerät, Speicher und Tarif zusammen (Telekom: nur Beträge,
-o2: Raten, aber kein Gerät). ``aufnehme`` sucht darum nach der Wahl auf der offenen
-Seite je Merkmal (``MERKMALE``) das sichtbare Element, das es nennt (Text aus dem
-Bestandssatz: Modell, Speicher, Tarif, Ratenzahl), nimmt je Merkmal das dem
-Preisbereich nächste (darunter zählt der Abstand anderthalbfach: die Auswahl steht
-meist über dem Preis) und fotografiert das Rechteck, das alle umschließt. Der
-Preisbereich selbst ist das Rechteck um seine Anker (je Anker das tiefste Element im
-kleinsten Element mit allen Ankern), nicht dessen Hülle: o2 und Telekom setzen den
-Preiskasten in eine seitenhohe Spalte (Live-Prüfung 21.11.2026). Was nicht im
-Bild steht, nennt ``Aufnahme.ohne`` (die Seite zeigt es als Lücke), nie stillschweigend.
-Ist das Rechteck höher als ``HOEHE_HOECHSTENS_PX``, fällt das vom Preis fernste
-Merkmal heraus (und steht in ``ohne``).
+Anbieterseite mit genau dieser Konfiguration. ``aufnehme`` sucht nach der Wahl auf der
+offenen Seite je Merkmal (``MERKMALE``) das sichtbare Element mit dem Text aus dem
+Bestandssatz (Modell, Speicher, Tarif, Ratenzahl) und den Preisbereich
+(Skripte und die Regeln, was „gewählt“ heißt: ``gegenprobe_bild_js``).
 
-Wo die Auswahl auf einer anderen Seite steht als der Preis (Vodafone und 1&1: Speicher
-und Raten auf der Produktseite, Tarif und Preis auf der Tarifauswahl), nimmt der Weg
-auf beiden Seiten ein Bild auf, ``stapel`` legt sie untereinander. Klein im Release:
-WebP, höchstens ``BREITE_PX`` breit, Qualität ``QUALITAET``.
+Ein Merkmal steht nur dann in ``zeigt``, wenn (i) es die GEWÄHLTE Option ist (oder eine
+Zusammenfassung der Wahl), beim Preis: der Preisbereich zeigt dieselben Beträge wie
+der gelesene Text (``warte_auf_preis``, sonst „Preis“ fehlt); (ii) sein Rechteck ganz
+im Ausschnitt liegt und kein Vorfahre mit ``overflow`` es beschneidet; (iii) an fünf
+Punkten das Element selbst oder ein Kind oben liegt. Vor dem Bild werden fest stehende
+und haftende Leisten, die weder Preis noch Auswahl enthalten, nur für unser Bild
+ausgeblendet; zeigt die Seite vorher einen zweiten, abweichenden Monatspreis
+(``WIDERSPRUCH``), steht „widersprüchlicher Preis“ in ``ohne``. Was fehlt, nennt
+``Aufnahme.ohne`` (die Seite zeigt es als Lücke); ``bild_ganz`` und der Text „zeigt …“
+lesen genau diese Liste.
+
+Der Ausschnitt ist das Rechteck um Preisbereich (ein niedriger Preiskasten ganz,
+Saturn/MediaMarkt; in einer seitenhohen Spalte nur die Anker, o2 und Telekom) und die
+Kacheln der gewählten Optionen; höher als ``HOEHE_HOECHSTENS_PX`` verliert es das
+fernste Merkmal. Wo die Auswahl auf einer anderen Seite steht (Vodafone, 1&1), legt
+``stapel`` zwei Bilder untereinander. WebP, höchstens ``BREITE_PX`` breit.
 """
 
 from __future__ import annotations
 
 import io
 import re
+import time
 from dataclasses import dataclass, field
 from html import escape
 from typing import TYPE_CHECKING, Any
 
+from . import gegenprobe_bild_js as js
 from .gegenprobe_browser import (
     Lesung,
     NichtPruefbar,
@@ -42,96 +47,31 @@ if TYPE_CHECKING:
     from playwright.sync_api import FloatRect, Page
 
 GERAET, SPEICHER, TARIF, RATEN, PREIS = "Gerät", "Speicher", "Tarif", "Raten", "Preis"
+WIDERSPRUCH = "widersprüchlicher Preis"
 MERKMALE = (GERAET, SPEICHER, TARIF, RATEN, PREIS)
-"""Was ein Konfigurationsbild zeigen soll, in der Reihenfolge der Seite."""
+"""Was ein Konfigurationsbild eines Ratenbündels zeigen soll."""
+ORDNUNG = (GERAET, SPEICHER, TARIF, RATEN, PREIS, WIDERSPRUCH)
+WAHL = (SPEICHER, TARIF, RATEN)
+"""Merkmale, die als gewählte Option (oder Zusammenfassung) sichtbar sein müssen."""
 HOEHE_HOECHSTENS_PX = 1_900
 """Höher wird ein Ausschnitt nicht; darüber fällt das fernste Merkmal heraus."""
+PREISKASTEN_HOECHSTENS_PX = 1_000
+"""Ein so niedriger Preisbereich kommt ganz ins Bild, ein höherer nur mit den Ankern."""
 FENSTER_HOECHSTENS_PX = 2_000
 RAND_PX = 12
 KOPF_FREI_PX = 140
-"""So viel Platz bleibt über dem Ausschnitt frei: dort liegen fest stehende
-Kopfleisten (Telekom, Vodafone), die sonst die oberste Auswahl verdecken."""
+"""Platz über dem Ausschnitt (dort lag vor dem Ausblenden die Kopfleiste)."""
+LEISTE_HOECHSTENS = 0.5
+"""Fest stehende Elemente bis zu diesem Anteil des Fensters gelten als Leiste."""
 BREITE_PX = 800
 QUALITAET = 55
 WARTE_MS = 400
+PREIS_WARTEN_MS = 6_000
+"""So lange wartet das Bild höchstens darauf, dass der Preisbereich die gelesenen
+Beträge zeigt (o2 füllt ihn nach; Teil von ``ZEIT_JE_BUENDEL_S`` im Skript)."""
+TAKT_MS = 250
 GRUND_NICHTS = "Weder Preisbereich noch Auswahl auf der Seite gefunden"
-
-_SUCHE_JS = """(arg) => {
-  const norm = s => (s || '').normalize('NFKC').toLowerCase()
-    .replace(/[^a-z0-9äöüß]/g, '');
-  const text = new Map();
-  const alle = [];
-  for (const el of document.querySelectorAll('body *')) {
-    const r = el.getBoundingClientRect();
-    if (r.width <= 0 || r.height <= 0) continue;
-    if (getComputedStyle(el).visibility === 'hidden') continue;
-    text.set(el, norm(el.innerText));
-    alle.push(el);
-  }
-  let preis = null, laenge = Infinity;
-  const anker = (arg.anker || []).map(norm);
-  if (anker.length) {
-    for (const el of alle) {
-      const t = text.get(el);
-      if (t.length < laenge && anker.every(a => t.includes(a))) {
-        preis = el;
-        laenge = t.length;
-      }
-    }
-  }
-  const teile = [];
-  if (preis) {
-    const innen = alle.filter(el => preis.contains(el));
-    for (const a of anker) {
-      const hat = el => (text.get(el) || '').includes(a);
-      const tief = innen.find(el => hat(el) && !Array.from(el.children).some(hat));
-      if (tief) teile.push(tief);
-    }
-  }
-  const oben = Math.min(...teile.map(el => el.getBoundingClientRect().top));
-  const unten = Math.max(...teile.map(el => el.getBoundingClientRect().bottom));
-  const mitte = teile.length ? (oben + unten) / 2 : 0;
-  const gefunden = {};
-  for (const [name, nadeln] of Object.entries(arg.merkmale)) {
-    const n = nadeln.map(norm).filter(x => x);
-    const hat = el => n.some(x => (text.get(el) || '').includes(x));
-    let bestes = null, abstand = Infinity;
-    for (const el of alle) {
-      if (!hat(el) || Array.from(el.children).some(hat)) continue;
-      const r = el.getBoundingClientRect();
-      const mitte_el = r.top + r.height / 2;
-      const d = mitte_el > mitte ? (mitte_el - mitte) * 1.5 : mitte - mitte_el;
-      if (d < abstand) { bestes = el; abstand = d; }
-    }
-    if (bestes) gefunden[name] = bestes;
-  }
-  window.__gegenprobeBild = {preis: teile, gefunden};
-  return true;
-}"""
-
-_KAESTEN_JS = """() => {
-  const k = window.__gegenprobeBild || {gefunden: {}};
-  const kasten = el => {
-    if (!el || !el.isConnected) return null;
-    const r = el.getBoundingClientRect();
-    const oben = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-    const frei = !!oben && (el.contains(oben) || oben.contains(el));
-    return {x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, frei};
-  };
-  const teile = (k.preis || []).map(kasten).filter(b => b);
-  const x = Math.min(...teile.map(b => b.x)), y = Math.min(...teile.map(b => b.y));
-  const preis = teile.length ? {
-    x, y,
-    w: Math.max(...teile.map(b => b.x + b.w)) - x,
-    h: Math.max(...teile.map(b => b.y + b.h)) - y,
-  } : null;
-  const out = {preis, merkmale: {}};
-  for (const [name, el] of Object.entries(k.gefunden)) {
-    const b = kasten(el);
-    if (b) out.merkmale[name] = b;
-  }
-  return out;
-}"""
+_BETRAG = re.compile(r"\d{1,4}(?:\.\d{3})*,(?:\d{2}|[–-]{1,2})")
 
 
 @dataclass
@@ -143,6 +83,8 @@ class Aufnahme:
     ohne: list[str] = field(default_factory=list)
     grund: str | None = None
     """Warum es kein Bild gibt (dann ``bild`` None)."""
+    befund: dict[str, str] = field(default_factory=dict)
+    """Je Merkmal, warum es nicht als gezeigt zählt (für das Protokoll)."""
 
 
 def modell_text(sku_id: str) -> str | None:
@@ -188,8 +130,10 @@ def nadeln(b: dict, nur: tuple[str, ...] = MERKMALE) -> dict[str, list[str]]:
 
 
 def erwartet(b: dict, nur: tuple[str, ...] = MERKMALE) -> list[str]:
-    """Die Merkmale, die ein Bild dieses Bündels zeigen soll."""
-    return [m for m in MERKMALE if m in nadeln(b, nur) or (m == PREIS and m in nur)]
+    """Die Merkmale, die ein Bild dieses Bündels zeigen soll. Ohne Geräterate keine
+    Raten: Saturn/MediaMarkt verkauft das Gerät einmalig und nennt keine Laufzeit auf
+    der Seite (Schnappschuss 21.11.2026: kein „Monat“ im Text)."""
+    return [m for m in ORDNUNG if m in nadeln(b, nur) or (m == PREIS and m in nur)]
 
 
 def _vereinige(kaesten: list[dict]) -> dict:
@@ -218,45 +162,113 @@ def waehle_kaesten(gefunden: dict) -> tuple[dict | None, list[str]]:
             break
         fern = max(merkmale, key=lambda m: abs(merkmale[m]["y"] - bezug))
         merkmale.pop(fern)
-    drin = sorted(merkmale, key=MERKMALE.index) + ([PREIS] if preis else [])
+    drin = sorted(merkmale, key=ORDNUNG.index) + ([PREIS] if preis else [])
     return rechteck, drin
 
 
-def aufnehme(
+def betraege(text: str) -> set[str]:
+    """Die Euro-Beträge eines Texts („40,00“; „44,–“ als „44,00“)."""
+    return {re.sub(r"[–-]+$", "00", b) for b in _BETRAG.findall(text or "")}
+
+
+def preis_passt(im_bild: str | None, gelesen: str) -> bool:
+    """Zeigt der Preisbereich Beträge, und stehen sie alle im gelesenen Text?"""
+    eigene = betraege(im_bild or "")
+    return bool(eigene) and (not gelesen or eigene <= betraege(gelesen))
+
+
+def warte_auf_preis(seite: Page, gelesen: str, frist_ms: int = PREIS_WARTEN_MS) -> bool:
+    """Wartet, bis der Preisbereich ``preis_passt``; höchstens ``frist_ms``."""
+    ende = time.monotonic() + frist_ms / 1000
+    while True:
+        if preis_passt(seite.evaluate(js.PREISTEXT), gelesen):
+            return True
+        if time.monotonic() >= ende:
+            return False
+        seite.wait_for_timeout(TAKT_MS)
+
+
+def gewaehlte(
     seite: Page, b: dict, anker: tuple[str, ...] | None, nur: tuple[str, ...] = MERKMALE
+) -> dict[str, bool]:
+    """Je gefundenem Merkmal: gilt es als gewählte Option (``js.SUCHE``)? Merkt sich
+    die Elemente für ``aufnehme`` auf der Seite."""
+    return seite.evaluate(
+        js.SUCHE,
+        {
+            "anker": list(anker or ()),
+            "merkmale": nadeln(b, nur),
+            "wahl": list(WAHL),
+            "preis_hoechstens": PREISKASTEN_HOECHSTENS_PX,
+        },
+    )
+
+
+def aufnehme(
+    seite: Page,
+    b: dict,
+    anker: tuple[str, ...] | None,
+    nur: tuple[str, ...] = MERKMALE,
+    gelesen: str = "",
 ) -> Aufnahme:
-    """Bild der gewählten Konfiguration auf der offenen Seite (Modulkopf)."""
+    """Bild der gewählten Konfiguration auf der offenen Seite (Modulkopf); ``gelesen``
+    ist der Text, den die Gegenprobe eben las (der Preis im Bild muss ihm gleichen)."""
     from playwright.sync_api import Error as PlaywrightFehler
 
     soll = erwartet(b, nur)
     try:
-        seite.evaluate(
-            _SUCHE_JS, {"anker": list(anker or ()), "merkmale": nadeln(b, nur)}
-        )
-        rechteck, drin = waehle_kaesten(seite.evaluate(_KAESTEN_JS))
+        gewaehlte(seite, b, anker, nur)
+        preis_ok = not anker or warte_auf_preis(seite, gelesen)
+        widerspruch = seite.evaluate(js.WIDERSPRUCH) if anker else None
+        rechteck, drin = waehle_kaesten(seite.evaluate(js.KAESTEN))
         if rechteck is None:
             return Aufnahme(None, [], soll, GRUND_NICHTS)
-        png, drin = _fotografiere(seite, rechteck, drin)
+        png, befund = _fotografiere(seite, rechteck, drin, gelesen if anker else None)
     except PlaywrightFehler as fehler:
         grund = f"Bild nicht aufgenommen: {str(fehler).splitlines()[0][:120]}"
         return Aufnahme(None, [], soll, grund)
-    zeigt = [m for m in soll if m in drin]
-    return Aufnahme(klein(png), zeigt, [m for m in soll if m not in zeigt])
+    zeigt = [
+        m
+        for m in soll
+        if m in drin and befund.get(m) == "" and (m != PREIS or preis_ok)
+    ]
+    ohne = [m for m in soll if m not in zeigt] + ([WIDERSPRUCH] if widerspruch else [])
+    if not preis_ok:
+        befund[PREIS] = "Preis im Bild nicht wie gelesen"
+    if widerspruch:
+        befund[WIDERSPRUCH] = widerspruch
+    return Aufnahme(
+        klein(png),
+        zeigt,
+        ohne,
+        None,
+        {m: befund.get(m) or "nicht gefunden" for m in ohne},
+    )
 
 
-def _fotografiere(seite: Page, rechteck: dict, drin: list[str]) -> tuple[bytes, list]:
-    """Fenster so hoch wie das Rechteck, dorthin rollen, neu messen (fest stehende
-    Kästen wandern mit), fotografieren; danach wieder das alte Fenster."""
+def _fotografiere(
+    seite: Page, rechteck: dict, drin: list[str], gelesen: str | None
+) -> tuple[bytes, dict]:
+    """Leisten ausblenden, das Fenster nur wenn nötig so hoch wie das Rechteck (ein
+    Größenwechsel lässt manche Seiten neu zeichnen), dorthin rollen, auf den Preis
+    warten, neu messen, je Merkmal prüfen (``js.PRUEFE``), fotografieren; danach alles
+    wie vorher."""
     alt = seite.viewport_size
     breite = alt["width"] if alt else 1440
-    hoehe = min(int(rechteck["h"]) + 4 * RAND_PX + KOPF_FREI_PX, FENSTER_HOECHSTENS_PX)
-    seite.set_viewport_size({"width": breite, "height": max(hoehe, 600)})
+    noetig = int(rechteck["h"]) + 4 * RAND_PX + KOPF_FREI_PX
+    hoehe = alt["height"] if alt else 1000
+    seite.evaluate(js.AUSBLENDEN, LEISTE_HOECHSTENS)
+    if noetig > hoehe:
+        hoehe = min(noetig, FENSTER_HOECHSTENS_PX)
+        seite.set_viewport_size({"width": breite, "height": hoehe})
     try:
         ziel = max(0, rechteck["y"] - RAND_PX - KOPF_FREI_PX)
         seite.evaluate("(y) => window.scrollTo(0, y)", ziel)
         seite.wait_for_timeout(WARTE_MS)
-        neu = seite.evaluate(_KAESTEN_JS)
-        kaesten = [neu["preis"]] if neu.get("preis") and "Preis" in drin else []
+        seite.evaluate(js.AUSBLENDEN, LEISTE_HOECHSTENS)
+        preis_da = gelesen is None or warte_auf_preis(seite, gelesen)
+        neu = seite.evaluate(js.KAESTEN)
+        kaesten = [neu["preis"]] if neu.get("preis") and PREIS in drin else []
         kaesten += [k for m, k in neu["merkmale"].items() if m in drin]
         r = _vereinige(kaesten) if kaesten else rechteck
         oben = seite.evaluate("() => scrollY")
@@ -266,29 +278,16 @@ def _fotografiere(seite: Page, rechteck: dict, drin: list[str]) -> tuple[bytes, 
             "x": x,
             "y": y,
             "width": min(r["w"] + 2 * RAND_PX, breite - x),
-            "height": min(r["h"] + 2 * RAND_PX, max(hoehe, 600) - y),
+            "height": min(r["h"] + 2 * RAND_PX, hoehe - y),
         }
-        sichtbar = [
-            m
-            for m in drin
-            if _im_bild(
-                neu["preis"] if m == PREIS else neu["merkmale"].get(m), clip, oben
-            )
-        ]
-        return seite.screenshot(clip=clip), sichtbar
+        befund = seite.evaluate(js.PRUEFE, clip)
+        if not preis_da:
+            befund[PREIS] = "Preis im Bild nicht wie gelesen"
+        return seite.screenshot(clip=clip), befund
     finally:
-        if alt:
+        seite.evaluate(js.WIEDER)
+        if alt and alt != seite.viewport_size:
             seite.set_viewport_size(alt)
-
-
-def _im_bild(kasten: dict | None, clip: FloatRect, oben: float) -> bool:
-    """Liegt der Kasten (Seitenkoordinaten) wenigstens zur Hälfte im Ausschnitt und
-    ist seine Mitte nicht verdeckt (``frei``: kein Banner, keine Leiste darüber)?"""
-    if not kasten or kasten.get("frei") is False:
-        return False
-    y = kasten["y"] - oben
-    innen = min(y + kasten["h"], clip["y"] + clip["height"]) - max(y, clip["y"])
-    return innen >= kasten["h"] / 2
 
 
 def klein(png: bytes) -> bytes:
@@ -325,8 +324,8 @@ def stapel(oben: Aufnahme | None, unten: Aufnahme) -> Aufnahme:
     ganz.paste(b, (0, a.height + RAND_PX))
     ausgabe = io.BytesIO()
     ganz.save(ausgabe, "WEBP", quality=QUALITAET, method=6)
-    zeigt = [m for m in MERKMALE if m in oben.zeigt or m in unten.zeigt]
-    soll = [m for m in MERKMALE if m in zeigt or m in oben.ohne or m in unten.ohne]
+    zeigt = [m for m in ORDNUNG if m in oben.zeigt or m in unten.zeigt]
+    soll = [m for m in ORDNUNG if m in zeigt or m in oben.ohne or m in unten.ohne]
     return Aufnahme(ausgabe.getvalue(), zeigt, [m for m in soll if m not in zeigt])
 
 
@@ -334,7 +333,7 @@ def _mit_fehlendem(da: Aufnahme, weg: Aufnahme | None) -> Aufnahme:
     """``da`` und die Merkmale, die nur das fehlende Bild hätte zeigen sollen."""
     if weg is None:
         return da
-    ohne = [m for m in MERKMALE if (m in da.ohne or m in weg.ohne + weg.zeigt)]
+    ohne = [m for m in ORDNUNG if (m in da.ohne or m in weg.ohne + weg.zeigt)]
     return Aufnahme(da.bild, da.zeigt, [m for m in ohne if m not in da.zeigt], da.grund)
 
 
@@ -378,7 +377,7 @@ def lesung(
     except NichtPruefbar as fehler:
         return mit_beleg(fehler, seite)
     vorher = vorab.aufnahme if isinstance(vorab, Vorab) else None
-    bild = stapel(vorher, aufnehme(seite, b, bild_anker))
+    bild = stapel(vorher, aufnehme(seite, b, bild_anker, gelesen=text))
     return Lesung(text, seite.url, bild.bild, bild.grund, html, bild.zeigt, bild.ohne)
 
 

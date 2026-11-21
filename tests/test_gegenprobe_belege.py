@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 from datetime import date
 
+import pytest
 from beleg_attrappe import AttrappeReleases
 from test_beleg_skripte import lade_skript
 
@@ -113,12 +114,12 @@ def test_verlinkt_sind_preisbild_und_beide_tage_der_aenderung():
 
 def test_bilder_bleiben_hoechstens_die_aufbewahrungsfrist():
     alt, neu = _probe("2026-11-17", 18.0), _probe(NEU_TAG, 20.0)
-    assert gb.aufbewahrt("2026-12-17", "2026-11-17")
-    assert not gb.aufbewahrt("2026-12-18", "2026-11-17")
+    assert gb.aufbewahrt("2027-02-15", "2026-11-17")
+    assert not gb.aufbewahrt("2027-02-16", "2026-11-17")
     proben = Gegenproben([alt, neu])
-    urls = gb.verlinkte("2026-12-18", [], lambda s: None, proben, _tage())
+    urls = gb.verlinkte("2027-02-16", [], lambda s: None, proben, _tage())
     assert urls == {neu.bild}
-    assert gb.verlinkte("2027-01-01", [], lambda s: None, proben, _tage()) == set()
+    assert gb.verlinkte("2027-03-01", [], lambda s: None, proben, _tage()) == set()
 
 
 def test_mit_bild_zaehlt_nur_ganze_konfiguration_im_fenster():
@@ -209,3 +210,61 @@ def test_ohne_frische_verweisliste_loescht_niemand(tmp_path):
     gb.schreibe_verlinkt(tmp_path, "2026-11-30", [])
     plan = modul.gegenprobe_plan(tmp_path, heute, gh)
     assert plan.releases == [] and plan.dateien == []
+
+
+def test_aenderung_behaelt_beide_bilder_bis_zur_frist():
+    """Prüfer PR 204: eine 45 Tage alte Änderung zeigt weiter beide Tage."""
+    proben = Gegenproben([_probe("2026-11-28", 5.0), _probe("2026-12-01", 9.5)])
+    tage = [
+        ("2026-11-28", [_messung("2026-11-28", 5.0)]),
+        ("2026-12-01", [_messung("2026-12-01", 9.5)]),
+    ]
+    assert len(gb.verlinkte("2027-01-15", [], lambda s: None, proben, tage)) == 2
+
+
+def _loeschlauf(tmp_path, schreibe):
+    """``erneuere`` des Belege-Skripts mit einer Gegenprobe-Attrappe."""
+    alt = "gegenprobe-2026-11-01-o2"
+    schreibe(tmp_path)
+    gh = AttrappeReleases({alt: ["a.webp", "b.webp"]})
+    lade_skript("belege_manifest").erneuere(
+        tmp_path, date(2026, 12, 10), False, AttrappeReleases(), gh
+    )
+    return gh
+
+
+def _verweis_kaputt(pfad):
+    (pfad / gb.VERLINKT).parent.mkdir(parents=True, exist_ok=True)
+    (pfad / gb.VERLINKT).write_text("{kaputt", encoding="utf-8")
+
+
+def _verweis_text(pfad):
+    (pfad / gb.VERLINKT).parent.mkdir(parents=True, exist_ok=True)
+    daten = {"format": 1, "datum": "2026-12-09", "bilder": 5}
+    (pfad / gb.VERLINKT).write_text(json.dumps(daten), encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    "schreibe",
+    [
+        lambda p: gb.schreibe_verlinkt(p, "2026-12-09", []),
+        lambda p: None,
+        _verweis_kaputt,
+        _verweis_text,
+    ],
+    ids=["leer", "fehlt", "kaputt", "text-statt-liste"],
+)
+def test_ohne_brauchbare_verweisliste_loescht_niemand(tmp_path, schreibe):
+    """Prüfer PR 204: eine frische, aber leere Liste löschte alles über 9 Tage."""
+    gh = _loeschlauf(tmp_path, schreibe)
+    assert gh.releases_geloescht == [] and gh.assets_geloescht == []
+
+
+def test_verweisliste_mit_zu_wenigen_jungen_bildern_ist_unplausibel():
+    heute = date(2026, 12, 10)
+    jung = "gegenprobe-2026-12-08-o2"
+    anhaenge = {jung: ["a.webp", "b.webp", "c.webp"]}
+    eins = {ga.url(jung, "a.webp")}
+    assert "1 von 3" in ga.unplausibel(anhaenge, eins, heute)
+    zwei = eins | {ga.url(jung, "b.webp")}
+    assert ga.unplausibel(anhaenge, zwei, heute) is None

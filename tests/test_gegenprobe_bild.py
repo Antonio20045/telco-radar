@@ -86,9 +86,9 @@ def besuchsweg(monkeypatch):
     protokoll: list[str] = []
     aufnehme = bild.aufnehme
 
-    def merke_aufnahme(seite, b, anker, nur=bild.MERKMALE):
+    def merke_aufnahme(seite, b, anker, nur=bild.MERKMALE, gelesen=""):
         protokoll.append(f"Bild {b['laufzeit_monate']}")
-        return aufnehme(seite, b, anker, nur)
+        return aufnehme(seite, b, anker, nur, gelesen)
 
     monkeypatch.setattr(bild, "aufnehme", merke_aufnahme)
 
@@ -205,3 +205,79 @@ def test_von_einer_leiste_verdecktes_merkmal_ist_nicht_im_bild(chromium):
     s.close()
     assert "Speicher" in a.ohne and "Speicher" not in a.zeigt
     assert "Preis" in a.zeigt
+
+
+GEKAPPT = """<html><body style="margin:0;font:16px sans-serif">
+<h1>Apple iPhone 17</h1>
+<div style="height:24px;overflow:hidden;width:500px;border:1px solid #888">
+  <p style="margin:0">Auswahl</p>
+  <div style="height:60px"></div>
+  <p>Speicher: <b>256 GB</b></p>
+</div>
+<p>Tarif: O2 Mobile L</p><p>Ratenzahlung: 24 Monate</p>
+<aside><h2>Dein Angebot</h2><p>Gerät monatlich: 40,00 €</p>
+<p>einmalig gesamt: 7,99 €</p></aside>
+</body></html>"""
+
+LEISTE = """<html><body style="margin:0;font:16px sans-serif">
+<h1>Apple iPhone 17</h1><p>Speicher: <b>256 GB</b></p>
+<p>Tarif: O2 Mobile L</p><p>Ratenzahlung: 24 Monate</p>
+<aside><h2>Dein Angebot</h2><p>Gerät monatlich: 40,00 €</p>
+<p>einmalig gesamt: 7,99 €</p></aside>
+<div style="position:fixed;left:0;top:0;width:300px;background:#fff;
+ border:2px solid red">49,99 €/Mon. Allnet Flat S</div>
+<div style="height:3000px"></div>
+</body></html>"""
+
+
+def _auf(chromium, html: str) -> bild.Aufnahme:
+    s = chromium.new_page(viewport={"width": 1440, "height": 1000})
+    s.set_content(html)
+    try:
+        return bild.aufnehme(s, _satz(24), ANKER)
+    finally:
+        s.close()
+
+
+def test_abgeschnittenes_merkmal_zaehlt_nicht(chromium):
+    """Prüfer PR 204: ein Merkmal im beschnittenen Teil einer Zeile (overflow)."""
+    a = _auf(chromium, GEKAPPT)
+    assert a.bild is not None
+    assert "Speicher" in a.ohne and "Speicher" not in a.zeigt
+
+
+def test_leiste_mit_fremdem_preis_ist_keine_ganze_konfiguration(chromium):
+    """Prüfer PR 204 (1&1, 21.11.2026): eine haftende Leiste mit anderem Monatspreis."""
+    a = _auf(chromium, LEISTE)
+    assert bild.WIDERSPRUCH in a.ohne
+    assert "Preis" in a.zeigt
+
+
+def test_nicht_gewaehlte_kachel_zaehlt_nicht(chromium):
+    """Vor der Wahl steht „24 Raten“ auf einer Kachel, gewählt ist sie nicht."""
+    s = chromium.new_page(viewport={"width": 1440, "height": 1000})
+    s.set_content(SEITE)
+    a = bild.aufnehme(s, _satz(24), ANKER)
+    s.get_by_text("24 Raten", exact=True).click()
+    b = bild.aufnehme(s, _satz(24), ANKER)
+    s.close()
+    assert "Raten" in a.ohne
+    assert "Raten" in b.zeigt
+
+
+def test_bild_wartet_bis_der_preis_dem_gelesenen_gleicht(chromium):
+    """o2 füllt die Beträge nach: das Bild nimmt erst den gefüllten Preisbereich."""
+    s = chromium.new_page(viewport={"width": 1440, "height": 1000})
+    s.set_content(
+        SEITE.replace('<span id="b">–</span>', '<span id="b"></span>').replace(
+            "einmalig gesamt: 7,99 €", "einmalig gesamt: <span id='e'></span>"
+        )
+        + "<script>setTimeout(() => { document.getElementById('b').textContent ="
+        " '40,00 €'; document.getElementById('e').textContent = '7,99 €'; }, 800)"
+        "</script>"
+    )
+    a = bild.aufnehme(s, _satz(24), ANKER, gelesen="Gerät monatlich: 40,00 € 7,99 €")
+    falsch = bild.aufnehme(s, _satz(24), ANKER, gelesen="Gerät monatlich: 41,00 €")
+    s.close()
+    assert "Preis" in a.zeigt
+    assert "Preis" in falsch.ohne

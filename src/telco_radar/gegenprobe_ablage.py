@@ -206,6 +206,36 @@ def _vermerke(ergebnisse, dateien, ziel, vorhanden, grund: str) -> None:
             e.bild, e.bild_fehlt = None, grund
 
 
+VERWEIS_JUNG_TAGE = 7
+VERWEIS_MINDESTANTEIL = 0.5
+"""Von den Bildern der letzten ``VERWEIS_JUNG_TAGE`` Tage muss die Verweisliste
+mindestens diesen Anteil nennen (fast jedes ist noch die letzte gute Prüfung eines
+Preises); sonst ist sie unplausibel und niemand löscht."""
+
+
+def unplausibel(
+    anhaenge: Mapping[str, Iterable[str]], verlinkt: set[str], heute: date
+) -> str | None:
+    """Der Grund, warum die Verweisliste nicht zum Löschen taugt; None, wenn sie passt.
+    Leer ist sie nie plausibel, nennt sie zu wenige der jungen Bilder auch nicht."""
+    if not verlinkt:
+        return "Verweisliste leer"
+    jung = {
+        url(tag, n)
+        for tag, namen in anhaenge.items()
+        if (d := datum_des_tags(tag)) is not None
+        and (heute - d).days <= VERWEIS_JUNG_TAGE
+        for n in namen
+    }
+    if jung and len(jung & verlinkt) < VERWEIS_MINDESTANTEIL * len(jung):
+        return (
+            f"Verweisliste nennt {len(jung & verlinkt)} von {len(jung)} Bildern der "
+            f"letzten {VERWEIS_JUNG_TAGE} Tage (mindestens "
+            f"{VERWEIS_MINDESTANTEIL:.0%})"
+        )
+    return None
+
+
 @dataclass(frozen=True)
 class Plan:
     """Was ``raeume_auf`` löscht und was danach bleibt."""

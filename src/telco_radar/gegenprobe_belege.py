@@ -29,9 +29,11 @@ from pathlib import Path
 from . import gegenprobe as gp
 from .gegenprobe_fenster import GEGENPROBE_FENSTER_TAGE, VORLAUF_TAGE, Gegenproben
 
-AUFBEWAHRUNG_TAGE = 30
-"""So lange nach ihrer Prüfung zeigt die Seite ein Gegenprobe-Bild (am Preis und an
-einer Preisänderung), so lange bleibt es im Release."""
+AUFBEWAHRUNG_TAGE = 90
+"""So lange nach ihrer Prüfung zeigt die Seite ein Gegenprobe-Bild, am Preis und an
+beiden Tagen einer Preisänderung, und so lange bleibt es im Release (wie die großen
+Änderungen der Klick-Belege). EINE Frist für beides: eine ältere Änderung zeigt
+benannt „Bild nach 90 Tagen nicht aufbewahrt“."""
 MINDEST_TAGE = GEGENPROBE_FENSTER_TAGE + VORLAUF_TAGE
 """Jünger wird kein Bild gelöscht: es kann noch ``letzte_gute`` eines Preises werden,
 den der Lauf gerade erst prüft."""
@@ -39,7 +41,7 @@ VERLINKT = gp.ORDNER / "verlinkt.json"
 FORMAT = 1
 GRUND_KEINE = "noch nicht gegengeprüft"
 GRUND_OHNE_BILD = "Gegenprobe ohne Bild"
-GRUND_ALT = f"Prüfung älter als {AUFBEWAHRUNG_TAGE} Tage, Bild nicht aufbewahrt"
+GRUND_ALT = f"Bild nach {AUFBEWAHRUNG_TAGE} Tagen nicht aufbewahrt"
 GRUND_GELOESCHT = "nicht mehr im Release"
 GRUND_KEIN_ALTER = "keine gute Gegenprobe des alten Preises"
 GRUND_KEIN_NEUER = "an diesem Tag nicht gegengeprüft"
