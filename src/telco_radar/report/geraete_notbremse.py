@@ -5,9 +5,10 @@ Bündel zählen. Ein Bündel mit ``herleitung`` (o2 aus Tarifsumme minus Geräte
 stand so nie auf der Anbieterseite und ist eine Schätzung. Ausgenommen sind Rechenwege,
 die eine Preisliste exakt nachrechnen (``HERLEITUNG_PREISLISTE``, 1&1-Tarifaufschlag):
 sie zählen wie gemessene. Ein Bündel, in dessen Preis eine
-abgelaufene Aktion steckt, ist veraltet. Ebenso eines, dessen Tarifpreis ein
-Zweitprodukt voraussetzt (o2 „Plus“, ``ist_bedingter_tarif``): der Vergleich nennt
-Neuvertragspreise ohne Boni, lieber fehlt der o2-Wert als ein zu niedriger. Beide
+abgelaufene Aktion steckt, ist veraltet. Ebenso eines, dessen Tarifrabatt nur mit
+aktivem Zweitprodukt gilt (o2 „Plus“, ``ist_bedingter_tarif``): der Vergleich nennt
+Neuvertragspreise ohne Bedingung, bei o2 also den Tarif ohne „Plus“ (Entscheidung
+Antonio 21.11.2026); die Plus-Zeile nennt ihren Abstand (``geraete_plus``). Beide
 bleiben als Zeile sichtbar, stellen aber weder Δ noch Referenz noch Sieger, keine
 Bewegung und keinen Günstigst-Wert; der Export nennt denselben Zustand.
 
@@ -68,8 +69,8 @@ HERLEITUNG_SATZ_SONST = (
 )
 DELTA_BEDINGT = "nur mit Zweitprodukt"
 SATZ_BEDINGT = (
-    "Kein Abstand zur Vodafone-Referenz: der Tarifpreis gilt nur, wenn ein "
-    "zweites Produkt gebucht wird."
+    "Kein Abstand zur Vodafone-Referenz: der Rabatt im Tarifpreis gilt nur, solange "
+    "ein zweites Produkt aktiv ist."
 )
 DELTA_AKTION_ABGELAUFEN = "Aktion abgelaufen"
 SATZ_AKTION_ABGELAUFEN = (

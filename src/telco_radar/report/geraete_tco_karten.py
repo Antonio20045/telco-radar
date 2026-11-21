@@ -77,6 +77,7 @@ from ..tco_model import (
 )
 from . import anbieter_farben, geraete_preisstand, geraete_rechnung, geraete_vergleich
 from . import geraete_notbremse as notbremse
+from .geraete_plus import vermerke as plus_vermerke
 from .geraete_tco_grafik import anbieter_slug
 from .geraete_zeitraum_wort import zeitraum_text
 from .geraete_zerlegung import zerlegung_balken
@@ -140,8 +141,7 @@ def kurz_datum(iso: str) -> str:
     S3b (Diff-Prüfung 21.09.2026): `None` (JSON-null aus einem halben
     Schreibvorgang des Stores) ist KEIN Crash, sondern „unlesbar“ - ein
     fehlender Wert wird nie geraten und wirft die Seite nicht in den
-    Notzustand.
-    """
+    Notzustand."""
     try:
         d = _dt.date.fromisoformat(str(iso or ""))
     except (ValueError, TypeError):
@@ -1341,7 +1341,7 @@ def modelle(
             bisher = je_angebot.get(schluessel)
             if bisher is None or _angebot_rang(k) < _angebot_rang(bisher):
                 je_angebot[schluessel] = k
-        karten = sorted(je_angebot.values(), key=_rang)
+        karten = plus_vermerke(sorted(je_angebot.values(), key=_rang))
 
         belege_modell: dict = {}
         for sku in gruppe["skus"]:

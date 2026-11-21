@@ -2,10 +2,10 @@
 
 Die SIM-only-Kachel "O2 Mobile on Demand M" verlinkt den Slug
 `o2-mobile-on-demand-m-plus`. Das Buendel dahinter ist aber nicht der Tarif der
-Kachel: sein Preis enthaelt den Bundle-Rabatt, der nur mit einem Zweitprodukt
-gilt. Truege es die ID der Kachel (`o2:o2-mobile-on-demand-m`), ueberschrieben
-sich M und M Plus im Bestand (je Tarif, Geraet und Laufzeit gilt der letzte
-Satz), und die Kachel-Grundgebuehr stuende als SIM-only-Vergleich neben einem
+Kachel: sein Preis enthaelt den Bundle-Rabatt, der nur gilt, solange ein
+Zweitprodukt aktiv ist. Truege es die ID der Kachel (`o2:o2-mobile-on-demand-m`),
+ueberschrieben sich M und M Plus im Bestand (je Tarif, Geraet und Laufzeit gilt der
+letzte Satz), und die Kachel-Grundgebuehr stuende als SIM-only-Vergleich neben einem
 Preis, der sie nie gemeint hat.
 """
 
@@ -31,7 +31,7 @@ def plus_fassung(
         return None
     return tid, (
         f"Plus-Fassung der SIM-only-Kachel {kachel.get('name', '')!r}: eigener Tarif "
-        f"(Slug {slug!r}), Preis nur mit Zweitprodukt"
+        f"(Slug {slug!r}), Rabatt nur mit Zweitprodukt"
     )
 
 

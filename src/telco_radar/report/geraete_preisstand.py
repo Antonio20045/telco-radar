@@ -4,8 +4,9 @@ statt einer Zahl, wenn der Preis nicht stehen darf.
 Vier Gründe nehmen einer Zeile die Zahl: ein veralteter Preis, ein Anschlusspreis, den
 eine neuere Messung widerlegt (Regel 18, ``analyze/geraete_anschluss``), ein Preis in
 Quarantäne (Prüfstelle: eine Regel ist verletzt, z. B. Regel 5) und ein Plus-Tarif,
-dessen Preis ein Zweitprodukt voraussetzt (``ist_bedingter_tarif``; Entscheidung
-05.11.2026, Prüfung PR #38 M1). Maßstab: lieber kein Preis als ein falscher - die
+dessen Rabatt nur mit aktivem Zweitprodukt gilt (``ist_bedingter_tarif``; Entscheidung
+05.11.2026, Prüfung PR #38 M1; die Lücke nennt den Abstand zum Tarif ohne „Plus“,
+``geraete_plus.luecke``). Maßstab: lieber kein Preis als ein falscher - die
 Zeile nennt ihren Grund, nicht die Regel.
 
 Der widerlegte Anschlusspreis steht vor dem veralteten Preis, weil er der genauere
@@ -22,6 +23,7 @@ aber nicht von heute, trägt „Preis vom 10.10.2026“; jenseits der Frische gi
 from __future__ import annotations
 
 from .geraete_notbremse import DELTA_BEDINGT, DELTA_NICHT_LIEFERBAR, zustand
+from .geraete_plus import luecke
 
 
 def marke(abgerufen_am: str, heute: str, frisch: bool) -> str:
@@ -139,7 +141,7 @@ def pruefung_satz(karte: dict) -> str:
 
 
 def ist_bedingt(karte: dict) -> bool:
-    """Setzt der Preis der Karte ein Zweitprodukt voraus? (``bedingter_tarif``.)"""
+    """Gilt der Rabatt der Karte nur mit aktivem Zweitprodukt? (``bedingter_tarif``.)"""
     return bool(karte.get("bedingter_tarif"))
 
 
@@ -195,7 +197,7 @@ def anzeige(karte: dict) -> dict:
     elif nicht_lieferbar(karte):
         kurz_, satz = KURZ_NICHT_LIEFERBAR, SATZ_NICHT_LIEFERBAR
     elif ist_bedingt(karte):
-        kurz_, satz = KURZ_BEDINGT, SATZ_BEDINGT
+        kurz_, satz = luecke(karte, KURZ_BEDINGT, SATZ_BEDINGT)
     elif anschluss_widerlegt(karte):
         kurz_, satz = KURZ_ANSCHLUSS, anschluss_grund(karte.get("abgerufen_am") or "")
     elif preis_veraltet(karte):
