@@ -1,7 +1,7 @@
 {
  "anbieter": "o2-auto",
- "datum": "2026-11-20",
- "dauer_sekunden": 5150.9,
+ "datum": "2026-11-21",
+ "dauer_sekunden": 5005.8,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -11,7 +11,7 @@
  "name": "o2",
  "seiten": [
   {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
    "geraet": "samsung-galaxy-s25-ultra",
    "gescheitert": 0,
    "grund": null,
@@ -76,61 +76,125 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtMjU2Z2ItdGl0YW5pdW0tc2lsdmVyYmx1ZS1lcm5ldWVydC0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTM2bS0wNS0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "acc10bbcabcc9b3aa766ab4ed81240bfcaa4f15737277d2421f8759a2a7c6a25",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile Unlimited M Plus mit 100 MBit/s"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 31,99 € inkl. 6,99 € Versand; davon Gerät 25,00 € · monatlich 43,99 € (Gerät und Tarif zusammen) · Monatsrate 24,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:29Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "256 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 0.0,
+      "anzahlung": 25.0,
+      "rate": 24.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtMjU2Z2ItdGl0YW5pdW0tc2lsdmVyYmx1ZS1lcm5ldWVydC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTI0bS0wNS0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "67b2bc7399e3dee809e463d384073e563a787424602b9b029ef7e22b8fcc8534",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile Unlimited M Plus mit 100 MBit/s"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 56,99 € (Gerät und Tarif zusammen) · Monatsrate 37,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:32Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "256 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 37.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
      }
     },
     {
@@ -142,7 +206,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7141044b9c4877f49b916ddb9ebd843c95b07bb15f2b8c033aedd4a2eb0f31af",
+      "beleg_id": "e71f63c711b3f161636c5ac9f1a20356a1f88812dabd9bad0562c2cb7b6c67d4",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -162,8 +226,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:12:23Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -203,7 +267,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3638afa84b09bf11c9e2fa7118c0b7f65a7667d79bc70bbad1235d99dbb78f31",
+      "beleg_id": "f5d390e1c03ec6f604c92a12ffd6fe5e28cbcd3acdc849ab2c75eff0463e5fb0",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -223,8 +287,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:12:26Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -264,7 +328,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "13fc016eae66d6bb1d7ee90a51bcf956959a52f96d587e5692fd137efc5092cf",
+      "beleg_id": "3242e9e2b565270bbb2df211ab97a26185758898cd5a442d480cb1f73c18c8ea",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -284,8 +348,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:12:34Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -325,7 +389,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a194b7c7995e064c0b90c90bb051b94ee8fbd56076500e99bb1422735cbb9603",
+      "beleg_id": "2ef8797eb420bf5340d3897969083f193cba10e32201e840dd86441a80a006dd",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -345,8 +409,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:12:37Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -386,7 +450,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cc9f86c62b622afd0537c6c8d57679b4da779432724bcecfac83aaae132e16de",
+      "beleg_id": "32926c39c36e242cc4985df84f0fb9cd3d9df734f61ab9861a2a224666ffd3fd",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -406,8 +470,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:12:42Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -447,7 +511,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "650cf4f4f1aed5b63a103974d6c8f0401f95f2139a74f046f2140b78ca058ff6",
+      "beleg_id": "33bfb0fa6bdfc82a39c5324136cd0c0e397576cab98a9a1ad713baeb455ae493",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -467,8 +531,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:12:48Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:05:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -498,79 +562,21 @@
       ],
       "volumen_gb": 50.0
      }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 138,
-    "beendet": 132,
+    "beendet": 133,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 6,
+     "library.telefonica.de": 5,
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 17.2,
-    "takte_ms": 7650,
+    "sekunden": 10.8,
+    "takte_ms": 5100,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -580,15 +586,16 @@
    "struktur": {
     "anteil_felder": 1.0,
     "anteil_knoepfe": 1.0,
-    "felder_gefunden": 42,
-    "felder_gesucht": 42,
-    "knoepfe_gefunden": 51,
-    "knoepfe_gesucht": 51
+    "felder_gefunden": 56,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 55,
+    "knoepfe_gesucht": 55
    },
-   "verworfen": 4
+   "verworfen": 4,
+   "zustand": "neu"
   },
   {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
    "geraet": "samsung-galaxy-s25-ultra",
    "gescheitert": 0,
    "grund": null,
@@ -653,61 +660,125 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1tLXBsdXMtb25saW5lLWh3djtwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "512 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "40de848b0c77f1c5e05e7222a5702515618ace25c434c97059ab635e58241c71",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile Unlimited M Plus mit 100 MBit/s"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 19,99 € inkl. 6,99 € Versand; davon Gerät 13,00 € · monatlich 50,99 € (Gerät und Tarif zusammen) · Monatsrate 26,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:06:47Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "512 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 0.0,
+      "anzahlung": 13.0,
+      "rate": 26.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        24.99
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjUtdWx0cmEtNTEyZ2ItdGl0YW5pdW0tYmxhY2stZXJuZXVlcnQtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1tLXBsdXMtb25saW5lLWh3djtwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "f8cd3aa250e75f8cd5890f32cb77fbf00488d3986c774853ac4ea5996d6e0f21",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S25 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile Unlimited M Plus mit 100 MBit/s"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 64,49 € (Gerät und Tarif zusammen) · Monatsrate 39,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:06:53Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 39.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        24.99
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
      }
     },
     {
@@ -719,7 +790,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "53b4f08ba79d8ea5082cbfc813e03f348111475efd0eca7ab54b3d1b5a20d961",
+      "beleg_id": "ad19e62df11fd3c4b8888b608226d8b134e26e288d9736ddffcfd9ebfd226111",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -739,8 +810,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:14:30Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:06:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -780,7 +851,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e2ef15cb7a0993a65c3114522b79bdbe1e22373d9b7d3071b99a05990bbef03e",
+      "beleg_id": "75d7a7394544e980fc554c95a5641a93ac72226dd5f5f4262414c691fd45b52f",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -800,8 +871,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:14:36Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:06:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -841,7 +912,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d35a2830cc12701efcc51ec50fd7556c7038dada8e43a72558dfaf71dc796571",
+      "beleg_id": "e985b9e50a6ae67a8d7271a573c2840ae8d1ac440cec7cc580351cbf410717d8",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -861,8 +932,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:14:41Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:07:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -902,7 +973,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1719c377ac1279cc8320110623a51c6462a5feefc52d2fa0a523dfebd1fd13a7",
+      "beleg_id": "f12e92bdd0cc0e1f1b3e22712c25b164a59272c3b4c607e3cb13b0440899132c",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -922,8 +993,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:14:44Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:07:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -963,7 +1034,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "28b15083db06f2cf7fda8ca92fef92f05d093c788ca2716e8c081dab973364fb",
+      "beleg_id": "66d8f5b5de651d70d49e7ecccd8503cd30b8e3473b4735b6d1caf602867aeb87",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -983,8 +1054,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:14:48Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:07:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1024,7 +1095,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4827786417428ceb00ddf400d6c675925f6ddfc2f37f8a1c5560ac8af6a5464f",
+      "beleg_id": "26f5f063b52bf2e5f67275e57b52325d764651204b20da1f949ed3f53ee3fa2b",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1044,8 +1115,8 @@
        }
       ],
       "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:14:51Z"
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-512gb-titanium-black-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
+      "zeitpunkt": "2026-11-21T00:07:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1075,78 +1146,21 @@
       ],
       "volumen_gb": 50.0
      }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Seite zeigt tarif O2 Mobile L mit 150 GB+ in diesem Zustand nicht",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 136,
-    "beendet": 132,
+    "anfragen": 135,
+    "beendet": 128,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 4
+     "library.telefonica.de": 6,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 16.5,
-    "takte_ms": 9350,
+    "sekunden": 9.4,
+    "takte_ms": 5800,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -1156,12 +1170,13 @@
    "struktur": {
     "anteil_felder": 1.0,
     "anteil_knoepfe": 1.0,
-    "felder_gefunden": 42,
-    "felder_gesucht": 42,
-    "knoepfe_gefunden": 51,
-    "knoepfe_gesucht": 51
+    "felder_gefunden": 56,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 55,
+    "knoepfe_gesucht": 55
    },
-   "verworfen": 4
+   "verworfen": 4,
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
@@ -1788,7 +1803,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "69f20b525a0e50401d1a7ed91112c59c2d9e857bff753169ca57c869d25508c4",
+      "beleg_id": "09eead28c75cc4f0095953af5621c47f2ba43c2a0244388b48b763f61b5b9dd8",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1809,7 +1824,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:19:10Z"
+      "zeitpunkt": "2026-11-21T00:11:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1849,7 +1864,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a1225f3a0bfbdc46c23aba7edd365747df817ca8db80a84994b85e362709dcf5",
+      "beleg_id": "6fddf7f2854b57dd654bd747e45802dbdcce12072a76b58428c2fa18ed789d3f",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1870,7 +1885,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:19:16Z"
+      "zeitpunkt": "2026-11-21T00:11:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1939,7 +1954,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ec1e233e0fd47589f06bbb8f1652a33a749190c828cd45ad9d6b23e73d561456",
+      "beleg_id": "05b789047bf9365255c594ef2ef2de4188ebbd7899297c0c3779a643394a4106",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -1960,7 +1975,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:19:30Z"
+      "zeitpunkt": "2026-11-21T00:11:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2000,7 +2015,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "95548b0382bf88005a83c265025215cef7541bf0573ca6a1dd72e24cd42b4982",
+      "beleg_id": "5f1e5d8d738097ca224dd43701cd780f30d7e2636a9b8da0ef0a5029b62b7be6",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2021,7 +2036,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:19:34Z"
+      "zeitpunkt": "2026-11-21T00:11:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2090,7 +2105,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c3cf2f46a4934fc610da673b6e87dc70b77014ddd313657b36492a851810f8f4",
+      "beleg_id": "e89edc5e2c644149dffe2d6f41b54875db8b619797a83a7be6549e1f09a6c6a6",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2111,7 +2126,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:19:40Z"
+      "zeitpunkt": "2026-11-21T00:11:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2412,7 +2427,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ed4955e3a231863af6abec6b68c2808405d77967cf5c2fc96bd3715638552dec",
+      "beleg_id": "806e4e44e3867878bc5ada96b2d059ff6b780333775fdd215a531c42f679a0ad",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2433,7 +2448,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:19:44Z"
+      "zeitpunkt": "2026-11-21T00:11:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2531,7 +2546,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b87b632b5b98112cbb8d229c9bca8fe5ba394af3aa22b2d48b078668a82ede0d",
+      "beleg_id": "98eae362800ec5bc05e062c58082d84b933c88cd85406f51e6141aa011e75e96",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2552,7 +2567,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:19:55Z"
+      "zeitpunkt": "2026-11-21T00:11:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2882,7 +2897,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9748f4369fc738e46fd883e097b55200af0930c0507e1aed8dbc0702267c7833",
+      "beleg_id": "cee2811a8d13c486b895522974bbc366df582d9b9b1fb15266fb65f7a861140b",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -2903,7 +2918,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:20:00Z"
+      "zeitpunkt": "2026-11-21T00:12:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7809,16 +7824,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 146,
-    "beendet": 142,
+    "anfragen": 145,
+    "beendet": 141,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 4
+     "library.telefonica.de": 6,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 20.1,
-    "takte_ms": 8900,
+    "sekunden": 11.4,
+    "takte_ms": 5100,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -7833,7 +7849,8 @@
     "knoepfe_gefunden": 137,
     "knoepfe_gesucht": 146
    },
-   "verworfen": 4
+   "verworfen": 4,
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
@@ -9417,7 +9434,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "be04db7a4ae1456d724f3cc667b7d79d3ea01cbb6c4e00337c99518f44051bf2",
+      "beleg_id": "e74da08f9af8926f6801ea3fc4d10c0ef844136c0ebf61ae6dde1e1c3139fe69",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -9438,7 +9455,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:44:18Z"
+      "zeitpunkt": "2026-11-21T00:36:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9478,7 +9495,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f48a1150ad0ef6ed1666ad75dd71bac8f2ea8e4f6bdee436b84146abbb5b9d4f",
+      "beleg_id": "2e0e495c54240d564af5664642e016994b1905aa85a02bca01c3c8606a9ba16d",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -9499,7 +9516,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:44:29Z"
+      "zeitpunkt": "2026-11-21T00:36:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9568,7 +9585,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6008539126557f3d0d27b2dee1e9480f3efe4be20cd743d70a2006d02858046e",
+      "beleg_id": "5d8939ffda7fbb47b099960a8a915934250b7b34312b2b73cb524826a33da19a",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -9589,7 +9606,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:44:43Z"
+      "zeitpunkt": "2026-11-21T00:36:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9629,7 +9646,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "70ba5e8f2377a6ed8da8a1cf0e6f111d67223593c8cc550beaaf0c8085bc1624",
+      "beleg_id": "56010e40a7d43d667f17dc9e2c5a9f6cabd3832c7350d2ebf3448bc18e64d72e",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -9650,7 +9667,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:44:47Z"
+      "zeitpunkt": "2026-11-21T00:36:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9719,7 +9736,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "919f5829b24aa1fc3f6c48cfce249198ef2d01ff8918f88e09d4ee9c90653a6f",
+      "beleg_id": "06bc6860741feea842cedea779019cf643f9fa7cf64ec140d18afe72cbe12810",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -9740,7 +9757,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T02:44:56Z"
+      "zeitpunkt": "2026-11-21T00:36:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10352,621 +10369,64 @@
      }
     },
     {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTUxMmdiLW5hY2h0aGltbWVsLTM2eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1vbi1kZW1hbmQtbS1wbHVzLW9ubGluZS1od3Y7cGFja3M9dW10cy1vcHRpb24=",
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTUxMmdiLW5hY2h0aGltbWVsLTI0eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1vbi1kZW1hbmQtbS1wdXNoLXByb21vLTI0bTtwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
-     "befunde": [
-      {
-       "feld": "variante.tarif",
-       "grund": "Seite zeigt O2 Mobile on Demand M Plus mit 50 GB+ statt O2 Mobile on Demand M mit 50 GB+"
-      },
-      {
-       "feld": "variante.laufzeit",
-       "grund": "Seite zeigt 36 statt 24"
-      }
-     ],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "24e54d89d0d08a736d07e708675fc855048d5f89727e6df8237c4659f6e057fe",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile on Demand M mit 50 GB+"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 135,49 € (Gerät und Tarif zusammen) · Monatsrate 115,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-21T00:36:51Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Seite zeigt O2 Mobile on Demand M Plus mit 50 GB+ statt O2 Mobile on Demand M mit 50 GB+",
+     "grund": null,
      "luecken": [],
-     "status": "befund",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 115.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": 50.0
      }
     },
     {
@@ -11028,6 +10488,647 @@
      }
     },
     {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTUxMmdiLW5hY2h0aGltbWVsLTM2eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1zLW9ubGluZS1od3YtMzZtLTA1LTAwO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e7901af6cd086c62c15bed3bfc5cbe6f913b56e52078d86515ae4e4d58caeef6",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile S mit 15 GB+"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 47,98 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 91,99 € (Gerät und Tarif zusammen) · Monatsrate 77,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-21T00:37:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "werte": {
+      "anschluss": 39.99,
+      "anzahlung": 1.0,
+      "rate": 77.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
      "antwort_url": null,
      "auswahl": {
       "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 2.773,00 € Tarif monatlich14,99 €",
@@ -11057,61 +11158,64 @@
      }
     },
     {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTUxMmdiLW5hY2h0aGltbWVsLTI0eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1zLW9ubGluZS1od3YtMjRtLTA1LTAwO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "O2 Mobile S mit 15 GB+"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "6fb30d42666b9fd0bcfa0aeba1b35664e17e1fb94d2ca84b3a44b1ccd2b8dcfa",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone Duo · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: O2 Mobile S mit 15 GB+"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig gesamt 47,98 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 130,49 € (Gerät und Tarif zusammen) · Monatsrate 115,50 €"
+       }
+      ],
+      "bildfolge_fehlt": [],
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+      "zeitpunkt": "2026-11-21T00:37:05Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "O2 Mobile S mit 15 GB+"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 39.99,
+      "anzahlung": 1.0,
+      "rate": 115.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": 15.0
      }
     },
     {
@@ -14394,16 +14498,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 146,
-    "beendet": 143,
+    "anfragen": 147,
+    "beendet": 147,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 4
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 19.3,
-    "takte_ms": 9900,
+    "sekunden": 15.6,
+    "takte_ms": 6700,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -14412,13 +14514,14 @@
    "stoerung": null,
    "struktur": {
     "anteil_felder": 1.0,
-    "anteil_knoepfe": 0.9485294117647058,
-    "felder_gefunden": 42,
-    "felder_gesucht": 42,
-    "knoepfe_gefunden": 129,
-    "knoepfe_gesucht": 136
+    "anteil_knoepfe": 0.9383561643835616,
+    "felder_gefunden": 56,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 137,
+    "knoepfe_gesucht": 146
    },
-   "verworfen": 4
+   "verworfen": 4,
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
@@ -16959,7 +17062,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f6afc054bc00b8089b425911b9bf6608fdcd2cc9d388ccefd519ef7a20c4eb71",
+      "beleg_id": "ad9cf74d2d76005d436586d3085a3a71629de79bb08f7d36cd3ad7b1b2c7e7e1",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -16980,7 +17083,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:09:56Z"
+      "zeitpunkt": "2026-11-21T01:01:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17020,7 +17123,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7109a61949fc362e938d22feb87d73563247def8feb40a2af86dfabf56a52eaf",
+      "beleg_id": "ef7035ae277a87c94f4348cb1a2412c69a3562f49bc9a7af770f595fe55c90e4",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -17041,7 +17144,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:10:00Z"
+      "zeitpunkt": "2026-11-21T01:01:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17110,7 +17213,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "61f9bdbdb4943e1c0cb0b3a535f1401b6306a1645c1f55fbb74a93590975ab2b",
+      "beleg_id": "eb4887383d8e78b3e482528a30e6fcd350834111993725487f775a3bb28e9703",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -17131,7 +17234,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:10:12Z"
+      "zeitpunkt": "2026-11-21T01:01:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17171,7 +17274,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0155c963949aa1cbaea67f6bc83329228d03b30588b7f590070391e03a2c5c03",
+      "beleg_id": "72d6ff009ab98a5f5a0697317da901705176d4251d27c61759c1df2605d1e25f",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -17192,7 +17295,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:10:17Z"
+      "zeitpunkt": "2026-11-21T01:01:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17261,7 +17364,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "55020b1cab30f137b7232d8c31467f7348eb3d3b0d273d36426f5670c4557e6e",
+      "beleg_id": "315363a00b0ede801a205c5057eb08beccf676f898c9669a882a91aa30151713",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -17282,7 +17385,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:10:25Z"
+      "zeitpunkt": "2026-11-21T01:01:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18221,7 +18324,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "52b772f2805feb1d794bc77c22f97582732e102163a57126647ff474ca81f9d3",
+      "beleg_id": "15a2befd387c72ef0c6ca3017fb6af972352ae977e62f058957ca2dcf0d451e0",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -18242,7 +18345,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:10:29Z"
+      "zeitpunkt": "2026-11-21T01:01:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18340,7 +18443,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b1753e40da23c05221b1ad85baccca8e8f1342154a929caaedc5d3b0f55c4df3",
+      "beleg_id": "c89a6967fa313d4956884088d1a9c589e93dd270c1f6212215e05cfe9ef391f6",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -18361,7 +18464,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:10:38Z"
+      "zeitpunkt": "2026-11-21T01:01:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -19329,7 +19432,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c9db13f48d6f449bd138812d814f04bac56554bd34dd3aa9034749dd7c39dc64",
+      "beleg_id": "aad826b3d7b2f597ad94d808f41c056767f492340951423503cff6394a0870a6",
       "bildfolge": [
        {
         "schritt": "geraet_speicher",
@@ -19350,7 +19453,7 @@
       ],
       "bildfolge_fehlt": [],
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:10:43Z"
+      "zeitpunkt": "2026-11-21T01:01:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -21066,17 +21169,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 143,
-    "beendet": 136,
+    "anfragen": 145,
+    "beendet": 141,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 6,
+     "library.telefonica.de": 5,
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 18.2,
-    "takte_ms": 8600,
+    "sekunden": 14.3,
+    "takte_ms": 5150,
     "wartet_auf": "load"
    },
    "speicher_gb": 1024,
@@ -21091,7 +21194,8 @@
     "knoepfe_gefunden": 137,
     "knoepfe_gesucht": 146
    },
-   "verworfen": 4
+   "verworfen": 4,
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
@@ -24581,125 +24685,1230 @@
      }
     },
     {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTJ0Yi1uYWNodGhpbW1lbC0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLXMtc3BlY2lhbC1vbmxpbmUtcHJvbW87cGFja3M9dW10cy1vcHRpb24=",
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTJ0Yi1uYWNodGhpbW1lbC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTI0bS0wNS0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "2 TB",
       "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
      },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "275209edbc0d8ebf14defebdcbabd44dba3b9f41ab2b998b3cbd6078ae2e1380",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile Unlimited S Special mit 15 MBit/s"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 139,99 € (Gerät und Tarif zusammen) · Monatsrate 115,00 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:35:13Z"
-     },
-     "beleg_status": "offen",
+     "befunde": [
+      {
+       "feld": "variante.tarif",
+       "grund": "Seite zeigt O2 Mobile Unlimited M Plus mit 100 MBit/s statt O2 Mobile Unlimited S Special mit 15 MBit/s"
+      },
+      {
+       "feld": "variante.laufzeit",
+       "grund": "Seite zeigt 24 statt 36"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
+     "grund": "Seite zeigt O2 Mobile Unlimited M Plus mit 100 MBit/s statt O2 Mobile Unlimited S Special mit 15 MBit/s",
      "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "2 TB",
       "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
      },
      "werte": {
-      "anschluss": 0.0,
-      "anzahlung": 1.0,
-      "rate": 115.0,
-      "ratenzahl": 36,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        24.99
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTJ0Yi1uYWNodGhpbW1lbC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLXMtc3BlY2lhbC1vbmxpbmUtcHJvbW87cGFja3M9dW10cy1vcHRpb24=",
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile L mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile S mit 15 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile L Plus mit 150 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "2 TB",
       "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "61e0715916046b44c3ed8df67b5bf48500816bf4e19243c803292a5f38457675",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile Unlimited S Special mit 15 MBit/s"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 24 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 197,49 € (Gerät und Tarif zusammen) · Monatsrate 172,50 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:35:17Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
+     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
      "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "2 TB",
       "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
      },
      "werte": {
-      "anschluss": 0.0,
-      "anzahlung": 1.0,
-      "rate": 172.5,
-      "ratenzahl": 24,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        24.99
-       ]
-      ],
-      "volumen_gb": "unbegrenzt"
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
@@ -24732,1282 +25941,81 @@
      }
     },
     {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTJ0Yi1uYWNodGhpbW1lbC0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtbC1vbmxpbmUtcHJvbW87cGFja3M9dW10cy1vcHRpb24=",
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
       "speicher": "2 TB",
       "tarif": "O2 Mobile L mit 150 GB+"
      },
      "befunde": [],
-     "beleg": {
-      "beleg_id": "9c57c39206665d6a9145f20201589ff01ff0ee545dffeb93cb5d5f38bbb365e9",
-      "bildfolge": [
-       {
-        "schritt": "geraet_speicher",
-        "text": "Gerät und Speicher gewählt: iPhone Duo · 2 TB"
-       },
-       {
-        "schritt": "tarif",
-        "text": "Tarif gewählt: O2 Mobile L mit 150 GB+"
-       },
-       {
-        "schritt": "laufzeit",
-        "text": "Laufzeit und Raten gewählt: 36 Monate"
-       },
-       {
-        "schritt": "preis",
-        "text": "Im Bild: einmalig gesamt 7,99 € inkl. 6,99 € Versand; davon Gerät 1,00 € · monatlich 139,99 € (Gerät und Tarif zusammen) · Monatsrate 115,00 €"
-       }
-      ],
-      "bildfolge_fehlt": [],
-      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
-      "zeitpunkt": "2026-11-20T03:35:26Z"
-     },
-     "beleg_status": "offen",
+     "beleg": null,
+     "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": null,
+     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
      "luecken": [],
-     "nachweise": {
-      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
-     },
-     "status": "erfasst",
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "2 TB",
       "tarif": "O2 Mobile L mit 150 GB+"
      },
      "werte": {
-      "anschluss": 0.0,
-      "anzahlung": 1.0,
-      "rate": 115.0,
-      "ratenzahl": 36,
-      "tarifbindung": 24,
-      "tarifphasen": [
-       [
-        1,
-        null,
-        24.99
-       ]
-      ],
-      "volumen_gb": 150.0
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
      }
     },
     {
-     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtZHVvLTJ0Yi1uYWNodGhpbW1lbC0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTM2bS0wNS0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
+     "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
       "speicher": "2 TB",
       "tarif": "O2 Mobile L mit 150 GB+"
      },
-     "befunde": [
-      {
-       "feld": "variante.tarif",
-       "grund": "Seite zeigt O2 Mobile Unlimited M Plus mit 100 MBit/s statt O2 Mobile L mit 150 GB+"
-      },
-      {
-       "feld": "variante.laufzeit",
-       "grund": "Seite zeigt 36 statt 24"
-      }
-     ],
+     "befunde": [],
      "beleg": null,
      "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": "Seite zeigt O2 Mobile Unlimited M Plus mit 100 MBit/s statt O2 Mobile L mit 150 GB+",
+     "grund": "Knopf für tarif nicht klickbar: Locator.click: Timeout 15000ms exceeded.",
      "luecken": [],
-     "status": "befund",
+     "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "2 TB",
       "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "256 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "512 GB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile L mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile on Demand M mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "1 TB",
-      "tarif": "O2 Mobile S mit 15 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile L Plus mit 150 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile on Demand M Plus mit 50 GB+"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited L mit 300 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited M mit 100 MBit/s"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €",
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Option „Einmalzahlung Gerät Gerät einmalig: 4.141,00 € Tarif monatlich19,99 €“ für laufzeit passt nicht auf das Muster",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": null,
-      "speicher": "2 TB",
-      "tarif": "O2 Mobile Unlimited S Special mit 15 MBit/s"
      },
      "werte": {
       "anschluss": null,
@@ -26317,11 +26325,13 @@
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5
+     "library.telefonica.de": 6,
+     "static2.o9.de": 1,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 20.7,
-    "takte_ms": 9700,
+    "sekunden": 13.7,
+    "takte_ms": 5900,
     "wartet_auf": "load"
    },
    "speicher_gb": 2048,
@@ -26330,17 +26340,19 @@
    "stoerung": null,
    "struktur": {
     "anteil_felder": 1.0,
-    "anteil_knoepfe": 0.9626865671641791,
-    "felder_gefunden": 28,
-    "felder_gesucht": 28,
-    "knoepfe_gefunden": 129,
-    "knoepfe_gesucht": 134
+    "anteil_knoepfe": 0.9831932773109243,
+    "felder_gefunden": 7,
+    "felder_gesucht": 7,
+    "knoepfe_gefunden": 117,
+    "knoepfe_gesucht": 119
    },
-   "verworfen": 4
+   "verworfen": 4,
+   "zustand": "neu"
   }
  ],
+ "seitengrund": null,
  "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10237
+ "zeitbudget_sekunden": 10280
 }

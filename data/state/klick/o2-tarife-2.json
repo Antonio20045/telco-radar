@@ -1,18 +1,18 @@
 {
  "anbieter": "o2-tarife-2",
- "datum": "2026-11-20",
- "dauer_sekunden": 96.2,
+ "datum": "2026-11-21",
+ "dauer_sekunden": 103.4,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+ "grund": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
  "karte": "o2-tarife.yaml",
  "laufstatus": "gestoert",
  "lesefrist_tage": 1,
  "name": "o2",
  "seiten": [
   {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "apple-iphone-15",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15-pro-max",
    "gescheitert": 0,
    "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
    "http_status": 200,
@@ -21,7 +21,7 @@
      "antwort_url": null,
      "auswahl": {
       "laufzeit": "36",
-      "speicher": "128 GB",
+      "speicher": "256 GB",
       "tarif": null
      },
      "befunde": [],
@@ -33,7 +33,7 @@
      "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 36,
-      "speicher": "128 GB",
+      "speicher": "256 GB",
       "tarif": null
      },
      "werte": {
@@ -50,7 +50,7 @@
      "antwort_url": null,
      "auswahl": {
       "laufzeit": "24",
-      "speicher": "128 GB",
+      "speicher": "256 GB",
       "tarif": null
      },
      "befunde": [],
@@ -62,101 +62,7 @@
      "status": "nicht_erfasst",
      "variante": {
       "laufzeit": 24,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 140,
-    "beendet": 139,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 2
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 17.1,
-    "takte_ms": 7300,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 128,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "apple-iphone-15-plus",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"pdp-tariff-plans-desktop\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"pdp-tariff-plans-desktop\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "128 GB",
+      "speicher": "256 GB",
       "tarif": null
      },
      "werte": {
@@ -173,19 +79,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 142,
-    "beendet": 138,
+    "beendet": 142,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "api-v4.trbo.com": 1,
-     "library.telefonica.de": 3
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 15.1,
-    "takte_ms": 6900,
+    "sekunden": 20.5,
+    "takte_ms": 9950,
     "wartet_auf": "load"
    },
-   "speicher_gb": 128,
+   "speicher_gb": 256,
    "sperre": null,
    "status": "gestoert",
    "stoerung": "seitenform",
@@ -197,11 +100,136 @@
     "knoepfe_gefunden": 2,
     "knoepfe_gesucht": 5
    },
-   "verworfen": 4
+   "verworfen": 4,
+   "zustand": "neu"
   },
   {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "apple-iphone-15-pro",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-16",
+   "gescheitert": 0,
+   "grund": "Strukturbruch: nur 29 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"pdp-tariff-plans-desktop\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"pdp-tariff-plans-desktop\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "Einmalzahlung Gerät Gerät einmalig: 1.099,00 € Tarif monatlich14,99 €",
+      "speicher": "128 GB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"pdp-tariff-plans-desktop\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "128 GB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 145,
+    "beendet": 141,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 5
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 14.7,
+    "takte_ms": 9150,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": 0.2857142857142857,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 2,
+    "knoepfe_gesucht": 7
+   },
+   "verworfen": 4,
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-16-plus",
    "gescheitert": 0,
    "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
    "http_status": 200,
@@ -267,8 +295,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 140,
-    "beendet": 133,
+    "anfragen": 141,
+    "beendet": 136,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -276,8 +304,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.3,
-    "takte_ms": 5200,
+    "sekunden": 15.8,
+    "takte_ms": 8050,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -292,37 +320,8 @@
     "knoepfe_gefunden": 2,
     "knoepfe_gesucht": 5
    },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "apple-iphone-15-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": null,
-   "kombinationen": [],
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "nicht_besucht"
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "apple-iphone-16",
-   "grund": "3 Seiten in Folge mit anderer Form: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": null,
-   "kombinationen": [],
-   "speicher_gb": 128,
-   "sperre": null,
-   "status": "nicht_besucht"
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "apple-iphone-16-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": null,
-   "kombinationen": [],
-   "speicher_gb": 128,
-   "sperre": null,
-   "status": "nicht_besucht"
+   "verworfen": 4,
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -332,7 +331,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -342,7 +342,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -352,7 +353,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -362,7 +364,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -372,7 +375,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -382,7 +386,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -392,7 +397,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -402,7 +408,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -412,7 +419,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -422,7 +430,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -432,7 +441,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -442,7 +452,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -452,7 +463,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -462,7 +474,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -472,7 +485,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -482,7 +496,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -492,7 +507,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -502,7 +518,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -512,7 +529,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -522,7 +540,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -532,7 +551,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -542,7 +562,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -552,7 +573,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -562,7 +584,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -572,7 +595,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -582,7 +606,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -592,7 +617,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -602,7 +628,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -612,7 +639,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -622,7 +650,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -632,7 +661,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -642,7 +672,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -652,7 +683,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -662,7 +694,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -672,7 +705,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -682,7 +716,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -692,7 +727,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -702,7 +738,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -712,7 +749,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -722,7 +760,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -732,7 +771,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -742,7 +782,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -752,7 +793,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -762,7 +804,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -772,7 +815,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -782,7 +826,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -792,7 +837,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -802,7 +848,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -812,7 +859,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -822,7 +870,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -832,7 +881,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -842,7 +892,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -852,7 +903,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -862,7 +914,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -872,7 +925,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -882,7 +936,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -892,7 +947,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -902,7 +958,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -912,7 +969,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -922,7 +980,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -932,7 +991,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -942,7 +1002,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -952,7 +1013,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -962,7 +1024,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -972,7 +1035,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -982,7 +1046,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -992,7 +1057,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1002,7 +1068,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1012,7 +1079,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1022,7 +1090,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1032,7 +1101,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1042,7 +1112,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1052,7 +1123,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1062,7 +1134,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1072,7 +1145,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1082,7 +1156,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1092,7 +1167,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1102,7 +1178,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1112,7 +1189,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1122,7 +1200,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1132,7 +1211,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1142,7 +1222,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1152,7 +1233,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1162,7 +1244,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1172,7 +1255,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1182,7 +1266,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1192,7 +1277,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1202,7 +1288,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1212,7 +1299,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1222,7 +1310,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1232,7 +1321,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1242,7 +1332,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1252,7 +1343,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1262,7 +1354,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1272,7 +1365,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1282,7 +1376,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -1292,7 +1387,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1302,7 +1398,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1312,7 +1409,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1322,7 +1420,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1332,7 +1431,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1342,7 +1442,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1352,7 +1453,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1362,7 +1464,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1372,7 +1475,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1382,7 +1486,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1392,7 +1497,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1402,7 +1508,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1412,7 +1519,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1422,7 +1530,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1432,7 +1541,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1442,7 +1552,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1452,7 +1563,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1462,7 +1574,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1472,7 +1585,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1482,7 +1596,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1492,7 +1607,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1502,7 +1618,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1512,7 +1629,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1522,7 +1640,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1532,7 +1651,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1542,7 +1662,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1552,7 +1673,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1562,7 +1684,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1572,7 +1695,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1582,7 +1706,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1592,7 +1717,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1602,7 +1728,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1612,7 +1739,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1622,7 +1750,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1632,7 +1761,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1642,7 +1772,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1652,7 +1783,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1662,7 +1794,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1672,7 +1805,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1682,7 +1816,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1692,7 +1827,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1702,7 +1838,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1712,7 +1849,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1722,7 +1860,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1732,7 +1871,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1742,7 +1882,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1752,7 +1893,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1762,7 +1904,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1772,7 +1915,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1782,7 +1926,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1792,7 +1937,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1802,7 +1948,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1812,7 +1959,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1822,7 +1970,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1832,7 +1981,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1842,7 +1992,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -1852,7 +2003,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1862,7 +2014,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1872,7 +2025,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1882,7 +2036,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1892,7 +2047,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1902,7 +2058,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1912,7 +2069,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1922,7 +2080,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1932,7 +2091,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1942,7 +2102,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1952,7 +2113,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1962,7 +2124,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1972,7 +2135,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1982,7 +2146,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -1992,7 +2157,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2002,7 +2168,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2012,7 +2179,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2022,7 +2190,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2032,7 +2201,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2042,7 +2212,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2052,7 +2223,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2062,7 +2234,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2072,7 +2245,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2082,7 +2256,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2092,7 +2267,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2102,7 +2278,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2112,7 +2289,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2122,7 +2300,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2132,7 +2311,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2142,7 +2322,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2152,7 +2333,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2162,7 +2344,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2172,7 +2355,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2182,7 +2366,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2192,7 +2377,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2202,7 +2388,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2212,7 +2399,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2222,7 +2410,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2232,7 +2421,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2242,7 +2432,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2252,7 +2443,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2262,7 +2454,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2272,7 +2465,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2282,7 +2476,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2292,7 +2487,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2302,7 +2498,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2312,7 +2509,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2322,7 +2520,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2332,7 +2531,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2342,7 +2542,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2352,7 +2553,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2362,7 +2564,8 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2372,7 +2575,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2382,7 +2586,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2392,7 +2597,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2402,7 +2608,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2412,7 +2619,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2422,7 +2630,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2432,7 +2641,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2442,7 +2652,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2452,7 +2663,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2462,7 +2674,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2472,7 +2685,8 @@
    "kombinationen": [],
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2482,7 +2696,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2492,7 +2707,8 @@
    "kombinationen": [],
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -2502,9 +2718,44 @@
    "kombinationen": [],
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15",
+   "grund": "3 Seiten in Folge mit anderer Form: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15-plus",
+   "grund": "3 Seiten in Folge mit anderer Form: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15-pro",
+   "grund": "3 Seiten in Folge mit anderer Form: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht",
+   "zustand": "neu"
   }
  ],
+ "seitengrund": null,
  "ueberfaellig": [
   "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
   "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-s",
@@ -2733,5 +2984,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10226
+ "zeitbudget_sekunden": 10242
 }
