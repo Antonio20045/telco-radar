@@ -27,7 +27,9 @@ Seiten kommen dann aus den Kacheln der Übersichten in der Ergebnisdatei dieses
 Schlüssels (``klickliste_kacheln``), reihum verteilt auf alle Einträge mit derselben
 Quelle. Ohne jede Kachel gelten die Produktseiten, die die Ergebnisdatei selbst
 besucht hat; fehlen auch sie, bleibt die Seitenliste leer und ``seitengrund`` nennt den
-Grund; dann leitet ``klickliste_auto`` die Seiten dieses Anbieters ab, sonst nicht.
+Grund. ``klickliste_auto`` leitet die Seiten dieses Anbieters ab, wenn keine Kachel
+Seiten liefert (leer oder nur der Rückfall auf die besuchten Seiten, der von selbst
+nie ein neues Modell aufnimmt: 1&1 iPhone Duo, 21.11.2026), sonst nicht.
 Fehlt eine Übersicht oder kommt sie aus dem Vorrat, nennt ``seitengrund`` das auch.
 """
 
@@ -106,6 +108,7 @@ class Erkundungsziel:
     karte: str | None = None
     seitenquelle: str | None = None
     seitengrund: str | None = None
+    seiten_rueckfall: bool = False
 
     @property
     def kartenschluessel(self) -> str:
@@ -196,7 +199,9 @@ def _mit_kachelseiten(
         if ziel.seitenquelle is not None:
             gruppen.setdefault(ziel.seitenquelle, []).append(stelle)
     for quelle, stellen in gruppen.items():
-        kacheln = lies_kachelseiten(root, quelle, katalog)
+        geschwister = [ziele[s].schluessel for s in stellen]
+        geschwister = [g for g in geschwister if g != quelle]
+        kacheln = lies_kachelseiten(root, quelle, katalog, geschwister)
         for luecke in kacheln.luecken:
             log.warning("Seiten aus der Übersicht %s: %s", quelle, luecke)
         basis = quellen.nach_name(ziele[stellen[0]].name).basis_url
@@ -212,7 +217,12 @@ def _mit_kachelseiten(
             leer = f"{len(seiten)} Seiten aus den Übersichten ({luecken})"
         teile = verteile(seiten, len(stellen))
         for stelle, teil in zip(stellen, teile, strict=True):
-            ziele[stelle] = replace(ziele[stelle], seiten=tuple(teil), seitengrund=leer)
+            ziele[stelle] = replace(
+                ziele[stelle],
+                seiten=tuple(teil),
+                seitengrund=leer,
+                seiten_rueckfall=kacheln.rueckfall,
+            )
     return ziele
 
 
@@ -223,7 +233,11 @@ def _auto_ziele(
     Eintrags dieses Anbieters. Eine abgeleitete Seite, die die Prüfung von ``_seite``
     nicht besteht, entfällt mit Protokoll; sie hält die Handliste nicht an."""
     vorhanden = {(z.name, s.geraet) for z in ziele for s in z.seiten}
-    aus_kacheln = {z.name for z in ziele if z.seitenquelle is not None and z.seiten}
+    aus_kacheln = {
+        z.name
+        for z in ziele
+        if z.seitenquelle is not None and z.seiten and not z.seiten_rueckfall
+    }
     try:
         abgeleitet = leite_ab(root, katalog, vorhanden)
     except KlicklisteAutoFehler as fehler:
