@@ -20,8 +20,9 @@ im Workflow aus dem Schritt „Heute schon gemessen?“ (``--datum``); ohne ``--
   nicht kennt (``nicht_im_soll``): dann zählt die Liste nicht, was angeboten wird.
 
 Stufe 2 (``geraete_angebot.einhaengen``): eine Lücke der Angebotszählung ohne Grund
-ist ``unbenannt`` und rot wie oben; eine fehlende Zählung des Tages ist benannt
-(„Angebot heute nicht gezählt: …“) und bleibt grün.
+ist ``unbenannt`` und rot wie oben, ebenso ein erfasster Preis, den die Seite nicht
+anbietet, ohne Grund (``nicht_im_soll_unbenannt``, Prüfung PR 205); eine fehlende
+Zählung des Tages ist benannt („Angebot heute nicht gezählt: …“) und bleibt grün.
 
 Ein benannter Ausfall (Soll nicht zählbar mit Grund, Lücke mit Grund) bleibt grün und
 steht in der Ausgabe. Rein lesend, ohne Netz.
@@ -57,6 +58,18 @@ def _zeile(zeile: dict) -> list[str]:
     extra = ((zeile.get("ebenen") or {}).get("modelle") or {}).get("nicht_im_soll_zahl")
     if quelle.get("gleiche_quelle_wie_sammler") is False and extra:
         befunde.append(f"{name}: {extra} erfasste Modelle fehlen im unabhängigen Soll")
+    k = (zeile.get("ebenen") or {}).get("kombinationen") or {}
+    ohne = k.get("nicht_im_soll_unbenannt")
+    if k.get("soll") is not None and ohne:
+        beispiele = [
+            e["schluessel"]
+            for e in k.get("nicht_im_soll") or ()
+            if not e.get("benannt")
+        ]
+        befunde.append(
+            f"{name}: {ohne} erfasste Preise ohne Angebot auf der Seite, ohne Grund: "
+            + ", ".join(beispiele[:6])
+        )
     return befunde
 
 

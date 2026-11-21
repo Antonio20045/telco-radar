@@ -65,6 +65,36 @@ def monate(text: str) -> int | None:
     return int(treffer.group(1)) if treffer else None
 
 
+_FUELL = frozenset(
+    {"shop", "geraet", "geraete", "e-shop", "privat", "handys", "smartphones", "de"}
+)
+_SCHREIBUNG = {"iphone": "iPhone", "ipad": "iPad"}
+_SPEICHERWORT = re.compile(r"^\d+(gb|tb)$")
+
+
+def name_aus_adresse(url: str) -> str:
+    """Lesbarer Gerätename aus einer Produktadresse, wenn keine Kachel einen nennt:
+    „…/google-pixel-10a.html“ -> „Google Pixel 10a“, „…/samsung/galaxy-s26/“ ->
+    „Samsung Galaxy S26“; Speicher, Farbe und „details“ dahinter fallen weg."""
+    pfad = urlsplit(url).path.removesuffix(".html").strip("/").split("/")
+    teile = [t for t in pfad if t and t not in _FUELL]
+    wahl = next((i for i, t in enumerate(teile) if "-" in t), len(teile) - 1)
+    if wahl < 0:
+        return url
+    woerter = teile[wahl].split("-")
+    if wahl > 0 and woerter[0] != teile[wahl - 1]:
+        woerter = [teile[wahl - 1], *woerter]
+    name: list[str] = []
+    for i, w in enumerate(woerter):
+        danach = woerter[i + 1] if i + 1 < len(woerter) else ""
+        if name and (
+            _SPEICHERWORT.match(w) or (w.isdigit() and danach in {"gb", "tb"})
+        ):
+            break
+        name.append(w)
+    return " ".join(_SCHREIBUNG.get(w, w[:1].upper() + w[1:]) for w in name)
+
+
 def ist_smartphone(titel: str) -> bool:
     """Grobe Sperre gegen Uhren, Kinderuhren, Roller und Zubehör in einer Übersicht."""
     return not NICHT_SMARTPHONE.search((titel or "").split(" mit ")[0])
@@ -259,14 +289,16 @@ def vodafone_tarifoptionen(html: str) -> list[Option]:
 
 
 def vodafone_tarifname(html: str) -> str:
-    """Name des gewählten Tarifs aus der Angebotsübersicht („Mobil XS mit 23 GB“)."""
+    """Name des gewählten Tarifs aus der Angebotsübersicht: „Mobil XS“ aus „Mobil XS
+    mit 23 GB“ (der Zusatz beschreibt das Volumen, die Kachel nennt den Namen so)."""
     kopf = _soup(html).select_one(
         ".ws10-offer-summary-card h2, .ws10-offer-summary-card h3"
     )
     name = _text(kopf)
     if not name:
         raise LeserFehler("Vodafone: kein Tarifname in der Angebotsübersicht")
-    return name
+    treffer = _VF_NAME.search(name)
+    return treffer.group(0) if treffer else name
 
 
 _VF_NAME = re.compile(r"\bMobil (?:XS|S|M|L|XL)\b")

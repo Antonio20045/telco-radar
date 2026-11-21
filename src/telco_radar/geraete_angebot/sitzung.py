@@ -44,6 +44,11 @@ _SCROLL_JS = r"""(s) => {
   if (it.length) it[it.length - 1].scrollIntoView();
   window.scrollBy(0, 300);
 }"""
+_HAT_JS = r"""(muster) => {
+  const re = new RegExp(muster, 'i');
+  return [...document.querySelectorAll('button, a, [role=button]')]
+    .some(x => re.test((x.innerText || '').trim()) && x.offsetParent !== null);
+}"""
 _TEXT_JS = "() => document.body ? document.body.innerText : ''"
 _SCHLANK_JS = r"""() => {
   const k = document.documentElement.cloneNode(true);
@@ -71,8 +76,20 @@ class Sitzung:
         host = url.split("/")[2]
         if host not in self.abgelehnt:
             self.abgelehnt.add(host)
-            if self.klicke_text(ABLEHNEN):
+            self.lehne_ab()
+
+    def lehne_ab(self) -> bool:
+        """Einwilligung ablehnen; der Locator sucht auch im Shadow-DOM (o2)."""
+        knopf = self.page.get_by_role("button", name=re.compile(ABLEHNEN, re.I))
+        for i in range(knopf.count()):
+            if knopf.nth(i).is_visible():
+                knopf.nth(i).evaluate("e => e.click()")
                 self.page.wait_for_timeout(800)
+                return True
+        if self.klicke_text(ABLEHNEN):
+            self.page.wait_for_timeout(800)
+            return True
+        return False
 
     def pruefe_schutz(self, status: int | None = None) -> None:
         """``Gesperrt``, wenn die aktuelle Seite eine Schutzseite ist."""
@@ -93,6 +110,10 @@ class Sitzung:
     def klicke_text(self, muster: str, wurzel: str | None = None) -> str | None:
         """Klickt das erste sichtbare Bedienelement, dessen Text ``muster`` trifft."""
         return self.page.evaluate(_KLICK_JS, [muster, wurzel])
+
+    def hat_text(self, muster: str) -> bool:
+        """Gibt es ein sichtbares Bedienelement, dessen Text ``muster`` trifft?"""
+        return bool(self.page.evaluate(_HAT_JS, muster))
 
     def klicke(self, selektor: str, warte_ms: int = WARTE_KLICK_MS) -> bool:
         """Klickt das erste Element zu ``selektor`` (per DOM-Klick, der auch unter
@@ -135,6 +156,7 @@ class Sitzung:
         alt, stabil, n = -1, 0, 0
         for _ in range(runden):
             self.page.evaluate(_SCROLL_JS, zaehle_js)
+            self.page.mouse.wheel(0, 600)
             self.page.wait_for_timeout(1500)
             n = int(
                 self.page.evaluate(

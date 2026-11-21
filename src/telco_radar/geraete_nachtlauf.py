@@ -57,6 +57,17 @@ def mindest_sekunden(http_cfg: dict) -> float:
     return 2 * float(http_cfg.get("timeout_seconds", 20)) + 5.0
 
 
+def signale_fuer(tco: TcoDB, bilanz: dict, heute: str) -> Signale:
+    """Was der Lauf über Ausfälle weiß; auch für den Nachtrag einer späten
+    Angebotszählung (``geraete_angebot_nachtrag``)."""
+    return Signale(
+        erfassung=dict(tco.erfassung or {}),
+        tarifwelt=dict(bilanz.get("tarifwelt") or {}),
+        tarifwelt_modelle=tuple(geraete_tarifwelt.modelle_der_stufe()),
+        ausfall=None if tco.updated == heute else AUSFALL_BESTAND,
+    )
+
+
 def schliesse_ab(
     root: Path,
     heute: str,
@@ -73,12 +84,7 @@ def schliesse_ab(
         lade_quellen(Path(root)), hole, uhr, katalog, rest, mindest
     )
     tco = TcoDB(zustand / "geraete_tco.json")
-    signale = Signale(
-        erfassung=dict(tco.erfassung or {}),
-        tarifwelt=dict(bilanz.get("tarifwelt") or {}),
-        tarifwelt_modelle=tuple(geraete_tarifwelt.modelle_der_stufe()),
-        ausfall=None if tco.updated == heute else AUSFALL_BESTAND,
-    )
+    signale = signale_fuer(tco, bilanz, heute)
     namen = {g.device_id: geraete_soll.anzeigename(g) for g in katalog.geraete}
     buendel = list(tco.buendel())
     voll = baue(

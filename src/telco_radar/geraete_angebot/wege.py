@@ -22,56 +22,87 @@ ANNAHME_RATEN_JE_TARIF = "Raten je Tarif auf dem vorgewählten Speicher gelesen"
 ANNAHME_TW_LAUFZEIT = "Tarifwelt: Gerät einmalig bezahlt, Vertragslaufzeit 24 Monate"
 
 
-def uebersicht(
-    schluessel: str, s: Sitzung, url: str
-) -> tuple[list[Kachel], int | None]:
-    """Die Smartphone-Kacheln der Übersicht und die vom Anbieter genannte Zahl."""
+NACHLADEN = r"^(mehr|weitere)\b.*\b(anzeigen|laden)$"
+"""Ein Knopf, der weitere Kacheln nachlädt („Weitere Geräte anzeigen“)."""
+HOECHSTENS_NACHLADEN = 30
+
+
+def _nachladen(s: Sitzung, muster: str, warte_ms: int) -> str | None:
+    """Klickt „mehr anzeigen“, bis der Knopf fehlt; Beleg nur, wenn er am Ende fehlt."""
+    for n in range(HOECHSTENS_NACHLADEN):
+        if not s.klicke_text(muster):
+            return f"Nachladen bis zum Ende ({n}-mal), danach kein Knopf mehr"
+        s.page.wait_for_timeout(warte_ms)
+    return None
+
+
+def _ohne_knopf(s: Sitzung) -> str | None:
+    s.scrolle_bis_stabil("a[href]", runden=4)
+    if s.hat_text(NACHLADEN):
+        return None
+    return "Seite ohne Nachlade-Knopf, ganz gescrollt"
+
+
+Uebersicht = tuple[list[Kachel], int | None, str | None]
+
+
+def uebersicht(schluessel: str, s: Sitzung, url: str) -> Uebersicht:
+    """Die Kacheln der Übersicht, die vom Anbieter genannte Zahl und der Beleg, dass
+    bis zum Ende gelesen wurde (``None``, wenn es keinen gibt)."""
     s.oeffne(url)
     if schluessel == "telekom":
-        for _ in range(30):
-            if not s.klicke_text(r"^weitere geräte anzeigen$"):
-                break
-            s.page.wait_for_timeout(3000)
-        return L.telekom_kacheln(s.html("uebersicht")), None
+        ende = _nachladen(s, r"^weitere geräte anzeigen$", 3000)
+        return L.telekom_kacheln(s.html("uebersicht")), None, ende
     if schluessel == "vodafone":
-        for _ in range(30):
-            if not s.klicke_text(r"^mehr smartphones anzeigen$"):
-                break
-            s.page.wait_for_timeout(2500)
+        ende = _nachladen(s, r"^mehr smartphones anzeigen$", 2500)
         genannt = L.genannte_zahl(s.text(), r"(\d+) Smartphones sortiert")
-        return L.vodafone_kacheln(s.html("uebersicht")), genannt
+        return L.vodafone_kacheln(s.html("uebersicht")), genannt, ende
     if schluessel == "o2":
         return _o2_uebersicht(s)
     if schluessel == "1und1":
-        return L.einsundeins_kacheln(s.html("uebersicht")), None
+        ende = _ohne_knopf(s)
+        return L.einsundeins_kacheln(s.html("uebersicht")), None, ende
     if schluessel == "congstar":
-        return L.congstar_kacheln(s.html("uebersicht")), None
+        ende = _ohne_knopf(s)
+        return L.congstar_kacheln(s.html("uebersicht")), None, ende
+    ende = _ohne_knopf(s)
     genannt = L.genannte_zahl(s.text(), r"Alle Smartphones\s*\((\d+)\)")
-    return L.tarifwelt_kacheln(s.html("uebersicht")), genannt
+    return L.tarifwelt_kacheln(s.html("uebersicht")), genannt, ende
 
 
-def _o2_uebersicht(s: Sitzung) -> tuple[list[Kachel], int | None]:
+def _o2_uebersicht(s: Sitzung) -> Uebersicht:
     """Der Shop lädt unter „Alle“ höchstens 36 Kacheln nach; je Herstellerfilter
     lädt er alle. Gezählt wird je Hersteller bis zum Ende, verglichen mit der Zahl,
-    die der Filter nennt („Apple (33)“)."""
+    die der Filter nennt („Apple (33)“); Beleg nur, wenn jede Zahl erreicht ist."""
     filter_ = s.page.locator("label.filter-item-label")
     texte = [filter_.nth(i).inner_text() for i in range(filter_.count())]
     genannt = next(
         (int(m.group(1)) for t in texte if (m := re.match(r"Alle \((\d+)\)", t))), None
     )
     kacheln: dict[str, Kachel] = {}
+    abweichend = []
     for i, text in enumerate(texte):
         if text.startswith("Alle"):
             continue
         filter_.nth(i).click()
         s.page.wait_for_timeout(3000)
         s.scrolle_bis_stabil("div.hardware-item")
-        for k in L.o2_kacheln(s.html(f"uebersicht-{text}")):
+        gelesen = L.o2_kacheln(s.html(f"uebersicht-{text}"))
+        zahl = L.genannte_zahl(text, r"\((\d+)\)")
+        if zahl != len(gelesen):
+            abweichend.append(f"{text}: {len(gelesen)} gelesen")
+        for k in gelesen:
             kacheln.setdefault(k.url, k)
-    if not texte:
-        s.scrolle_bis_stabil("div.hardware-item")
-        kacheln = {k.url: k for k in L.o2_kacheln(s.html("uebersicht"))}
-    return list(kacheln.values()), genannt
+    ende = None
+    if texte and not abweichend:
+        ende = "je Herstellerfilter so viele Kacheln wie genannt"
+    return list(kacheln.values()), genannt, ende
+
+
+def o2_tarifuebersicht(s: Sitzung) -> list[Option]:
+    """Die Tarifübersicht einmal je Lauf: Tarife mit „Handy hinzufügen“."""
+    s.oeffne(LS.O2_TARIFUEBERSICHT)
+    return LS.o2_tarifuebersicht(s.html("tarifuebersicht"))
 
 
 def _setze(seite: Seite, geraet: dict) -> None:
@@ -167,11 +198,7 @@ def vodafone(s: Sitzung, seite: Seite) -> None:
         for k in _kreuz([sp], namen, raten_je[sp.wert])
         if (kurz.get(k[1], ""), k[2]) not in ausschluss
     ]
-    if ausschluss:
-        seite.annahmen.append(
-            "laut Seite ausgeschlossen: "
-            + ", ".join(f"{t} mit {n} Raten" for t, n in sorted(ausschluss))
-        )
+    seite.ausgeschlossen = [[t, n] for t, n in sorted(ausschluss)]
 
 
 def o2(s: Sitzung, seite: Seite) -> None:
@@ -263,12 +290,14 @@ def _tarifwelt_dialog(s: Sitzung, seite: Seite, speicher: str) -> list[list]:
         label = f"label[for='form-rhf-checkbox-carrier_{netz}']"
         s.klicke(label, 2300)
         weitere, gewaehlt = LS.tarifwelt_tarifnamen(s.html(f"netz-{netz}-{speicher}"))
-        namen = weitere + ([gewaehlt] if gewaehlt and zahl == len(weitere) + 1 else [])
-        if len(namen) != zahl:
-            seite.annahmen.append(
-                f"Tarifwelt {speicher} {netz}: {zahl} genannt, {len(namen)} gelesen"
+        karten = weitere + ([gewaehlt] if gewaehlt and zahl == len(weitere) + 1 else [])
+        if len(karten) != zahl:
+            seite.unvollstaendig.append(
+                f"{speicher}, Netz {netz}: Seite nennt {zahl} Tarife, "
+                f"gelesen {len(karten)}"
             )
-        kombis += [[speicher, n, 24, NETZ_ALIAS.get(netz, netz)] for n in namen]
+        ziel = NETZ_ALIAS.get(netz, netz)
+        kombis += [[speicher, n, 24, ziel, code] for n, code in karten]
         s.klicke(label, 1200)
     return kombis
 

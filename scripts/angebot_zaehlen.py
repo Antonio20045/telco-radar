@@ -30,8 +30,12 @@ Grund in der Datei. ``JOB_MINUTEN`` ist das ``timeout-minutes`` der Vorlage.
 from __future__ import annotations
 
 import argparse
+import os
+import shutil
+import subprocess
 import sys
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -41,7 +45,12 @@ from playwright.sync_api import sync_playwright
 
 from telco_radar import geraete_angebot as ga
 from telco_radar.geraete_angebot import wege
-from telco_radar.geraete_angebot.lesen import LeserFehler, ist_smartphone
+from telco_radar.geraete_angebot.konkurrenz import Konkurrenz, NichtPruefbar
+from telco_radar.geraete_angebot.lesen import (
+    LeserFehler,
+    ist_smartphone,
+    name_aus_adresse,
+)
 from telco_radar.geraete_angebot.sitzung import Sitzung
 from telco_radar.geraete_angebot.tor import Gesperrt, Tor
 
@@ -76,16 +85,6 @@ def abstand(root: Path, name: str) -> float:
     return max(ga.MINDESTABSTAND_S, float(eintrag.get("rate_limit_sekunden") or 0.0))
 
 
-def titel_aus_adresse(url: str) -> str:
-    """Titel für ``--seiten`` (ohne Übersicht): der Pfad als Wörter, damit die
-    Katalogzuordnung beim Einhängen greift („samsung galaxy s26 256gb …“)."""
-    teile = url.split("://", 1)[-1].split("?")[0].split("/")[1:]
-    woerter = " ".join(teile).replace("-", " ").replace(".html", "")
-    return " ".join(
-        w for w in woerter.split() if w not in {"shop", "geraet", "e", "privat"}
-    )
-
-
 def seiten_aus(kacheln: list[ga.Kachel], hoechstens: int | None) -> list[ga.Seite]:
     """Je Smartphone-Kachel ohne Paket eine Seite (Pakete zählen nur als Modell)."""
     seiten = [
@@ -98,11 +97,43 @@ def seiten_aus(kacheln: list[ga.Kachel], hoechstens: int | None) -> list[ga.Seit
 
 def _status(z: ga.Zaehlung) -> str:
     gelesen = sum(1 for s in z.seiten if s.status == ga.GELESEN)
-    if z.laufstatus in (ga.GESPERRT, ga.GESTOERT):
+    if z.laufstatus in (ga.GESPERRT, ga.GESTOERT, ga.ZEITGRENZE):
         return z.laufstatus
-    if gelesen == len(z.seiten) and z.kacheln:
+    ganz, beleg = ga.uebersicht_pruefung(z)
+    if not ganz and z.kacheln:
+        z.grund = z.grund or beleg
+    if gelesen == len(z.seiten) and z.kacheln and ganz:
         return ga.GELESEN
     return ga.TEILWEISE if gelesen else ga.GESTOERT
+
+
+def gh_abfrage() -> Callable[[str], int] | None:
+    """Zahl laufender und wartender Läufe eines Workflows über ``gh api`` (nur
+    lesend); ``None`` ohne ``GITHUB_REPOSITORY`` oder ``gh`` (lokal)."""
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if not repo or not shutil.which("gh"):
+        return None
+
+    def abfrage(workflow: str) -> int:
+        zahl = 0
+        for status in ("in_progress", "queued"):
+            pfad = f"repos/{repo}/actions/workflows/{workflow}/runs?status={status}"
+            try:
+                aus = subprocess.run(
+                    ["gh", "api", pfad, "--jq", ".total_count"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    check=False,
+                )
+            except (OSError, subprocess.TimeoutExpired) as fehler:
+                raise NichtPruefbar(str(fehler)) from fehler
+            if aus.returncode != 0 or not aus.stdout.strip().isdigit():
+                raise NichtPruefbar((aus.stderr or aus.stdout).strip()[:150])
+            zahl += int(aus.stdout.strip())
+        return zahl
+
+    return abfrage
 
 
 def kurzgrund(fehler: Exception) -> str:
@@ -113,10 +144,15 @@ def kurzgrund(fehler: Exception) -> str:
     return f"Browserfehler: {zeile}"[:300]
 
 
-def zaehle_seiten(z: ga.Zaehlung, s: Sitzung, weg, ende: float, mono) -> None:
-    """Liest jede Seite, solange Zeit ist; Sperre und Serienfehler beenden benannt."""
+def zaehle_seiten(
+    z: ga.Zaehlung, s: Sitzung, weg, ende: float, mono, konkurrenz: Konkurrenz
+) -> None:
+    """Liest jede Seite, solange Zeit ist; Sperre, Serienfehler und ein paralleler
+    Lauf auf demselben Host beenden benannt."""
     fehler_folge, abbruch = 0, None
     for seite in z.seiten:
+        if abbruch is None and (anderer := konkurrenz.zwischendurch(ende)):
+            abbruch = f"nicht gezählt: {anderer}"
         if abbruch:
             seite.status, seite.grund = ga.NICHT_GELESEN, abbruch
             continue
@@ -142,6 +178,16 @@ def zaehle_seiten(z: ga.Zaehlung, s: Sitzung, weg, ende: float, mono) -> None:
         fehler_folge = 0
         seite.status, seite.sekunden = ga.GELESEN, round(mono() - beginn, 1)
         print(f"{z.schluessel}: {seite.titel}: {seite.sekunden} s")
+
+
+def tarifuebersicht(z: ga.Zaehlung, s: Sitzung) -> None:
+    """o2: Tarife der Tarifübersicht mit „Handy hinzufügen“; ein Ausfall wird
+    benannt, die Produktseiten-Auswahl gilt dann allein."""
+    try:
+        z.tarifuebersicht = wege.o2_tarifuebersicht(s)
+    except (LeserFehler, PlaywrightError) as fehler:
+        z.tarifuebersicht_grund = f"Tarifübersicht nicht gelesen: {kurzgrund(fehler)}"
+        print(f"::warning::o2 {z.tarifuebersicht_grund}")
 
 
 def lauf(
@@ -180,29 +226,35 @@ def lauf(
             abstand(Path(args.root), anbieter.abstand_konfig),
         )
         s = Sitzung(kontext.new_page(), tor, args.aufnehmen)
+        konkurrenz = Konkurrenz(gh_abfrage(), anbieter.schluessel, mono, time.sleep)
         try:
+            if anderer := konkurrenz.frei(ende):
+                raise Gesperrt(f"nicht gezählt: {anderer}")
             if args.seiten:
-                z.kacheln = [ga.Kachel(u, titel_aus_adresse(u)) for u in args.seiten]
+                z.kacheln = [ga.Kachel(u, name_aus_adresse(u)) for u in args.seiten]
             else:
                 beginn = mono()
-                z.kacheln, z.genannt = wege.uebersicht(
+                z.kacheln, z.genannt, z.uebersicht_ende = wege.uebersicht(
                     anbieter.schluessel, s, anbieter.uebersicht
                 )
                 z.sekunden_uebersicht = round(mono() - beginn, 1)
+                if anbieter.schluessel == "o2":
+                    tarifuebersicht(z, s)
                 print(
                     f"{z.schluessel}: Übersicht {len(z.kacheln)} Kacheln, "
                     f"genannt {z.genannt}, {z.sekunden_uebersicht} s"
                 )
         except Gesperrt as sperre:
-            z.laufstatus, z.grund = ga.GESPERRT, str(sperre)
+            gesperrt = not str(sperre).startswith("nicht gezählt")
+            z.laufstatus = ga.GESPERRT if gesperrt else ga.ZEITGRENZE
+            z.grund = str(sperre)
         except (LeserFehler, PlaywrightError) as fehler:
-            z.laufstatus, z.grund = (
-                ga.GESTOERT,
-                f"Übersicht: {type(fehler).__name__}: {fehler}"[:300],
-            )
-        z.seiten = seiten_aus(z.kacheln, args.hoechstens)
+            z.laufstatus, z.grund = ga.GESTOERT, f"Übersicht: {kurzgrund(fehler)}"
+        z.seiten = [] if args.nur_uebersicht else seiten_aus(z.kacheln, args.hoechstens)
         if z.laufstatus == ga.NICHT_GELESEN:
-            zaehle_seiten(z, s, wege.SEITEN[anbieter.schluessel], ende, mono)
+            weg = wege.SEITEN[anbieter.schluessel]
+            zaehle_seiten(z, s, weg, ende, mono, konkurrenz)
+        z.konkurrenz = konkurrenz.vermerk or "keine parallelen Läufe auf diesem Host"
         browser.close()
     z.laufstatus = _status(z)
     z.gezaehlt_bis = datetime.now(UTC).isoformat(timespec="seconds")
@@ -217,6 +269,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--job-start", type=float, default=None)
     p.add_argument("--job-frist-sekunden", type=float, default=None)
     p.add_argument("--hoechstens", type=int, default=None)
+    p.add_argument("--nur-uebersicht", action="store_true")
     p.add_argument("--seiten", nargs="*", default=None)
     p.add_argument("--ausgabe", type=Path, default=None)
     p.add_argument("--aufnehmen", type=Path, default=None)

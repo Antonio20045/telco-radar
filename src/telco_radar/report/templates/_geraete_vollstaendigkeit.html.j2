@@ -27,7 +27,13 @@
           {% for u in z.ungezaehlt %}<li>{% if u.url %}<a href="{{ u.url }}" rel="noopener">{{ u.name }}</a>{% else %}{{ u.name }}{% endif %}: nicht gezählt ({{ u.grund }})</li>{% endfor %}
         </ul>
         {% endif %}
+        {% for h in z.hinweise %}<p class="gr-vs-grund">{{ h }}</p>{% endfor %}
         {% if z.nicht_im_soll %}<p class="gr-vs-extra">{{ z.nicht_im_soll }}</p>{% endif %}
+        {% if z.extras %}
+        <ul class="gr-vs-luecken gr-vs-extras">
+          {% for e in z.extras %}<li data-schluessel="{{ e.schluessel }}"{% if not e.benannt %} class="gr-vs-unbenannt"{% endif %}>{{ e.name }}: {{ e.grund }}</li>{% endfor %}
+        </ul>
+        {% endif %}
         {% if z.quelle_url %}<p class="gr-vs-quelle">Liste: <a href="{{ z.quelle_url }}" rel="noopener">{{ z.quelle_text }}</a>{% if z.gezaehlt %}, gezählt am {{ z.gezaehlt }}{% endif %}{% if z.gleiche_quelle %} · {{ z.gleiche_quelle }}{% endif %}</p>{% endif %}
       </details>
       {% if z.ausfall %}<p class="gr-vs-ausfall">{{ z.ausfall }}</p>{% endif %}

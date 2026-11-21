@@ -11,6 +11,7 @@ import re
 
 from bs4 import Tag
 
+from ..geraete_tarifschluessel import preis_code
 from . import Option
 from .lesen import (
     LeserFehler,
@@ -77,6 +78,30 @@ def o2_geraet(html: str) -> dict:
         "ausserhalb": ausserhalb,
         "farben": [_option(e, lab) for e, lab in farben],
     }
+
+
+O2_TARIFUEBERSICHT = "https://www.o2online.de/tarife/"
+
+
+def o2_tarifuebersicht(html: str) -> list[Option]:
+    """Tarifübersicht: je Tarifkachel der Link „Handy hinzufügen“ (``/e-shop?tarif=
+    <slug>``), ein sichtbarer Kaufweg mit Gerät neben der Produktseite (Befund
+    21.11.2026, ``berichte/o2-nicht-plus.md``). Wert ist der Slug, Text ein lesbarer
+    Name daraus; die Kachel nennt keinen vollständigen Tarifnamen."""
+    gesehen: dict[str, Option] = {}
+    for a in _soup(html).find_all("a", href=re.compile(r"[?&]tarif=")):
+        if _text(a) != "Handy hinzufügen":
+            continue
+        treffer = re.search(r"[?&]tarif=([a-z0-9-]+)", str(a.get("href") or ""))
+        if treffer:
+            slug = treffer.group(1)
+            name = " ".join(
+                w.upper() if w == "o2" else w.capitalize() for w in slug.split("-")
+            )
+            gesehen.setdefault(slug, Option(name, slug))
+    if not gesehen:
+        raise LeserFehler("o2: keine Tarifkachel mit „Handy hinzufügen“")
+    return list(gesehen.values())
 
 
 def einsundeins_geraet(html: str) -> dict:
@@ -253,26 +278,49 @@ def tarifwelt_netzzahlen(html: str) -> dict[str, int]:
     return zahlen
 
 
-def tarifwelt_tarifnamen(html: str) -> tuple[list[str], str | None]:
-    """Namen der Tarife unter dem gesetzten Filter („Tarif: <Name>, Datenvolumen …“)
-    und der Name des ausgewählten Tarifs (eigener Abschnitt)."""
+_TW_GERAET = re.compile(r"Gerätepreis:?\s*([\d.]*\d(?:,\d+)?) Euro")
+_TW_MONAT = re.compile(
+    r"(?:monatlicher Preis:|Tarif monatlich)\s*([\d.]*\d(?:,\d+)?) Euro"
+)
+
+
+def _euro(treffer: re.Match | None) -> float | None:
+    if treffer is None:
+        return None
+    return float(treffer.group(1).replace(".", "").replace(",", "."))
+
+
+def tarifwelt_karte(aria: str) -> tuple[str, str]:
+    """(Name, Preis-Code) einer Tarifkarte aus ihrem ``aria-label`` („Tarif: Mobile
+    Unlimited L Promo , Datenvolumen: …, Gerätepreis: 1 Euro, monatlicher Preis:
+    59,99 Euro …“); der Preis unterscheidet gleichnamige Tarife."""
+    name = aria[6:].split(", Datenvolumen")[0].strip()
+    code = preis_code(_euro(_TW_GERAET.search(aria)), _euro(_TW_MONAT.search(aria)))
+    return name, code
+
+
+def tarifwelt_tarifnamen(
+    html: str,
+) -> tuple[list[tuple[str, str]], tuple[str, str] | None]:
+    """Karten unter dem gesetzten Filter und die Karte des ausgewählten Tarifs
+    (eigener Abschnitt), je als (Name, Preis-Code)."""
     soup = _soup(html)
     dialog = (soup.find_all(role="dialog") or [soup])[-1]
 
-    def namen(abschnitt) -> list[str]:
+    def karten(abschnitt) -> list[tuple[str, str]]:
         if abschnitt is None:
             return []
         return [
-            str(b["aria-label"])[6:].split(", Datenvolumen")[0].strip()
+            tarifwelt_karte(str(b["aria-label"]))
             for b in abschnitt.find_all(
                 "button", attrs={"aria-label": re.compile(r"^Tarif: ")}
             )
         ]
 
-    weitere = namen(
+    weitere = karten(
         dialog.find("section", attrs={"aria-label": re.compile(r"^Weitere")})
     )
-    gewaehlt = namen(
+    gewaehlt = karten(
         dialog.find("section", attrs={"aria-label": re.compile(r"^Aktuell")})
     )
     return weitere, (gewaehlt[0] if gewaehlt else None)

@@ -34,7 +34,12 @@ from dataclasses import dataclass, field
 
 from .analyze.buendel_angebot import angebot_ohne_farbe, modell_und_speicher
 from .geraete_soll import SATURN_NETZE
-from .geraete_tarifschluessel import nummeriert, vergleich_eintrag
+from .geraete_tarifschluessel import (
+    normiert,
+    nummeriert,
+    preis_code,
+    vergleich_eintrag,
+)
 
 ERWARTET = ("Telekom", "Vodafone", "o2", "1&1", "congstar", *SATURN_NETZE)
 EBENEN = ("modelle", "modell_speicher", "kombinationen")
@@ -110,7 +115,10 @@ def _nimm(ist: Ist, b: dict) -> None:
         ist.laufzeiten.add(b["laufzeit_monate"])
     kombi = kombi_schluessel(str(b.get("id") or ""))
     if kombi is not None:
-        ist.kombi_roh.add(kombi)
+        preis = ""
+        if b.get("anbieter") in SATURN_NETZE:
+            preis = preis_code(b.get("geraet_zuzahlung"), b.get("tarif_monatlich"))
+        ist.kombi_roh.add((kombi, preis))
 
 
 def ist_zaehlung(buendel: Iterable, datum: str) -> dict[str, Ist]:
@@ -123,7 +131,9 @@ def ist_zaehlung(buendel: Iterable, datum: str) -> dict[str, Ist]:
             continue
         _nimm(je.setdefault(name, Ist()), b)
     for ist in je.values():
-        ist.kombinationen = nummeriert(vergleich_eintrag(k) for k in ist.kombi_roh)
+        ist.kombinationen = nummeriert(
+            vergleich_eintrag(k, p) for k, p in ist.kombi_roh
+        )
     return je
 
 
@@ -314,7 +324,7 @@ class SichtbareAuswahl:
                 for t in self.tarife
                 for n in self.laufzeiten
             )
-        return {f"{self.modell}-{s}--{t}--{n}m" for s, t, n in auswahl}
+        return {f"{self.modell}-{s}--{normiert(t)}--{n}m" for s, t, n in auswahl}
 
 
 def modell_der_kombination(schluessel: str) -> str | None:
@@ -331,6 +341,7 @@ def haenge_kombinationen_ein(
     grund: Callable[[str], str] | None = None,
     ausgenommen: Iterable[str] = (),
     quelle: dict | None = None,
+    grund_extra: Callable[[str], str] | None = None,
 ) -> dict:
     """Setzt das Kombinations-Soll eines Anbieters aus den Seiten des Browser-Zählers
     (Stufe 2) und rechnet Lücken und ``unbenannt`` neu; Ist aus ``buendel`` wie oben.
@@ -338,7 +349,9 @@ def haenge_kombinationen_ein(
     ``grund(schluessel)`` nennt je Lücke den Grund aus den Signalen
     (``geraete_angebot.einhaengen``); ohne ihn gilt der Ausfallvermerk des Anbieters,
     sonst ``UNBENANNT``. ``ausgenommen`` sind Modelle, deren Seite nicht gezählt
-    wurde: ihr Ist fällt aus dem Vergleich, statt als „nicht im Soll“ zu erscheinen."""
+    wurde: ihr Ist fällt aus dem Vergleich, statt als „nicht im Soll“ zu erscheinen.
+    ``grund_extra(schluessel)`` benennt einen erfassten Preis ohne Angebot auf der
+    Seite; ohne Grund zählt er in ``nicht_im_soll_unbenannt`` (Wächter rot)."""
     seiten = [a for a in auswahlen if a.anbieter == anbieter]
     zeile = next(z for z in voll["anbieter"] if z["name"] == anbieter)
     weg = set(ausgenommen)
@@ -358,14 +371,17 @@ def haenge_kombinationen_ein(
         fehlend, extra = sorted(soll - ist), sorted(ist - soll)
         gruende = {k: (grund(k) if grund else fest) for k in fehlend}
         ohne = sum(1 for g in gruende.values() if g == UNBENANNT)
+        extras = [
+            _luecke(k, k, "", grund_extra(k) if grund_extra else UNBENANNT)
+            for k in extra
+        ]
         ebene.update(
             erfasst=len(soll & ist),
             luecken=[_luecke(k, k, "", gruende[k]) for k in fehlend][:LISTE_HOECHSTENS],
             luecken_zahl=len(fehlend),
-            nicht_im_soll=[{"schluessel": k, "name": k} for k in extra][
-                :LISTE_HOECHSTENS
-            ],
+            nicht_im_soll=extras[:LISTE_HOECHSTENS],
             nicht_im_soll_zahl=len(extra),
+            nicht_im_soll_unbenannt=sum(1 for e in extras if not e["benannt"]),
             quelle=quelle
             or {
                 "art": "browser_auswahl",

@@ -37,7 +37,8 @@ def _b(anbieter: str, sku: str, tarif_slug: str, laufzeit: int = 24) -> dict:
 
 def test_ist_vergleicht_den_grundtarif_nicht_die_schreibweise_der_messung():
     """„O2 Mobile L Plus mit 150 GB+ (24 Mon.)“ und „… mit 150 GB+“ sind auf der
-    Seite EIN Tarif; die Seite nennt ihn „O2 Mobile L Plus mit 150 GB+“."""
+    Seite EIN Tarif; die Seite nennt ihn „O2 Mobile L Plus mit 150 GB+“. Ein anderes
+    Datenvolumen bliebe ein anderer Tarif (Prüfung PR 205)."""
     sku = "apple-iphone-17-256gb-schwarz"
     buendel = [
         _b("o2", sku, "o2-mobile-l-plus-mit-150-gb-24-mon"),
@@ -46,7 +47,7 @@ def test_ist_vergleicht_den_grundtarif_nicht_die_schreibweise_der_messung():
     ]
     ist = ist_zaehlung(buendel, TAG)["o2"]
     assert ist.kombinationen == {
-        "apple-iphone-17-256gb--o2-mobile-l-plus--24m",
+        "apple-iphone-17-256gb--o2-mobile-l-plus-mit-150gb--24m",
         "apple-iphone-17-256gb--o2-mobile-special--36m",
     }
     assert ist.zahlen()["buendel"] == 3
@@ -99,6 +100,10 @@ def _voll_mit_angeboten() -> dict:
             "status": "gelesen",
             "nicht_gezaehlt": [],
             "nicht_gezaehlt_zahl": 0,
+            "uebersicht": {
+                "vollstaendig": True,
+                "beleg": "Übersicht nennt 1, gelesen 1",
+            },
         }
     return {"vollstaendigkeit": voll}
 

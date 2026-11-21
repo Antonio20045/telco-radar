@@ -108,12 +108,10 @@ def test_vodafone_tarife_auf_der_seite_oder_in_der_tarifauswahl():
     assert L.vodafone_tarife_inline(_html("vodafone_galaxy_s26")) == []
     auswahl = L.vodafone_tarifoptionen(_html("vodafone_iphone17pro_tarifauswahl"))
     assert [o.wert for o in auswahl] == ["267", "268", "271"]
-    assert L.vodafone_tarifname(_html("vodafone_iphone17pro_tarifauswahl")) == (
-        "Mobil XL mit unbegrenzten GB"
+    assert (
+        L.vodafone_tarifname(_html("vodafone_iphone17pro_tarifauswahl")) == "Mobil XL"
     )
-    assert L.vodafone_tarifname(_html("vodafone_galaxy_s26_tarif_xs")).startswith(
-        "Mobil XS"
-    )
+    assert L.vodafone_tarifname(_html("vodafone_galaxy_s26_tarif_xs")) == "Mobil XS"
 
 
 def test_vodafone_ausschluss_der_seite_wird_gelesen():
@@ -183,7 +181,8 @@ def test_tarifwelt_netzzahl_ist_die_gegenprobe_der_namen():
     assert len(weitere) + 1 == sum(zahlen.values())
     telekom, _ = LS.tarifwelt_tarifnamen(_html("tarifwelt_iphone17pro_dialog_telekom"))
     assert len(telekom) == zahlen["telekom"]
-    assert telekom.count("Magenta Mobil L 5G Aktion") == 2
+    assert [n for n, _ in telekom].count("Magenta Mobil L 5G Aktion") == 2
+    assert len({code for _, code in telekom}) == len(telekom)
     o2 = LS.tarifwelt_netzzahlen(_html("tarifwelt_galaxy_s26_dialog_256"))
     namen, sel = LS.tarifwelt_tarifnamen(_html("tarifwelt_galaxy_s26_o2_256"))
     assert len(namen) + (1 if sel and o2["o2"] == len(namen) + 1 else 0) == o2["o2"]
@@ -455,9 +454,25 @@ def test_skript_frist_passt_zu_den_jobminuten():
     assert skript.job_frist("tarifwelt") == skript.JOB_MINUTEN["tarifwelt"] * 60 - (
         skript.PUFFER_S
     )
-    assert skript.titel_aus_adresse(
-        "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/weiss-256-gb"
-    ).startswith("samsung samsung galaxy s26")
+    for adresse, name in [
+        (
+            "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/weiss-256-gb",
+            "Samsung Galaxy S26",
+        ),
+        (
+            "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
+            "Google Pixel 10a",
+        ),
+        (
+            "https://tarife.mediamarkt.de/smartphones/samsung/galaxy-s26/",
+            "Samsung Galaxy S26",
+        ),
+        (
+            "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details",
+            "Apple iPhone 17",
+        ),
+    ]:
+        assert L.name_aus_adresse(adresse) == name
 
 
 def test_zaehler_kennt_den_sammler_und_die_gegenprobe_nicht():

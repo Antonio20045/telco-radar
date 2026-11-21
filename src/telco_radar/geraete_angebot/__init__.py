@@ -147,7 +147,10 @@ class Seite:
     wählbaren (speicher, tarif, monate[, netz]) ausdrücklich, wenn die Seite
     Abhängigkeiten zeigt; sonst gilt das Kreuzprodukt aus Speicher, Tarifen und
     Laufzeiten. ``ausserhalb`` sind sichtbare Zahlweisen außerhalb des Vergleichs
-    (Einmalzahlung, Flex), gezählt, nicht multipliziert."""
+    (Einmalzahlung, Flex), gezählt, nicht multipliziert. ``ausgeschlossen`` nennt, was
+    die Seite selbst ausschließt ([Tarif, Monate]); ``unvollstaendig``, wo die Seite
+    mehr nennt als gelesen wurde (dann ist die Zählung dieser Seite nicht vollständig).
+    Tarifwelt: ein Kombinationseintrag trägt Netz und Preis-Code als 4./5. Wert."""
 
     url: str
     titel: str
@@ -162,6 +165,8 @@ class Seite:
     kombinationen: list[list] | None = None
     annahmen: list[str] = field(default_factory=list)
     sekunden: float | None = None
+    ausgeschlossen: list[list] = field(default_factory=list)
+    unvollstaendig: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -175,7 +180,12 @@ class Kachel:
 
 @dataclass
 class Zaehlung:
-    """Die Zählung eines Anbieters an einem Messtag (eine Datei)."""
+    """Die Zählung eines Anbieters an einem Messtag (eine Datei). ``genannt`` ist die
+    Trefferzahl, die die Übersicht selbst nennt; ``uebersicht_ende`` der Beleg, dass
+    sie bis zum Ende gelesen wurde (kein Nachlade-Knopf mehr, Filterzahlen erreicht);
+    ``konkurrenz`` das Ergebnis der Prüfung auf parallele Läufe (``konkurrenz``).
+    ``tarifuebersicht`` (nur o2): Tarife mit „Handy hinzufügen“ der Tarifübersicht, ein
+    zweiter sichtbarer Kaufweg; ``None`` mit ``tarifuebersicht_grund`` bei Ausfall."""
 
     schluessel: str
     messtag: str
@@ -188,10 +198,31 @@ class Zaehlung:
     genannt: int | None = None
     seiten: list[Seite] = field(default_factory=list)
     sekunden_uebersicht: float | None = None
+    uebersicht_ende: str | None = None
+    konkurrenz: str | None = None
+    tarifuebersicht: list[Option] | None = None
+    tarifuebersicht_grund: str | None = None
 
     def als_dict(self) -> dict:
         """Die Datei als Dict (Format ``FORMAT``)."""
         return {"format": FORMAT, **asdict(self)}
+
+
+def uebersicht_pruefung(z: Zaehlung) -> tuple[bool, str]:
+    """Ist die Übersicht belegt bis zum Ende gelesen? (Prüfung PR 205)
+
+    Nennt der Anbieter eine Zahl, muss sie der Zahl gelesener Kacheln gleichen
+    („Übersicht nennt 95, gelesen 1“); ohne genannte Zahl braucht es den Beleg
+    ``uebersicht_ende`` (kein Nachlade-Knopf mehr, Filterzahlen erreicht). Ohne beides
+    ist die Zählung nicht vollständig, das Soll kann still geschrumpft sein."""
+    gelesen = len(z.kacheln)
+    if z.genannt is not None and z.genannt != gelesen:
+        return False, f"Übersicht nennt {z.genannt}, gelesen {gelesen}"
+    if z.genannt is not None:
+        return True, f"Übersicht nennt {z.genannt}, gelesen {gelesen}"
+    if z.uebersicht_ende:
+        return True, z.uebersicht_ende
+    return False, f"kein Beleg, dass die Übersicht ganz gelesen ist ({gelesen} Kacheln)"
 
 
 class AngebotsdateiFehler(ValueError):
@@ -243,6 +274,8 @@ def aus_dict(daten: dict) -> Zaehlung:
     felder = {k: v for k, v in daten.items() if k != "format"}
     felder["kacheln"] = [Kachel(**k) for k in daten.get("kacheln") or ()]
     felder["seiten"] = [_seite(s) for s in daten.get("seiten") or ()]
+    if daten.get("tarifuebersicht") is not None:
+        felder["tarifuebersicht"] = [Option(**o) for o in daten["tarifuebersicht"]]
     try:
         return Zaehlung(**felder)
     except TypeError as fehler:
