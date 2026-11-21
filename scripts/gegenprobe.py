@@ -3,23 +3,27 @@
 AUFRUF
 ------
     PYTHONPATH=src python scripts/gegenprobe.py [--root .] [--datum JJJJ-MM-TT]
-        [--je-anbieter 5] [--anbieter o2 ...] [--hoechstens N] [--bilder ORDNER]
-        [--hochladen] [--job-start EPOCHE] [--job-frist-sekunden 3000]
+        [--je-anbieter 5] [--anbieter o2 ...] [--hoechstens N] [--buendel ID ...]
+        [--bilder ORDNER] [--hochladen] [--job-start EPOCHE]
+        [--job-frist-sekunden 3000]
 
 Gewählt wird nach ``gegenprobe.auswahl``: jedes Bündel, dessen Gesamtkosten oder
 Posten sich zum vorigen Messtag geändert haben (Historie
 ``data/state/geraete_tco_historie/<datum>.jsonl``), dazu je Anbieter
-``STICHPROBE_JE_ANBIETER`` unveränderte, zufällig, aber fest je Datum. Je Bündel geht
-``collect.geraete.gegenprobe_browser.lies`` den Kundenweg, der Leser des Anbieters
+``STICHPROBE_JE_ANBIETER`` unveränderte, zufällig, aber fest je Datum; zuerst die
+Stichproben, dann die Änderungen reihum über die Anbieter. Die Auswahl wird nach
+Seitenbesuch gruppiert (``gegenprobe_reihe.gruppiere``, ``gegenprobe_wege.seite_von``):
+Besuch öffnet die Seite einmal und prüft jedes gewählte Bündel darauf
+(``gegenprobe_wege.lies_gruppe``). Der Leser des Anbieters
 (``gegenprobe_sicht.LESER``) liest den sichtbaren Text, ``gegenprobe.vergleiche``
 vergleicht mit dem Bestand ``geraete_tco.json``. Ergebnis:
 ``data/state/gegenprobe/<datum>.jsonl``; die Bilder gehen mit ``--hochladen`` ins
 Release ``gegenprobe-<datum>`` (``beleg_ablage.Gh``), sonst bleiben sie in ``--bilder``.
 
 Zeit (Harte Regel 8): ``--job-frist-sekunden`` ist die Restzeit des Jobs ab
-``--job-start``; ein Bündel beginnt nur, wenn ``ZEIT_JE_BUENDEL_S`` davor noch Platz
-hat. Was danach übrig ist, steht als „nicht prüfbar: Zeitbudget“ in der Datei, nie
-als stilles Fehlen.
+``--job-start``; ein Seitenbesuch beginnt und ein Bündel darin folgt nur, wenn
+``ZEIT_JE_BUENDEL_S`` davor noch Platz hat. Was danach übrig ist, steht als „nicht
+prüfbar: Zeitbudget“ in der Datei, nie als stilles Fehlen.
 
 Exit-Code 0: gelaufen (auch mit Abweichungen, das sind Befunde); 2: Eingabe unlesbar.
 """
@@ -46,9 +50,10 @@ from telco_radar.collect.geraete.gegenprobe_browser import (
     Lesung,
     NichtPruefbar,
 )
+from telco_radar.collect.geraete.gegenprobe_schritte import tor
 from telco_radar.collect.geraete.gegenprobe_sicht import LESER
-from telco_radar.collect.geraete.gegenprobe_wege import lies
-from telco_radar.collect.geraete.robots import RobotsWaechter, host_von
+from telco_radar.collect.geraete.gegenprobe_wege import lies_gruppe, seite_von
+from telco_radar.gegenprobe_reihe import gruppiere
 from telco_radar.tco_model import kosten_ueber
 
 FEHLER_EINGABE = 2
@@ -122,7 +127,8 @@ def mit_gelesenen(satz: dict, gelesen: dict) -> dict:
 
 
 Lesen = Callable[[str, dict], Lesung]
-"""(Anbieter-Schlüssel, Bestandssatz) -> Lesung; im Lauf ``gegenprobe_browser.lies``."""
+"""(Anbieter-Schlüssel, Bestandssatz) -> Lesung; im Lauf die Lesung des Seitenbesuchs
+(``gegenprobe_wege.lies_gruppe``)."""
 
 
 def pruefe(
@@ -192,6 +198,9 @@ def main(argumente: list[str] | None = None) -> int:
     parser.add_argument("--je-anbieter", type=int, default=gp.STICHPROBE_JE_ANBIETER)
     parser.add_argument("--anbieter", action="append", default=[])
     parser.add_argument("--hoechstens", type=int)
+    parser.add_argument(
+        "--buendel", action="append", default=[], help="nur diese Bündel (lokal)"
+    )
     parser.add_argument("--bilder", type=Path)
     parser.add_argument("--hochladen", action="store_true")
     parser.add_argument("--ausgabe", type=Path, help="statt der Tagesdatei (lokal)")
@@ -222,6 +231,8 @@ def main(argumente: list[str] | None = None) -> int:
         if bid in saetze
         and (not args.anbieter or gp.anbieter_aus_id(bid) in args.anbieter)
     ][: args.hoechstens]
+    if args.buendel:
+        wahl = [(b, gp.ANLASS_STICHPROBE) for b in args.buendel if b in saetze]
     print(
         f"Gegenprobe {datum} (Vortag {vortag_datum}): {len(wahl)} Bündel, davon "
         f"{sum(a == gp.ANLASS_AENDERUNG for _, a in wahl)} Preisänderungen"
@@ -235,65 +246,91 @@ def main(argumente: list[str] | None = None) -> int:
 
 
 def laufe(args, wahl, saetze, datum, ua, ende):
-    """Geht die Auswahl durch, bis die Frist reicht; danach Zeitbudget-Zeilen."""
+    """Geht die Auswahl Seitenbesuch für Seitenbesuch durch (``gruppiere``, ein Besuch
+    prüft alle gewählten Bündel seiner Seite), bis die Frist reicht; danach
+    Zeitbudget-Zeilen. Vor jedem Laden gelten robots.txt und der Abstand (``tor``)."""
     from playwright.sync_api import sync_playwright
 
-    from telco_radar.collect import http
-
-    def hole(url: str) -> tuple[int, str]:
-        antwort = http.get(
-            url,
-            headers={"User-Agent": KENNUNG_ROBOTS},
-            timeout=20,
-            follow_redirects=True,
-        )
-        return antwort.status_code, antwort.text
-
-    robots = RobotsWaechter(hole)
-    aufnehmen = args.aufnehmen is not None
-    zuletzt: dict[str, float] = {}
-    ergebnisse: list[gp.Ergebnis] = []
-    bilder: dict[str, bytes] = {}
+    vor_laden = tor(KENNUNG_ROBOTS, MINDESTABSTAND_S, lambda: datetime.now(UTC))
+    gruppen = gruppiere(
+        wahl, lambda bid: seite_von(gp.anbieter_aus_id(bid), saetze[bid])
+    )
+    print(f"Gegenprobe: {len(gruppen)} Seitenbesuche", flush=True)
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
+        lauf = Lauf(args, browser, saetze, datum, ua, ende, vor_laden)
         try:
-            for bid, anlass in wahl:
-                satz = saetze[bid]
-                if time.monotonic() > ende:
-                    ergebnisse.append(
-                        _ohne_lauf(satz, anlass, datum, gp.GRUND_ZEITBUDGET)
-                    )
-                    continue
-                url = satz.get("quelle_url") or ""
-                darf, grund = robots.darf(url, datetime.now(UTC))
-                if not darf:
-                    ergebnisse.append(
-                        _ohne_lauf(satz, anlass, datum, f"{gp.GRUND_ROBOTS}: {grund}")
-                    )
-                    continue
-                host = host_von(url)
-                warte = zuletzt.get(host, 0.0) + robots.abstand(url, MINDESTABSTAND_S)
-                time.sleep(max(0.0, warte - time.monotonic()))
-                zuletzt[host] = time.monotonic()
-                kennung = ua.get(satz.get("anbieter") or "")
-                ergebnis, lesung = pruefe(
-                    partial(lies, browser, kennung=kennung, aufnehmen=aufnehmen),
-                    satz,
-                    anlass,
-                    datum,
-                    gp.messzeit(args.gemessen_um, satz),
-                )
-                if lesung is not None and lesung.bild is not None:
-                    bilder[bid] = lesung.bild
-                if aufnehmen and lesung is not None and lesung.html:
-                    args.aufnehmen.mkdir(parents=True, exist_ok=True)
-                    datei = args.aufnehmen / f"{gp.anbieter_aus_id(bid)}.html"
-                    datei.write_text(lesung.html + "\n", encoding="utf-8")
-                ergebnisse.append(ergebnis)
-                print(f"  {ergebnis.status:15} {bid}", flush=True)
+            for gruppe in gruppen:
+                if time.monotonic() <= ende:
+                    lauf.besuche(gruppe)
         finally:
             browser.close()
-    return ergebnisse, bilder
+    reihe = [
+        lauf.ergebnisse.get(bid)
+        or _ohne_lauf(saetze[bid], anlass, datum, gp.GRUND_ZEITBUDGET)
+        for bid, anlass in wahl
+    ]
+    return reihe, lauf.bilder
+
+
+class Lauf:
+    """Was alle Seitenbesuche eines Laufs teilen, und was sie gelesen haben.
+
+    Keine dataclass: Tests laden das Skript ohne Eintrag in ``sys.modules``."""
+
+    def __init__(self, args, browser, saetze, datum, ua, ende, vor_laden) -> None:
+        self.args = args
+        self.browser = browser
+        self.saetze = saetze
+        self.datum = datum
+        self.ua = ua
+        self.ende = ende
+        self.vor_laden = vor_laden
+        self.ergebnisse: dict[str, gp.Ergebnis] = {}
+        self.bilder: dict[str, bytes] = {}
+
+    def besuche(self, gruppe: list[tuple[str, str]]) -> None:
+        """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht."""
+        anlass = dict(gruppe)
+        schluessel = gp.anbieter_aus_id(gruppe[0][0])
+        aufnehmen = self.args.aufnehmen is not None
+        lesungen = lies_gruppe(
+            self.browser,
+            schluessel,
+            [self.saetze[bid] for bid, _ in gruppe],
+            self.ua.get(self.saetze[gruppe[0][0]].get("anbieter") or ""),
+            self.vor_laden,
+            aufnehmen,
+        )
+        try:
+            for satz, gelesen in lesungen:
+                bid = satz["id"]
+                ergebnis, lesung = pruefe(
+                    partial(_gelesen, gelesen),
+                    satz,
+                    anlass[bid],
+                    self.datum,
+                    gp.messzeit(self.args.gemessen_um, satz),
+                )
+                if lesung is not None and lesung.bild is not None:
+                    self.bilder[bid] = lesung.bild
+                if aufnehmen and lesung is not None and lesung.html:
+                    self.args.aufnehmen.mkdir(parents=True, exist_ok=True)
+                    datei = self.args.aufnehmen / f"{schluessel}.html"
+                    datei.write_text(lesung.html + "\n", encoding="utf-8")
+                self.ergebnisse[bid] = ergebnis
+                print(f"  {ergebnis.status:15} {bid}", flush=True)
+                if time.monotonic() > self.ende:
+                    break
+        finally:
+            lesungen.close()
+
+
+def _gelesen(gelesen: Lesung | Exception, _schluessel: str, _satz: dict) -> Lesung:
+    """Für ``pruefe``: die Lesung des Seitenbesuchs oder sein Fehler."""
+    if isinstance(gelesen, Exception):
+        raise gelesen
+    return gelesen
 
 
 def _ohne_lauf(satz: dict, anlass: str, datum: str, grund: str) -> gp.Ergebnis:
