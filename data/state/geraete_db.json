@@ -2,8 +2,8 @@
  "updated": "2026-11-21",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 125,
-   "funde_gesamt": 734,
+   "laeufe": 126,
+   "funde_gesamt": 740,
    "letzter_lauf": "2026-11-21",
    "letzte_funde": 6,
    "letzter_fund": "2026-11-21",
@@ -334,8 +334,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 123,
-   "funde_gesamt": 20756,
+   "laeufe": 124,
+   "funde_gesamt": 20911,
    "letzter_lauf": "2026-11-21",
    "letzte_funde": 155,
    "termine": [
@@ -666,10 +666,10 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 123,
-   "funde_gesamt": 8322,
+   "laeufe": 124,
+   "funde_gesamt": 8393,
    "letzter_lauf": "2026-11-21",
-   "letzte_funde": 69,
+   "letzte_funde": 71,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -988,9 +988,9 @@
     ],
     [
      "2026-11-21",
-     69,
+     71,
      "gelesen",
-     2173,
+     2233,
      0,
      null
     ]
@@ -998,8 +998,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 70,
-   "funde_gesamt": 15724,
+   "laeufe": 71,
+   "funde_gesamt": 15879,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1597,11 +1597,11 @@
     ],
     [
      "2026-11-21",
-     20,
-     "lesefehler",
      0,
-     20,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
@@ -1875,18 +1875,18 @@
     ],
     [
      "2026-11-21",
-     20,
-     "lesefehler",
      0,
-     20,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 87,
-   "funde_gesamt": 16055,
+   "laeufe": 88,
+   "funde_gesamt": 16190,
    "letzter_lauf": "2026-11-21",
    "letzte_funde": 135,
    "termine": [
@@ -2536,8 +2536,8 @@
    "tote_adressen": 0
   },
   "Telekom": {
-   "laeufe": 28,
-   "funde_gesamt": 278,
+   "laeufe": 29,
+   "funde_gesamt": 288,
    "letzter_lauf": "2026-11-21",
    "letzte_funde": 10,
    "termine": [
@@ -2796,7 +2796,7 @@
      "2026-11-21",
      10,
      "gelesen",
-     33,
+     35,
      0,
      null
     ]
@@ -2804,8 +2804,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 110,
-   "funde_gesamt": 1962,
+   "laeufe": 111,
+   "funde_gesamt": 1982,
    "letzter_lauf": "2026-11-21",
    "letzte_funde": 20,
    "termine": [
@@ -3375,8 +3375,8 @@
    "tote_adressen": null
   },
   "MediaMarkt": {
-   "laeufe": 22,
-   "funde_gesamt": 113,
+   "laeufe": 23,
+   "funde_gesamt": 119,
    "funde_nach_tag": [
     [
      "2026-10-19",
@@ -8761,7 +8761,7 @@
    "erstpreis_am": "2026-10-10",
    "last_verified": "2026-11-21",
    "letzter_check": "2026-11-21",
-   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-razr-70-256-gb-swarovski-edition-black-xt2657-1-30043385A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=7&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-razr-70-256-gb-swarovski-edition-black-xt2657-1-30043385A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=6&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-11-21",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -11006,23 +11006,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-11-03",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1699.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-11-03",
-   "last_verified": "2026-11-20",
+   "last_verified": "2026-11-21",
    "letzter_check": "2026-11-21",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-18-pro-512gb-burgundy-3071604.html",
-   "abgerufen_am": "2026-11-20",
+   "abgerufen_am": "2026-11-21",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-18-pro"
    ],
    "titel_roh": "APPLE iPhone 18 Pro 512 GB Burgunder Dual SIM",
-   "preis_ohne_vertrag": 1699.0,
-   "stale_since": "2026-11-21"
+   "preis_ohne_vertrag": 1699.0
   },
   {
    "id": "saturn--apple-iphone-18-pro-512gb-polar",
@@ -32188,15 +32187,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-08-29",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 991.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-11-18",
-   "letzter_check": "2026-11-20",
+   "last_verified": "2026-11-21",
+   "letzter_check": "2026-11-21",
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
-   "abgerufen_am": "2026-11-18",
+   "abgerufen_am": "2026-11-21",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -32208,7 +32207,6 @@
    "monatsrate": 41.0,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0,
-   "stale_since": "2026-11-19",
    "ended_since": "2026-11-20"
   },
   {
@@ -32293,15 +32291,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-08-29",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1405.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-11-18",
-   "letzter_check": "2026-11-20",
+   "last_verified": "2026-11-21",
+   "letzter_check": "2026-11-21",
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
-   "abgerufen_am": "2026-11-18",
+   "abgerufen_am": "2026-11-21",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -32313,7 +32311,6 @@
    "monatsrate": 58.5,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0,
-   "stale_since": "2026-11-19",
    "ended_since": "2026-11-20"
   },
   {

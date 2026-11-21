@@ -155,7 +155,7 @@ def test_tagesdatei_und_quellen_nennen_details_und_geraeteuebersicht():
     klick = [e.url for e in anbieter.klick_einstiege if e.kind == "klick"]
 
     uebersicht = ("https://mobile.1und1.de/smartphones",)
-    assert einsundeins.uebersichten == DETAILS + uebersicht
+    assert einsundeins.uebersichten == uebersicht + DETAILS
     assert tuple(klick) == DETAILS + uebersicht
     assert not set(RASTER) & {*einsundeins.uebersichten, *klick}
     assert [e.kind for e in anbieter.einstiege] == []
