@@ -51,6 +51,7 @@ from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tarif_model import HOCH
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
+_API = "https://api.vodafone.de/"
 _WURZEL = Path(__file__).parent.parent
 
 _HASH_SUB = "05CFDB77B68E33D50A854615C1AE94C471BDBF9988C4DFFAE4B8757E091903C3"
@@ -390,6 +391,8 @@ def test_rueckfall_loest_vorschau_ohne_eigenen_eintrag_ueber_den_hash():
     aufrufe = []
 
     def hole(url, kopfzeilen=None):
+        if not url.startswith(_API):
+            return 404, ""
         aufrufe.append((url, kopfzeilen))
         assert kopfzeilen == {"x-api-key": "geheim"}
         return 200, _fixture("vodafone_tarif_hardware.json")
@@ -411,7 +414,8 @@ def test_loese_tarifnamen_macht_einen_get_je_geraet_nicht_je_variante():
     aufrufe = []
 
     def hole(url, kopfzeilen=None):
-        aufrufe.append(url)
+        if url.startswith(_API):
+            aufrufe.append(url)
         return 200, _fixture("vodafone_tarif_hardware.json")
 
     loese_tarifnamen(hole, {}, rohbuendel)
@@ -424,6 +428,8 @@ def test_ein_deckel_teilt_die_ids_in_mehrere_abrufe(monkeypatch):
     aufrufe = []
 
     def hole(url, kopfzeilen=None):
+        if not url.startswith(_API):
+            return 404, ""
         aufrufe.append(url.split("hardwareId=")[1].split("&")[0])
         return 200, _fixture("vodafone_tarif_hardware.json")
 
@@ -475,7 +481,8 @@ def _vollstaendig_2909():
     aufrufe = []
 
     def hole(url, kopfzeilen=None):
-        aufrufe.append(url)
+        if url.startswith(_API):
+            aufrufe.append(url)
         return 200, _fixture("vodafone_tarif_hardware_geraet_2026-09-29.json")
 
     gesetzt = loese_tarifnamen(hole, {}, rohbuendel)

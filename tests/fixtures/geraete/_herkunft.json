@@ -1037,6 +1037,42 @@
       "gzip": true,
       "bytes_roh": 28934,
       "sha256_roh": "957cc00b3da163ba5bb157b937e3b140ef843721894498a8dc4c7c0f9de5f921"
+    },
+    {
+      "datei": "vodafone_tarif_hardware_a17_20261121.json",
+      "url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?hardwareId=57459&businessTransaction=newContract&salesChannel=Online.Consumer",
+      "abgerufen_am": "2026-11-21",
+      "http_status": 200,
+      "absender": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (config/settings.yaml)",
+      "filter": "gekuerzt: FamilyCard S/M/L und _links entfernt, mit json.dumps neu geschrieben; Mobil XS bis XL und FamilyCard XL unveraendert",
+      "beleg": "Samsung Galaxy A17 5G (virtualItem 216), Abruf fuer docs/belege/vodafone-tarife-ml-2111/ (Befund Mobil M/L ausgeblendet)",
+      "gzip": false,
+      "bytes_roh": 39590,
+      "sha256_roh": "4f6eb9232d11206bb7d9a1bd5ffa026fa8988e6e9be83be54eed01c7aaa749ab"
+    },
+    {
+      "datei": "vodafone_virtualitem_a17_20261121.json",
+      "url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/216?businessTransaction=newContract&salesChannel=Online.Consumer",
+      "abgerufen_am": "2026-11-21",
+      "http_status": 200,
+      "absender": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (config/settings.yaml)",
+      "filter": "_links entfernt, mit json.dumps neu geschrieben; Inhalt sonst unveraendert",
+      "beleg": "Samsung Galaxy A17 5G, Detailantwort derselben Messung wie vodafone_tarif_hardware_a17_20261121.json",
+      "gzip": false,
+      "bytes_roh": 25036,
+      "sha256_roh": "e716dd75b3ddb3cb20ad3fbd2382515900b0d02a1029b3260689893634c4d98d"
+    },
+    {
+      "datei": "vodafone_produktseite_a17_20261121.html",
+      "url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html",
+      "abgerufen_am": "2026-11-21",
+      "http_status": 200,
+      "absender": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (config/settings.yaml)",
+      "filter": "gekuerzt auf die Skriptbloecke additionalPageOptions (bis bntPromoHiddenSubscriptions) und sailsPageOptions (bis householdPortfolio), Auslassungen als /* gekuerzt */ markiert, Kopfkommentar mit Quelle; Text der Bloecke unveraendert",
+      "beleg": "docs/belege/vodafone-tarife-ml-2111/belege.txt Abschnitt 2 (auf 11 Produktseiten gleich)",
+      "gzip": false,
+      "bytes_roh": 1719,
+      "sha256_roh": "9f279a90024502b726ecf28272b6f6224199559e68e5ccd6bd0eb2d7c25b3999"
     }
   ]
 }

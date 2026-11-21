@@ -124,29 +124,18 @@ Laufzeit, die Vertragsmindestlaufzeit bleibt der Rueckfall - und wenn gar
 keine Laufzeit bestimmbar ist, nennt das Protokoll Hash, Geraeterate und
 Phasenenden, statt das Angebot lautlos zu verschlucken.
 
-DIE OFFENE TARIFNAMEN-FRAGE IST GEKLAERT: JA, ES GIBT EINEN ENDPUNKT
-----------------------------------------------------------------------
-`prices.composition[].offerCoreHash` nennt keinen Klarnamen - aber
-`/glados/v2/tariff/v2/hardware?hardwareId=<hardwareId>&businessTransaction=
-newContract&salesChannel=Online.Consumer` (Pfad `xy+Ty[V2]` im
-Skriptbuendel, Parameter `hardwareId` = `fy` in dessen Variablennamen)
-liefert je Geraet die Liste seiner buchbaren Tarife MIT `tariffName` UND
-dem GLEICHEN `offerCoreHash` in ihren eigenen `atomics[].prices.composition`
--Eintraegen. "DEM GLEICHEN Hash" stimmt nur teilweise: am 29.09.2026
-standen beim Pixel 11 nur 9 von 24 Vorschau-Hashes in der Tarifantwort,
-und derselbe Hash wechselt zwischen Tagen. Seit dem 29.09.2026 ist die
-Tarifantwort deshalb nicht mehr nur Namensquelle, sondern DIE Quelle der
-Buendel: sie nennt je Variante alle Tarife mit allen Laufzeiten, und der
-Name kommt aus `tariffName` (siehe `loese_tarifnamen`). Der Parameter
-`hardwareId` ist dort eine Liste; alle Varianten eines Geraets gehen in
-EINEN Abruf.
-
-`loese_tarifnamen()` macht dafuer EINEN zusaetzlichen GET je GERAET
-(nicht je Variante oder Rohsatz) und wird NICHT von `lies_buendel()` selbst
-aufgerufen - ein Adapter bleibt ein reiner Text-zu-Daten-Uebersetzer ohne
-eigenes Netz. Aufgerufen wird sie von der Pipeline (`geraete_pipeline.py`),
-nachdem alle Anbieter gesammelt sind, ueber den generischen Adapter-Haken
-`Adapter.loese_tarifnamen`.
+DIE TARIFNAMEN KOMMEN AUS DER TARIFSCHNITTSTELLE
+-------------------------------------------------
+`offerCoreHash` nennt keinen Klarnamen; `/glados/v2/tariff/v2/hardware?
+hardwareId=<Liste>&...` (Pfad `xy+Ty[V2]` im Skriptbuendel) nennt je Variante
+alle Tarife mit `tariffName` und allen Laufzeiten. Die Hashes der Vorschau
+stehen dort nur teilweise (Pixel 11, 29.09.2026: 9 von 24) und wechseln
+zwischen Tagen; seitdem ist die Tarifantwort DIE Quelle der Buendel. Welche
+dieser Tarife die Produktseite wirklich anbietet, sagt erst die Seite selbst
+(`vodafone_sicht`, 21.11.2026). `loese_tarifnamen()` holt je GERAET die
+Produktseite und EINE Tarifantwort; sie laeuft nicht in `lies_buendel()`
+(ein Adapter bleibt Text-zu-Daten), sondern ueber den Haken
+`Adapter.loese_tarifnamen` der Pipeline, nachdem alle Anbieter gesammelt sind.
 """
 
 from __future__ import annotations
@@ -160,6 +149,7 @@ from urllib.parse import urlsplit
 
 from .basis import GeraeteAbrufFehler, _preis
 from .vodafone_aktion import RABATTPOSTEN, tarif_mit_aktion
+from .vodafone_sicht import TARIF_ID, ausblendung_je_seite, sichtbare_angebote
 
 from ...tco_model import laufzeit_in_monaten
 
@@ -534,7 +524,8 @@ def _buendel_aus_tarifantwort(text: str) -> dict:
     (gemessen 29.09.2026: Mobil XS/S/M/L/XL je mit 12/24/36 Monaten
     Ratenlaufzeit plus FamilyCard S/M/L/XL als `sub`) - in derselben
     `prices.composition`-Form wie die Detailantwort, aber mit `tariffName`;
-    jede Komposition traegt den Rabattblock ihres Tarifs (`RABATTPOSTEN`).
+    jede Komposition traegt den Rabattblock ihres Tarifs (`RABATTPOSTEN`)
+    und dessen `virtualItemId` (`TARIF_ID`, siehe `vodafone_sicht`).
     Eine unlesbare Antwort ergibt ein leeres Woerterbuch ("nicht gelesen").
     """
     try:
@@ -554,8 +545,9 @@ def _buendel_aus_tarifantwort(text: str) -> dict:
             name = str(tarif.get("tariffName") or "").strip()
             if not name:
                 continue
+            tarif_id = str(tarif.get("virtualItemId") or "").strip()
             for atom in tarif.get("atomics") or []:
-                posten = {RABATTPOSTEN: _pfad(atom, RABATTPOSTEN)}
+                posten = {RABATTPOSTEN: _pfad(atom, RABATTPOSTEN), TARIF_ID: tarif_id}
                 for k in _pfad(atom, "prices", "composition") or []:
                     if isinstance(k, dict):
                         out.setdefault(hwid, []).append((name, {**k, **posten}))
@@ -680,7 +672,8 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
 
     Eine Variante, die in der Antwort fehlt oder deren Abruf scheitert,
     behaelt ihre Vorschau-Saetze (nicht gelesen ist nicht leer); fuer sie
-    bleibt der Hash-Rueckfall ueber alle gelesenen Antworten.
+    bleibt der Hash-Rueckfall ueber alle gelesenen Antworten. Tarife, die die
+    Produktseite ausblendet, werden kein Satz (`vodafone_sicht`).
 
     Mutiert `rohbuendel` in place (die Liste ist `Anbieterbilanz.buendel`)
     und gibt die Zahl der Saetze zurueck, die hier ihren Tarifnamen
@@ -700,8 +693,10 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
             (str(saetze[0].get("titel") or ""), str(saetze[0].get("url") or "")), []
         ).append(hwid)
 
+    ausblendung = ausblendung_je_seite(hole, [g[1] for g in sorted(je_geraet)])
     vollstaendig: dict[str, list] = {}
     hash_namen: dict[str, str] = {}
+    verborgen: set[str] = set()
     letzter = 0.0
     for geraet in sorted(je_geraet):
         ids = sorted(je_geraet[geraet])
@@ -712,7 +707,9 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
                 time.sleep(warte)
             letzter = time.monotonic()
             angebote = _hole_angebote(hole, kopfzeilen, geraet[0], teil)
-            for hwid, eintraege in angebote.items():
+            for hwid, alle in angebote.items():
+                eintraege, weg = sichtbare_angebote(alle, ausblendung[geraet[1]])
+                verborgen |= weg
                 if hwid in teil and eintraege:
                     vollstaendig[hwid] = eintraege
                 for name, k in eintraege:
@@ -747,6 +744,8 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
             and not str(r.get("tarif_name") or "").strip()
         ):
             name = hash_namen.get(str(r.get("tarif_slug") or "").strip())
+            if name is None and r.get("tarif_slug") in verborgen:
+                continue
             if name:
                 r["tarif_name"] = name
                 gesetzt += 1
