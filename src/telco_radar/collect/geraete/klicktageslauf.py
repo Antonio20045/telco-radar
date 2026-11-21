@@ -1,25 +1,19 @@
 """Klick-Tageslauf je Anbieter (Datenkonzept Geräteradar §8 „Betrieb“).
 
-Ein Job je Anbieter (Matrix im eigenen Workflow ``klick.yml``) arbeitet die Klick-Karte
+Ein Job je Anbieter (Matrix in ``klick.yml``) arbeitet die Klick-Karte
 ``config/klickkarten/<schluessel>.yaml`` über die Produktseiten aus
-``config/klick_tageslauf.yaml`` ab (Format und Prüfung wie ``klickziele``). Jede Seite
-läuft durch den Klick-Crawler (``klickcrawler.klicke_durch``) mit demselben Tor wie die
-Erkundung: robots.txt samt Crawl-delay und Visit-time je Anfrage, eigener Abstand des
-Anbieters, User-Agent aus ``geraete_quellen.yaml``, keine Tarnung. Endet eine Seite
-gestört durch Bot-Schutz oder Challenge, geht für den Anbieter keine Anfrage mehr hinaus
-(CLAUDE.md Regel 4); die übrigen Seiten heißen ``nicht_besucht`` mit Grund. Serverfehler
-(HTTP 5xx) wiederholt ``klickwiederholung``. Lud eine Seite nur nicht
-(``klicklauf.STOERUNG_ZEIT``, kein Bot-Schutz, CLAUDE.md Regel 10), folgt die nächste
-Seite unter derselben Hostschleuse samt Crawl-delay; nach
-``HOECHSTE_ZEITUEBERSCHREITUNGEN`` solchen Seiten endet er. Hat eine Seite nach
-bestandener Bot-Prüfung nur eine andere Form (``klicklauf.STOERUNG_SEITE``:
-Kanarienwert, Vorbereitung, Strukturbruch, keine angebotene Kombination; o2 11.10.2026),
-folgt ebenso die nächste; erst ``HOECHSTE_SEITENFORMEN_IN_FOLGE`` solche Seiten
-hintereinander beenden ihn (Telekom 10. und 11.10.2026: je eine Seite hielt alle übrigen
-an). Eine nie gelesene Seite zählt dabei nicht, sobald der Anbieter einen Lesestand hat
-(Vodafone 12.10.2026: drei nie gelesene Seiten standen in der Rotation vorn und hielten
-22 an). Ebenso endet der Lauf, sobald die Parallellauf-Prüfung (``klickparallel``, vor
-jeder Seite) einen anderen Lauf auf denselben Hosts meldet.
+``config/klick_tageslauf.yaml`` ab (Format wie ``klickziele``), jede Seite durch
+``klickcrawler.klicke_durch`` mit dem Tor der Erkundung: robots.txt samt Crawl-delay und
+Visit-time, eigener Abstand, User-Agent aus ``geraete_quellen.yaml``, keine Tarnung.
+Nach Bot-Schutz oder Challenge geht keine Anfrage mehr hinaus (CLAUDE.md Regel 4), der
+Rest heißt ``nicht_besucht`` mit Grund. 5xx wiederholt ``klickwiederholung``. Lud eine
+Seite nur nicht (``klicklauf.STOERUNG_ZEIT``, Regel 10), folgt die nächste; nach
+``HOECHSTE_ZEITUEBERSCHREITUNGEN`` solchen endet er. Eine Seite anderer Form
+(``klicklauf.STOERUNG_SEITE``: Kanarienwert, Vorbereitung, Strukturbruch) ebenso; erst
+``HOECHSTE_SEITENFORMEN_IN_FOLGE`` in Folge beenden ihn (Telekom 10./11.10.2026), eine
+nie gelesene zählt nicht, sobald ein Lesestand da ist (Vodafone 12.10.2026). Er endet
+auch, wenn ``klickparallel`` einen anderen Lauf auf denselben Hosts meldet. Mit
+``Erkundungsziel.uebersichten_zuletzt`` kommen die Übersichten nach den Produktseiten.
 
 Zeitbudget (CLAUDE.md Regel 8): ``budget_ende`` rechnet gegen die Restzeit des Jobs,
 ``job_frist_s`` (Vorgabe ``JOB_FRIST_S``, gleich ``timeout-minutes`` des Matrix-Jobs)
@@ -29,22 +23,15 @@ Eine Seite beginnt nur mit mindestens ``MINDESTZEIT_SEITE_S`` Rest und bekommt h
 Crawler nennt den Rest ``nicht besucht``. Zwischen zwei besuchten Seiten wartet der
 Lauf ``Erkundungsziel.seitenabstand_sekunden`` (ruhiges Tempo, keine Anpassung an
 eine Sperre); vor der ersten und nach dem Ende wartet er nicht. Die Übersichten des
-Anbieters (``Erkundungsziel.uebersichten``, ``klickuebersicht``) liest der Lauf vor den
-Produktseiten, unter denselben Grenzen, Abständen und Stopps; sie stehen unter
-``uebersichten`` in der Ergebnisdatei und zählen für den Laufstatus mit. Eine Übersicht
+Anbieters (``Erkundungsziel.uebersichten``, ``klickuebersicht``) liest der Lauf vor
+(oder nach, siehe oben) den Produktseiten, unter denselben Grenzen, Abständen und
+Stopps; sie stehen unter ``uebersichten``, zählen für den Laufstatus mit. Eine Übersicht
 samt Folgeseiten hat eine Grenze; jede gestörte Folgeseite hält den Anbieter an.
-Telekom (Pitch 4, Schnitt 3): 5 Tarife × ~3 Seiten × ~100 s plus 14 × 60 s Abstand
-≈ 39 min von 67 min Budget; der Rest reicht für etwa 4 der 7 Produktseiten (je ~280 s),
-die übrigen bleiben ``nicht besucht`` und kommen in der Rotation am nächsten Tag.
 
-Rotation: Einheit ist die Produktseite, denn der Crawler klickt alle Varianten einer
-Seite in einem Gang. Zuerst kommen nie gelesene Seiten, dann die am längsten nicht
-gelesenen oder an ihrer Form gescheiterten (Lesestand, ``klickergebnis.lies_stand``);
-bei Gleichstand gilt die Reihenfolge der Konfiguration. Seiten, die heute nicht ganz
-gelesen wurden (eine an der Zeitgrenze abgeschnittene zählt nicht,
-``klickergebnis.ganz_gelesen``) und deren letzte Lesung ``LESEFRIST_TAGE`` oder
-älter ist, stehen unter ``ueberfaellig``: jede Seite soll jeden Tag gelesen sein.
-Kein LLM.
+Rotation je Produktseite: nie gelesene zuerst, dann die am längsten nicht gelesenen
+oder an ihrer Form gescheiterten (``klickergebnis.lies_stand``), sonst Konfiguration.
+Heute nicht ganz gelesene Seiten (``klickergebnis.ganz_gelesen``) mit letzter Lesung
+``LESEFRIST_TAGE`` oder älter stehen unter ``ueberfaellig``. Kein LLM.
 """
 
 from __future__ import annotations
@@ -190,6 +177,26 @@ def _als_seiten(uebersicht: dict) -> list[dict]:
     ]
 
 
+def _lies_uebersichten(
+    ziel: Erkundungsziel,
+    gang: _Gang,
+    lies_uebersicht: Uebersichtsleser | None,
+    uebersichten: list[dict],
+) -> None:
+    """Die Übersichten des Anbieters unter den Grenzen und Stopps von ``gang``."""
+    if lies_uebersicht is None:
+        return
+    for adresse in ziel.uebersichten:
+        stopp = gang.vor()
+        if stopp is not None:
+            uebersichten.append(_uebersicht_nicht_besucht(adresse, stopp))
+            continue
+        ergebnis = lies_uebersicht(adresse, gang.grenze())
+        uebersichten.append(ergebnis)
+        for teil in ergebnis.get("seiten") or [ergebnis]:
+            gang.nach(teil["status"], teil.get("stoerung"), teil["grund"])
+
+
 def budget_ende(job_frist_s: float, verstrichen_s: float, jetzt: float) -> float:
     """Monotone Grenze des Laufs: Restzeit des Jobs ohne ``RESERVE_S``."""
     return jetzt + job_frist_s - verstrichen_s - RESERVE_S
@@ -275,17 +282,8 @@ def fahre(
     seiten: list[dict] = []
     uebersichten: list[dict] = []
     gang = _Gang(ziel, ende, laeufe, uhr, schlafe)
-    for adresse in ziel.uebersichten:
-        if lies_uebersicht is None:
-            break
-        stopp = gang.vor()
-        if stopp is not None:
-            uebersichten.append(_uebersicht_nicht_besucht(adresse, stopp))
-            continue
-        ergebnis = lies_uebersicht(adresse, gang.grenze())
-        uebersichten.append(ergebnis)
-        for teil in ergebnis.get("seiten") or [ergebnis]:
-            gang.nach(teil["status"], teil.get("stoerung"), teil["grund"])
+    if not ziel.uebersichten_zuletzt:
+        _lies_uebersichten(ziel, gang, lies_uebersicht, uebersichten)
     for seite in reihenfolge(ziel.seiten, gelesen, versucht):
         stopp = gang.vor()
         if stopp is not None:
@@ -295,6 +293,8 @@ def fahre(
         seiten.append(seite_als_daten(seite, lauf))
         nie = bool(gelesen) and ohne_geheimnisse(seite.adresse) not in gelesen
         gang.nach(lauf.status, lauf.stoerung, lauf.grund, nie)
+    if ziel.uebersichten_zuletzt:
+        _lies_uebersichten(ziel, gang, lies_uebersicht, uebersichten)
     status, grund = laufstatus(
         seiten + [s for u in uebersichten for s in _als_seiten(u)], ziel.seitengrund
     )

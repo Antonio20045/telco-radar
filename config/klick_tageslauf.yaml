@@ -53,7 +53,8 @@
 # 20 Telekom- oder Vodafone-Seiten (Telekom ~500 s je Seite, Vodafone 5–9 min). Ein
 # großer Anbieter steht darum in mehreren Einträgen mit eigenen Seiten, gleichem
 # `name` und `karte: <schluessel>` des ersten Eintrags; jeder Eintrag ist ein
-# eigener Matrix-Job, der Lesestand gilt je `name`. Übersichten nur im ersten.
+# eigener Matrix-Job, der Lesestand gilt je `name`. Übersichten nur im ersten, außer
+# den 1&1-Tarifdetail-Seiten (Anschlusspreis): die liest jeder 1&1-Eintrag selbst.
 #
 # `seitenabstand_sekunden` (Vorgabe 0): Pause zwischen zwei Seiten eines Anbieters,
 # ruhiges Tempo als Normalfall, keine Anpassung an eine Sperre (Pitch 1, 08.10.2026).
@@ -228,6 +229,13 @@ anbieter:
     # demselben Tarif (Pitch 2, Schnitt 3; seit 20.11.2026 über den Namen der Kachel,
     # Unlimited XL heißt dort `…-xl-mvl`, hier `…-xl-ovl`).
     uebersichten:
+      # Die Geräteübersicht: je Kachel der Produktlink (`klickraster.liste_saetze`),
+      # daraus die Seiten beider 1&1-Einträge (`seiten_aus_uebersicht`, ab dem Lauf
+      # danach); vor den Tarifdetail-Seiten, damit drei 502 dort sie nicht kosten.
+      # Die sieben Geräteraster (smartphones-all-net-flat-s …) stehen seit
+      # 20.11.2026 nicht mehr hier: sie lesen sich seit dem Shop-Umbau nicht mehr, und
+      # jede Produktseite liest alle sieben Tarife selbst (Tarifauswahl im Bestellweg).
+      - https://mobile.1und1.de/smartphones
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false
@@ -235,12 +243,11 @@ anbieter:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
-      # Die Geräteübersicht: je Kachel der Produktlink (`klickraster.liste_saetze`),
-      # daraus die Seiten beider 1&1-Einträge (`seiten_aus_uebersicht`, ab dem Lauf
-      # danach). Die sieben Geräteraster (smartphones-all-net-flat-s …) stehen seit
-      # 20.11.2026 nicht mehr hier: sie lesen sich seit dem Shop-Umbau nicht mehr, und
-      # jede Produktseite liest alle sieben Tarife selbst (Tarifauswahl im Bestellweg).
-      - https://mobile.1und1.de/smartphones
+    # Übersichten NACH den Produktseiten, erst die Geräteliste, dann die
+    # Tarifdetail-Seiten: drei HTTP 502 dort in Folge beenden den Eintrag
+    # (`klickwiederholung`); zuerst gelesen kosteten sie alle Geräteseiten
+    # (21.11.2026), zuletzt nur den Anschlusspreis.
+    uebersichten_zuletzt: true
     # Seiten (seit 20.11.2026) aus den Kacheln der Geräteübersicht des letzten
     # abgelegten Laufs (data/state/klick/1und1.json, `klickliste_kacheln`): je Gerät
     # der Produktlink wörtlich, neue Modelle kommen ohne Handarbeit (Xiaomi 18 Pro).
@@ -252,8 +259,21 @@ anbieter:
   - schluessel: 1und1-2
     name: 1&1
     karte: 1und1
-    # Ohne eigene Tarifdetail-Seiten: der Anschlusspreis kommt aus der Datei von
-    # `1und1` desselben Tags (`klickanschluss.anschluesse_je_lauf`, 21.11.2026).
+    # Dieselben sieben Tarifdetail-Seiten wie `1und1`: Nachtlauf 21.11.2026 bekam
+    # `1und1` auf der ersten HTTP 502 und las keine; alle 308 Sätze dieses Eintrags
+    # standen ohne Anschlusspreis, also ohne Gesamtkosten. Die Tarifauswahl der
+    # Produktseiten nennt ihn nicht. Was einer der beiden am Tag liest, gilt für
+    # beide (`klickanschluss.tagesanschluesse`); ein anderer Tag zählt nie. Wie bei
+    # `1und1` nach den Produktseiten: ein Ausfall kostet nur den Anschlusspreis.
+    uebersichten_zuletzt: true
+    uebersichten:
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
     seiten_aus_uebersicht: 1und1
 
   # Telekom alle fünf Tarife (Antonio 11.10.2026: alles, immer). Eine Produktseite zeigt
