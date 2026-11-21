@@ -6,7 +6,8 @@ Eine Attrappe ersetzt GitHub; feste Daten, nie das heutige Datum.
 from __future__ import annotations
 
 import subprocess
-from datetime import date
+import time
+from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
@@ -460,3 +461,43 @@ def test_vorhandene_datei_gilt_nicht_als_angekommen(tmp_path):
     )
     bilanz = veroeffentliche(viele(tmp_path, 1), HEUTE, gh, schlaf=lambda s: None)
     assert (bilanz.hochgeladen, bilanz.fehlgeschlagen) == (0, 1)
+
+
+class LangsameLoeschung(AttrappeReleases):
+    """Wie GitHub über das Netz: jede Löschung braucht ``verzug`` Sekunden."""
+
+    def __init__(self, *args, verzug: float = 0.05, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.verzug = verzug
+
+    def release_loeschen(self, tag: str) -> None:
+        time.sleep(self.verzug)
+        super().release_loeschen(tag)
+
+    def asset_loeschen(self, tag: str, datei: str) -> None:
+        time.sleep(self.verzug)
+        super().asset_loeschen(tag, datei)
+
+
+def test_aufraeumen_loescht_abgelaufene_belege_parallel_statt_sequenziell():
+    """Lauf vom 21.11.2026: viele abgelaufene Belege ließen `scripts/belege_manifest.py`
+    die Gesamtfrist von 200 s überschreiten, weil jede Löschung ein eigener, sequenziell
+    abgewarteter `gh`-Aufruf war. 40 abgelaufene Tagesreleases zu je 0,05 s bräuchten
+    sequenziell mindestens 2 s; parallel (``GLEICHZEITIGE_LOESCHUNGEN``) bleibt der Lauf
+    deutlich darunter, und kein Fehlschlag wird dabei leise übersprungen."""
+    anzahl = 40
+    tage = [date(2026, 9, 1) + timedelta(days=i) for i in range(anzahl)]
+    anhaenge = {
+        f"belege-{tag.isoformat()}": [dateiname("g", "o2", tag)] for tag in tage
+    }
+    gh = LangsameLoeschung(anhaenge, verzug=0.05)
+    sequenziell_mindestens = anzahl * 0.05
+
+    beginn = time.monotonic()
+    bilanz, rest = raeume_auf(anhaenge, HEUTE, gh)
+    dauer = time.monotonic() - beginn
+
+    assert bilanz.releases_geloescht == sorted(anhaenge)
+    assert bilanz.fehler == []
+    assert rest == {}
+    assert dauer < sequenziell_mindestens / 2

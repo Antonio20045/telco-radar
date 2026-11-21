@@ -16,6 +16,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from klickserver import Antwort, html, klickserver, umleitung
 
+from telco_radar.collect.geraete import klicktor
 from telco_radar.collect.geraete.robots import RobotsWaechter
 
 JETZT = datetime(2026, 10, 3, 5, 0, tzinfo=UTC)
@@ -276,3 +277,47 @@ def test_crawl_delay_gilt_zwischen_zwei_produktseiten(chromium):
     assert start_zweiter - ende_erster >= verzug
     assert len(server.mit("/handy/") + server.mit("/api/")) == 4
     assert min(server.luecken(("/handy/", "/api/"))) >= verzug
+
+
+def test_502_der_hauptseite_wird_wiederholt_und_gelingt_dann(chromium, monkeypatch):
+    """1&1, 21.11.2026: ein HTTP 502 beim Seitenabruf war vorübergehend (30 Minuten
+    später lieferte dieselbe Adresse 200). Der zweite Versuch kommt durch, kein
+    ``stoerung`` und kein ``Lauf endet``."""
+    monkeypatch.setattr(klicktor, "WARTEZEITEN_S", (0.01, 0.01, 0.01))
+    versuche = {"/handy/x": 0}
+
+    def antworte(pfad: str) -> Antwort:
+        teile = urlsplit(pfad)
+        if teile.path == "/handy/x":
+            versuche["/handy/x"] += 1
+            if versuche["/handy/x"] == 1:
+                return Antwort(502, "text/plain", "Bad Gateway")
+        return _beispiel(_seite())(pfad)
+
+    with klickserver(antworte) as server:
+        lauf = _laufe(chromium, server.adresse("/handy/x"), OFFEN)
+
+    assert server.mit("/handy/x") == ["/handy/x", "/handy/x"]
+    assert lauf.http_status == 200
+    assert lauf.status == "gelesen", lauf.grund
+    assert lauf.stoerung is None
+
+
+def test_403_der_hauptseite_wird_nie_wiederholt(chromium, monkeypatch):
+    """403 (wie 429) ist Bot-Schutz, kein vorübergehender Fehler: CLAUDE.md Regel 4
+    verbietet, ihn zu umgehen. Ein einziger Versuch, der Lauf endet sofort."""
+    monkeypatch.setattr(klicktor, "WARTEZEITEN_S", (0.01, 0.01, 0.01))
+
+    def antworte(pfad: str) -> Antwort:
+        teile = urlsplit(pfad)
+        if teile.path == "/handy/x":
+            return Antwort(403, "text/html", "<p>Zugriff verweigert</p>")
+        return _beispiel(_seite())(pfad)
+
+    with klickserver(antworte) as server:
+        lauf = _laufe(chromium, server.adresse("/handy/x"), OFFEN)
+
+    assert server.mit("/handy/x") == ["/handy/x"]
+    assert lauf.status == "gestoert"
+    assert "403" in lauf.grund
+    assert lauf.http_status == 403

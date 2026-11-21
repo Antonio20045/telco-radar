@@ -34,6 +34,7 @@ import subprocess
 import time
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -55,6 +56,11 @@ from .beleg_regeln import (
 PAKET = 40
 """Dateien je ``gh release upload``: klein genug, dass ein Fehler wenig kostet."""
 ZEIT_JE_AUFRUF_S = 300
+GLEICHZEITIGE_LOESCHUNGEN = 8
+"""Höchstens so viele ``gh``-Löschungen gleichzeitig in ``raeume_auf``: jeder Aufruf
+ist Prozessstart und ein HTTPS-Rundgang, keine CPU-Arbeit. Sequenziell sprengten viele
+abgelaufene Belege (ein Tagesrelease je Anbieter und Gerät) die Gesamtfrist von
+``scripts/belege_manifest.py`` (``GESAMT_FRIST_S``, 200 s; Lauf vom 21.11.2026)."""
 VERSUCHE = 5
 """Hochladeversuche je Paket bei vorübergehenden Fehlern."""
 BACKOFF_S, PAUSE_ZWISCHEN_PAKETEN_S = (10.0, 30.0, 60.0, 120.0), 1.0
@@ -370,31 +376,76 @@ def veroeffentliche(
     return bilanz
 
 
-def raeume_auf(
-    anhaenge: Anhaenge, heute: date, gh: Releases
-) -> tuple[Bilanz, dict[str, list[str]]]:
-    """Löscht Abgelaufenes (Modulkopf); gibt Bilanz und verbleibende Anhänge zurück."""
-    bilanz = Bilanz()
+def _parallel(
+    aufgaben: Sequence[Any], erledige: Callable[[Any], GhFehler | None]
+) -> list[GhFehler | None]:
+    """``erledige`` je Aufgabe, bis zu ``GLEICHZEITIGE_LOESCHUNGEN`` gleichzeitig.
+
+    Jeder Aufruf ist ein eigener ``gh``-Prozess samt HTTPS-Rundgang, keine
+    CPU-Arbeit; ``map`` liefert die Fehler in derselben Reihenfolge wie die
+    Aufgaben, darum bleiben Bilanz und Protokoll deterministisch wie beim
+    sequenziellen Lauf."""
+    if not aufgaben:
+        return []
+    with ThreadPoolExecutor(max_workers=GLEICHZEITIGE_LOESCHUNGEN) as pool:
+        return list(pool.map(erledige, aufgaben))
+
+
+def _einzeldateien(
+    anhaenge: Anhaenge, heute: date, ganze_releases: list[str]
+) -> tuple[dict[str, list[str]], list[tuple[str, str]]]:
+    """Dateien je Tag ohne ganzes Release: bleibend und abgelaufen (zu löschen)."""
     rest: dict[str, list[str]] = {}
+    abgelaufen: list[tuple[str, str]] = []
     for tag in sorted(anhaenge):
-        if release_abgelaufen(tag, heute):
-            try:
-                gh.release_loeschen(tag)
-                bilanz.releases_geloescht.append(tag)
-            except GhFehler as fehler:
-                bilanz.fehler.append(f"{tag} nicht gelöscht: {fehler}")
-                rest[tag] = list(anhaenge[tag])
+        if tag in ganze_releases:
             continue
         rest[tag] = []
         for datei in anhaenge[tag]:
             datum = datum_der_datei(datei)
             if datum is None or not ist_abgelaufen(datum, heute, ist_gross_tag(tag)):
                 rest[tag].append(datei)
-                continue
-            try:
-                gh.asset_loeschen(tag, datei)
-                bilanz.assets_geloescht += 1
-            except GhFehler as fehler:
-                bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
-                rest[tag].append(datei)
+            else:
+                abgelaufen.append((tag, datei))
+    return rest, abgelaufen
+
+
+def raeume_auf(
+    anhaenge: Anhaenge, heute: date, gh: Releases
+) -> tuple[Bilanz, dict[str, list[str]]]:
+    """Löscht Abgelaufenes (Modulkopf); gibt Bilanz und verbleibende Anhänge zurück.
+
+    Die Löschungen laufen parallel (``_parallel``, ``GLEICHZEITIGE_LOESCHUNGEN``):
+    sequenziell sprengten viele abgelaufene Belege (ein Tagesrelease je Anbieter und
+    Gerät) die Gesamtfrist von ``scripts/belege_manifest.py`` (``GESAMT_FRIST_S``,
+    200 s; Lauf vom 21.11.2026). Kein Fehlschlag bleibt unbemerkt: er steht wie beim
+    sequenziellen Lauf in ``bilanz.fehler``, die Datei bleibt in ``rest``."""
+    bilanz = Bilanz()
+    ganze_releases = [t for t in sorted(anhaenge) if release_abgelaufen(t, heute)]
+    rest, einzeldateien = _einzeldateien(anhaenge, heute, ganze_releases)
+
+    fehler_je_release = _parallel(ganze_releases, lambda t: _gh_fehler(gh, t))
+    for tag, fehler in zip(ganze_releases, fehler_je_release, strict=True):
+        if fehler is None:
+            bilanz.releases_geloescht.append(tag)
+        else:
+            bilanz.fehler.append(f"{tag} nicht gelöscht: {fehler}")
+            rest[tag] = list(anhaenge[tag])
+
+    fehler_je_datei = _parallel(einzeldateien, lambda p: _gh_fehler(gh, *p))
+    for (tag, datei), fehler in zip(einzeldateien, fehler_je_datei, strict=True):
+        if fehler is None:
+            bilanz.assets_geloescht += 1
+        else:
+            bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
+            rest[tag].append(datei)
     return bilanz, rest
+
+
+def _gh_fehler(gh: Releases, tag: str, datei: str | None = None) -> GhFehler | None:
+    """Führt die Löschung aus; die Ausnahme statt sie zu werfen, fürs Sammeln."""
+    try:
+        gh.release_loeschen(tag) if datei is None else gh.asset_loeschen(tag, datei)
+        return None
+    except GhFehler as fehler:
+        return fehler

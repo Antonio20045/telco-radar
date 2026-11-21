@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 import test_klick_zusammenfuehrung as vorlage
-from klickergebnisse import erfasst, o2_lesung
+from klickergebnisse import O2_SEITE, erfasst, ergebnisdatei, lauf, o2_lesung
 
 from telco_radar.analyze.klick_nachholen import (
     ABSTAND_S,
@@ -31,6 +31,7 @@ from telco_radar.analyze.klick_nachholen import (
     veraltet,
 )
 from telco_radar.collect.geraete.klickergebnis import ORDNER, schreibe
+from telco_radar.collect.geraete.klicklauf import LAUF_GESTOERT
 from telco_radar.geraete_pipeline import run_geraete_stage
 
 HEUTE = vorlage.HEUTE
@@ -291,6 +292,24 @@ def test_veraltet_kennt_fehlende_alte_und_zukuenftige_dateien(tmp_path):
     assert veraltet(tmp_path, "2026-09-28", ["o2"]) == []
     schreibe(tmp_path / "o2-2.json", _klick_datei(HEUTE))
     assert veraltet(tmp_path, HEUTE, ["o2"]) == ["o2"]
+
+
+def test_veraltet_zaehlt_gestoerten_lauf_ohne_seiten_als_veraltet(tmp_path):
+    """1&1, 21.11.2026: HTTP 502 beim ersten Seitenabruf, der Lauf endete gestört mit
+    0 ganz gelesenen Seiten, die Datei trägt trotzdem das heutige Datum. Das Datum
+    allein hätte sie als vom Messtag durchgehen lassen (``Klick-Lauf fertig``, obwohl
+    kein Satz nachkam); sie zählt wie eine veraltete Datei, damit das Nachholen den
+    Anbieter nicht übergeht."""
+    gestoert_ohne_seiten = lauf(
+        O2_SEITE, [], status=LAUF_GESTOERT, grund="Abruf gestört (HTTP 502)"
+    )
+    schreibe(
+        tmp_path / "1und1.json",
+        ergebnisdatei("1&1", "1und1", [(O2_SEITE, gestoert_ohne_seiten)], HEUTE),
+    )
+    schreibe(tmp_path / "o2.json", _klick_datei(HEUTE))
+
+    assert veraltet(tmp_path, HEUTE, ["1&1", "o2"]) == ["1&1"]
 
 
 def _antwort(laeufe: list[dict], status: int = 200):
