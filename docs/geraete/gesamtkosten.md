@@ -46,7 +46,7 @@ Nutzungsmonaten, damit alle Angebote über denselben Zeitraum stehen.
 | Telekom (`/shop/geraet/apple/apple-iphone-16/ultramarin-128-gb`, MagentaMobil L) | „MagentaMobil L 59,95 €“, „24 Monate Vertragslaufzeit“, „zzgl. 39,95 € pro Karte einmalig“, „Einmalige Zahlung 40,95 € inkl. Bereitstellung 39,95 €“ (also 1 € Anzahlung), „Anzahlung und bis zu 36 monatliche Raten“, „Gesamtpreis des Geräts 969 €“, „Geräte-Rabatt im Ratenkauf −200 € angewendet“ | Anzahlung 1 €, Anschluss 39,95 €, Rabatt steckt schon in der Rate |
 | congstar (`/geraete/apple/apple-iphone-16/`) | „36 mtl. Zahlungen“, „Monatliche Kosten 20,00 €“, „Anzahlung 1,00 €“, „721,00 € Gesamtpreis“ (ebenso 24 × 30,00 € + 1 €); „Die Dauer der Gerätelaufzeit hat keine Auswirkung auf die Tariflaufzeit.“; Tarif „24 Monate Laufzeit“ oder „Ohne Laufzeit“, „Einmalige Kosten 0,00 €“ | Gerätegesamtpreis = Anzahlung + N × Rate; Tarif getrennt; ohne Laufzeit 24 Vergleichsmonate |
 | 1&1 (`/iphone-16`, Datenblock `hwdVariantsHardwarePrices`) | „24 Monate Fix 42,– €/Mon.“, „36 Monate Fix 28,– €“ (dazu der Tarifpreis der Stufe), „+ 12 Monate Flex“ als freiwillige Verlängerung; „Sofortkauf 1008,– €“ = 24 × 42 = 36 × 28; `tariff.contractduration` 24; keine einmalige Gerätezahlung außer der Bereitstellung | N × Bündelbetrag + Bereitstellung; „Flex“ und Rückgabe zählen nicht |
-| o2 (`/e-shop/apple/…-details`) | übersprungen: die Seite liefert Preise nur per JavaScript, im statischen HTML steht kein Preis | Regel wie Vodafone/Telekom; Versand 6,99 € laut `config/versandkosten.yaml` (Beleg 05.11.2026) |
+| o2 (`/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-gray-details`, Browser 21.11.2026) | „Gerät monatlich: 45,00 €“, „Ratenzahlung: 24 Monate“, „Gesamtpreis Gerät: 1.081,00 €“, „Tarif monatlich: 24,99 € (Mindestlaufzeit 24 Monate)“, „Gerät Anzahlung: 1,00 €“, „einmaliger Anschlusspreis 0,00 € 39,99 €“ (durchgestrichen), „Versandkosten: 6,99 €“ | Regel wie Vodafone/Telekom; Versand 6,99 € |
 | Saturn/MediaMarkt Tarifwelt (`tarife.mediamarkt.de`) | übersprungen: Single-Page-App ohne Text im HTML. Beleg ist die Schnittstellenantwort vom 08.11.2026 (`tests/fixtures/geraete/tarifwelt_mm_productdetail_*`): `oneTimeCosts` = Gerät 1 €, „Anschlusspreis Tarif“ 39,99 €, „Versandkosten“ 5,95 €; `monthlyCosts` = „Grundpreis Tarif“; `contractTerm` 24 | Gerätepreis einmalig + 24 × Grundpreis + Anschluss + Versand; keine Geräterate (0,00 €) |
 
 ## Felder je Anbieter
@@ -97,4 +97,6 @@ Der Export nennt die Spalte deshalb „Gerät einmalig EUR“, nicht „Anzahlun
   nicht mehr vom Referenzgerät, sondern aus seiner eigenen Tarifoption
   (`o2_anschluss`): Listenpreis 0 € in der Fußnote zählt 0 €, ein höherer oder keiner
   ist die Lücke „Anschlusspreis“ (Gegenprobe 20.11.2026: iPhone 14 erneuert, S Special
-  Plus, gespeichert 39,99 €, Seite 0,00 €).
+  Plus, gespeichert 39,99 €, Seite 0,00 €). Seit 21.11.2026 auch dann die Lücke, wenn
+  die Antwort ihren gewählten Tarif über dessen Fußnote hebt (Redmi 17, on Demand M:
+  Fußnote 0 €, berechnet 39,99 €).
