@@ -24,13 +24,22 @@ nicht mehr aufgefrischt und altern in der Ansicht
 `bntPromo…` spricht fuer eine befristete Aktion), kommen sie im naechsten Lauf
 zurueck.
 
+EINE SEITE JE LAUF, NICHT JE GERAET
+-----------------------------------
+Die Ausblendung stand am 21.11.2026 auf allen elf geprueften Produktseiten, der
+Tarifuebersicht `alle-tarife-mit-vertrag.html` (dort als `tariffIds`) und der
+SIM-only-Seite gleich. Gelesen wird sie deshalb EINMAL je Lauf, von der
+Tarifuebersicht (`UEBERSICHT`); scheitert die, von der ersten Produktseite. Jeder
+Abruf kostet Zeit, die spaeter im Job der Tarifwelt fehlt.
+
 NICHT GELESEN IST NICHT „NICHTS AUSGEBLENDET“
 ---------------------------------------------
-Eine Seite, die nicht gelesen wurde, bekommt die Vorgabe der heute gelesenen
-Seiten (am 21.11.2026 auf allen elf geprueften Produktseiten gleich). Ist gar
-keine Seite lesbar, ist unbekannt, was die Seiten zeigen. Dann bleibt jeder Tarif
-der Schnittstelle, denn ein Ausfall von www.vodafone.de darf nicht die ganze
-eigene Referenz kosten - aber nie still (Warnung „Sichtbarkeit unbekannt“).
+Ist keine der beiden Seiten lesbar, ist unbekannt, was die Seiten zeigen. Dann
+bleibt jeder Tarif der Schnittstelle, denn ein Ausfall von www.vodafone.de darf
+nicht die ganze eigene Referenz kosten - aber nie still: Warnung „Sichtbarkeit
+unbekannt“, und jeder so ersetzte Rohsatz traegt `UNGEPRUEFT`; das Laufergebnis
+nennt die Anbieter unter `sichtbarkeit_nicht_geprueft` (`nicht_geprueft`), damit
+die Seite „Sichtbarkeit nicht geprueft“ zeigen kann.
 """
 
 from __future__ import annotations
@@ -47,6 +56,14 @@ TARIF_ID = "tarif_virtual_item_id"
 
 KANAL_DER_SEITE = "consumer"
 
+UEBERSICHT_SCHLUESSEL = "tariffIds"
+
+UEBERSICHT = (
+    "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html"
+)
+
+UNGEPRUEFT = "sichtbarkeit_nicht_geprueft"
+
 SEITENOPTIONEN = "sailsPageOptions"
 
 _AUSBLENDUNG_RE = re.compile(
@@ -60,20 +77,21 @@ def ausgeblendete_tarife(html: str, kanal: str = KANAL_DER_SEITE) -> frozenset |
     """Tarif-IDs (`virtualItemId`), die die Produktseite fuer Neuvertraege NICHT
     zur Auswahl stellt - None, wenn die Seite nicht verstanden wurde.
 
-    `kanal` ist der Schluessel der Seite zu `salesChannel=Online.Consumer`. Eine
-    Seite mit `sailsPageOptions`, aber ohne Ausblende-Block, blendet nichts aus
-    (leere Menge); eine Seite ohne `sailsPageOptions` ist keine verstandene
-    Produktseite.
+    `kanal` ist der Schluessel der Produktseite zu `salesChannel=Online.Consumer`;
+    die Tarifuebersicht hat nur einen Kanal und schreibt `tariffIds`. Eine Seite
+    mit `sailsPageOptions`, aber ohne Ausblende-Block, blendet nichts aus (leere
+    Menge); eine Seite ohne `sailsPageOptions` ist keine verstandene Seite.
     """
     if SEITENOPTIONEN not in (html or ""):
         return None
     for block in _AUSBLENDUNG_RE.finditer(html):
-        liste = re.search(
-            rf"(?:^|[\s,{{'\"]){re.escape(kanal)}['\"]?\s*:\s*\[([^\]]*)\]",
-            block.group("koerper"),
-        )
-        if liste:
-            return frozenset(_ID_RE.findall(liste.group(1)))
+        for schluessel in (kanal, UEBERSICHT_SCHLUESSEL):
+            liste = re.search(
+                rf"(?:^|[\s,{{'\"]){re.escape(schluessel)}['\"]?\s*:\s*\[([^\]]*)\]",
+                block.group("koerper"),
+            )
+            if liste:
+                return frozenset(_ID_RE.findall(liste.group(1)))
     return frozenset()
 
 
@@ -98,38 +116,44 @@ def _lies_seite(hole: Callable, url: str) -> frozenset | None:
     return ausgeblendet
 
 
-def ausblendung_je_seite(hole: Callable, adressen: list) -> dict[str, frozenset]:
-    """Seitenadresse -> ausgeblendete Tarif-IDs, ein Abruf je Adresse."""
-    gelesen = {a: _lies_seite(hole, a) for a in dict.fromkeys(adressen) if a}
-    bekannt = [v for v in gelesen.values() if v is not None]
-    if gelesen and not bekannt:
-        log.warning(
-            "Vodafone: keine Produktseite lesbar - Sichtbarkeit unbekannt, "
-            "alle Tarife der Schnittstelle bleiben"
-        )
-    vorgabe = frozenset().union(*bekannt)
-    out: dict[str, frozenset] = {}
-    for adresse, ausgeblendet in gelesen.items():
-        if ausgeblendet is None and bekannt:
-            log.info(
-                "Vodafone-Produktseite %s: es gilt die Ausblendung der heute "
-                "gelesenen Seiten (%s)",
-                adresse,
-                ",".join(sorted(vorgabe)),
-            )
-        out[adresse] = vorgabe if ausgeblendet is None else ausgeblendet
-    return out
+def ausblendung_des_laufs(hole: Callable, geraeteseiten: list) -> frozenset | None:
+    """Die ausgeblendeten Tarif-IDs dieses Laufs: Tarifuebersicht, sonst die erste
+    Produktseite - hoechstens zwei Abrufe. None heisst „nicht geprueft“."""
+    erste = next((a for a in geraeteseiten if a), None)
+    for adresse in (UEBERSICHT, erste):
+        ausgeblendet = _lies_seite(hole, adresse) if adresse else None
+        if ausgeblendet is not None:
+            return ausgeblendet
+    log.warning(
+        "Vodafone: weder Tarifuebersicht noch Produktseite lesbar - Sichtbarkeit "
+        "unbekannt, alle Tarife der Schnittstelle bleiben"
+    )
+    return None
+
+
+def vermerke(saetze: list, ausgeblendet: frozenset | None) -> list:
+    """Die Rohsaetze, bei ungeprueftem Lauf mit `UNGEPRUEFT` gekennzeichnet."""
+    if ausgeblendet is not None:
+        return saetze
+    return [{**s, UNGEPRUEFT: True} for s in saetze]
+
+
+def nicht_geprueft(rohbuendel: list) -> list[str]:
+    """Anbieter, deren Tarifauswahl in diesem Lauf nicht geprueft wurde."""
+    return sorted(
+        {str(b.get("anbieter") or "") for b in rohbuendel if b.get(UNGEPRUEFT)}
+    )
 
 
 def sichtbare_angebote(
-    angebote: list, ausgeblendet: frozenset
+    angebote: list, ausgeblendet: frozenset | None
 ) -> tuple[list, set[str]]:
     """(Tarifname, Komposition)-Paare ohne die ausgeblendeten Tarife, dazu die
     `offerCoreHash` der weggelassenen (fuer den Hash-Rueckfall der Vorschau)."""
     sichtbar: list = []
     verborgen: set[str] = set()
     for name, komposition in angebote:
-        if komposition.get(TARIF_ID) in ausgeblendet:
+        if komposition.get(TARIF_ID) in (ausgeblendet or ()):
             verborgen.add(str(komposition.get("offerCoreHash") or "").strip())
         else:
             sichtbar.append((name, komposition))

@@ -132,10 +132,9 @@ alle Tarife mit `tariffName` und allen Laufzeiten. Die Hashes der Vorschau
 stehen dort nur teilweise (Pixel 11, 29.09.2026: 9 von 24) und wechseln
 zwischen Tagen; seitdem ist die Tarifantwort DIE Quelle der Buendel. Welche
 dieser Tarife die Produktseite wirklich anbietet, sagt erst die Seite selbst
-(`vodafone_sicht`, 21.11.2026). `loese_tarifnamen()` holt je GERAET die
-Produktseite und EINE Tarifantwort; sie laeuft nicht in `lies_buendel()`
-(ein Adapter bleibt Text-zu-Daten), sondern ueber den Haken
-`Adapter.loese_tarifnamen` der Pipeline, nachdem alle Anbieter gesammelt sind.
+(`vodafone_sicht`, einmal je Lauf). `loese_tarifnamen()` holt je GERAET EINE
+Tarifantwort, ueber den Haken `Adapter.loese_tarifnamen` der Pipeline (nicht in
+`lies_buendel()`: ein Adapter bleibt Text-zu-Daten).
 """
 
 from __future__ import annotations
@@ -149,7 +148,7 @@ from urllib.parse import urlsplit
 
 from .basis import GeraeteAbrufFehler, _preis
 from .vodafone_aktion import RABATTPOSTEN, tarif_mit_aktion
-from .vodafone_sicht import TARIF_ID, ausblendung_je_seite, sichtbare_angebote
+from . import vodafone_sicht as sicht
 
 from ...tco_model import laufzeit_in_monaten
 
@@ -545,9 +544,9 @@ def _buendel_aus_tarifantwort(text: str) -> dict:
             name = str(tarif.get("tariffName") or "").strip()
             if not name:
                 continue
-            tarif_id = str(tarif.get("virtualItemId") or "").strip()
+            tid = {sicht.TARIF_ID: str(tarif.get("virtualItemId") or "").strip()}
             for atom in tarif.get("atomics") or []:
-                posten = {RABATTPOSTEN: _pfad(atom, RABATTPOSTEN), TARIF_ID: tarif_id}
+                posten = {RABATTPOSTEN: _pfad(atom, RABATTPOSTEN), **tid}
                 for k in _pfad(atom, "prices", "composition") or []:
                     if isinstance(k, dict):
                         out.setdefault(hwid, []).append((name, {**k, **posten}))
@@ -693,7 +692,7 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
             (str(saetze[0].get("titel") or ""), str(saetze[0].get("url") or "")), []
         ).append(hwid)
 
-    ausblendung = ausblendung_je_seite(hole, [g[1] for g in sorted(je_geraet)])
+    ausgeblendet = sicht.ausblendung_des_laufs(hole, [g[1] for g in sorted(je_geraet)])
     vollstaendig: dict[str, list] = {}
     hash_namen: dict[str, str] = {}
     verborgen: set[str] = set()
@@ -708,7 +707,7 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
             letzter = time.monotonic()
             angebote = _hole_angebote(hole, kopfzeilen, geraet[0], teil)
             for hwid, alle in angebote.items():
-                eintraege, weg = sichtbare_angebote(alle, ausblendung[geraet[1]])
+                eintraege, weg = sicht.sichtbare_angebote(alle, ausgeblendet)
                 verborgen |= weg
                 if hwid in teil and eintraege:
                     vollstaendig[hwid] = eintraege
@@ -736,7 +735,7 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
         if r.get("quelle") == "vodafone_buendel" and hwid in vollstaendig:
             if r is vorschau[hwid][0]:
                 saetze = ersetzt[hwid]
-                neu.extend(saetze)
+                neu.extend(sicht.vermerke(saetze, ausgeblendet))
                 gesetzt += len(saetze)
             continue
         if (

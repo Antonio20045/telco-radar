@@ -24,7 +24,12 @@ import pytest
 
 from telco_radar.collect.geraete import vodafone as vodafone_modul
 from telco_radar.collect.geraete.vodafone import lies_buendel, loese_tarifnamen
-from telco_radar.collect.geraete.vodafone_sicht import ausgeblendete_tarife
+from telco_radar.collect.geraete.vodafone_sicht import (
+    UEBERSICHT,
+    UNGEPRUEFT,
+    ausgeblendete_tarife,
+    nicht_geprueft,
+)
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _SEITE = "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html"
@@ -102,6 +107,12 @@ def test_seite_ohne_ausblendung_blendet_nichts_aus():
     assert ausgeblendete_tarife(_seite_ohne_ausblendung()) == frozenset()
 
 
+def test_die_tarifuebersicht_schreibt_tariff_ids():
+    """Die Übersicht hat nur einen Kanal: ``tariffIds: ['269','270']``."""
+    uebersicht = _text("vodafone_tarifuebersicht_20261121.html")
+    assert ausgeblendete_tarife(uebersicht) == frozenset({"269", "270"})
+
+
 def test_unverstandene_seite_ist_unbekannt_nicht_leer():
     assert ausgeblendete_tarife(_tarifantwort()) is None
     assert ausgeblendete_tarife("") is None
@@ -117,7 +128,7 @@ def test_ausgeblendete_tarife_werden_keine_buendel():
     for tarif in ("Mobil XS", "Mobil S", "Mobil XL"):
         for laufzeit in (12, 24, 36):
             assert (tarif, laufzeit) in _paare(rohbuendel)
-    assert _SEITE in aufrufe
+    assert [a for a in aufrufe if not a.startswith("https://api.")] == [UEBERSICHT]
 
 
 def test_gegenprobe_ohne_ausblendung_bleiben_alle_fuenf_stufen():
@@ -174,26 +185,50 @@ def test_vorschau_mit_ausgeblendetem_tarif_faellt_auch_im_hash_rueckfall():
     assert {"Mobil XS", "Mobil S"} <= {s["tarif_name"] for s in mit}
 
 
-def test_eine_unlesbare_seite_nimmt_die_vorgabe_einer_gelesenen_seite():
-    """Die Ausblendung stand am 21.11.2026 auf allen elf geprüften Produktseiten
-    gleich. Scheitert eine Seite, gilt die Vorgabe der heute gelesenen Seiten."""
+def _zwei_geraete():
     zweite = "https://www.vodafone.de/privat/handys/zweites-geraet.html"
-    andere_antwort = _tarifantwort().replace(
-        '"hardwareId": "57459"', '"hardwareId": "57460"'
-    )
     rohbuendel = _vorschau() + [
         {**s, "sku": "57460", "sku_id": "zweites-57460", "url": zweite}
         for s in _vorschau()
     ]
+    return rohbuendel, _tarifantwort().replace(
+        '"hardwareId": "57459"', '"hardwareId": "57460"'
+    )
+
+
+def _hole_zwei(andere_antwort: str, seiten: dict):
+    seitenabrufe: list[str] = []
 
     def hole(url, kopfzeilen=None, **_):
         if url.startswith("https://api.vodafone.de/"):
             return 200, andere_antwort if "57460" in url else _tarifantwort()
-        if url == zweite:
-            return 503, ""
-        return 200, _seite()
+        seitenabrufe.append(url)
+        return seiten.get(url, (404, ""))
 
+    return hole, seitenabrufe
+
+
+def test_die_ausblendung_wird_einmal_je_lauf_gelesen():
+    """Zwei Geräte, ein Seitenabruf: die Tarifübersicht. Sie gilt für beide."""
+    rohbuendel, andere = _zwei_geraete()
+    uebersicht = (200, _text("vodafone_tarifuebersicht_20261121.html"))
+    hole, seitenabrufe = _hole_zwei(andere, {UEBERSICHT: uebersicht})
     loese_tarifnamen(hole, {}, rohbuendel)
+    assert seitenabrufe == [UEBERSICHT]
+    for sku in ("57459", "57460"):
+        namen = {s["tarif_name"] for s in rohbuendel if s["sku"] == sku}
+        assert namen & _MOBIL == {"Mobil XS", "Mobil S", "Mobil XL"}, sku
+    assert nicht_geprueft(rohbuendel) == []
+
+
+def test_scheitert_die_uebersicht_gilt_die_erste_produktseite():
+    rohbuendel, andere = _zwei_geraete()
+    hole, seitenabrufe = _hole_zwei(
+        andere, {UEBERSICHT: (503, ""), _SEITE: (200, _seite())}
+    )
+    loese_tarifnamen(hole, {}, rohbuendel)
+    assert len(seitenabrufe) == 2 and seitenabrufe[0] == UEBERSICHT
+    assert _SEITE in seitenabrufe
     zweites = {s["tarif_name"] for s in rohbuendel if s["sku"] == "57460"}
     assert zweites & _MOBIL == {"Mobil XS", "Mobil S", "Mobil XL"}
 
@@ -209,3 +244,12 @@ def test_ohne_jede_gelesene_seite_bleibt_alles_und_das_protokoll_sagt_es(caplog)
         loese_tarifnamen(hole, {}, rohbuendel)
     assert {s["tarif_name"] for s in rohbuendel} & _MOBIL == _MOBIL
     assert "Sichtbarkeit unbekannt" in caplog.text
+    assert all(s[UNGEPRUEFT] for s in rohbuendel)
+    assert nicht_geprueft(rohbuendel) == ["Vodafone"]
+
+
+def test_gegenprobe_gelesene_seite_kennzeichnet_nichts():
+    rohbuendel = _vorschau()
+    hole, _ = _hole(_seite(), _tarifantwort())
+    loese_tarifnamen(hole, {}, rohbuendel)
+    assert not any(UNGEPRUEFT in s for s in rohbuendel)

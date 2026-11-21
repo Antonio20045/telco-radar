@@ -20,14 +20,14 @@ src/telco_radar/collect/geraete/autoerkennung.py zeilen 499
 src/telco_radar/collect/geraete/congstar.py zeilen 870
 src/telco_radar/collect/geraete/o2.py zeilen 679
 src/telco_radar/collect/geraete/telekom.py zeilen 658
-src/telco_radar/collect/geraete/vodafone.py zeilen 759
+src/telco_radar/collect/geraete/vodafone.py zeilen 758
 src/telco_radar/collect/lieferzeit.py zeilen 441
 src/telco_radar/collect/newsroom.py zeilen 679
 src/telco_radar/collect/promo_snapshot.py zeilen 415
 src/telco_radar/collect/tarif_crawler.py zeilen 895
 src/telco_radar/collect/tarif_pdf.py zeilen 670
 src/telco_radar/geraete_model.py zeilen 1129
-src/telco_radar/geraete_pipeline.py zeilen 610
+src/telco_radar/geraete_pipeline.py zeilen 609
 src/telco_radar/pipeline.py zeilen 988
 src/telco_radar/promo_bilder.py zeilen 417
 src/telco_radar/report/bilder.py zeilen 432

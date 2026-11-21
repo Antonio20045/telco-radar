@@ -54,6 +54,7 @@ from .tarif_bezug import Tarifbestand
 from .collect.geraete import ADAPTER, laufuhr, sammle
 from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
+from .collect.geraete.vodafone_sicht import nicht_geprueft
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 
@@ -206,13 +207,10 @@ def nachsammle_buendel(
     (`vodafone.loese_tarifnamen`) und bekam bis hierher das ROHE `hole`:
     ohne Disallow, ohne Crawl-delay, ohne Fensterpruefung - und das
     ausgerechnet nach der Sammelphase, also an der spaetesten Stelle des
-    Laufs, an der ein Besuchsfenster am ehesten zu ist. Die Zusage "die
-    Fensterpruefung gilt JE ABRUF" (Collector-Modulkopf, `geraete.yml`) hielt
-    fuer ihn nicht. Er bekommt deshalb ein `hole`, das durch dieselbe
-    `Abrufschleuse` geht wie die Sammelphase - je Anbieter eine eigene, wie dort.
+    Laufs, an der ein Besuchsfenster am ehesten zu ist. Er bekommt deshalb ein
+    `hole` durch dieselbe `Abrufschleuse` wie die Sammelphase, je Anbieter eine.
 
-    `uhr()` ist die Zeit des NAECHSTEN Abrufs: die Stufe laeuft in Echtzeit,
-    ein eingefrorener Zeitstempel waere der Fehler, den die Fensterprobe sucht.
+    `uhr()` ist die Zeit des NAECHSTEN Abrufs (Echtzeit, nie eingefroren).
     """
     for bilanz in bilanzen:
         if not bilanz.buendel:
@@ -492,6 +490,7 @@ def run_geraete_stage(
         "buendel": len(buendelbilanz.buendel) if buendelbilanz else 0,
         "buendel_neu": neue_buendel,
         "buendel_ohne_tarif": buendelbilanz.ohne_tarif if buendelbilanz else 0,
+        "sichtbarkeit_nicht_geprueft": nicht_geprueft(rohbuendel),
         "klick": klickbilanz,
         "tarifwelt": tarifwelt,
         "kollisionen": len(kollisionen),

@@ -52,8 +52,9 @@ robots.txt von www.vodafone.de erlaubt /privat/handys/ und /privat/handys-tablet
    marketingStatus/Gültigkeitsdatum. cheapest: XS und S true, M, L und XL false (also kein Merkmal).
 
 4. FOLGE IM ADAPTER (vodafone_sicht.py)
-   Je Gerät wird die Produktseite gelesen; Angebote mit virtualItemId in
-   bntPromoHiddenSubscriptions.consumer werden kein Bündel. Die 954 M/L-Zeilen werden nicht mehr
+   Einmal je Lauf wird die Tarifübersicht gelesen (sonst die erste Produktseite); Angebote mit
+   virtualItemId in bntPromoHiddenSubscriptions (consumer bzw. tariffIds) werden kein Bündel.
+   Keine Seite lesbar: alle Tarife bleiben, Laufergebnis sichtbarkeit_nicht_geprueft = ["Vodafone"]. Die 954 M/L-Zeilen werden nicht mehr
    aufgefrischt und fallen nach ALT_AB_TAGEN = 3 aus dem Vergleich. Endet die Aktion, kommen sie zurück.
    Gegenprobe: /privat/handys/<gerät>.html öffnen, "Zur Tarifauswahl", unter "Wähl Dein Datenvolumen"
    die Kacheln zählen. Stehen dort vier oder fünf (zusätzlich 60 GB / 120 GB = Mobil M / L), muss der

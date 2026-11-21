@@ -1073,6 +1073,18 @@
       "gzip": false,
       "bytes_roh": 1719,
       "sha256_roh": "9f279a90024502b726ecf28272b6f6224199559e68e5ccd6bd0eb2d7c25b3999"
+    },
+    {
+      "datei": "vodafone_tarifuebersicht_20261121.html",
+      "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "abgerufen_am": "2026-11-21",
+      "http_status": 200,
+      "absender": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (config/settings.yaml)",
+      "filter": "gekuerzt auf den Anfang der Skriptbloecke additionalPageOptions (bis bntPromoHiddenSubscriptions) und sailsPageOptions, Auslassungen als /* gekuerzt */ markiert, Kopfkommentar mit Quelle; Text der Bloecke unveraendert",
+      "beleg": "docs/belege/vodafone-tarife-ml-2111/belege.txt Abschnitt 2 (Tarifuebersicht: tariffIds 269, 270)",
+      "gzip": false,
+      "bytes_roh": 525,
+      "sha256_roh": "de475bd85f8ead328dfc0a58e7ef7dfe081083617df6e8387221979fcbdb3ff8"
     }
   ]
 }
