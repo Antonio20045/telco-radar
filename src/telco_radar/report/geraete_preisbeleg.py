@@ -9,7 +9,8 @@ Der Screenshot einer Zeile kommt nur aus der Zuordnung ``geraete_zeilenbelege`` 
 closed, nie das Bild eines anderen Tarifs) oder aus der Gegenprobe desselben Preises.
 Die Gegenprobe gehört zu einem Preis, wenn ihre gespeicherten Gesamtkosten die der
 Zeile sind (``gesamt_gespeichert``); eine ältere Gegenprobe eines anderen Preises steht
-nicht an der Zeile. Fehlt etwas, nennt der Beleg es (``SATZ_*``), nie leer.
+nicht an der Zeile (``gegenprobe_fenster.Gegenproben``, dieselbe Stelle, an der die
+Gegenprobe ihr Fenster rechnet). Fehlt etwas, nennt der Beleg es (``SATZ_*``), nie leer.
 
 Gelesen wird nur ``data/state/gegenprobe/<datum>.jsonl`` (``telco_radar.gegenprobe``);
 eine unlesbare Datei ist der Ausfall „Gegenprobe“ (Regel 6).
@@ -17,8 +18,6 @@ eine unlesbare Datei ist der Ausfall „Gegenprobe“ (Regel 6).
 
 from __future__ import annotations
 
-import re
-from collections import defaultdict
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from pathlib import Path
@@ -27,6 +26,8 @@ from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 from .. import gegenprobe as gp
+from ..gegenprobe_fenster import SPEICHER_MUSTER, Gegenproben
+from ..gegenprobe_fenster import angebot as angebot
 from .ausfall import Ausfall
 from .geraete_tco_grafik import euro
 
@@ -44,7 +45,9 @@ STATUS_WORT = {
     gp.BESTAETIGT: "bestätigt",
     gp.TEILWEISE: "teilweise bestätigt",
     gp.ABWEICHEND: "abweichend",
+    gp.ERFASSUNGSLUECKE: "Erfassungslücke",
     gp.NICHT_PRUEFBAR: "nicht prüfbar",
+    gp.NICHT_GEGENGEPRUEFT: "nicht gegengeprüft",
 }
 
 
@@ -98,59 +101,6 @@ def host(url: str) -> str:
     return urlsplit(url or "").netloc.removeprefix("www.")
 
 
-_SPEICHER = re.compile(r"^(.*?-\d+(?:gb|tb))(?:-.*)?$")
-_ZUSTAND = re.compile(r"-(refurbished|gebraucht|erneuert|b-ware)$")
-
-
-def angebot(buendel_id: str) -> str:
-    """Der Bündel-Schlüssel ohne Farbe: Anbieter, Gerät mit Speicher und Zustand,
-    Tarif, Raten. Farben eines Geräts sind dasselbe Angebot, wenn der Preis gleich
-    ist; der Zustand (erneuert, gebraucht) bleibt ein anderes."""
-    teile = buendel_id.split("--")
-    if len(teile) != 5:
-        return buendel_id
-    sku = teile[2]
-    treffer = _SPEICHER.match(sku)
-    zustand = _ZUSTAND.search(sku)
-    if treffer:
-        teile[2] = treffer.group(1) + (zustand.group(0) if zustand else "")
-    return "--".join(teile)
-
-
-class Gegenproben:
-    """Alle Gegenproben je Bündel und je Angebot (ohne Farbe), jüngste zuletzt."""
-
-    def __init__(self, ergebnisse: Iterable[gp.Ergebnis] = ()) -> None:
-        self._je_id: dict[str, list[gp.Ergebnis]] = defaultdict(list)
-        self._je_angebot: dict[str, list[gp.Ergebnis]] = defaultdict(list)
-        for e in sorted(ergebnisse, key=lambda e: (e.datum, e.geprueft_um or "")):
-            self._je_id[e.buendel_id].append(e)
-            self._je_angebot[angebot(e.buendel_id)].append(e)
-
-    def zum_preis(self, buendel_id: str, gesamt: float | None) -> gp.Ergebnis | None:
-        """Die jüngste Gegenprobe dieses Preises: dasselbe Bündel oder dasselbe
-        Angebot in anderer Farbe, mit gleichen Gesamtkosten."""
-        if gesamt is None:
-            return None
-        for liste in (
-            self._je_id.get(buendel_id, []),
-            self._je_angebot.get(angebot(buendel_id), []),
-        ):
-            for e in reversed(liste):
-                if e.gesamt_gespeichert is not None and gp.gleich(
-                    e.gesamt_gespeichert, gesamt
-                ):
-                    return e
-        return None
-
-    def am(self, buendel_id: str, datum: str) -> gp.Ergebnis | None:
-        """Die Gegenprobe dieses Bündels an diesem Tag."""
-        for e in reversed(self._je_id.get(buendel_id, [])):
-            if e.datum == datum:
-                return e
-        return None
-
-
 def _wert(feld: str, wert: Any) -> str:
     if feld in gp.GANZZAHLFELDER:
         return f"{wert} Raten"
@@ -176,7 +126,7 @@ def _abweichung(a: dict) -> str:
 def farbe(buendel_id: str) -> str:
     """Die Farbe im Bündel-Schlüssel (Teil der SKU hinter dem Speicher), lesbar."""
     teile = buendel_id.split("--")
-    treffer = _SPEICHER.match(teile[2]) if len(teile) == 5 else None
+    treffer = SPEICHER_MUSTER.match(teile[2]) if len(teile) == 5 else None
     rest = teile[2][len(treffer.group(1)) :].strip("-") if treffer else ""
     return rest.replace("-", " ")
 
@@ -226,12 +176,31 @@ def gegenprobe_anzeige(
         "messung": _zeitpunkt(e.gemessen_um),
         "grund": e.grund or "",
         "abweichungen": [_abweichung(a) for a in e.abweichungen],
+        "luecken": [_abweichung(a) for a in e.luecken],
         "nicht_gelesen": [
             gp.FELDNAMEN.get(f, f) for f in e.nicht_gelesen if _zaehlt(f, e.gespeichert)
         ],
         "seite": e.seite,
         "bild": e.bild,
     }
+
+
+def versuch_ist_neuer(gezeigt: gp.Ergebnis | None, versuch: gp.Ergebnis | None) -> bool:
+    """Ist ``versuch`` ein jüngerer, gescheiterter Besuch als die gezeigte Prüfung?"""
+    if gezeigt is None or versuch is None or versuch is gezeigt:
+        return False
+    zeit = (versuch.datum, versuch.geprueft_um or "")
+    return versuch.status == gp.NICHT_PRUEFBAR and zeit > (
+        gezeigt.datum,
+        gezeigt.geprueft_um or "",
+    )
+
+
+def versuch_hinweis(versuch: gp.Ergebnis | None) -> str:
+    """„letzter Versuch 21.11.2026: nicht prüfbar (Timeout beim Laden)“."""
+    if versuch is None:
+        return ""
+    return f"letzter Versuch {datum_de(versuch.datum)}: nicht prüfbar ({versuch.grund})"
 
 
 def beleg(
@@ -243,9 +212,14 @@ def beleg(
     bild: dict | None,
     gegenprobe: gp.Ergebnis | None,
     buendel_id: str = "",
+    versuch: gp.Ergebnis | None = None,
 ) -> dict:
-    """Ein Beleg: jede Angabe da oder als benannte Lücke."""
+    """Ein Beleg: jede Angabe da oder als benannte Lücke. Ist ``versuch`` (der
+    letzte geöffnete Besuch) jünger als die gezeigte Gegenprobe und gescheitert,
+    nennt ein Hinweis Tag und Grund."""
     anzeige = gegenprobe_anzeige(gegenprobe, buendel_id, abgerufen_am)
+    if anzeige is not None and versuch_ist_neuer(gegenprobe, versuch):
+        anzeige["hinweise"].append(versuch_hinweis(versuch))
     if bild is None and gegenprobe is not None and gegenprobe.bild:
         bild = {"url": gegenprobe.bild, "datum": gegenprobe.datum, "art": "Gegenprobe"}
     return {
@@ -284,7 +258,13 @@ class Preisbelege:
         self.zeilenbild = zeilenbild
 
     def der_karte(self, karte: dict) -> dict:
-        """Der Beleg einer Preiszeile der Geräteseite."""
+        """Der Beleg einer Preiszeile der Geräteseite: die letzte gute Gegenprobe des
+        Preises (``Gegenproben.letzte_gute``, dieselbe wie Fenster und Bilanz), ohne
+        sie der letzte Versuch; ein jüngerer gescheiterter Versuch steht als Hinweis
+        daneben."""
+        bid = karte.get("buendel_id") or ""
+        gute = self.gegenproben.letzte_gute(bid, karte.get("gesamt"))
+        versuch = self.gegenproben.letzter_versuch(bid, karte.get("gesamt"))
         bild = self.zeilenbild(karte)
         if bild is not None:
             bild = {"url": bild["url"], "datum": bild["datum"], "art": "Messung"}
@@ -295,10 +275,9 @@ class Preisbelege:
             or _ohne_teile(karte.get("rechnung")),
             gesamt=karte.get("gesamt"),
             bild=bild,
-            gegenprobe=self.gegenproben.zum_preis(
-                karte.get("buendel_id") or "", karte.get("gesamt")
-            ),
-            buendel_id=karte.get("buendel_id") or "",
+            gegenprobe=gute if gute is not None else versuch,
+            buendel_id=bid,
+            versuch=versuch,
         )
 
 

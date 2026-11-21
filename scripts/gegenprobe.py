@@ -3,27 +3,34 @@
 AUFRUF
 ------
     PYTHONPATH=src python scripts/gegenprobe.py [--root .] [--datum JJJJ-MM-TT]
-        [--je-anbieter 5] [--anbieter o2 ...] [--hoechstens N] [--buendel ID ...]
-        [--bilder ORDNER] [--hochladen] [--job-start EPOCHE]
-        [--job-frist-sekunden 3000]
+        [--anbieter o2|saturn-mediamarkt|... ...] [--plan] [--hoechstens N]
+        [--buendel ID ...] [--bilder ORDNER] [--hochladen] [--ausgabe TEIL.jsonl]
+        [--job-start EPOCHE] [--job-frist-sekunden 3000]
 
-Gewählt wird nach ``gegenprobe.auswahl``: jedes Bündel, dessen Gesamtkosten oder
-Posten sich zum vorigen Messtag geändert haben (Historie
-``data/state/geraete_tco_historie/<datum>.jsonl``), dazu je Anbieter
-``STICHPROBE_JE_ANBIETER`` unveränderte, zufällig, aber fest je Datum; zuerst die
-Stichproben, dann die Änderungen reihum über die Anbieter. Die Auswahl wird nach
-Seitenbesuch gruppiert (``gegenprobe_reihe.gruppiere``, ``gegenprobe_wege.seite_von``):
-Besuch öffnet die Seite einmal und prüft jedes gewählte Bündel darauf
-(``gegenprobe_wege.lies_gruppe``). Der Leser des Anbieters
-(``gegenprobe_sicht.LESER``) liest den sichtbaren Text, ``gegenprobe.vergleiche``
-vergleicht mit dem Bestand ``geraete_tco.json``. Ergebnis:
-``data/state/gegenprobe/<datum>.jsonl``; die Bilder gehen mit ``--hochladen`` ins
+Reihenfolge und Seitenbesuche: ``gegenprobe_fenster`` (früheste Frist zuerst, ein
+Besuch prüft jedes heute noch nicht geöffnete Bündel seiner Seite). Der Leser des
+Anbieters (``gegenprobe_sicht.LESER``) liest den sichtbaren Text,
+``gegenprobe.vergleiche`` vergleicht mit dem Bestand ``geraete_tco.json``.
+
+``--anbieter`` schneidet den Lauf auf einen Job (``gegenprobe_fenster.job_von``: ein
+Job je Host, Saturn/MediaMarkt ist einer); ohne ihn läuft alles in einem Job.
+``--plan`` druckt nur die Jobs mit fälligen Bündeln als JSON-Liste (Matrix, ohne
+Browser). Ergebnis: ohne ``--ausgabe`` ergänzt der Lauf
+``data/state/gegenprobe/<datum>.jsonl`` und die Bilanz
+``data/state/gegenprobe/bilanz/<datum>.json`` (``gegenprobe_bilanz.lege_ab``); mit
+``--ausgabe`` schreibt er nur seine Teildatei und daneben ``<teil>.lauf.json``, die
+``scripts/gegenprobe_ablegen.py`` später ablegt. Bilder gehen mit ``--hochladen`` ins
 Release ``gegenprobe-<datum>`` (``beleg_ablage.Gh``), sonst bleiben sie in ``--bilder``.
 
 Zeit (Harte Regel 8): ``--job-frist-sekunden`` ist die Restzeit des Jobs ab
 ``--job-start``; ein Seitenbesuch beginnt und ein Bündel darin folgt nur, wenn
-``ZEIT_JE_BUENDEL_S`` davor noch Platz hat. Was danach übrig ist, steht als „nicht
-prüfbar: Zeitbudget“ in der Datei, nie als stilles Fehlen.
+``ZEIT_JE_BUENDEL_S`` davor noch Platz hat. Eine Preisänderung ohne Besuch steht als
+„nicht gegengeprüft“ mit Grund in der Datei, jedes andere offene Bündel als
+„überfällig“ in der Bilanz, nie als stilles Fehlen. Verdächtige Seiten (letzter
+Versuch gescheitert) besucht ein Lauf je Anbieter höchstens
+``gegenprobe_fenster.VERDAECHTIG_JE_NACHT``-mal, den Rest stellt er benannt zurück. Den
+ganzen Anbieter stoppt nur eine Sperre oder eine Serie von Serverfehlern
+(``gegenprobe_reihe.Schutzschalter``); der Ausfall steht mit Grund in der Bilanz.
 
 Exit-Code 0: gelaufen (auch mit Abweichungen, das sind Befunde); 2: Eingabe unlesbar.
 """
@@ -35,6 +42,8 @@ import json
 import sys
 import tempfile
 import time
+import uuid
+from collections import defaultdict
 from collections.abc import Callable
 from datetime import UTC, date, datetime
 from functools import partial
@@ -43,28 +52,36 @@ from pathlib import Path
 import yaml
 
 from telco_radar import gegenprobe as gp
+from telco_radar import gegenprobe_fenster as gf
 from telco_radar import tco_historie
-from telco_radar.analyze.geraete_pruefstatus import buendel_aus_satz
 from telco_radar.collect.geraete.gegenprobe_browser import (
     Gesperrt,
     Lesung,
-    NichtPruefbar,
 )
 from telco_radar.collect.geraete.gegenprobe_schritte import tor
-from telco_radar.collect.geraete.gegenprobe_sicht import LESER
 from telco_radar.collect.geraete.gegenprobe_wege import lies_gruppe, seite_von
-from telco_radar.gegenprobe_reihe import gruppiere
-from telco_radar.tco_model import kosten_ueber
+from telco_radar.gegenprobe_bilanz import angezeigte, lege_ab
+from telco_radar.gegenprobe_bilanz import gesamt_von as gesamt
+from telco_radar.gegenprobe_pruefung import Lesen as Lesen
+from telco_radar.gegenprobe_pruefung import anderer_tarif as anderer_tarif
+from telco_radar.gegenprobe_pruefung import ohne_lauf as _ohne_lauf
+from telco_radar.gegenprobe_pruefung import pruefe as _pruefe
+from telco_radar.gegenprobe_reihe import AUS, Schutzschalter, gruppiere
 
 FEHLER_EINGABE = 2
 TCO_DATEI = Path("data") / "state" / "geraete_tco.json"
 HISTORIE = Path("data") / "state" / "geraete_tco_historie"
 QUELLEN = Path("config") / "geraete_quellen.yaml"
 JOB_MINUTEN = 60
-"""``timeout-minutes`` des Jobs in ``gegenprobe.yml`` (ein Test hält beide gleich)."""
+"""``timeout-minutes`` des Einzeljobs ``gegenprobe`` (ein Wächter hält beide gleich)."""
 PUFFER_S = 600
 """Einrichten des Läufers, Hochladen und Commit nach dem letzten Bündel."""
 JOB_FRIST_S = JOB_MINUTEN * 60 - PUFFER_S
+MATRIX_JOB_MINUTEN = 160
+"""``timeout-minutes`` eines Anbieter-Jobs der Matrix (Rechnung im Workflow-Kopf)."""
+MATRIX_JOB_FRIST_S = MATRIX_JOB_MINUTEN * 60 - PUFFER_S
+HOECHSTE_FRIST_S = max(JOB_FRIST_S, MATRIX_JOB_FRIST_S)
+"""Mehr Restzeit glaubt das Skript keinem Aufruf."""
 ZEIT_JE_BUENDEL_S = 90
 """So lange darf ein Kundenweg höchstens dauern (Laden, Klicks, Bild)."""
 MINDESTABSTAND_S = 5.0
@@ -96,121 +113,35 @@ def lies_historie(
     return heute, [dict(z) for z in zuletzt.values()], vorher[-1][0] if vorher else None
 
 
-def _norm(text: str) -> str:
-    return "".join(z for z in text.lower() if z.isalnum())
-
-
-def anderer_tarif(gespeichert: str, gelesen: str | None) -> bool:
-    """Zeigt die Seite einen anderen Tarif als den des Bündels?"""
-    if not gelesen:
-        return False
-    a, b = _norm(gespeichert), _norm(gelesen)
-    return not (a.startswith(b) or b.startswith(a))
-
-
-def gesamt(satz: dict) -> float | None:
-    """Gesamtkosten eines Satzes über ``kosten_ueber`` (None bei Lücke oder Unfug)."""
-    try:
-        return kosten_ueber(buendel_aus_satz(satz)).gesamt
-    except (TypeError, ValueError, KeyError):
-        return None
-
-
-def mit_gelesenen(satz: dict, gelesen: dict) -> dict:
-    """Der Satz mit den gelesenen Posten; weicht der Tarif ab, gelten keine Phasen."""
-    neu = {**satz, **gelesen}
-    tarif = gelesen.get("tarif_monatlich")
-    alt = satz.get("tarif_monatlich")
-    if tarif is not None and alt is not None and not gp.gleich(tarif, alt):
-        neu["tarif_phasen"] = None
-    return neu
-
-
-Lesen = Callable[[str, dict], Lesung]
-"""(Anbieter-Schlüssel, Bestandssatz) -> Lesung; im Lauf die Lesung des Seitenbesuchs
-(``gegenprobe_wege.lies_gruppe``)."""
-
-
 def pruefe(
     lesen: Lesen, satz: dict, anlass: str, datum: str, gemessen_um: str | None = None
 ) -> tuple[gp.Ergebnis, Lesung | None]:
-    """Eine Gegenprobe: Kundenweg, Leser, Vergleich. Nie eine Ausnahme nach außen."""
-    schluessel = gp.anbieter_aus_id(satz["id"])
-    basis = {
-        "datum": datum,
-        "buendel_id": satz["id"],
-        "anbieter": satz.get("anbieter") or "",
-        "anlass": anlass,
-        "sku_id": satz.get("sku_id") or "",
-        "tarif_name": satz.get("tarif_name") or "",
-        "laufzeit_monate": satz.get("laufzeit_monate"),
-        "gespeichert": gp.gespeicherte_werte(satz),
-        "gesamt_gespeichert": gesamt(satz),
-        "geprueft_um": datetime.now(UTC).isoformat(timespec="seconds"),
-        "gemessen_um": gemessen_um,
-    }
-    leser = LESER.get(schluessel)
-    if leser is None:
-        return gp.Ergebnis(
-            **basis, status=gp.NICHT_PRUEFBAR, grund=gp.GRUND_KEIN_LESER
-        ), None
-    try:
-        lesung = lesen(schluessel, satz)
-    except Gesperrt as fehler:
-        grund = f"{gp.GRUND_GESPERRT} ({fehler})"
-        return gp.Ergebnis(**basis, status=gp.NICHT_PRUEFBAR, grund=grund), None
-    except NichtPruefbar as fehler:
-        return gp.Ergebnis(**basis, status=gp.NICHT_PRUEFBAR, grund=str(fehler)), None
-    sicht = leser(lesung.text)
-    gelesen = sicht.werte()
-    extra = {
-        "seite": lesung.seite,
-        "text": lesung.text[: gp.TEXT_HOECHSTENS],
-        "gelesen": {**gelesen, "tarif_name": sicht.tarif_name, "roh": sicht.roh},
-        "bild_fehlt": lesung.bild_fehlt,
-    }
-    if anderer_tarif(satz.get("tarif_name") or "", sicht.tarif_name):
-        grund = f"Die Seite zeigt einen anderen Tarif: {sicht.tarif_name}"
-        ergebnis = gp.Ergebnis(**basis, **extra, status=gp.NICHT_PRUEFBAR, grund=grund)
-        return ergebnis, lesung
-    status, abweichungen, fehlt, grund = gp.vergleiche(basis["gespeichert"], gelesen)
-    nicht_gelesen = [
-        f for f in gp.FELDER if satz.get(f) is not None and f not in gelesen
-    ]
-    ergebnis = gp.Ergebnis(
-        **basis,
-        **extra,
-        status=status,
-        grund=grund,
-        abweichungen=abweichungen,
-        nicht_gelesen=nicht_gelesen,
-        gesamt_gelesen=gesamt(mit_gelesenen(satz, gelesen))
-        if status != gp.NICHT_PRUEFBAR
-        else None,
-    )
-    return ergebnis, lesung
+    """``gegenprobe_pruefung.pruefe`` mit der Uhrzeit dieser Prüfung."""
+    jetzt = datetime.now(UTC).isoformat(timespec="seconds")
+    return _pruefe(lesen, satz, anlass, datum, gemessen_um, jetzt)
 
 
 def main(argumente: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", default=".", type=Path)
     parser.add_argument("--datum")
-    parser.add_argument("--je-anbieter", type=int, default=gp.STICHPROBE_JE_ANBIETER)
-    parser.add_argument("--anbieter", action="append", default=[])
+    parser.add_argument("--anbieter", action="append", default=[], help="Job/Schlüssel")
+    parser.add_argument("--plan", action="store_true", help="nur fällige Jobs (JSON)")
     parser.add_argument("--hoechstens", type=int)
     parser.add_argument(
         "--buendel", action="append", default=[], help="nur diese Bündel (lokal)"
     )
     parser.add_argument("--bilder", type=Path)
     parser.add_argument("--hochladen", action="store_true")
-    parser.add_argument("--ausgabe", type=Path, help="statt der Tagesdatei (lokal)")
+    parser.add_argument("--ausgabe", type=Path, help="Teildatei statt Tagesdatei")
     parser.add_argument("--aufnehmen", type=Path, help="Ordner für Test-Fixtures")
     parser.add_argument("--job-start", type=float)
     parser.add_argument("--job-frist-sekunden", type=float, default=JOB_FRIST_S)
     args = parser.parse_args(argumente)
     beginn = time.time()
     verstrichen = max(0.0, beginn - (args.job_start or beginn))
-    frist = min(args.job_frist_sekunden, JOB_FRIST_S) - verstrichen - ZEIT_JE_BUENDEL_S
+    frist = min(args.job_frist_sekunden, HOECHSTE_FRIST_S) - verstrichen
+    frist -= ZEIT_JE_BUENDEL_S
     ende = time.monotonic() + max(0.0, frist)
     try:
         bestand = json.loads((args.root / TCO_DATEI).read_text(encoding="utf-8"))
@@ -222,59 +153,68 @@ def main(argumente: list[str] | None = None) -> int:
         args.gemessen_um = bestand.get("gemessen_um")
         heute, vortag, vortag_datum = lies_historie(args.root / HISTORIE, datum)
         ua = kennungen(args.root)
+        proben = gf.Gegenproben(gp.lies_alle(args.root / gp.ORDNER).values())
     except (OSError, ValueError, KeyError) as fehler:
         print(f"Gegenprobe: Eingabe unlesbar: {fehler}", file=sys.stderr)
         return FEHLER_EINGABE
-    wahl = [
-        (bid, anlass)
-        for bid, anlass in gp.auswahl(datum, heute, vortag, args.je_anbieter)
-        if bid in saetze
-        and (not args.anbieter or gp.anbieter_aus_id(bid) in args.anbieter)
-    ][: args.hoechstens]
+    angezeigt = angezeigte(bestand["buendel"], datum)
+    aenderungen = [bid for bid, _ in gp.auswahl(datum, heute, vortag, 0)]
+    nur = gf.schluessel_der_jobs(args.anbieter)
+    wahl = gf.kandidaten(datum, angezeigt, gesamt, proben, aenderungen, nur)
+    if args.plan:
+        print(json.dumps(gf.jobs(wahl)))
+        return 0
+    seite = partial(_seite, saetze)
+    gruppen = gf.plane(wahl[: args.hoechstens], seite)
     if args.buendel:
-        wahl = [(b, gp.ANLASS_STICHPROBE) for b in args.buendel if b in saetze]
+        eigene = [(b, gp.ANLASS_STICHPROBE) for b in args.buendel if b in saetze]
+        gruppen = gruppiere(eigene, seite)
     print(
-        f"Gegenprobe {datum} (Vortag {vortag_datum}): {len(wahl)} Bündel, davon "
-        f"{sum(a == gp.ANLASS_AENDERUNG for _, a in wahl)} Preisänderungen"
+        f"Gegenprobe {datum} (Vortag {vortag_datum}): {len(wahl)} offen, "
+        f"{sum(k.faellig for k in wahl)} fällig, davon "
+        f"{sum(k.anlass == gp.ANLASS_AENDERUNG for k in wahl)} Preisänderungen; "
+        f"{len(gruppen)} Seitenbesuche geplant; ohne erste Anzeige (sofort fällig): "
+        f"{sum(map(gf.ohne_erste_anzeige, angezeigt))}"
     )
-    ergebnisse, bilder = laufe(args, wahl, saetze, datum, ua, ende)
+    ergebnisse, bilder, laeufe = laufe(args, gruppen, saetze, datum, ua, ende)
     veroeffentliche(args, datum, ergebnisse, bilder)
-    gp.schreibe_tag(args.ausgabe or gp.tagesdatei(args.root, datum), ergebnisse)
+    if args.ausgabe is not None:
+        gp.schreibe_tag(args.ausgabe, ergebnisse)
+        lauf_text = json.dumps(laeufe, ensure_ascii=False, indent=1)
+        args.ausgabe.with_suffix(".lauf.json").write_text(lauf_text + "\n", "utf-8")
+    else:
+        lege_ab(args.root, datum, ergebnisse, laeufe, angezeigt)
     for e in ergebnisse:
-        print(f"{e.status:15} {e.anbieter:35} {e.buendel_id} {e.grund or ''}")
+        print(f"{e.status:20} {e.anbieter:35} {e.buendel_id} {e.grund or ''}")
+    for lauf in laeufe:
+        print(f"Lauf {lauf}")
     return 0
 
 
-def laufe(args, wahl, saetze, datum, ua, ende):
-    """Geht die Auswahl Seitenbesuch für Seitenbesuch durch (``gruppiere``, ein Besuch
-    prüft alle gewählten Bündel seiner Seite), bis die Frist reicht; danach
-    Zeitbudget-Zeilen. Vor jedem Laden gelten robots.txt und der Abstand (``tor``)."""
+def _seite(saetze: dict, bid: str) -> str:
+    return seite_von(gp.anbieter_aus_id(bid), saetze[bid])
+
+
+def laufe(args, gruppen, saetze, datum, ua, ende):
+    """Geht die Seitenbesuche durch (``Lauf.alle``), solange die Frist reicht. Vor
+    jedem Laden gelten robots.txt und der Abstand (``tor``)."""
     from playwright.sync_api import sync_playwright
 
     vor_laden = tor(KENNUNG_ROBOTS, MINDESTABSTAND_S, lambda: datetime.now(UTC))
-    gruppen = gruppiere(
-        wahl, lambda bid: seite_von(gp.anbieter_aus_id(bid), saetze[bid])
-    )
     print(f"Gegenprobe: {len(gruppen)} Seitenbesuche", flush=True)
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         lauf = Lauf(args, browser, saetze, datum, ua, ende, vor_laden)
         try:
-            for gruppe in gruppen:
-                if time.monotonic() <= ende:
-                    lauf.besuche(gruppe)
+            lauf.alle(gruppen)
         finally:
             browser.close()
-    reihe = [
-        lauf.ergebnisse.get(bid)
-        or _ohne_lauf(saetze[bid], anlass, datum, gp.GRUND_ZEITBUDGET)
-        for bid, anlass in wahl
-    ]
-    return reihe, lauf.bilder
+    return lauf.zeilen(gruppen), lauf.bilder, lauf.laeufe()
 
 
 class Lauf:
-    """Was alle Seitenbesuche eines Laufs teilen, und was sie gelesen haben.
+    """Was alle Seitenbesuche eines Laufs teilen, was sie gelesen haben, wie lange sie
+    je Anbieter brauchten und welcher Anbieter ausfiel (``Schutzschalter``).
 
     Keine dataclass: Tests laden das Skript ohne Eintrag in ``sys.modules``."""
 
@@ -288,12 +228,42 @@ class Lauf:
         self.vor_laden = vor_laden
         self.ergebnisse: dict[str, gp.Ergebnis] = {}
         self.bilder: dict[str, bytes] = {}
+        self.schutz = Schutzschalter()
+        self.lauf_id = uuid.uuid4().hex[:12]
+        """Kennung dieses Laufs: dieselbe Teildatei zweimal abgelegt zählt einmal."""
+        self.verdaechtig: dict[str, int] = defaultdict(int)
+        """Je Anbieter besuchte verdächtige Seiten in diesem Lauf."""
+        self.zurueckgestellt: dict[str, int] = defaultdict(int)
+        """Je Anbieter verdächtige Seiten über ``VERDAECHTIG_JE_NACHT`` hinaus."""
+        self.uhr: Callable[[], float] = time.monotonic
+        self.zeit: dict[str, list[float]] = defaultdict(lambda: [0, 0.0, 0])
+        """Je Anbieter-Schlüssel [Besuche, Sekunden, Bündel]."""
+
+    def alle(self, gruppen: list[list[tuple[str, str]]]) -> None:
+        """Jeder Seitenbesuch, solange die Frist reicht; jeder geplante Anbieter
+        bekommt einen Lauf-Eintrag, auch mit 0 Besuchen."""
+        for gruppe in gruppen:
+            self.zeit.setdefault(gp.anbieter_aus_id(gruppe[0][0]), [0, 0.0, 0])
+        for gruppe in gruppen:
+            if self.uhr() > self.ende:
+                return
+            self.besuche(gruppe)
 
     def besuche(self, gruppe: list[tuple[str, str]]) -> None:
-        """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht."""
+        """Ein Seitenbesuch: prüft die Bündel der Gruppe, solange die Frist reicht.
+        Verdächtige Seiten (``gf.verdaechtige_seite``) nur bis ``VERDAECHTIG_JE_NACHT``
+        je Anbieter, ihre Fehler belegen keinen Host-Ausfall (``_buche``)."""
         anlass = dict(gruppe)
         schluessel = gp.anbieter_aus_id(gruppe[0][0])
+        if self.schutz.stufe(schluessel) == AUS:
+            return
+        if verdacht := gf.verdaechtige_seite(gruppe):
+            if self.verdaechtig[schluessel] >= gf.VERDAECHTIG_JE_NACHT:
+                self.zurueckgestellt[schluessel] += 1
+                return
+            self.verdaechtig[schluessel] += 1
         aufnehmen = self.args.aufnehmen is not None
+        beginn = self.uhr()
         lesungen = lies_gruppe(
             self.browser,
             schluessel,
@@ -302,9 +272,15 @@ class Lauf:
             self.vor_laden,
             aufnehmen,
         )
+        gelesen_ok, fehler, zahl = False, None, 0
         try:
             for satz, gelesen in lesungen:
                 bid = satz["id"]
+                zahl += 1
+                if isinstance(gelesen, Exception):
+                    fehler = fehler or gelesen
+                else:
+                    gelesen_ok = True
                 ergebnis, lesung = pruefe(
                     partial(_gelesen, gelesen),
                     satz,
@@ -319,11 +295,59 @@ class Lauf:
                     datei = self.args.aufnehmen / f"{schluessel}.html"
                     datei.write_text(lesung.html + "\n", encoding="utf-8")
                 self.ergebnisse[bid] = ergebnis
-                print(f"  {ergebnis.status:15} {bid}", flush=True)
-                if time.monotonic() > self.ende:
+                print(f"  {ergebnis.status:20} {bid}", flush=True)
+                if self.uhr() > self.ende:
                     break
         finally:
             lesungen.close()
+        self._buche(schluessel, beginn, zahl, (gelesen_ok, fehler, verdacht))
+
+    def _buche(self, schluessel, beginn, zahl, ausgang) -> None:
+        gelesen_ok, fehler, verdacht = ausgang
+        zeit = self.zeit[schluessel]
+        zeit[0] += 1
+        zeit[1] += self.uhr() - beginn
+        zeit[2] += zahl
+        if gelesen_ok:
+            self.schutz.erfolg(schluessel)
+        elif fehler is not None and (isinstance(fehler, Gesperrt) or not verdacht):
+            sperre = isinstance(fehler, Gesperrt)
+            self.schutz.fehler(schluessel, str(fehler), sofort=sperre)
+
+    def zeilen(self, gruppen: list[list[tuple[str, str]]]) -> list[gp.Ergebnis]:
+        """Die geprüften Bündel und je nicht geöffnete Preisänderung eine Zeile
+        „nicht gegengeprüft“ mit Grund (Ausfall des Anbieters oder Zeitbudget)."""
+        out = list(self.ergebnisse.values())
+        for gruppe in gruppen:
+            for bid, anlass in gruppe:
+                if bid in self.ergebnisse or anlass != gp.ANLASS_AENDERUNG:
+                    continue
+                schluessel = gp.anbieter_aus_id(bid)
+                ausfall = self.schutz.grund(schluessel)
+                grund = gp.GRUND_ZEITBUDGET if ausfall is None else ausfall
+                out.append(_ohne_lauf(self.saetze[bid], anlass, self.datum, grund))
+        return out
+
+    def laeufe(self) -> list[dict]:
+        """Je Anbieter dieses Laufs Besuche, Sekunden, Bündel und Ausfall."""
+        return [
+            {
+                "datum": self.datum,
+                "anbieter": s,
+                "besuche": int(self.zeit[s][0]),
+                "sekunden": round(self.zeit[s][1], 1),
+                "buendel": int(self.zeit[s][2]),
+                "ausfall": _verbunden(self.schutz.ausfaelle(s)),
+                "zurueckgestellt": self.zurueckgestellt[s],
+                "lauf_id": self.lauf_id,
+            }
+            for s in sorted(set(self.zeit) | set(self.schutz.abgeschaltet()))
+        ]
+
+
+def _verbunden(gruende: list[str]) -> str | None:
+    """Die Ausfälle eines Anbieters als ein Text; None, wenn keiner war."""
+    return "; ".join(gruende) if gruende else None
 
 
 def _gelesen(gelesen: Lesung | Exception, _schluessel: str, _satz: dict) -> Lesung:
@@ -331,22 +355,6 @@ def _gelesen(gelesen: Lesung | Exception, _schluessel: str, _satz: dict) -> Lesu
     if isinstance(gelesen, Exception):
         raise gelesen
     return gelesen
-
-
-def _ohne_lauf(satz: dict, anlass: str, datum: str, grund: str) -> gp.Ergebnis:
-    return gp.Ergebnis(
-        datum=datum,
-        buendel_id=satz["id"],
-        anbieter=satz.get("anbieter") or "",
-        status=gp.NICHT_PRUEFBAR,
-        anlass=anlass,
-        grund=grund,
-        sku_id=satz.get("sku_id") or "",
-        tarif_name=satz.get("tarif_name") or "",
-        laufzeit_monate=satz.get("laufzeit_monate"),
-        gespeichert=gp.gespeicherte_werte(satz),
-        gesamt_gespeichert=gesamt(satz),
-    )
 
 
 def veroeffentliche(args, datum, ergebnisse, bilder) -> None:
