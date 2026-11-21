@@ -127,7 +127,10 @@ def _variante(daten: dict) -> dict:
     `variantenzahl != 1` und wird in `tarifwelt_lauf._pruefe` zur Luecke.
     Diese Felder sind der Beleg, dass Preis UND Lieferbarkeit zu Geraet und
     Speicher der Zeile gehoeren - nicht das freie Text-Label des Kostenpostens
-    (Befund A2 vom 12.11.2026)."""
+    (Befund A2 vom 12.11.2026). `geraet_monatsrate` ist `monthlyPrice` der
+    Variante: gemessen, auch wenn es 0 ist; fehlt das Feld oder ist es keine
+    Zahl, ist sie `None` und `tarifwelt_pruefung.pruefe` macht daraus eine
+    benannte Luecke (Befund regel11 vom 21.11.2026: bis dahin eine Konstante)."""
     hardware = daten.get("hardware") or {}
     varianten = [v for v in (hardware.get("variants") or []) if isinstance(v, dict)]
     eine = varianten[0] if len(varianten) == 1 else {}
@@ -153,7 +156,15 @@ def _variante(daten: dict) -> dict:
         ),
         "variante_farbe": str((eine.get("color") or {}).get("name") or "").strip()
         or None,
+        "geraet_monatsrate": _zahl(eine.get("monthlyPrice")),
     }
+
+
+def _zahl(wert: object) -> float | None:
+    """Ein Betrag aus der Antwort als Zahl; ein Wahrheitswert oder Text ist keine."""
+    if isinstance(wert, bool) or not isinstance(wert, (int, float)):
+        return None
+    return float(wert)
 
 
 def lies_produktdetail(text: str, url: str = "") -> dict | None:
