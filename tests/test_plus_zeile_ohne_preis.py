@@ -147,10 +147,10 @@ def test_plus_wort_bei_einem_anderen_anbieter_ist_kein_zweitprodukt_tarif():
 
 
 def _o2_adressen() -> list[str]:
-    """Alle Startadressen der o2-Einträge (``o2``, ``o2-tarife``, ``o2-tarife-2`` …)."""
-    roh = yaml.safe_load(
-        (WURZEL / "config" / "klick_tageslauf.yaml").read_text("utf-8")
-    )
+    """Alle Startadressen der o2-Einträge (``o2``, ``o2-tarife``, ``o2-tarife-2`` …),
+    bis 21.11.2026 in der Tagesdatei, seitdem im Archiv der Fixtures."""
+    archiv = WURZEL / "tests" / "fixtures" / "klickliste" / "o2_tageslauf_20261121.yaml"
+    roh = yaml.safe_load(archiv.read_text("utf-8"))
     return [
         s["url"]
         for a in roh["anbieter"]

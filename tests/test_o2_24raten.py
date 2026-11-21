@@ -6,8 +6,9 @@ Messung 05.11.2026 (iPhone 17 Pro 256 GB, o2 Mobile M, Tarif 19,99 EUR, Anschlus
 Die Rate bleibt also NICHT stehen, wenn man die Laufzeit wechselt; nur der
 Geraetepreis (1.315,00 EUR) ist gleich. Die Tests halten fest:
 
-  * jede o2-Startadresse des Tageslaufs traegt ratenzahlung=24 (Gegenprobe:
-    andere Anbieter bleiben unberuehrt),
+  * jede o2-Startadresse des Tageslaufs (bis 21.11.2026, seitdem
+    tests/fixtures/klickliste/o2_tageslauf_20261121.yaml) traegt ratenzahlung=24
+    (Gegenprobe: andere Anbieter bleiben unberuehrt),
   * beide gemessenen Zeilen ergeben Geraete-Summe 1.315,00 EUR und gleiche Kosten
     ueber 24 Monate, aber jede steht nur unter ihrer eigenen Ansicht,
   * eine 36-Raten-Zeile steht nie unter "24 Monate",
@@ -26,7 +27,7 @@ from telco_radar.tco_kosten import kosten_ueber
 from telco_radar.tco_model import Buendel
 
 WURZEL = pathlib.Path(__file__).resolve().parent.parent
-TAGESLAUF = WURZEL / "config" / "klick_tageslauf.yaml"
+TAGESLAUF = WURZEL / "tests" / "fixtures" / "klickliste" / "o2_tageslauf_20261121.yaml"
 
 MESSUNG_O2_MOBILE_M = dict(tarif_monatlich=19.99, anschlusspreis=39.99)
 

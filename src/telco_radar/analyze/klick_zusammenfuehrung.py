@@ -6,8 +6,8 @@ Ergebnisdateien des Klick-Tageslaufs (``collect.geraete.klickergebnis``) aus dem
 genannten Ordner, sonst aus ``UMGEBUNG``, sonst aus ``data/state/klick`` (``ORDNER``),
 wenn es ihn gibt; ohne Ordner bleibt alles wie ohne Klick-Crawler. Geplant sind die
 Anbieter aus ``klickziele.TAGESDATEI``; fehlt die Datei eines geplanten Anbieters,
-nennt ihn die Bilanz unter ``fehlt``. Aus den Dateien werden Rohsätze
-(``klickrohsatz``), gemischt unter die Rohsätze der Adapter.
+nennt ihn die Bilanz unter ``fehlt``, eine ungeplante zählt nicht (``nur_geplante``).
+Aus den Dateien werden Rohsätze (``klickrohsatz``), gemischt unter die der Adapter.
 
 Messung ist eine Datei von heute, ``gelesen`` oder ``gestoert`` (``klick_teillauf``).
 Eine ältere liefert nichts: was sie gemessen hat, steht mit ihrem Datum im Bestand,
@@ -57,7 +57,7 @@ from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
 from . import klick_anbieterbilanz as anbieterbilanz
 from .klick_alter import alter_tage, widerspruch_zeilen
-from .klick_erfassung import Angebot, erfassungsgruende
+from .klick_erfassung import Angebot, erfassungsgruende, nur_geplante
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
 from .klick_messtag import adapterschluessel, lesung_zum_buendel, teile_nach_messtag
@@ -190,7 +190,7 @@ def zusammenfuehren(
     if ordner is None:
         return Zusammenfuehrung(list(adapter))
     ergebnisse, unlesbar = lies_ergebnisse(ordner)
-    geplant = geplante_anbieter(root)
+    ergebnisse = nur_geplante(ergebnisse, geplant := geplante_anbieter(root))
     return fuehre_zusammen(
         adapter, ergebnisse, katalog, heute, geraet, unlesbar, geplant
     )
