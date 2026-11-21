@@ -3,13 +3,11 @@
 Sie haengt wie der Promo-Zweig NACH dem Kernlauf, mit eigenem try/except.
 Zwei Dinge macht sie besser als er, beide aus Teil F des Auftrags:
 
-  * **Ein echtes Zeitbudget.** Der Promo-Zweig hat keines; seine einzige
-    Grenze ist das 50-Minuten-Job-Timeout, und ein Timeout ist in GitHub ein
-    "cancelled", kein "failed". Diese Stufe bekommt eine Frist, bricht bei
+  * **Ein echtes Zeitbudget.** Der Promo-Zweig hat keines (nur das Job-Timeout, in
+    GitHub "cancelled", nicht "failed"). Diese Stufe hat eine Frist, bricht bei
     Ablauf sauber ab, speichert das Teilergebnis und vermerkt es.
-  * **Sie ist auf der Website sichtbar.** `promo_result` wird zugewiesen und
-    nie wieder gelesen - der ganze Promo-Zweig existiert nur im Actions-Log.
-    Diese Stufe gibt eine Bilanz zurueck, die in `stats` gehoert.
+  * **Sie ist auf der Website sichtbar.** `promo_result` liest niemand, der Promo-
+    Zweig steht nur im Actions-Log; diese Stufe gibt eine Bilanz fuer `stats`.
 
 WARUM ES AUSSERDEM EINEN EIGENEN NAECHTLICHEN LAUF GIBT
 ------------------------------------------------------
@@ -60,6 +58,7 @@ from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 
 from . import geraete_fragment, geraete_tarifwelt
+from .geraete_o2_anschluss import speichere as o2_messe
 from .report.geraete_tco_karten import geraet_aus_sku, ist_frisch
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
@@ -411,11 +410,12 @@ def run_geraete_stage(
             )
             if klickzug.rohsaetze:
                 buendelbilanz = klickzug.buendel(bestand, heute, tco.nach_id)
-                if buendelbilanz.buendel:
-                    neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
             klickbilanz, tco.erfassung = klickzug.bilanz, klickzug.erfassung
             tarifwelt = geraete_tarifwelt.stufe(
                 quellen, bestand, hole, uhr, heute, zustand, tco, beginn
+            )
+            neue_buendel = o2_messe(
+                buendelbilanz, tco, quellen, hole, uhr, heute, beginn
             )
             seite = Seite(ist_frisch, geraet_aus_sku, katalog)
             pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)

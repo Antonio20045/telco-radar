@@ -62,8 +62,12 @@ def ziele():
 
 
 @pytest.fixture(scope="module")
-def o2(ziele):
-    return replace(ziele["o2"], seiten=ziele["o2"].seiten[:5])
+def o2():
+    """Die o2-Seiten, wie sie bis 21.11.2026 im Tageslauf standen (o2 misst seitdem
+    nur der Adapter)."""
+    archiv = WURZEL / "tests" / "fixtures" / "klickliste" / "o2_tageslauf_20261121.yaml"
+    alle = {z.schluessel: z for z in lade_ziele(kachel_wurzel(), archiv, hoechste=None)}
+    return replace(alle["o2"], seiten=alle["o2"].seiten[:5])
 
 
 @pytest.fixture(scope="module")

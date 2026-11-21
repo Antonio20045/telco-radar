@@ -1,4 +1,5 @@
-"""Zweiter o2-Job: Karte o2-tarife.yaml und Seiten in config/klick_tageslauf.yaml.
+"""Zweiter o2-Job: Karte o2-tarife.yaml und ihre Seiten (bis 21.11.2026 in
+config/klick_tageslauf.yaml, seitdem ``O2_TAGESLAUF``: o2 misst nur der Adapter).
 
 Die Produktseite zeigt einen Tarif ohne Kachel nur, wenn er als ``tarif=`` in der
 Adresse steht, dann gewählt (Erkundung 10.10.2026, Zweig klick-erkundung,
@@ -24,10 +25,13 @@ from bestand_pfad import lese_wurzel
 
 from telco_radar.collect.geraete.klickkarte import lade_klickkarte
 from telco_radar.collect.geraete.klickoptionen import lies_optionen
-from telco_radar.collect.geraete.klickziele import TAGESDATEI, lade_ziele
+from telco_radar.collect.geraete.klickziele import lade_ziele
 
 WURZEL = Path(__file__).parent.parent
 KARTEN = WURZEL / "config" / "klickkarten"
+O2_TAGESLAUF = (
+    WURZEL / "tests" / "fixtures" / "klickliste" / "o2_tageslauf_20261121.yaml"
+)
 O2 = lade_klickkarte(KARTEN / "o2.yaml")
 TARIFE = lade_klickkarte(KARTEN / "o2-tarife.yaml")
 VERTIEFUNG = (
@@ -86,7 +90,7 @@ def test_karte_gleicht_o2_bis_auf_den_tarifknopf():
 
 def _ziele():
     return {
-        z.schluessel: z for z in lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
+        z.schluessel: z for z in lade_ziele(lese_wurzel(), O2_TAGESLAUF, hoechste=None)
     }
 
 

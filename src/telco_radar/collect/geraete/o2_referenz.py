@@ -111,6 +111,16 @@ def passt(referenz: dict, g: dict) -> bool:
     )
 
 
+def gleicher_slug(referenz: dict, g: dict) -> bool:
+    """Der eigene Tarif einer Messung steht mit demselben Slug in der Referenz.
+
+    Das genügt für die Ableitung (`o2.saetze_aus_konfiguration`): aus der Referenz
+    kommt nur der Slug, der Anschlusspreis aus der eigenen Option. `passt` (mit
+    Anschlusspreis) bleibt die Bedingung für Proben und Durchläufe der Referenz."""
+    eigen = referenz.get(g["anzeige"])
+    return eigen is not None and eigen["slug"] == g["slug"]
+
+
 def _zaehle(z: dict, name: str) -> None:
     z[name] = int(z.get(name, 0)) + 1
 
@@ -293,14 +303,24 @@ class Referenzstand:
 _EE_RE = re.compile(r"-ee-\d+(?:gb|tb)-")
 _ANGEBOT_RE = re.compile(r"^[a-z]+-(?P<geraet>.+?-\d+(?:gb|tb)-.+?)-\d+x\w+$")
 _EE_NAME = re.compile(r"\b(?:ee|enterprise)\b", re.IGNORECASE)
+_ZUGABE = re.compile(r"\s+mit\s+.*$", re.IGNORECASE)
+_MIT_IM_ANGEBOT = re.compile(r"-mit-")
 
 
 def modellname(h: dict) -> str:
     """Die Gerätebeschreibung eines Katalogeintrags. o2 nennt die Enterprise
     Edition nur im Angebotsnamen (`…-galaxy-s26-ee-256gb-black-…`), die
     Beschreibung heißt wie das normale Modell; ohne den Zusatz liefen ihre
-    Preise als normales S26 (Preisprüfung 26.10.2026, 102 € zu hoch)."""
+    Preise als normales S26 (Preisprüfung 26.10.2026, 102 € zu hoch).
+
+    Eine Gratis-Zugabe steht nur in der Beschreibung („Google Pixel 11 mit Fitbit
+    Charge 6“, Angebotsname `…-pixel-11-256gb-frost-36xhigh`; die Seite: „erhalte die
+    Fitbit Charge 6 gratis dazu“, Gerätepreis wie ohne). Ohne `-mit-` im Angebotsnamen
+    fällt der Zusatz weg; ein Zubehörbündel trägt ihn im Angebotsnamen
+    (`…-mit-pixel-buds-pro-2-…`) und wird weiter verworfen (Befund 21.11.2026)."""
     modell = str(h.get("description") or "").strip()
+    if not _MIT_IM_ANGEBOT.search(str(h.get("offerName") or "")):
+        modell = _ZUGABE.sub("", modell)
     ee = _EE_RE.search(str(h.get("offerName") or ""))
     if modell and ee and not _EE_NAME.search(modell):
         return f"{modell} Enterprise Edition"

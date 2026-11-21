@@ -27,6 +27,7 @@ Adapterliste statt einer Klick-Übersicht."""
 
 from __future__ import annotations
 
+import logging
 import re
 from datetime import date
 
@@ -36,6 +37,8 @@ from ..klick_vertrag import (
     FRISCHEGRENZE_TAGE,
     LAUF_GESTOERT,
 )
+
+log = logging.getLogger(__name__)
 
 SATZ = "{anbieter} nicht erfasst: {art} ({angaben})"
 SATZ_TEILWEISE = "{anbieter} teilweise erfasst: {grund}"
@@ -243,3 +246,18 @@ def nicht_im_angebot_aus_angebot(
             {f"{name}{TRENNER}{g}": satz for g in sorted(alle - set(gesehen))}
         )
     return saetze
+
+
+def nur_geplante(ergebnisse: list[dict], geplant: list[str] | None) -> list[dict]:
+    """Die Klick-Ergebnisse der Anbieter im Tagesplan ``geplant``
+    (``klickziele.geplante_anbieter``; ``None`` ohne Tagesdatei: alle).
+
+    Die Datei eines Anbieters, der nicht mehr im Plan steht, zählt nicht: o2 steht seit
+    21.11.2026 nicht mehr darin, ``data/state/klick/o2*.json`` vom 21.11. blieben aber
+    liegen, und die gestörte hieße sonst bis zur Frischegrenze „o2 nicht erfasst“."""
+    if not geplant:
+        return ergebnisse
+    ungeplant = sorted({str(d.get("name")) for d in ergebnisse} - set(geplant))
+    if ungeplant:
+        log.info("Klick-Ergebnisse ohne Tagesplan zählen nicht: %s", ungeplant)
+    return [d for d in ergebnisse if str(d.get("name")) in geplant]

@@ -1,0 +1,281 @@
+{
+ "@type": "hwCatalog:HwCatalogValue",
+ "hwCatalogSwitcherStateValue": {
+  "@type": "hwCatalog:HwCatalogSwitcherStateValue",
+  "selectedTargetGroupSwitcher": "privatkunden",
+  "hwOnlyOrBundleSwitcherValue": {
+   "@type": "hwCatalog:HwOnlyOrBundleSwitcherValue",
+   "hwOnlyOrBundleState": {
+    "@type": "hwCatalog:HwOnlyOrBundleState",
+    "name": "BUNDLE"
+   },
+   "showSwitcher": true
+  }
+ },
+ "hardware": [
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4510 320281 00",
+   "description": "Google Pixel 11 mit Fitbit Charge 6",
+   "offerName": "privatkunden-google-pixel-11-256gb-frost-36xhigh",
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 1,
+    "monthlyPrice": 42.49,
+    "totalPrice": 1530.64,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "originalDeviceTotalPrice": 991.0,
+    "promotionActive": false
+   },
+   "bundle": {
+    "@type": "hwCatalog:BundleValue",
+    "tariffName": "O<sub>2</sub> Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+    "tariffOfferName": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+    "tariffDataVolume": "50+ GB"
+   },
+   "rateDurationValue": "36 Monate",
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+    "quantity": 1,
+    "attributes": {
+     "dimension153": "7oRwswmx1kRCYfZWO58kaPnSzUJVFonJP2Pl5dYKe_4",
+     "position": "1",
+     "dimension41": "smartphone|postpaid",
+     "dimension46": "",
+     "dimension43": "inStock|postpaid",
+     "dimension42": "privatkunden-google-pixel-11-256gb-frost-36xhigh|privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+     "brand": "o2shop",
+     "dimension167": "neukunde",
+     "metric17": "36|24",
+     "dimension45": "",
+     "dimension163": "privatkunden",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "760177701",
+     "dimension168": "privatkunden-google-pixel-11-256gb-frost-36xhigh",
+     "dimension154": "4510 320281 00",
+     "dimension164": "Pixel 11",
+     "metric7": "991.0",
+     "dimension165": "Google",
+     "metric3": "27.5",
+     "metric5": "1",
+     "dimension60": null,
+     "dimension59": "o2-mobile-on-demand-m-plus",
+     "dimension37": null,
+     "dimension40": null,
+     "associatedFrameContractNumber": null,
+     "variant": "",
+     "dimension137": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+     "dimension136": "no-paid-packs",
+     "metric8": "359.76",
+     "metric6": "0",
+     "metric2": "14.99",
+     "metric4": "0.0",
+     "dimension166": "no-paid-packs",
+     "id": "84419585",
+     "aep_product_name": "Google Pixel 11 mit Fitbit Charge 6 mit Tarif O2 Mobile on Demand M Plus mit 50 GB+",
+     "aep_monthly_price_base": "57.49",
+     "aep_monthly_price_final": "42.49",
+     "dimension78": "36|24",
+     "aep_one_time_price_base": "40.99",
+     "aep_one_time_price_final": "1.0",
+     "category": "postpaid_bundle",
+     "price": "1350.76"
+    }
+   }
+  },
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4530 001192 00",
+   "description": "Google Pixel 11 mit Pixel Buds Pro 2",
+   "offerName": "privatkunden-google-pixel-11-256gb-obsidian-mit-pixel-buds-pro-2-hazel-36xhigh",
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-obsidian-mit-pixel-buds-pro-2-hazel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 1,
+    "monthlyPrice": 43.99,
+    "totalPrice": 1584.64,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "originalDeviceTotalPrice": 1045.0,
+    "promotionActive": false
+   },
+   "bundle": {
+    "@type": "hwCatalog:BundleValue",
+    "tariffName": "O<sub>2</sub> Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+    "tariffOfferName": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+    "tariffDataVolume": "50+ GB"
+   },
+   "rateDurationValue": "36 Monate",
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+    "quantity": 1,
+    "attributes": {
+     "dimension153": "Bnv-SCbOB7c0iq7jYbLMkKraj7L3iXenibzVgP8Qno4",
+     "position": "1",
+     "dimension41": "smartphone|postpaid",
+     "dimension46": "",
+     "dimension43": "inStock|postpaid",
+     "dimension42": "privatkunden-google-pixel-11-256gb-obsidian-mit-pixel-buds-pro-2-hazel-36xhigh|privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+     "brand": "o2shop",
+     "metric17": "36|24",
+     "dimension45": "",
+     "dimension167": "neukunde",
+     "dimension163": "privatkunden",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "406986689",
+     "dimension168": "privatkunden-google-pixel-11-256gb-obsidian-mit-pixel-buds-pro-2-hazel-36xhigh",
+     "dimension154": "4530 001192 00",
+     "dimension164": "Pixel 11 + Pixel Buds Pro 2",
+     "metric7": "1045.0",
+     "dimension165": "Google",
+     "metric3": "29.0",
+     "metric5": "1",
+     "dimension60": null,
+     "dimension59": "o2-mobile-on-demand-m-plus",
+     "dimension37": null,
+     "dimension40": null,
+     "associatedFrameContractNumber": null,
+     "variant": "",
+     "dimension137": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+     "dimension136": "no-paid-packs",
+     "metric8": "359.76",
+     "metric6": "0",
+     "metric2": "14.99",
+     "metric4": "0.0",
+     "dimension166": "no-paid-packs",
+     "id": "84419585",
+     "aep_product_name": "Google Pixel 11 mit Pixel Buds Pro 2 mit Tarif O2 Mobile on Demand M Plus mit 50 GB+",
+     "aep_monthly_price_base": "58.99",
+     "aep_monthly_price_final": "43.99",
+     "dimension78": "36|24",
+     "aep_one_time_price_base": "40.99",
+     "aep_one_time_price_final": "1.0",
+     "category": "postpaid_bundle",
+     "price": "1404.76"
+    }
+   }
+  },
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4510 320291 00",
+   "description": "Google Pixel 11 Pro XL mit Fitbit Charge 6",
+   "offerName": "privatkunden-google-pixel-11-pro-xl-256gb-canyon-36xhigh",
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 1,
+    "monthlyPrice": 53.99,
+    "totalPrice": 1944.64,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "originalDeviceTotalPrice": 1405.0,
+    "promotionActive": false
+   },
+   "bundle": {
+    "@type": "hwCatalog:BundleValue",
+    "tariffName": "O<sub>2</sub> Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+    "tariffOfferName": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+    "tariffDataVolume": "50+ GB"
+   },
+   "rateDurationValue": "36 Monate",
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+    "quantity": 1,
+    "attributes": {
+     "dimension153": "2CxojwuqpMiGvX5iR4rkzcX_EtnvLzbgtLpOrRijIYU",
+     "position": "1",
+     "dimension41": "smartphone|postpaid",
+     "dimension46": "",
+     "dimension43": "inStock|postpaid",
+     "dimension42": "privatkunden-google-pixel-11-pro-xl-256gb-canyon-36xhigh|privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+     "brand": "o2shop",
+     "dimension167": "neukunde",
+     "metric17": "36|24",
+     "dimension45": "",
+     "dimension163": "privatkunden",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "221068358",
+     "dimension168": "privatkunden-google-pixel-11-pro-xl-256gb-canyon-36xhigh",
+     "dimension154": "4510 320291 00",
+     "dimension164": "Pixel 11 Pro XL",
+     "metric7": "1405.0",
+     "dimension165": "Google",
+     "metric3": "39.0",
+     "metric5": "1",
+     "dimension60": null,
+     "dimension59": "o2-mobile-on-demand-m-plus",
+     "dimension37": null,
+     "dimension40": null,
+     "associatedFrameContractNumber": null,
+     "variant": "",
+     "dimension137": "privatkunden-o2-mobile-on-demand-m-plus-online-hwv",
+     "dimension136": "no-paid-packs",
+     "metric8": "359.76",
+     "metric6": "0",
+     "metric2": "14.99",
+     "metric4": "0.0",
+     "dimension166": "no-paid-packs",
+     "id": "84419585",
+     "aep_product_name": "Google Pixel 11 Pro XL mit Fitbit Charge 6 mit Tarif O2 Mobile on Demand M Plus mit 50 GB+",
+     "aep_monthly_price_base": "68.99",
+     "aep_monthly_price_final": "53.99",
+     "dimension78": "36|24",
+     "aep_one_time_price_base": "40.99",
+     "aep_one_time_price_final": "1.0",
+     "category": "postpaid_bundle",
+     "price": "1764.76"
+    }
+   }
+  }
+ ]
+}

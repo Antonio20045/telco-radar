@@ -70,16 +70,17 @@
 #   Vodafone           Adapter vodafone_api     Klick nur Beleg        2385 Adapter
 #   Telekom            Klick (12 Jobs)          HTTP-Adapter: Barpreis  264 Klick
 #                                               und einzelne Bündel       7 Adapter
-#   o2                 offen: Adapter + Klick   –                      1402 Adapter
-#                                                                       973 Klick
+#   o2                 Adapter o2_katalog       keiner (seit 21.11.)   2233 Adapter
 #   congstar           offen: Klick-Werte,      –                       624 Klick
 #                      Adapter deckt jeden                              181 Adapter
 #                      Schlüssel
 #   1&1                Klick (methode klick)    keiner                    4
 #   Saturn/MediaMarkt  Tarifwelt-Stufe          keiner                  159
 # Ein Weg fällt nur weg, wenn dadurch keine Zeile des Messtags verloren geht;
-# bei o2 und congstar liefert jeder Weg heute Zeilen, die der andere nicht hat
-# (o2) oder die Belege und Werte trägt (congstar).
+# bei congstar trägt der Klick heute Belege und Werte. o2: am 21.11.2026 hatte der
+# Klick 26 Zeilen ohne Adapter-Gegenstück; 18 davon liefert der Adapter seit diesem
+# Stand selbst (Gratis-Zugabe, eigene Geräteaktion), 8 waren eine erneuerte Seite,
+# die der Klick als Neuware las.
 #   aktiv         false = wird nicht abgefragt. Dann ist `grund` PFLICHT; er
 #                 steht wörtlich auf /geraete-quellen.html. Kein Anbieter
 #                 verschwindet stillschweigend.
@@ -776,7 +777,7 @@ anbieter:
 
   - name: o2
     typ: netzbetreiber
-    erfassung: adapter+klick
+    erfassung: adapter
     gruppe: Telefónica Deutschland
     rang: 3
     methode: o2_katalog
@@ -794,7 +795,11 @@ anbieter:
     # (CLAUDE.md Regel 8). Befund 16.11.2026: das Budget des Tageslaufs
     # (--frist 1500) deckt diesen Bedarf nicht, deshalb fehlten von rund
     # 2.500 o2-Preisen am 14./15.11. je rund 1.100.
-    sammelbedarf_sekunden: 1140
+    # Gemessen 21.11.2026 (Gerätelauf 44858465074): 206 Abrufe in 801 s
+    # (03:10:33–03:23:54, 3,9 s je Abruf). Die Nachmessung offener
+    # Anschlusspreise läuft nicht hier, sondern nach der Tarifwelt-Stufe in
+    # der Restzeit des Jobs (`geraete_o2_anschluss`).
+    sammelbedarf_sekunden: 820
     kopfzeilen:
       # Der Endpunkt weist diesen Medientyp in der Nutzlast von /e-shop/
       # selbst aus. Mit `Accept: application/json` antwortet er mit einer
@@ -829,6 +834,11 @@ anbieter:
       verworfen. Am 04.09.2026 gingen alle drei bei 66 von 66 auf, und
       sieben von sieben nachgeprüften Produktseiten nennen dieselben Beträge
       in ihrem serverseitigen pdp:PriceSummaryValue.
+      SEIT DEM 21.11.2026 EINZIGER PREISWEG FÜR o2: der Klick-Lauf misst o2
+      nicht mehr. Je Gerät, Speicher und Laufzeit ist der gewählte Tarif
+      gemessen; die übrigen Tarife derselben Antwort sind abgeleitet
+      (o2s Monatssumme je Tarif minus Gerätrate). Gegenprobe an 482 Klick-
+      Messungen desselben Tages: Tarif, Rate und Anzahlung alle gleich.
     einstiege:
       # Die Einstiegsseite IST die Nutzlast (direkt=True): eine Antwort mit
       # allen Geraeten und Preisen, keine Produktseite wird nachgeladen.

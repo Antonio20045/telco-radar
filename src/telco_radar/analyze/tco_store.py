@@ -33,9 +33,8 @@ schreibt ein Lauf hier ALLE Preisfelder eines Buendels gemeinsam - auch als `Non
 Grund ist die Kennzahl: TCO-24 ist eine SUMME. Ein Tarifpreis von gestern plus eine
 Geraeterate von heute ergibt einen Betrag, der an keinem Tag gegolten hat, und niemand
 koennte ihm ansehen, dass er aus zwei Messungen stammt. Lieber eine sichtbare Luecke
-(`Kosten.luecken`) als eine unsichtbare Mischung - und genau derselbe Befund hat
-am 03.09.2026 die Preisform an ihre Zahl gebunden. Ebenso gemeinsam: die Kennzeichen
-eines Klick-Buendels (`tco_buendel.KLICKFELDER`), die ein Adapterwert abraeumt.
+(`Kosten.luecken`) als eine unsichtbare Mischung (Befund 03.09.2026); ebenso gemeinsam
+die Klick-Kennzeichen (`tco_buendel.KLICKFELDER`) und `anschluss_gemessen_am`.
 
 `first_seen` bleibt unberuehrt: seit wann ein Angebot beobachtet wird, misst kein Lauf.
 
@@ -101,6 +100,7 @@ _MESSFELDER = (
     "geraet_monatsrate",
     "laufzeit_monate",
     "anschlusspreis",
+    "anschluss_gemessen_am",
     "quelle_url",
     "abgerufen_am",
     "zustand",

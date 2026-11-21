@@ -591,7 +591,8 @@ def test_gestoerter_tag_laesst_die_frische_klickmessung_stehen(
 def test_fehlender_anbieter_ist_benannt(adapter, katalog, tmp_path):
     """Nur die o2-Datei liegt im Ordner (die anderen Matrix-Jobs ohne Artefakt): die
     Bilanz nennt jeden geplanten Anbieter ohne Datei und reicht ``ueberfaellig`` der
-    Datei durch. Gegenprobe: ohne Tagesplan ist nichts geplant, nichts fehlt."""
+    Datei durch. Gegenprobe: ohne Tagesplan ist nichts geplant, nichts fehlt. o2 steht
+    seit 21.11.2026 nicht mehr im Plan: seine Datei zählt dann nicht."""
     ordner = tmp_path / "klick"
     o2 = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
     o2["ueberfaellig"] = [O2_SEITE.adresse]
@@ -603,8 +604,8 @@ def test_fehlender_anbieter_ist_benannt(adapter, katalog, tmp_path):
     ohne = zusammenfuehren(adapter, ordner, tmp_path, katalog, HEUTE, _geraet(katalog))
 
     assert "Telekom" in geplant and zug.bilanz["geplant"] == geplant
-    assert zug.bilanz["fehlt"] == [name for name in geplant if name != "o2"]
-    assert zug.bilanz["dateien"][0]["ueberfaellig"] == [O2_SEITE.adresse]
+    assert zug.bilanz["fehlt"] == geplant and zug.bilanz["dateien"] == []
+    assert ohne.bilanz["dateien"][0]["ueberfaellig"] == [O2_SEITE.adresse]
     assert (ohne.bilanz["geplant"], ohne.bilanz["fehlt"]) == (None, [])
 
 

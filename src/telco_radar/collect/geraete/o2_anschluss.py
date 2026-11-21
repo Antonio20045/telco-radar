@@ -19,6 +19,16 @@ nur senken (iPhone 14 erneuert: Fußnote 39,99 €, berechnet 0,00 €). Darum:
 - Listenpreis 0 € → 0,00 € (weniger geht nicht).
 - Listenpreis über 0 € oder keiner → ``None``: die Gesamtkosten nennen die Lücke
   „Anschlusspreis“ (``tco_kosten``), gezählt unter ``ZAEHLER_ANSCHLUSS_OFFEN``.
+
+DER GEGENBEFUND (21.11.2026)
+----------------------------
+Eine Geräteaktion kann den Betrag auch über die Fußnote heben: Xiaomi Redmi 17,
+„O2 Mobile on Demand M“, Fußnote „0 €“, berechnet 39,99 €
+(``tests/fixtures/geraete/o2_redmi17_tarifoptionen_20261121.json.gz``). Berechnet die
+Antwort für ihren gewählten Tarif mehr als dessen Fußnote, taugen ihre Fußnoten nicht
+als Beleg (``fussnoten_tragen``): jeder abgeleitete Anschlusspreis dieser Antwort ist
+die Lücke. Gegenprobe am selben Tag gegen die Klick-Messung: 439 abgeleitete
+Anschlusspreise gleich, 43 Lücke, 0 abweichend.
 """
 
 from __future__ import annotations
@@ -26,6 +36,7 @@ from __future__ import annotations
 import re
 
 ZAEHLER_ANSCHLUSS_OFFEN = "anschluss_offen"
+_CENT = 0.005
 """Abgeleitete Sätze ohne berechneten Anschlusspreis in der Antwort."""
 
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -45,10 +56,20 @@ def listen_anschluss(option: dict) -> float | None:
     return float(betrag)
 
 
-def abgeleiteter_anschluss(option: dict, zaehler: dict) -> float | None:
+def fussnoten_tragen(gewaehlt: dict, berechnet: float | None) -> bool:
+    """Die Fußnoten einer Antwort belegen 0 €, solange die Antwort für ihren gewählten
+    Tarif nicht mehr berechnet als dessen Fußnote (``None``: keine Fußnote, trägt)."""
+    liste = listen_anschluss(gewaehlt)
+    return liste is None or berechnet is None or berechnet <= liste + _CENT
+
+
+def abgeleiteter_anschluss(
+    option: dict, zaehler: dict, fussnoten: bool = True
+) -> float | None:
     """Der berechnete Anschlusspreis einer nicht gewählten Tarifoption: 0,00 € bei
-    einem Listenpreis von 0 €, sonst ``None`` (gezählt)."""
-    if listen_anschluss(option) == 0:
+    einem Listenpreis von 0 € und tragenden Fußnoten (``fussnoten_tragen``), sonst
+    ``None`` (gezählt)."""
+    if fussnoten and listen_anschluss(option) == 0:
         return 0.0
     zaehler[ZAEHLER_ANSCHLUSS_OFFEN] = int(zaehler.get(ZAEHLER_ANSCHLUSS_OFFEN, 0)) + 1
     return None

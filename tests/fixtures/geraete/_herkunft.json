@@ -1017,6 +1017,26 @@
       "gzip": true,
       "bytes_roh": 48415,
       "sha256_roh": "8487d9c7a51d3fd5518df73992bbf0cd6338cd235a0cdcfd4e7bb5d75f0ac4ed"
+    },
+    {
+      "datei": "o2_katalog_zugabe_20261121.json",
+      "url": "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__",
+      "abgerufen_am": "2026-11-21",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Echter Abruf 2026-11-21, HTTP 200, Accept application/vnd.commerce.message+json, Absender TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber), robots.txt (User-agent: *) sperrt /e-shop/rest/ nicht. Vollantwort 594275 B (sha256 4e74e8f353bec56d647d87ce4808c3d7e41b31499b7312549a931087424da44a), 90 Eintraege. GEKUERZT auf die drei Eintraege Pixel 11 256 GB frost und Pixel 11 Pro XL 256 GB canyon (Beschreibung 'mit Fitbit Charge 6', Angebotsname ohne 'mit') sowie Pixel 11 mit Pixel Buds Pro 2 (Angebotsname mit '-mit-') und auf die Felder, die o2.lies_buendel liest; Werte unveraendert.",
+      "gzip": false,
+      "bytes_roh": 10161,
+      "sha256_roh": "f280f530ac12ae8da52385fefd062574742a1f6cc82ad02c5360bdf1b8dd35fc"
+    },
+    {
+      "datei": "o2_redmi17_tarifoptionen_20261121.json.gz",
+      "url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m",
+      "abgerufen_am": "2026-11-21",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Echter Abruf 2026-11-21, HTTP 200, Absender TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber), robots.txt (User-agent: *) sperrt /e-shop/ nicht. GEKUERZT auf die pdp:PageValue-Felder, die o2.saetze_aus_konfiguration liest (wie o2_iphone14_erneuert_tarifoptionen_20261120.json.gz); Werte und Texte unveraendert.",
+      "gzip": true,
+      "bytes_roh": 28934,
+      "sha256_roh": "957cc00b3da163ba5bb157b937e3b140ef843721894498a8dc4c7c0f9de5f921"
     }
   ]
 }

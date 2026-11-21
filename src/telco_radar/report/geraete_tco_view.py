@@ -1,7 +1,6 @@
 """Reiter "Was kostet es": die Daten fuer Zeitreihe, Export und Notbremse.
 
-Gerechnet wird ausschliesslich in `tco_model`. Dieses Modul ruft
-`kosten_ueber()` auf und formt das Ergebnis; es addiert selbst keinen Euro.
+Gerechnet wird nur in `tco_model`; dieses Modul formt `kosten_ueber()`, ohne einen Euro.
 Zwei Rechnungen derselben Zahl sind zwei Zahlen. Widerlegte Bündel: `bereinigt`.
 
 Fehlt ein Posten, steht die benannte Luecke statt einer Zahl: "Wenn kein
@@ -66,6 +65,7 @@ _BUENDEL_FELDER = (
     "geraet_monatsrate",
     "laufzeit_monate",
     "anschlusspreis",
+    "anschluss_gemessen_am",
     "quelle_url",
     "abgerufen_am",
     "quelle_art",

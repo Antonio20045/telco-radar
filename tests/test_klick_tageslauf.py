@@ -1,6 +1,8 @@
 """Klick-Tageslauf je Anbieter (``collect.geraete.klicktageslauf``), ohne Browser.
 
-Die Seiten sind die echten aus ``config/klick_tageslauf.yaml``; der Crawler ist
+Die Seiten sind die echten aus ``config/klick_tageslauf.yaml``, die o2-Seiten die bis
+21.11.2026 dort gelaufenen (``O2_TAGESLAUF``, o2 misst seitdem nur der Adapter); der
+Crawler ist
 gefälscht und liefert je Seite einen vorbereiteten Klicklauf, die Uhr ist eine Zahl,
 die nur der Crawler weiterstellt. Erfasste Werte stammen aus der echten
 o2-Lesung (``tests/klickergebnisse.py``). Geprüft: Rotation (nie gelesen zuerst, dann
@@ -66,6 +68,9 @@ HEUTE = "2026-09-29"
 NICHT_GELADEN = "Seite nach 30000 ms nicht geladen (30000 ms ohne neue Antwort)"
 OHNE_SCHALTER = "Vorbereitung: span.dt_switch.forwardTradeInSwitch nicht gefunden"
 MINUTE = 60.0
+O2_TAGESLAUF = (
+    WURZEL / "tests" / "fixtures" / "klickliste" / "o2_tageslauf_20261121.yaml"
+)
 _SKRIPT = WURZEL / "scripts" / "klick_tageslauf.py"
 
 
@@ -76,10 +81,17 @@ def ziele():
 
 
 @pytest.fixture(scope="module")
-def o2(ziele):
-    """Die ersten sechs o2-Seiten der Tagesdatei: Rotation und Budget unabhängig
-    davon, wie viele Seiten die Datei heute nennt."""
-    return replace(ziele["o2"], seiten=ziele["o2"].seiten[:6])
+def o2_ziele():
+    """Die o2-Einträge, wie sie bis 21.11.2026 in der Tagesdatei liefen."""
+    alle = lade_ziele(lese_wurzel(), O2_TAGESLAUF, hoechste=None)
+    return {z.schluessel: z for z in alle}
+
+
+@pytest.fixture(scope="module")
+def o2(o2_ziele):
+    """Die ersten sechs dieser o2-Seiten: Rotation und Budget unabhängig davon, wie
+    viele Seiten die Datei nennt."""
+    return replace(o2_ziele["o2"], seiten=o2_ziele["o2"].seiten[:6])
 
 
 @pytest.fixture(scope="module")
@@ -141,9 +153,6 @@ def _fahre(o2, karte, crawler, uhr, ende=10**6, gelesen=None):
 
 def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
     assert list(ziele) == [
-        "o2",
-        "o2-tarife",
-        "o2-tarife-2",
         "vodafone",
         "vodafone-2",
         "vodafone-3",
@@ -165,7 +174,7 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
     for ziel in ziele.values():
         karte = WURZEL / "config" / "klickkarten" / f"{ziel.kartenschluessel}.yaml"
         assert karte.is_file()
-    assert O2_SEITE.adresse in {s.adresse for s in ziele["o2"].seiten}
+    assert not [z for z in ziele.values() if z.name == "o2"]
     telekom = _seiten_von(ziele, "Telekom")
     assert len(telekom) == len(set(telekom)) == 238
     vodafone = _seiten_von(ziele, "Vodafone")
@@ -203,9 +212,6 @@ def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
 
     assert skript.main(["--plan", "--root", str(lese_wurzel())]) == 0
     assert json.loads(capsys.readouterr().out) == [
-        "o2",
-        "o2-tarife",
-        "o2-tarife-2",
         "vodafone",
         "vodafone-2",
         "vodafone-3",
@@ -224,7 +230,8 @@ def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
         "telekom-11",
         "congstar",
     ]
-    assert skript.main(["--root", str(lese_wurzel()), "--anbieter", "o2,telekom"]) == 2
+    zwei = ["--root", str(lese_wurzel()), "--anbieter", "vodafone,telekom"]
+    assert skript.main(zwei) == 2
 
 
 def test_rotation_nie_gelesen_zuerst_dann_die_aelteste(o2, karte, gelesen_o2):
@@ -320,7 +327,7 @@ def test_grosse_modelle_im_mittleren_telekom_tarif_stehen_vor_scheiternden_seite
     assert "tariffId=MF_17791" in gefunden[0].adresse
 
 
-def test_vorrang_gilt_nur_fuer_grosse_modelle_im_mittleren_tarif(ziele):
+def test_vorrang_gilt_nur_fuer_grosse_modelle_im_mittleren_tarif(ziele, o2_ziele):
     """Gegenprobe: dasselbe Modell in einem anderen Tarif und ein Nicht-Topmodell im
     mittleren Tarif haben keinen Vorrang; bei o2 gibt es keinen."""
     seiten = [s for job in _telekom_jobs(ziele) for s in job.seiten]
@@ -337,7 +344,7 @@ def test_vorrang_gilt_nur_fuer_grosse_modelle_im_mittleren_tarif(ziele):
     ]
     assert andere_tarife and kleine
     assert not any(hat_vorrang(s) for s in andere_tarife + kleine)
-    assert not any(hat_vorrang(s) for s in ziele["o2"].seiten)
+    assert not any(hat_vorrang(s) for s in o2_ziele["o2"].seiten)
 
 
 def _vorrang_im_tarif_m(ziele):

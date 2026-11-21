@@ -14,6 +14,13 @@
    "commit": "82f01eca",
    "filter": "Felder datum, name, uebersichten[].adresse/status/grund und je Satz nur titel, speicher_gb, tarif_name, url (ohne Preise)",
    "sha256_roh": "3343e7f4ba06cab0d9ed39b6bfa1323a187b000ce729ebdc2364b4021700979f"
+  },
+  {
+   "datei": "o2_tageslauf_20261121.yaml",
+   "quelle": "config/klick_tageslauf.yaml @ origin/main 82bf141d (Stand 2026-11-21, die drei Einträge o2, o2-tarife, o2-tarife-2)",
+   "commit": "82bf141d",
+   "filter": "nur die o2-Einträge, wörtlich; Kopfkommentar neu",
+   "sha256_roh": "853c6057f5ac81254557143ee5f1bf6b013375367aee847368052709d683404a"
   }
  ]
 }
