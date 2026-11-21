@@ -10,13 +10,15 @@ der Produktseiten mit demselben Slug, ``klickraster`` auf die Rastersätze mit d
 Namen (``anschluesse``). Ohne Slug oder Betrag ist die Seite gestört
 (``GeraeteAbrufFehler``), nie ein Nullwert.
 
-Die Tarifdetail-Seiten liest nur der erste Eintrag eines Anbieters (``1und1``); seine
-Produktseiten teilen sich mehrere Einträge (``1und1-2``, je ein Matrix-Job und eine
-Ergebnisdatei). ``tagesanschluesse`` legt darum in der Zusammenführung
-(``klick_teillauf``) die Anschlusspreise aller Dateien desselben Anbieters und desselben
-Tags zusammen (Nachtlauf 21.11.2026: die 308 Sätze von ``1und1-2`` standen ohne
-Anschlusspreis). Ein anderer Tag zählt nie: was heute nicht gelesen ist, bleibt
-``None``.
+Die Produktseiten eines Anbieters teilen sich mehrere Einträge (``1und1``,
+``1und1-2``, je ein Matrix-Job und eine Ergebnisdatei); die Tarifdetail-Seiten liest
+jeder selbst, denn die Tarifauswahl der Produktseiten nennt keinen Anschlusspreis.
+``tagesanschluesse`` legt in der Zusammenführung (``klick_teillauf``) die
+Anschlusspreise aller Dateien desselben Anbieters und desselben Tags zusammen.
+Nachtlauf 21.11.2026: nur ``1und1`` las die Tarifdetail-Seiten, bekam HTTP 502, und
+alle 308 Sätze von ``1und1-2`` standen ohne Anschlusspreis. Eine Datei nur mit
+Tarifdetail-Seiten sagt nichts über das Geräteangebot (``klickrohsatz.ausbeute``). Ein
+anderer Tag zählt nie: was heute nicht gelesen ist, bleibt ``None``.
 """
 
 from __future__ import annotations

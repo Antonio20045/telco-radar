@@ -53,7 +53,8 @@
 # 20 Telekom- oder Vodafone-Seiten (Telekom ~500 s je Seite, Vodafone 5–9 min). Ein
 # großer Anbieter steht darum in mehreren Einträgen mit eigenen Seiten, gleichem
 # `name` und `karte: <schluessel>` des ersten Eintrags; jeder Eintrag ist ein
-# eigener Matrix-Job, der Lesestand gilt je `name`. Übersichten nur im ersten.
+# eigener Matrix-Job, der Lesestand gilt je `name`. Übersichten nur im ersten, außer
+# den 1&1-Tarifdetail-Seiten (Anschlusspreis): die liest jeder 1&1-Eintrag selbst.
 #
 # `seitenabstand_sekunden` (Vorgabe 0): Pause zwischen zwei Seiten eines Anbieters,
 # ruhiges Tempo als Normalfall, keine Anpassung an eine Sperre (Pitch 1, 08.10.2026).
@@ -252,8 +253,19 @@ anbieter:
   - schluessel: 1und1-2
     name: 1&1
     karte: 1und1
-    # Ohne eigene Tarifdetail-Seiten: der Anschlusspreis kommt aus der Datei von
-    # `1und1` desselben Tags (`klickanschluss.anschluesse_je_lauf`, 21.11.2026).
+    # Dieselben sieben Tarifdetail-Seiten wie `1und1`: Nachtlauf 21.11.2026 bekam
+    # `1und1` auf der ersten HTTP 502 und las keine; alle 308 Sätze dieses Eintrags
+    # standen ohne Anschlusspreis, also ohne Gesamtkosten. Die Tarifauswahl der
+    # Produktseiten nennt ihn nicht. Was einer der beiden am Tag liest, gilt für
+    # beide (`klickanschluss.tagesanschluesse`); ein anderer Tag zählt nie.
+    uebersichten:
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
     seiten_aus_uebersicht: 1und1
 
   # Telekom alle fünf Tarife (Antonio 11.10.2026: alles, immer). Eine Produktseite zeigt
