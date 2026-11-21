@@ -18,8 +18,9 @@ rund 813 s) und nimmt nur, was danach bleibt: dieselbe Regel wie
 ``geraete_tarifwelt.stufen_frist`` (Jobfrist minus Vorlauf minus vergangene Zeit minus
 ``RESERVE_NACH_NACHMESSUNG_SEKUNDEN``). Damit der Rückstand trotzdem schrumpft, gilt
 ein gemessener Anschlusspreis ``ANSCHLUSS_GUELTIG_TAGE`` Tage (der Betrag ändert sich
-selten; die Zeile nennt sein Messdatum, ``Buendel.anschluss_gemessen_am``), und
-gemessen wird zuerst, was nie gemessen ist, dann das älteste.
+selten; Zeile und Historie nennen sein Messdatum, ``Buendel.anschluss_gemessen_am``),
+nur zum selben Angebot (``ANGEBOT``). Gemessen wird zuerst die Lücke, dann der
+Fußnotenwert ohne Messung, dann die älteste Messung (``_rang``).
 
 Bestätigt die Seite Raten, Tarif, Gerätrate, Anzahlung und Tarifbetrag des Bündels,
 gilt ihr Anschlusspreis und das Bündel ist gemessen (ohne ``herleitung``); sonst
@@ -76,22 +77,53 @@ def _tage(von: str, bis: str) -> int | None:
         return None
 
 
+ANGEBOT = (
+    "laufzeit_monate",
+    "geraet_monatsrate",
+    "geraet_zuzahlung",
+    "tarif_monatlich",
+)
+"""Das Angebot, für das ein Anschlusspreis gemessen ist. Es steht in derselben
+Bestandszeile wie Betrag und Datum: gemessen und übernommen wird nur zum selben
+Angebot, also trägt die Zeile bis zur nächsten Messung genau das gemessene."""
+
+
+def _gleiches_angebot(b: Buendel, alt: dict) -> bool:
+    for feld in ANGEBOT:
+        heute_wert, damals = getattr(b, feld), alt.get(feld)
+        if heute_wert is None or damals is None or not _gleich(heute_wert, damals):
+            return False
+    return True
+
+
 def uebernimm(b: Buendel, alt: dict | None, heute: str) -> Buendel:
     """Ein offenes Bündel mit dem gemessenen Anschlusspreis seines Bestandseintrags,
-    solange die Messung höchstens ``ANSCHLUSS_GUELTIG_TAGE`` alt ist."""
+    solange die Messung höchstens ``ANSCHLUSS_GUELTIG_TAGE`` alt ist und das Angebot
+    (``ANGEBOT``) dasselbe; sonst bleibt die Lücke und wird nachgemessen."""
     if not _offen(b) or b.anschlusspreis is not None or not alt:
         return b
     am, betrag = str(alt.get("anschluss_gemessen_am") or ""), alt.get("anschlusspreis")
     alter = _tage(am, heute) if am else None
     if betrag is None or alter is None or not 0 <= alter <= ANSCHLUSS_GUELTIG_TAGE:
         return b
+    if not _gleiches_angebot(b, alt):
+        return b
     return replace(b, anschlusspreis=betrag, anschluss_gemessen_am=am)
 
 
+def _rang(b: Buendel) -> tuple[int, str]:
+    """Lücke zuerst, dann Fußnotenwerte ohne Messung, dann die ältesten Messungen."""
+    if b.anschlusspreis is None:
+        return (0, "")
+    if not b.anschluss_gemessen_am:
+        return (1, "")
+    return (2, b.anschluss_gemessen_am)
+
+
 def reihenfolge(saetze: list[Buendel]) -> list[int]:
-    """Stellen der offenen Bündel: nie gemessene zuerst, dann die ältesten Messungen."""
+    """Stellen der abgeleiteten Bündel in Nachmess-Reihenfolge (``_rang``)."""
     stellen = [i for i, b in enumerate(saetze) if _offen(b)]
-    return sorted(stellen, key=lambda i: saetze[i].anschluss_gemessen_am or "")
+    return sorted(stellen, key=lambda i: _rang(saetze[i]))
 
 
 def bestaetigt(b: Buendel, g: dict | None) -> bool:
@@ -131,7 +163,9 @@ def nachmessen(
         except (GeraeteAbrufFehler, HttpFehler, OSError) as exc:
             log.info("o2-Anschluss: %s nicht lesbar (%s)", b.quelle_url, exc)
             g = None
-        if g is not None and bestaetigt(b, g):
+        if g is None:
+            name = "nicht_gelesen"
+        elif bestaetigt(b, g):
             out[i] = replace(
                 b,
                 anschlusspreis=g["anschluss"],

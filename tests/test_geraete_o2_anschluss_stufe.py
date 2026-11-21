@@ -97,17 +97,25 @@ def test_ohne_restzeit_kein_abruf():
     assert abrufe == [] and z == {"frist": 1}
 
 
+ANGEBOT = {
+    "laufzeit_monate": 36,
+    "geraet_monatsrate": 7.0,
+    "geraet_zuzahlung": 1.0,
+    "tarif_monatlich": 19.99,
+}
+
+
 def test_messung_gilt_sieben_tage():
-    alt = {"anschlusspreis": 39.99, "anschluss_gemessen_am": "2026-11-14"}
+    alt = {"anschlusspreis": 39.99, "anschluss_gemessen_am": "2026-11-14", **ANGEBOT}
     b = stufe_o2.uebernimm(_offen(), alt, HEUTE)
     assert (b.anschlusspreis, b.anschluss_gemessen_am) == (39.99, "2026-11-14")
     assert stufe_o2.ANSCHLUSS_GUELTIG_TAGE == 7
 
 
 def test_gegenprobe_achttaegige_messung_gilt_nicht():
-    alt = {"anschlusspreis": 39.99, "anschluss_gemessen_am": "2026-11-13"}
+    alt = {"anschlusspreis": 39.99, "anschluss_gemessen_am": "2026-11-13", **ANGEBOT}
     assert stufe_o2.uebernimm(_offen(), alt, HEUTE).anschlusspreis is None
-    ohne_datum = {"anschlusspreis": 39.99}
+    ohne_datum = {"anschlusspreis": 39.99, **ANGEBOT}
     assert stufe_o2.uebernimm(_offen(), ohne_datum, HEUTE).anschlusspreis is None
 
 
@@ -167,3 +175,53 @@ def test_beleg_nennt_das_messdatum_des_anschlusspreises():
 def test_o2_aus_den_quellen_ist_aktiv():
     o2_quelle = lade_quellen(WURZEL).nach_name(stufe_o2.ANBIETER)
     assert o2_quelle is not None and o2_quelle.crawlbar
+
+
+def test_luecke_vor_bereits_gefuellten_fussnotenzeilen():
+    """Prüfung PR 191: 980 von 1425 abgeleiteten Zeilen (Nacht 21.11.) tragen schon
+    0,00 € aus der Fußnote (ohne Datum), 445 die Lücke. Bei knapper Restzeit muss die
+    Lücke zuerst gemessen werden."""
+    gefuellt = [
+        _offen(anschlusspreis=0.0, geraet_monatsrate=8.0 + i * 0.01) for i in range(30)
+    ]
+    saetze = [*gefuellt, _offen()]
+    erlaubt = iter([True] * 10 + [False] * 100)
+    z: dict = {}
+    aus = stufe_o2.nachmessen(saetze, _seite, HEUTE, lambda: next(erlaubt), z)
+    assert aus[-1].anschlusspreis == 39.99, z
+
+
+def test_uebernommener_anschlusspreis_nach_preisaenderung():
+    """Prüfung PR 191: dieselbe Bündel-ID, aber andere Rate, Anzahlung und
+    Tarifpreis als bei der Messung: der alte Anschlusspreis gilt nicht."""
+    alt = {
+        "anschlusspreis": 0.0,
+        "anschluss_gemessen_am": "2026-11-18",
+        "laufzeit_monate": 36,
+        "geraet_monatsrate": 7.0,
+        "geraet_zuzahlung": 1.0,
+        "tarif_monatlich": 19.99,
+    }
+    neu = _offen(geraet_monatsrate=20.0, geraet_zuzahlung=25.0, tarif_monatlich=24.99)
+    assert neu.id == _offen().id
+    assert stufe_o2.uebernimm(neu, alt, HEUTE).anschlusspreis is None
+    gleich = stufe_o2.uebernimm(_offen(), alt, HEUTE)
+    assert (gleich.anschlusspreis, gleich.anschluss_gemessen_am) == (0.0, "2026-11-18")
+
+
+def test_unlesbare_seite_heisst_nicht_gelesen():
+    z: dict = {}
+    stufe_o2.nachmessen([_offen()], lambda u: "<html></html>", HEUTE, lambda: True, z)
+    assert z == {"nicht_gelesen": 1}
+
+
+def test_historie_nennt_das_messdatum_des_anschlusspreises(tmp_path):
+    from telco_radar.analyze.tco_store import TcoDB
+
+    tco = TcoDB(tmp_path / "geraete_tco.json")
+    b = _offen(anschlusspreis=0.0, anschluss_gemessen_am="2026-11-18")
+    tco.upsert_buendel([b], HEUTE)
+    tco.save(HEUTE)
+    tag = (tmp_path / "geraete_tco_historie" / f"{HEUTE}.jsonl").read_text("utf-8")
+    assert '"anschluss_gemessen_am": "2026-11-18"' in tag
+    assert tco.nach_id(b.id)["anschluss_gemessen_am"] == "2026-11-18"
