@@ -14,7 +14,8 @@ Gerät führt, wenn er vom Katalog abweicht (Kanarienwert). Jeder Verstoß wirft
 ``ErkundungszielFehler`` mit der Stelle; ein Ziel wird nie still übergangen.
 User-Agent und Abrufabstand kommen aus den Quellen;
 ``seitenabstand_sekunden`` (Zahl ab 0, Vorgabe 0) ist die Pause zwischen zwei Seiten;
-``uebersichten`` nennt Übersichtsseiten, jede wörtlich ein Einstieg aus den Quellen;
+``uebersichten`` nennt Übersichtsseiten, jede wörtlich ein Einstieg aus den Quellen,
+gelesen vor den Produktseiten, mit ``uebersichten_zuletzt: true`` danach;
 ``karte`` (Vorgabe: der Schlüssel) nennt die Klick-Karte unter ``KARTEN``, damit ein
 großer Anbieter auf mehrere Einträge (je ein Matrix-Job) mit einer Karte aufgeteilt
 werden kann.
@@ -109,6 +110,7 @@ class Erkundungsziel:
     seitenquelle: str | None = None
     seitengrund: str | None = None
     seiten_rueckfall: bool = False
+    uebersichten_zuletzt: bool = False
 
     @property
     def kartenschluessel(self) -> str:
@@ -176,6 +178,7 @@ def lade_ziele(
                 ),
                 karte=_text(eintrag, "karte", ort) if "karte" in eintrag else None,
                 seitenquelle=quelle,
+                uebersichten_zuletzt=_ja_nein(eintrag, "uebersichten_zuletzt", ort),
             )
         )
     ziele = _mit_kachelseiten(root, ziele, katalog, quellen)
@@ -347,6 +350,13 @@ def _uebersichten(eintrag: dict, ort: str, einstiege: list) -> tuple[str, ...]:
         grund = "uebersichten nicht wörtlich als Einstieg in geraete_quellen.yaml"
         raise ErkundungszielFehler(f"{ort}: {grund}")
     return tuple(roh)
+
+
+def _ja_nein(eintrag: dict, feld: str, ort: str) -> bool:
+    wert = eintrag.get(feld, False)
+    if not isinstance(wert, bool):
+        raise ErkundungszielFehler(f"{ort}: {feld} nicht true oder false")
+    return wert
 
 
 def _seitenabstand(eintrag: dict, ort: str) -> float:
