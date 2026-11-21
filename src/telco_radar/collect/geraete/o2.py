@@ -83,7 +83,7 @@ from typing import Optional
 from .basis import GeraeteAbrufFehler, _gleich, _preis
 from .o2_anschluss import abgeleiteter_anschluss, fussnoten_tragen
 from .o2_referenz import Referenzstand, belegadresse, modellname, tarife_aus
-from .o2_referenz import gleicher_slug
+from .o2_referenz import angebotene, erfasst, gleicher_slug
 from .ratenlaufzeit import katalog_mit_phasen, o2_phasen, ratenzahl_im_knopf
 from ...geraete_model import probe_geht_auf
 
@@ -548,11 +548,11 @@ def saetze_aus_konfiguration(
     Warum abgeleitet statt gemessen: docs/geraete/ist-zustand-preise.md (21.11.2026)
     """
     z = zaehler if zaehler is not None else {}
+    optionen = angebotene(pv, z)
     g = _gemessen(pv)
     if g is None:
         _zaehle(z, "ohne_probe")
-        return []
-    optionen = (pv.get("tariff") or {}).get("tariffOptions") or []
+        return erfasst(z, optionen, [])
     out = [
         _rohsatz(basis, g, g["name"], g["slug"], g["tarif_rate"], g["anschluss"], url)
     ]
@@ -560,13 +560,13 @@ def saetze_aus_konfiguration(
     out[0]["tarif_phasen"] = o2_phasen(pv, uri, g, g["tarif_rate"], z, gemessen=True)
     _zaehle(z, "gemessen")
     if referenz is None:
-        return out
+        return erfasst(z, optionen, out)
     if not gleicher_slug(referenz, g):
         _zaehle(z, "referenz_widerspricht")
-        return out
+        return erfasst(z, optionen, out)
     fussnoten = fussnoten_tragen(_ausgewaehlt(optionen) or {}, g["anschluss"])
     for option in optionen:
-        if not isinstance(option, dict) or option.get("selected"):
+        if option.get("selected"):
             continue
         ref = referenz.get(_ohne_markup(option.get("displayValue") or ""))
         summe = _preis(option.get("monthlyCharges"))
@@ -584,7 +584,7 @@ def saetze_aus_konfiguration(
         satz["herleitung"] = HERLEITUNG_TARIFSUMME
         out.append(satz)
         _zaehle(z, "abgeleitet")
-    return out
+    return erfasst(z, optionen, out)
 
 
 def _hole_seite(hole, url: str, z: dict) -> Optional[dict]:

@@ -1085,6 +1085,16 @@
       "gzip": false,
       "bytes_roh": 525,
       "sha256_roh": "de475bd85f8ead328dfc0a58e7ef7dfe081083617df6e8387221979fcbdb3ff8"
+    },
+    {
+      "datei": "o2_galaxy_s26_tarifoptionen_20261121.json.gz",
+      "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+      "abgerufen_am": "2026-11-21",
+      "filter": "gekuerzt, siehe beleg",
+      "beleg": "Echter Abruf 2026-11-21, HTTP 200, Absender TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber), robots.txt (User-agent: *) sperrt /e-shop/ nicht. Vollantwort 951229 B (sha256 4f6fdfdcc4d887ac4d8892df74c1ad69ea0901b0da1c8de6ca8d21d563972272). GEKUERZT auf die pdp:PageValue-Felder, die o2.saetze_aus_konfiguration liest, je Tarifoption zusaetzlich 'disabled' (wie o2_redmi17_tarifoptionen_20261121.json.gz); Werte und Texte unveraendert.",
+      "gzip": true,
+      "bytes_roh": 90341,
+      "sha256_roh": "b24718efe2ee07755f3960214a7c80f34fd5273d52c58c0abceccfcdfd2e81ea"
     }
   ]
 }
