@@ -26,8 +26,10 @@ Restzeit (``beleg_ablage.runner_mit_frist``), ein Alarm (``wachhund``) beendet a
 alles andere. Jeder Fehler, auch ein Zeitüberschreiten, steht auf stderr und als
 ``ausfall`` im Manifest (die Seite nennt ihn; die letzten Bilder bleiben stehen,
 CLAUDE.md Clean Code 5), und der Exit-Code ist 0. Nur ein falscher Aufruf (argparse)
-endet mit 2. Löschen, das scheitert, schreibt das Manifest trotzdem: die nicht
-gelöschten Bilder sind abgelaufen und fallen darin schon heraus. Es ist deshalb kein
+endet mit 2. Das Manifest steht, bevor gelöscht wird; Löschen hat ``LOESCH_BUDGET_S``
+und schiebt den Rest auf den nächsten Lauf (im Protokoll benannt). Löschen, das
+scheitert, kostet das Manifest deshalb nie: die nicht gelöschten Bilder sind
+abgelaufen und fallen darin schon heraus. Es ist deshalb kein
 ``ausfall`` (die Seite ist vollständig), steht als ``::error::`` im Protokoll, und der
 nächste Lauf löscht erneut. Das Token liegt nur
 in ``GH_TOKEN``. Der Workflow committet die Manifestdatei, dieses Skript nicht.
@@ -61,6 +63,7 @@ from telco_radar.beleg_manifest import (
     markiere_ausfall,
     schreibe,
 )
+from telco_radar.beleg_regeln import abgelaufen
 from telco_radar.beleg_veraltet import (
     Veraltet,
     finde_veraltete,
@@ -78,6 +81,12 @@ prüft es): dann ist der Schritt fertig, bevor GitHub ihn abbricht und der Commi
 Messtags verlorengeht."""
 SCHREIB_RESERVE_S = 20
 """Davon gehen die ``gh``-Aufrufe nicht auf: Platz für Manifest und Ausfallvermerk."""
+LOESCH_BUDGET_S = 60.0
+"""So lange dürfen nach dem Schreiben des Manifests Löschaufrufe beginnen; der Rest
+bleibt liegen, heißt „aufgeschoben (Zeit)“ und kommt im nächsten Lauf dran. Lauf
+44858465074: fünf abgelaufene Releases mit je bis zu 900 Bildern, ``gh release
+delete`` antwortet seit dem 20.11.2026 jedes Mal mit HTTP 502 (gemessen 43 s je
+Release mit drei Versuchen); ohne Budget kostete das jeden Lauf die ganze Frist."""
 OK = 0
 FEHLER_FRIST_ODER_LAUF = (
     GhFehler,
@@ -130,11 +139,14 @@ def wachhund(sekunden: float) -> Iterator[None]:
 
 def lauf_mit_wiederholung(
     lauf: Callable[..., subprocess.CompletedProcess[str]],
-    schlaf: Callable[[float], None] = time.sleep,
+    schlaf: Callable[[float], None] | None = None,
 ) -> Callable[..., subprocess.CompletedProcess[str]]:
     """Wiederholt einen einzelnen ``gh``-Aufruf (``VERSUCHE_GH``, ``PAUSEN_GH_S``),
     nur bei einem vorübergehenden Fehler (5xx/Netzfehler); 403/404 und andere
-    Logikfehler gehen beim ersten Versuch durch."""
+    Logikfehler gehen beim ersten Versuch durch. ``main`` legt die Wiederholung UM
+    ``runner_mit_frist``: jeder Versuch rechnet sein Timeout aus der Restzeit neu
+    (vorher galt für alle drei Versuche das Timeout des ersten, Lauf 44858465074)."""
+    schlaf = schlaf or time.sleep
 
     def aufruf(argv: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
         fertig = lauf(argv, **kwargs)
@@ -169,16 +181,18 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
     """Liest, räumt auf, schreibt das Manifest; gibt den Ausfallgrund zurück oder
     ``None``.
 
-    Frühere Positionen eines Paares und Tages (zweiter Klick-Lauf) fallen zuerst aus
-    dem Manifest und werden erst danach gelöscht: die Datei zeigt auf die neuen Bilder,
-    bevor die alten verschwinden."""
+    Erst das Manifest, dann das Löschen: das Manifest entsteht aus dem, was nach dem
+    Aufräumen bleibt (``abgelaufen``), und steht, bevor der erste Löschaufruf beginnt.
+    Löschen hat ``LOESCH_BUDGET_S``; was danach noch offen ist, ein Fehler oder die
+    Gesamtfrist beim Löschen kostet nie das Manifest (kein Ausfall, die Seite ist
+    vollständig) und steht im Protokoll. Frühere Positionen eines Paares und Tages
+    (zweiter Klick-Lauf) fallen zuerst aus dem Manifest und werden erst danach
+    gelöscht: die Datei zeigt auf die neuen Bilder, bevor die alten verschwinden."""
     try:
         anhaenge = gh.anhaenge()
     except GhFehler as fehler:
         return f"Releases nicht lesbar: {fehler}"
-    bilanz = Bilanz()
-    if not nur_lesen:
-        bilanz, anhaenge = raeume_auf(anhaenge, heute, gh)
+    alle, anhaenge = anhaenge, abgelaufen(anhaenge, heute)[2]
     veraltet = entscheide_veraltete(anhaenge, gh)
     ergebnisse, unlesbar = lies_ergebnisse(root / KLICK_ORDNER)
     for zeile in unlesbar:
@@ -190,14 +204,26 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
         ohne_stellen(anhaenge, veraltet.loeschen), heute, lies_folgen(ergebnisse)
     )
     schreibe(root / MANIFEST_DATEI, manifest)
-    geloescht = 0
+    bilanz, geloescht = Bilanz(), 0
     if not nur_lesen:
-        for tag, datei in veraltet.loeschen:
-            try:
-                gh.asset_loeschen(tag, datei)
-                geloescht += 1
-            except GhFehler as fehler:
-                bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
+        loesch_ende = time.monotonic() + LOESCH_BUDGET_S
+
+        def weiter() -> bool:
+            return time.monotonic() < loesch_ende
+
+        try:
+            bilanz, _ = raeume_auf(alle, heute, gh, weiter)
+            for tag, datei in veraltet.loeschen:
+                if not weiter():
+                    bilanz.ausgelassen += 1
+                    continue
+                try:
+                    gh.asset_loeschen(tag, datei)
+                    geloescht += 1
+                except GhFehler as fehler:
+                    bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
+        except Gesamtfrist as fehler:
+            bilanz.fehler.append(f"Löschen abgebrochen: {fehler}")
     gross = sum(1 for b in manifest["belege"] if b["gross"])
     print(
         f"Belege: {len(manifest['belege'])} Bilder im Manifest, davon {gross} große "
@@ -207,6 +233,7 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
         f"{len(bilanz.releases_geloescht)} "
         f"Releases und {bilanz.assets_geloescht} Dateien gelöscht, "
         f"{geloescht} Dateien früherer Positionen ersetzt, "
+        f"{bilanz.ausgelassen} Löschungen aufgeschoben (Zeit), "
         f"{len(veraltet.offen)} Paare unentschieden"
     )
     for paar in veraltet.offen:
@@ -241,7 +268,7 @@ def main(
         vermerke_ausfall(args.root, args.melde_ausfall, heute)
         return OK
     ende = time.monotonic() + GESAMT_FRIST_S - SCHREIB_RESERVE_S
-    gh = gh or Gh(runner_mit_frist(ende, lauf=lauf_mit_wiederholung(lauf)))
+    gh = gh or Gh(lauf_mit_wiederholung(runner_mit_frist(ende, lauf=lauf)))
     try:
         with wachhund(GESAMT_FRIST_S):
             grund = erneuere(args.root, heute, args.nur_lesen, gh)
