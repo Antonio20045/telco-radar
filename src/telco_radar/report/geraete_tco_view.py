@@ -66,6 +66,7 @@ _BUENDEL_FELDER = (
     "laufzeit_monate",
     "anschlusspreis",
     "anschluss_gemessen_am",
+    "plus_vorteil",
     "quelle_url",
     "abgerufen_am",
     "quelle_art",
@@ -107,8 +108,7 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
     (`Buendel.__post_init__`: kein Anbieter, kein Tarif, kein Geraetepreis
     ohne SKU). Ein Satz, der sie verletzt, ist kaputt und darf die TAFEL
     nicht kosten - er wird uebergangen, nicht repariert. Repariert stuende
-    eine erfundene Zahl in einer Kennzahl, teurer als eine fehlende Zeile.
-    """
+    eine erfundene Zahl in einer Kennzahl, teurer als eine fehlende Zeile."""
     fertig = []
     for e in eintraege:
         if not isinstance(e, dict):

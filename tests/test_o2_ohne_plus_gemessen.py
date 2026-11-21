@@ -66,16 +66,16 @@ def _zaehlt(b) -> bool:
     )
 
 
-def test_gemessenes_angebot_der_woche_bleibt_gemessen_und_zaehlt():
-    """Gestern an der eigenen Seite gemessen, heute dasselbe Angebot abgeleitet."""
+def test_gemessenes_angebot_der_woche_fuellt_die_heutige_luecke_und_zaehlt():
+    """Gestern an der eigenen Seite gemessen, heute dasselbe Angebot ohne Anschluss."""
     alt = {
         "anschlusspreis": 39.99,
         "anschluss_gemessen_am": "2026-11-20",
         "herleitung": "",
         **ANGEBOT,
     }
-    heute = _offen(anschlusspreis=0.0)
-    assert not _zaehlt(heute)
+    heute = _offen()
+    assert heute.anschlusspreis is None and not _zaehlt(heute)
     b = stufe_o2.uebernimm(heute, alt, HEUTE)
     assert (b.herleitung, b.anschlusspreis, b.anschluss_gemessen_am) == (
         "",
@@ -83,6 +83,26 @@ def test_gemessenes_angebot_der_woche_bleibt_gemessen_und_zaehlt():
         "2026-11-20",
     )
     assert _zaehlt(b)
+
+
+def test_heute_gelesener_wert_wird_nie_ueberschrieben():
+    """Clean Code 6 (Prüfung PR 207): 0,00 € heute aus der Fußnote gelesen, die Messung
+    von gestern nennt 39,99 €. Der heutige Wert bleibt, das Bündel bleibt abgeleitet
+    und wird nachgemessen; nennt er denselben Betrag, ist es gemessen."""
+    alt = {
+        "anschlusspreis": 39.99,
+        "anschluss_gemessen_am": "2026-11-20",
+        "herleitung": "",
+        **ANGEBOT,
+    }
+    b = stufe_o2.uebernimm(_offen(anschlusspreis=0.0), alt, HEUTE)
+    assert (b.anschlusspreis, b.herleitung, b.anschluss_gemessen_am) == (
+        0.0,
+        o2.HERLEITUNG_TARIFSUMME,
+        "",
+    )
+    gleich = stufe_o2.uebernimm(_offen(anschlusspreis=39.99), alt, HEUTE)
+    assert (gleich.herleitung, gleich.anschluss_gemessen_am) == ("", "2026-11-20")
 
 
 def test_gegenprobe_geaendertes_angebot_bleibt_geschaetzt():

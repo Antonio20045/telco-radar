@@ -56,8 +56,7 @@ Was dieses Modul bewusst nicht tut
 Es raet nicht. Kein Barpreis wird aus einer Rate geschaetzt (§ 11), keine Sachleistung
 bekommt ein Preisschild, und ein Buendel wird nie gegen die SIM-only-Referenz eines
 ANDEREN Anbieters oder Tarifs gerechnet - das waere eine Differenz zweier verschiedener
-Fragen.
-"""
+Fragen."""
 
 from __future__ import annotations
 
@@ -475,6 +474,7 @@ class Buendel:
     laufzeit_monate: Optional[int] = None
     anschlusspreis: Optional[float] = None
     anschluss_gemessen_am: str = ""
+    plus_vorteil: float | None = None
     rabatte: list[Rabatt] = field(default_factory=list)
     aktionen: list[Aktion] = field(default_factory=list)
     quelle_url: str = ""

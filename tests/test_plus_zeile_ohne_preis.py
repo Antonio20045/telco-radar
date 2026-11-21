@@ -15,12 +15,7 @@ from pathlib import Path
 
 import yaml
 
-from telco_radar.report import (
-    geraete_plus,
-    geraete_preisstand,
-    geraete_tco_karten,
-    geraete_tco_view,
-)
+from telco_radar.report import geraete_preisstand, geraete_tco_karten, geraete_tco_view
 from telco_radar.report import html as seiten
 from telco_radar.report.geraete_export import SPALTE_UEBER_24, tco_csv
 from telco_radar.tco_model import Buendel
@@ -78,8 +73,7 @@ def test_plus_zeile_zeigt_keinen_preis_keine_rechnung_nur_den_grund():
     karte = _o2_karte(PLUS)
     assert karte["bedingter_tarif"] and karte["gesamt"] is not None
     zeile = _zeile(karte)
-    assert GRUND == "nur mit Zweitprodukt – nicht vergleichbar"
-    assert geraete_plus.SATZ in zeile
+    assert GRUND in zeile
     for betrag in ("20,00", "39,99", "30,00", "1,00"):
         assert betrag not in zeile, betrag
     assert "gr-bnd-rechnung" not in zeile and "gr-bnd-summe" not in zeile
@@ -102,8 +96,8 @@ def test_anzeige_blankt_nur_die_kopie_und_nur_bei_plus():
     assert karte["gesamt"] == gesamt
     assert kopie["gesamt"] is None and kopie["delta"] is None
     assert kopie["belastbar"] is False and kopie["rechnung"] == []
-    assert kopie["luecke_kurz"] == geraete_plus.KURZ_OHNE_BETRAG
-    assert kopie["leer_grund"] == geraete_plus.SATZ
+    assert kopie["luecke_kurz"] == geraete_preisstand.KURZ_BEDINGT
+    assert kopie["leer_grund"] == GRUND
     ohne = _o2_karte(OHNE_PLUS)
     assert geraete_preisstand.anzeige(ohne) is ohne
 
@@ -118,7 +112,10 @@ def test_die_plus_zeile_zaehlt_nicht_fuer_vergleich_und_durchschnitt():
         heute=HEUTE,
     )["modelle"][0]
     o2 = next(k for k in modell["karten"] if k["anbieter"] == "o2")
-    assert o2["zaehlt"] is False and o2["notbremse"]["kurz"] == "nur mit Zweitprodukt"
+    assert (
+        o2["zaehlt"] is False
+        and o2["notbremse"]["kurz"] == "Rabatt nur mit Zweitprodukt"
+    )
     assert o2["delta"] is None
 
 

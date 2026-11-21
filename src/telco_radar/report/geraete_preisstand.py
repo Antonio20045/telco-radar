@@ -6,8 +6,8 @@ eine neuere Messung widerlegt (Regel 18, ``analyze/geraete_anschluss``), ein Pre
 Quarantäne (Prüfstelle: eine Regel ist verletzt, z. B. Regel 5) und ein Plus-Tarif,
 dessen Rabatt nur mit aktivem Zweitprodukt gilt (``ist_bedingter_tarif``; Entscheidung
 05.11.2026, Prüfung PR #38 M1; die Lücke nennt den Abstand zum Tarif ohne „Plus“,
-``geraete_plus.luecke``). Maßstab: lieber kein Preis als ein falscher - die
-Zeile nennt ihren Grund, nicht die Regel.
+``tco_plus``, ``geraete_notbremse.plus_zustand``). Maßstab: lieber kein Preis als ein
+falscher - die Zeile nennt ihren Grund, nicht die Regel.
 
 Der widerlegte Anschlusspreis steht vor dem veralteten Preis, weil er der genauere
 Grund ist: die Zeile selbst ist frisch. Solange beides „veraltet“ hieß, schrieb die
@@ -23,7 +23,6 @@ aber nicht von heute, trägt „Preis vom 10.10.2026“; jenseits der Frische gi
 from __future__ import annotations
 
 from .geraete_notbremse import DELTA_BEDINGT, DELTA_NICHT_LIEFERBAR, zustand
-from .geraete_plus import luecke
 
 
 def marke(abgerufen_am: str, heute: str, frisch: bool) -> str:
@@ -172,7 +171,7 @@ def buendel_luecke(b, heute: str) -> str:
     if nicht_lieferbar(flags):
         return SATZ_NICHT_LIEFERBAR
     if flags["bedingter_tarif"]:
-        return SATZ_BEDINGT
+        return f"{flags['notbremse']['kurz']} – nicht vergleichbar"
     if anschluss_widerlegt(flags):
         return anschluss_grund(b.abgerufen_am)
     if veraltet(frisch, flags["veraltet_pruefung"]):
@@ -197,7 +196,9 @@ def anzeige(karte: dict) -> dict:
     elif nicht_lieferbar(karte):
         kurz_, satz = KURZ_NICHT_LIEFERBAR, SATZ_NICHT_LIEFERBAR
     elif ist_bedingt(karte):
-        kurz_, satz = luecke(karte, KURZ_BEDINGT, SATZ_BEDINGT)
+        plus = zustand(karte) or {}
+        kurz_ = plus.get("kurz") or KURZ_BEDINGT
+        satz = f"{kurz_} – nicht vergleichbar"
     elif anschluss_widerlegt(karte):
         kurz_, satz = KURZ_ANSCHLUSS, anschluss_grund(karte.get("abgerufen_am") or "")
     elif preis_veraltet(karte):

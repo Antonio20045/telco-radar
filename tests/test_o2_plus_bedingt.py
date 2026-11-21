@@ -74,7 +74,7 @@ def test_plus_tarif_zaehlt_nicht_und_nennt_den_grund():
     o2, vodafone = _karte(modell, "o2"), _karte(modell, "Vodafone")
     assert o2["zaehlt"] is False
     assert o2["delta"] is None, o2["delta"]
-    assert o2["notbremse"]["kurz"] == "nur mit Zweitprodukt"
+    assert o2["notbremse"]["kurz"] == "Rabatt nur mit Zweitprodukt"
     assert "zweites Produkt" in o2["notbremse"]["satz"]
     assert modell["spanne"] == [vodafone["gesamt"]] * 2, modell["spanne"]
     assert modell["antwort"]["tarif_gesamt"] == vodafone["gesamt"]

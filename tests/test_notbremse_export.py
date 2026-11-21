@@ -49,7 +49,7 @@ def _grund(roh: dict, heute: str) -> str:
     if ist_schaetzung(str(roh.get("herleitung") or "")):
         return "nicht direkt genannt"
     if ist_bedingter_tarif(roh["anbieter"], roh["tarif_name"]):
-        return "nur mit Zweitprodukt"
+        return "Rabatt nur mit Zweitprodukt"
     for a in roh.get("aktionen") or []:
         ende = str(a.get("gueltig_bis") or "").strip()
         if a.get("eingerechnet") and ende and ende < heute:
@@ -86,7 +86,8 @@ def test_der_export_hat_eine_statusspalte(export):
 
 
 @pytest.mark.parametrize(
-    "grund", ["nicht direkt genannt", "nur mit Zweitprodukt", "Aktion abgelaufen"]
+    "grund",
+    ["nicht direkt genannt", "Rabatt nur mit Zweitprodukt", "Aktion abgelaufen"],
 )
 def test_buendel_das_nicht_zaehlt_ist_markiert(export, grund):
     betroffen = [z for z, g in _gruende_je_zeile(export) if g == {grund}]

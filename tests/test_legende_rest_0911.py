@@ -95,11 +95,11 @@ def test_preis_veraltet_heisst_in_der_legende_preis_veraltet():
 def test_zweitprodukt_und_schaetzung_stehen_mit_den_woertern_der_tafel():
     plus = _karte(zaehlt=False, bedingter_tarif=True, gesamt=1339.75)
     geschaetzt = _karte(zaehlt=False, schaetzung=True, gesamt=1165.75, tarif_id="x")
-    assert geraete_preisstand.zeilen_grund(plus) == "nur mit Zweitprodukt"
+    assert geraete_preisstand.zeilen_grund(plus) == "Rabatt nur mit Zweitprodukt"
     assert geraete_preisstand.zeilen_grund(geschaetzt) == "nicht direkt genannt"
     assert geraete_preisstand.zeilen_grund(_karte()) == ""
     text = _legende(_satz(plus, geschaetzt), wert=1374)
-    assert "(nur mit Zweitprodukt, nicht direkt genannt)" in text, text
+    assert "(Rabatt nur mit Zweitprodukt, nicht direkt genannt)" in text, text
 
 
 def test_billigere_schaetzzeile_neben_der_zaehlenden_zeile_wird_genannt():

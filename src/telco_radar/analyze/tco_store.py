@@ -63,8 +63,7 @@ Umstellung vom 20.11.2026 trennt bei 1&1 `rechenweise` Stufe 2), `abgerufen_am` 
   nicht nachholbar - deshalb wird die Datei beim Zusammenfuehren gelesen und nie blind
   neu geschrieben.
 * Keine Rueckrechnung aus frueheren Stand-Commits (Entscheidung 3 im Strategiedokument):
-  die Reihe beginnt ehrlich mit dem ersten Lauf nach der Umstellung.
-"""
+  die Reihe beginnt ehrlich mit dem ersten Lauf nach der Umstellung."""
 
 from __future__ import annotations
 
@@ -101,6 +100,7 @@ _MESSFELDER = (
     "laufzeit_monate",
     "anschlusspreis",
     "anschluss_gemessen_am",
+    "plus_vorteil",
     "quelle_url",
     "abgerufen_am",
     "zustand",

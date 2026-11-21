@@ -42,6 +42,7 @@ from .collect.geraete.basis import GeraeteAbrufFehler, _gleich, antwort_text
 from .collect.http import HttpFehler, SchutzAntwort
 from .geraete_abruf import hole_fuer_anbieter
 from .tco_model import Buendel
+from .tco_plus import vermerke as plus_vermerke
 
 log = logging.getLogger(__name__)
 
@@ -118,12 +119,17 @@ def uebernimm(b: Buendel, alt: dict | None, heute: str) -> Buendel:
 
     Ist der Eintrag selbst gemessen (``_messung``), ist es das Bündel bis dahin auch:
     ohne ``herleitung``, Messdatum in ``anschluss_gemessen_am`` (Entscheidung Antonio
-    21.11.2026, o2 ohne „Plus“ zählt gemessen). Sonst übernimmt es nur einen
-    gemessenen Anschlusspreis in seine Lücke; ohne beides wird es nachgemessen."""
+    21.11.2026, o2 ohne „Plus“ zählt gemessen). Die alte Messung füllt nur, was heute
+    fehlt: ein heute gelesener Anschlusspreis (etwa 0,00 € aus der Fußnote) wird nie
+    überschrieben (Clean Code 6); nennt er denselben Betrag, ist das Bündel gemessen,
+    sonst bleibt es abgeleitet und wird nachgemessen. Ohne eigene Messung übernimmt es
+    nur einen gemessenen Anschlusspreis in seine Lücke."""
     if not _offen(b) or not alt or not _gleiches_angebot(b, alt):
         return b
     am, betrag = _messung(alt)
     if betrag is not None and _gueltig(am, heute):
+        if b.anschlusspreis is not None and not _gleich(b.anschlusspreis, betrag):
+            return b
         return replace(
             b, anschlusspreis=betrag, anschluss_gemessen_am=am, herleitung=""
         )
@@ -249,5 +255,6 @@ def speichere(bilanz, tco, quellen, hole, uhr, heute: str, beginn=None) -> int:
     if bilanz is None or not bilanz.buendel:
         return 0
     bilanz.buendel, _ = stufe(bilanz.buendel, tco, quellen, hole, uhr, heute, beginn)
+    bilanz.buendel = plus_vermerke(bilanz.buendel)
     neu, _ = tco.upsert_buendel(bilanz.buendel, heute)
     return neu
