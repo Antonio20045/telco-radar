@@ -19,8 +19,10 @@ Browser). Ergebnis: ohne ``--ausgabe`` ergänzt der Lauf
 ``data/state/gegenprobe/<datum>.jsonl`` und die Bilanz
 ``data/state/gegenprobe/bilanz/<datum>.json`` (``gegenprobe_bilanz.lege_ab``); mit
 ``--ausgabe`` schreibt er nur seine Teildatei und daneben ``<teil>.lauf.json``, die
-``scripts/gegenprobe_ablegen.py`` später ablegt. Bilder gehen mit ``--hochladen`` ins
-Release ``gegenprobe-<datum>`` (``beleg_ablage.Gh``), sonst bleiben sie in ``--bilder``.
+``scripts/gegenprobe_ablegen.py`` später ablegt. Je gut gelesenem Bündel ein Bild der
+gewählten Konfiguration (``collect.geraete.gegenprobe_bild``); mit ``--hochladen`` geht
+es ins Release des Jobs ``gegenprobe-<datum>-<job>`` (``gegenprobe_ablage``), sonst
+bleibt es in ``--bilder``.
 
 Zeit (Harte Regel 8): ``--job-frist-sekunden`` ist die Restzeit des Jobs ab
 ``--job-start``; ein Seitenbesuch beginnt und ein Bündel darin folgt nur, wenn
@@ -52,6 +54,7 @@ from pathlib import Path
 import yaml
 
 from telco_radar import gegenprobe as gp
+from telco_radar import gegenprobe_ablage as ablage
 from telco_radar import gegenprobe_fenster as gf
 from telco_radar import tco_historie
 from telco_radar.collect.geraete.gegenprobe_browser import (
@@ -84,6 +87,9 @@ HOECHSTE_FRIST_S = max(JOB_FRIST_S, MATRIX_JOB_FRIST_S)
 """Mehr Restzeit glaubt das Skript keinem Aufruf."""
 ZEIT_JE_BUENDEL_S = 90
 """So lange darf ein Kundenweg höchstens dauern (Laden, Klicks, Bild)."""
+HOCHLADEN_S = ZEIT_JE_BUENDEL_S + PUFFER_S // 2
+"""So lange nach dem letzten Besuch darf ein Bildpaket noch beginnen; der Rest des
+Puffers bleibt für Artefakt und Commit."""
 MINDESTABSTAND_S = 5.0
 """Abstand zweier Seitenaufrufe beim selben Host, wenn robots.txt nicht mehr nennt."""
 KENNUNG_ROBOTS = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
@@ -177,7 +183,7 @@ def main(argumente: list[str] | None = None) -> int:
         f"{sum(map(gf.ohne_erste_anzeige, angezeigt))}"
     )
     ergebnisse, bilder, laeufe = laufe(args, gruppen, saetze, datum, ua, ende)
-    veroeffentliche(args, datum, ergebnisse, bilder)
+    veroeffentliche(args, datum, ergebnisse, bilder, ende + HOCHLADEN_S)
     if args.ausgabe is not None:
         gp.schreibe_tag(args.ausgabe, ergebnisse)
         lauf_text = json.dumps(laeufe, ensure_ascii=False, indent=1)
@@ -357,43 +363,15 @@ def _gelesen(gelesen: Lesung | Exception, _schluessel: str, _satz: dict) -> Lesu
     return gelesen
 
 
-def veroeffentliche(args, datum, ergebnisse, bilder) -> None:
-    """Legt die Bilder ab und lädt sie mit ``--hochladen`` ins Tages-Release."""
+def veroeffentliche(args, datum, ergebnisse, bilder, frist_ende=None) -> None:
+    """Legt die Bilder ab und lädt sie mit ``--hochladen`` in die Releases des Jobs
+    (``gegenprobe_ablage``), bis ``frist_ende``; was nicht ankommt, nennt die Zeile."""
     ordner = args.bilder or Path(tempfile.gettempdir()) / "gegenprobe-bilder" / datum
-    ordner.mkdir(parents=True, exist_ok=True)
-    dateien: dict[str, Path] = {}
-    for e in ergebnisse:
-        bild = bilder.get(e.buendel_id)
-        if bild is None:
-            continue
-        endung = "webp" if bild[:4] == b"RIFF" else "png"
-        datei = ordner / f"{gp.kennung(e.buendel_id, datum)}.{endung}"
-        datei.write_bytes(bild)
-        dateien[e.buendel_id] = datei
-    if not args.hochladen:
-        for e in ergebnisse:
-            if e.buendel_id in dateien:
-                e.bild_fehlt = f"nicht veröffentlicht (lokal: {dateien[e.buendel_id]})"
-        return
-    from telco_radar.beleg_ablage import Gh, GhFehler
-
-    gh = Gh()
-    tag = gp.release_tag(datum)
-    try:
-        gh.release_anlegen(tag, f"Gegenprobe {datum}")
-    except GhFehler as fehler:
-        print(f"Gegenprobe: Release {tag} nicht angelegt (gibt es ihn?): {fehler}")
-    try:
-        gh.hochladen(tag, list(dateien.values()))
-    except GhFehler as fehler:
-        print(f"Gegenprobe: Bilder nicht hochgeladen: {fehler}", file=sys.stderr)
-        for e in ergebnisse:
-            if e.buendel_id in dateien:
-                e.bild_fehlt = "Bild nicht veröffentlicht (Release gestört)"
-        return
-    for e in ergebnisse:
-        if e.buendel_id in dateien:
-            e.bild = gp.bild_url(datum, dateien[e.buendel_id].name)
+    gh = ablage.GhGegenprobe() if args.hochladen else None
+    bilanz = ablage.veroeffentliche(ergebnisse, bilder, datum, ordner, gh, frist_ende)
+    print(f"Gegenprobe-Bilder: {bilanz.zeilen()[0]}")
+    for zeile in bilanz.fehler:
+        print(f"Gegenprobe-Bilder: {zeile}", file=sys.stderr)
 
 
 if __name__ == "__main__":

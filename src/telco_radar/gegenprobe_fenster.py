@@ -159,6 +159,17 @@ class Gegenproben:
                     return e
         return None
 
+    def des_angebots(self, buendel_id: str) -> list[gp.Ergebnis]:
+        """Alle Gegenproben dieses Bündels, danach die des Angebots in anderen Farben,
+        je jüngste zuerst."""
+        eigene = self._je_id.get(buendel_id, [])
+        andere = [
+            e
+            for e in self._je_angebot.get(angebot(buendel_id), [])
+            if e.buendel_id != buendel_id
+        ]
+        return [*reversed(eigene), *reversed(andere)]
+
     def am(self, buendel_id: str, datum: str) -> gp.Ergebnis | None:
         """Die Gegenprobe dieses Bündels an diesem Tag."""
         for e in reversed(self._je_id.get(buendel_id, [])):

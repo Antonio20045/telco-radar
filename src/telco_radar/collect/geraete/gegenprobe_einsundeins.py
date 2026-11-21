@@ -16,6 +16,7 @@ import re
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlparse, urlunparse
 
+from .gegenprobe_bild import GERAET, RATEN, SPEICHER, Aufnahme, Vorab, aufnehme
 from .gegenprobe_browser import (
     KLICKFRIST_MS,
     NichtPruefbar,
@@ -80,9 +81,10 @@ def _leiste(seite: Page) -> str:
     return leiste.first.inner_text() if leiste.count() else ""
 
 
-def _zur_tarifauswahl(seite: Page, b: dict, oeffnen: Oeffnen) -> None:
+def _zur_tarifauswahl(seite: Page, b: dict, oeffnen: Oeffnen) -> Aufnahme:
     """Produktseite: Speicher, Reiter „N Monate“, „N Monate Fix“, bis die Preisleiste
-    die Rate von Fix zeigt; dann „Weiter zur Tarifauswahl“ mit derselben Rate."""
+    die Rate von Fix zeigt; Bild der Auswahl (Gerät, Speicher, Raten), dann „Weiter
+    zur Tarifauswahl“ mit derselben Rate."""
     speicher = speicher_aus_sku(b.get("sku_id") or "")
     n = b.get("laufzeit_monate")
     if not speicher or not n:
@@ -104,6 +106,7 @@ def _zur_tarifauswahl(seite: Page, b: dict, oeffnen: Oeffnen) -> None:
         seite, lambda: leiste_rate(_leiste(seite)) == rate
     ):
         raise NichtPruefbar(f"Die Preisleiste übernimmt „{n} Monate Fix“ nicht")
+    auswahl = aufnehme(seite, b, None, (GERAET, SPEICHER, RATEN))
     weiter = seite.locator(
         "#price-summary-overlay-cta > button", has_text="Weiter zur Tarifauswahl"
     )
@@ -112,6 +115,7 @@ def _zur_tarifauswahl(seite: Page, b: dict, oeffnen: Oeffnen) -> None:
     lehne_einwilligung_ab(seite)
     if leiste_rate(_leiste(seite)) != rate:
         raise NichtPruefbar(f"Die Tarifauswahl zeigt nicht die Rate von {n} Monate Fix")
+    return auswahl
 
 
 def _waehle_kachel(seite: Page, kachel: Locator) -> str | None:
@@ -129,7 +133,7 @@ def _waehle_kachel(seite: Page, kachel: Locator) -> str | None:
 
 def waehle(seite: Page, gruppe: list[dict], oeffnen: Oeffnen) -> Schritte:
     """Der Weg: einmal zur Tarifauswahl, dann jede gewählte Kachel lesen."""
-    _zur_tarifauswahl(seite, gruppe[0], oeffnen)
+    auswahl = _zur_tarifauswahl(seite, gruppe[0], oeffnen)
     offen = nach_tarif(gruppe, norm)
     kacheln = seite.locator(_KACHEL)
     for stelle in range(min(kacheln.count(), HOECHSTE_TARIFKACHELN)):
@@ -146,7 +150,7 @@ def waehle(seite: Page, gruppe: list[dict], oeffnen: Oeffnen) -> Schritte:
                 yield b, fehler
             continue
         for b in liste:
-            yield b, ""
+            yield b, Vorab.mit("", auswahl)
         seite.keyboard.press("Escape")
         seite.wait_for_timeout(TAKT_MS * 2)
     yield from nicht_zur_wahl(offen)

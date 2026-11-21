@@ -1,0 +1,101 @@
+{
+ "zweck": "DOM der Anbieterseiten nach der Wahl (Gegenprobe, 21.11.2026) für die Erkennung der gewählten Option im Konfigurationsbild (tests/test_gegenprobe_auswahl.py).",
+ "eintraege": [
+  {
+   "datei": "1-1-1.html.gz",
+   "url": "https://mobile.1und1.de/iphone-air",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--1-1--apple-iphone-air-256gb-lichtgold--1-1-all-net-flat-l--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:26:07+00:00, Bild zeigte Gerät, Speicher",
+   "gzip": true,
+   "bytes_roh": 132913,
+   "sha256_roh": "85a8c03fd581d073906deeed9f4563ab4b69f63c5e2a98829919c6c5c9f032ec"
+  },
+  {
+   "datei": "1-1-2.html.gz",
+   "url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffselect?tariffChangeUrl=//mobile.1und1.de/iphone-air&optionalPrecedingDocuments=//mobile.1und1.de/iphone-air&addFlowStates=tradeInAvailable,brandApple,watchAvailable,askWatch,askHeadphones&traceId=1b1a4e9c-ddd3-4246-880b-f896bc47c6e6",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--1-1--apple-iphone-air-256gb-lichtgold--1-1-all-net-flat-l--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:26:16+00:00, Bild zeigte Gerät, Tarif, Raten, Preis",
+   "gzip": true,
+   "bytes_roh": 134178,
+   "sha256_roh": "583eb0ac3fdbf04b4b709bf1e2b07600baee0d28bedffec6662e0b1a47734a8b"
+  },
+  {
+   "datei": "congstar-1.html.gz",
+   "url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?planId=545&installmentPlanId=500",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--congstar--apple-iphone-17-256gb-weiss--allnet-flat-l--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:25:53+00:00, Bild zeigte Speicher, Tarif, Raten, Preis",
+   "gzip": true,
+   "bytes_roh": 171355,
+   "sha256_roh": "9485157ae2e28d6b682980b7ce327a6f4a223051195a9053e4e8fbd72b1f39ca"
+  },
+  {
+   "datei": "o2-1.html.gz",
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--o2--apple-iphone-15-pro-max-256gb-titan-schwarz--o2-mobile-l-mit-150-gb-24-mon--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:25:01+00:00, Bild zeigte Gerät, Tarif, Raten, Preis",
+   "gzip": true,
+   "bytes_roh": 135222,
+   "sha256_roh": "6188b37c23e2e6e2a2ea135468571a84f412f0cf4c4926560d56c8372e7b2bd6"
+  },
+  {
+   "datei": "saturn-mediamarkt-telekom-netz-1.html.gz",
+   "url": "https://tarife.mediamarkt.de/smartphones/apple/iphone-17/?farbe=black&speicher=256&ogi=68c2d649b31debf7ff0c86c4&ofi=6ada20a5903654b324c7ead4&tfi=68dcf534457a239ed5b14da5&hwi=68c2cc264a986e88ff5cfb12_HW110228-1",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--saturn-mediamarkt-telekom-netz--apple-iphone-17-256gb-ohne-farbe--allnet-flat-100gb--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:26:24+00:00, Bild zeigte Gerät, Speicher, Tarif, Preis",
+   "gzip": true,
+   "bytes_roh": 107104,
+   "sha256_roh": "2669f3eb719001abc849bee19a20431ac3dca26f022640f93033d829fb70a4e0"
+  },
+  {
+   "datei": "telekom-1.html.gz",
+   "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=35.5&instalmentId=24",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--telekom--apple-iphone-17-256gb-ohne-farbe--magentamobil-l--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:25:13+00:00, Bild zeigte Gerät, Speicher, Tarif, Raten, Preis",
+   "gzip": true,
+   "bytes_roh": 109217,
+   "sha256_roh": "aa2184c86be42400ebacbd1d1cda3c8462b2b7dc8f50e73b8291bd0de45dcef0"
+  },
+  {
+   "datei": "vodafone-1.html.gz",
+   "url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--vodafone--apple-iphone-17-256gb-schwarz--mobil-s--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:25:26+00:00, Bild zeigte Gerät, Speicher, Raten",
+   "gzip": true,
+   "bytes_roh": 596752,
+   "sha256_roh": "bde0141cf7c37a682779bc6c0e8656e5d76f206254bd6e42d04ffa5453cba3a4"
+  },
+  {
+   "datei": "vodafone-2.html.gz",
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+   "abgerufen_am": "2026-11-21",
+   "buendel_id": "buendel--vodafone--apple-iphone-17-256gb-schwarz--mobil-s--24m",
+   "werkzeug": "Live-Aufnahme K3 (Chromium, scripts/gegenprobe-Weg; DOM nach der Wahl: Attribute class/id/role/type/name/for/aria-*, checked aus dem Zustand, unsichtbare Knoten mit hidden; ohne Skripte, Stile, Bilder)",
+   "beleg": "Gegenprobe-Kundenweg vom 2026-11-21T14:25:36+00:00, Bild zeigte Gerät, Tarif, Preis",
+   "gzip": true,
+   "bytes_roh": 220058,
+   "sha256_roh": "7189c4baa11ca0b480cd27ed06e8e27f2ec43dd8fc3bd96c87ba38b3d2bef00e"
+  },
+  {
+   "datei": "faelle.json",
+   "abgeleitet_aus": "data/state/geraete_tco.json vom 2026-11-21 (Bündel der Schnappschüsse) und die Anker/Merkmale der Aufnahme",
+   "beleg": "Eingaben je Schnappschuss für tests/test_gegenprobe_auswahl.py",
+   "gzip": false,
+   "bytes_roh": 3582,
+   "sha256_roh": "6f5cae251fcf2baf80d958aef019c8e375827009c815c13752b45b7828a76fc1"
+  }
+ ]
+}
