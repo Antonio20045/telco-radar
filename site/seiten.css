@@ -4266,6 +4266,14 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   .bericht .szene-bild{position:relative;top:auto;aspect-ratio:12/5;height:auto;margin:0 0 20px;border-radius:16px}
   .bericht .szene-titel,.bericht .szene--blatt .szene-titel--blatt{font-size:40px;margin-bottom:16px}}
 @media (max-width:900px){.bericht .szene .kurzpfad-satz{font-size:20px}}
+.gr-pb-zusatz{display:block;font-size:12px;margin-top:2px}
+.gr-pb-ohnebild{display:block}
+.pa-tagbeleg{min-width:0}
+.pa-vorschau{margin:2px 0 8px}
+.pa-vorschau .gr-pb-bild{width:280px;max-height:360px;object-fit:contain;
+  object-position:left top}
+.gr-pb-screenshot .gr-pb-bild{width:320px;max-height:520px;object-fit:contain;
+  object-position:left top}
 .gr-preisbelege[hidden],.gr-pb[hidden]{display:none}
 .gr-pb{border-top:1px solid var(--rule-2)}
 .gr-pb>summary{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;
