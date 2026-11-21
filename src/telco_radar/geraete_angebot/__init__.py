@@ -18,7 +18,8 @@ desselben Messtags hängt es ein (``einhaengen``) – vor dem Soll/Ist-Wächter.
 
 Messtag ist das Datum in Europe/Berlin beim Start der Zählung: die Zählung läuft ab
 23:05 UTC (00:05 bzw. 01:05 Uhr in Berlin), also am selben Kalendertag wie der
-Gerätelauf ab etwa 03:00 UTC, und endet vor dem Klick-Lauf (``SPERRFENSTER``).
+Gerätelauf ab etwa 03:00 UTC, und endet vor dem Klick-Lauf (``KLICK_FENSTER``,
+``TARIFWELT_FENSTER``).
 """
 
 from __future__ import annotations
@@ -75,10 +76,11 @@ SATURN_NETZE = {
 NETZ_ALIAS = {"telefonica": "o2"}
 """Der Netzfilter der Tarifwelt führt Telefónica neben o2; beides ist das o2-Netz."""
 
-KLICK_FENSTER = (0, 6)
-"""00:00-06:00 UTC: Klick-Lauf, Gerätelauf und Gegenprobe auf denselben Hosts."""
-TARIFWELT_FENSTER = (2, 6)
-"""02:00-06:00 UTC: Tarifwelt-Stufe des Gerätelaufs und Gegenprobe."""
+KLICK_FENSTER = (0, 7)
+"""00:00-07:00 UTC: Klick-Lauf (bis etwa 03:00), Gerätelauf, Gegenprobe (Matrix, bis
+160 Minuten nach dem Gerätelauf) auf denselben Hosts."""
+TARIFWELT_FENSTER = (2, 7)
+"""02:00-07:00 UTC: Tarifwelt-Stufe des Gerätelaufs und Gegenprobe."""
 
 ANBIETER: dict[str, Anbieter] = {
     a.schluessel: a
