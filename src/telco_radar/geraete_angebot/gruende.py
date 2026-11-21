@@ -18,7 +18,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from ..geraete_tarifschluessel import grundtarif, kern, ohne_variante
+from ..geraete_tarifschluessel import grundtarif, kern
 from ..geraete_vollstaendigkeit import (
     GRUND_NICHT_IM_KATALOG,
     SATURN_NETZE,
@@ -118,7 +118,6 @@ def grund_der_luecke(
 TARIF_NICHT_AUF_SEITE = "Tarif nicht in der Auswahl der Produktseite"
 SPEICHER_NICHT_AUF_SEITE = "Speicher nicht in der Auswahl der Produktseite"
 LAUFZEIT_NICHT_AUF_SEITE = "Laufzeit nicht in der Auswahl der Produktseite"
-ANDERER_KAUFWEG = "anderer Kaufweg (Tarifübersicht), nicht gezählt"
 AUSWAHL_OFFEN = "Auswahl dieses Geräts nicht ganz gelesen"
 
 
@@ -168,48 +167,15 @@ def grund_ohne_angebot(soll: ZeilenSoll) -> Callable[[str], str]:
     return grund
 
 
-def passt(ist_tarif: str, karte: str) -> bool:
-    """Gehört der gemessene Grundtarif zur Kachel? Gleich, oder Kachel + „mit …“."""
-    return ist_tarif == karte or ist_tarif.startswith(karte + "-mit-")
-
-
-NICHT_GEPRUEFT = "Kaufweg Tarifübersicht heute nicht geprüft"
-
-
-def nicht_vergleichbar(
-    soll: ZeilenSoll,
-    ist_kombis: set[str],
-    karten: list | None,
-    ohne_karten: str | None = None,
-) -> dict[str, str]:
-    """Gemessene Preise gelesener Geräte, die NICHT verglichen werden, mit Grund:
-    Gerät nur teilweise gelesen (ein Klick scheiterte, eine zweite Seite fehlt), oder
-    Tarif nur über die Tarifübersicht kaufbar (o2, ``karten``: Namen der Kacheln mit
-    „Handy hinzufügen“). Das Soll kommt allein aus der Produktseite; solche Preise
-    sind weder Soll noch „nicht angeboten“. Fehlen die Kacheln (Übersicht nicht
-    gelesen), trägt jeder solche Preis ``ohne_karten``."""
-    angeboten = (
-        set().union(*(a.schluessel() for a in soll.auswahlen))
-        if soll.auswahlen
-        else set()
-    )
-    seite = _auf_seite(soll)
-    namen = [grundtarif(k.text) for k in karten or ()]
-    offen: dict[str, str] = {}
-    for k in sorted(ist_kombis - angeboten):
-        modell = modell_der_kombination(k) or ""
-        if modell in soll.teilweise_gelesen:
-            offen[k] = AUSWAHL_OFFEN
-            continue
-        tarif = ohne_variante(kern(_teile(k)[1]))[0]
-        if modell not in seite or tarif in seite[modell][1]:
-            continue
-        if karten is None and ohne_karten:
-            offen[k] = ohne_karten
-            continue
-        passende = [n for n in namen if passt(tarif, n)]
-        if len(passende) == 1:
-            offen[k] = ANDERER_KAUFWEG
-        elif passende:
-            offen[k] = NICHT_EINDEUTIG
-    return offen
+def nicht_vergleichbar(soll: ZeilenSoll, ist_kombis: set[str]) -> dict[str, str]:
+    """Gemessene Preise gelesener Geräte, die NICHT verglichen werden: die Auswahl des
+    Geräts ist nicht vollständig gelesen (ein Klick scheiterte, eine zweite Seite fehlt,
+    das Karussell endete nicht). Sonst gilt nur: angeboten (in der Auswahl) oder so
+    nicht angeboten (Auswahl vollständig gelesen, fehlt dort)."""
+    angebote = [a.schluessel() for a in soll.auswahlen]
+    angeboten = set().union(*angebote) if angebote else set()
+    return {
+        k: AUSWAHL_OFFEN
+        for k in sorted(ist_kombis - angeboten)
+        if modell_der_kombination(k) in soll.teilweise_gelesen
+    }

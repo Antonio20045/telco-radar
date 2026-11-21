@@ -99,12 +99,6 @@ def _o2_uebersicht(s: Sitzung) -> Uebersicht:
     return list(kacheln.values()), genannt, ende
 
 
-def o2_tarifuebersicht(s: Sitzung) -> list[Option]:
-    """Die Tarifübersicht einmal je Lauf: Tarife mit „Handy hinzufügen“."""
-    s.oeffne(LS.O2_TARIFUEBERSICHT)
-    return LS.o2_tarifuebersicht(s.html("tarifuebersicht"))
-
-
 NICHT_GEWAEHLT = "Option „{option}“ ließ sich nicht wählen, nicht gelesen"
 
 

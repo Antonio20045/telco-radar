@@ -182,16 +182,6 @@ def zaehle_seiten(
         print(f"{z.schluessel}: {seite.titel}: {seite.sekunden} s")
 
 
-def tarifuebersicht(z: ga.Zaehlung, s: Sitzung) -> None:
-    """o2: Tarife der Tarifübersicht mit „Handy hinzufügen“; ein Ausfall wird
-    benannt, die Produktseiten-Auswahl gilt dann allein."""
-    try:
-        z.tarifuebersicht = wege.o2_tarifuebersicht(s)
-    except (LeserFehler, PlaywrightError) as fehler:
-        z.tarifuebersicht_grund = f"Tarifübersicht nicht gelesen: {kurzgrund(fehler)}"
-        print(f"::warning::o2 {z.tarifuebersicht_grund}")
-
-
 def lauf(
     args, anbieter: ga.Anbieter, jetzt: datetime, ende: float, mono
 ) -> ga.Zaehlung:
@@ -240,8 +230,6 @@ def lauf(
                     anbieter.schluessel, s, anbieter.uebersicht
                 )
                 z.sekunden_uebersicht = round(mono() - beginn, 1)
-                if anbieter.schluessel == "o2":
-                    tarifuebersicht(z, s)
                 print(
                     f"{z.schluessel}: Übersicht {len(z.kacheln)} Kacheln, "
                     f"genannt {z.genannt}, {z.sekunden_uebersicht} s"

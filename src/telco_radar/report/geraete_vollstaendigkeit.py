@@ -62,6 +62,7 @@ GERAETE = " Angeboten erfasst ({gezaehlt} von {soll} Geräten gezählt)"
 NICHT_VERGLICHEN = "{n} Preise nicht verglichen ({grund})"
 KONKURRENZ_OFFEN = "Überschneidung mit anderen Läufen nicht prüfbar"
 UEBERSICHT_OFFEN = "Übersicht nicht ganz gelesen"
+TEILZAEHLUNG = "Teilzählung"
 AUSWAHL_OFFEN = "Auswahl nicht ganz gelesen"
 LUECKEN_ZEIGEN = 40
 """Höchstzahl gezeigter Lücken je Anbieter; die Zahl steht immer vollständig."""
@@ -100,16 +101,6 @@ def _lesbare_luecke(luecke: dict) -> dict:
     return {**luecke, "grund": OHNE_GRUND}
 
 
-KAUFWEGE = (
-    "Tarifübersicht: {n} Tarife mit „Handy hinzufügen“ (anderer Kaufweg, nicht gezählt)"
-)
-
-
-def _kaufwege(herkunft: dict | None) -> str:
-    tarife = ((herkunft or {}).get("tarifuebersicht") or {}).get("tarife")
-    return KAUFWEGE.format(n=len(tarife)) if tarife else ""
-
-
 def _hinweise(angebot: dict, k: dict) -> list[str]:
     uebersicht = angebot.get("uebersicht") or {}
     gruende: dict[str, int] = {}
@@ -133,9 +124,12 @@ def _hinweise(angebot: dict, k: dict) -> list[str]:
 def _angebot_marken(z: dict, k: dict) -> list[str]:
     angebot = z.get("angebot") or {}
     extra = k.get("nicht_im_soll_zahl")
+    geraete = angebot.get("geraete") or {}
+    teil = geraete.get("soll") is None or geraete.get("gezaehlt") != geraete.get("soll")
     marken = [
         x
         for x in (
+            TEILZAEHLUNG if teil else "",
             _luecken(k.get("luecken_zahl")),
             OHNE_ANGEBOT.format(n=zahl(extra)) if extra else "",
             ""
@@ -186,7 +180,6 @@ def angebot_zeile(z: dict) -> dict:
             for s in (
                 _ebene_satz("Modelle", ebenen.get("modelle") or {}),
                 _ebene_satz("Speicher", ebenen.get("modell_speicher") or {}),
-                _kaufwege(angebot.get("herkunft")),
             )
             if s
         ],

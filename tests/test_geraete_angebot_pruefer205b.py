@@ -11,6 +11,10 @@ dass kein Preis eines Geräts ohne gelesene Auswahl (Pixel 11, Galaxy A57) zähl
 „Slug -> Tarifname hängt nicht von der Reihenfolge ab“ prüft jetzt das
 Ergebnis des Einhängens für beide Reihenfolgen der Bündel (die Abbildung Slug ->
 Messname über den Bestand gibt es nicht mehr; der Name kommt von der Kachel).
+
+Runde 5: Die Tests zum zweiten o2-Kaufweg (Slug-Reihenfolge, kaufbarer Tarif der
+Übersicht, Ausfall der Übersicht) sind entfernt; den Kaufweg gibt es nicht mehr
+(Karussell-Befund: die Produktseite bietet alle 11 Tarife selbst).
 """
 
 from __future__ import annotations
@@ -19,8 +23,6 @@ import pytest
 import test_geraete_angebot as base
 
 from telco_radar import geraete_angebot as ga
-from telco_radar.geraete_angebot import einhaengen as ein
-from telco_radar.geraete_vollstaendigkeit import Signale, baue
 from telco_radar.report import geraete_vollstaendigkeit as seite
 
 TAG = base.TAG
@@ -98,166 +100,3 @@ def test_modell_ausserhalb_der_uebersicht_zaehlt_nicht_als_preis_ohne_angebot(
     assert {e["grund"] for e in modelle["nicht_im_soll"]} == {
         "nicht in der Übersicht des Anbieters"
     }
-
-
-def _o2_lauf(tmp_path, ist, katalog, tarifuebersicht, grund=None):
-    s = ga.Seite(
-        "https://www.o2online.de/e-shop/smartphone/apple-iphone-17",
-        "Apple iPhone 17",
-        status=ga.GELESEN,
-        speicher=[ga.Option("256 GB", "256 GB")],
-        tarife=[ga.Option("O2 Mobile S mit 15 GB+", "x")],
-        laufzeiten=[ga.Option("24", "24")],
-    )
-    z = ga.Zaehlung("o2", TAG, f"{TAG}T23:10:00+00:00", seiten=[s], genannt=1)
-    z.kacheln = [ga.Kachel(s.url, s.titel)]
-    z.tarifuebersicht, z.tarifuebersicht_grund = tarifuebersicht, grund
-    ga.schreibe(tmp_path, z)
-    sig = Signale()
-    voll = baue(TAG, f"{TAG}T04:00:00+00:00", ist, {}, sig)
-    ein.haenge_ein(voll, tmp_path, TAG, ist, sig, katalog)
-    return next(x for x in voll["anbieter"] if x["name"] == "o2")["ebenen"][
-        "kombinationen"
-    ]
-
-
-def test_slug_zu_tarifname_haengt_nicht_von_der_reihenfolge_der_buendel_ab(
-    tmp_path, katalog
-):
-    """Unter dem Startslug ``o2-mobile-unlimited-m`` stehen zwei Tarife; das Ergebnis
-    darf nicht vom ersten Bündel abhängen, und „Unlimited M“ ist nie „Mobile S“."""
-    url = "https://www.o2online.de/e-shop/x?tarif=o2-mobile-unlimited-m"
-    sku = "apple-iphone-17-256gb-schwarz"
-
-    def bd(slug, name):
-        return {
-            "id": f"buendel--x--{sku}--{slug}--24m",
-            "sku_id": sku,
-            "anbieter": "o2",
-            "tarif_id": slug,
-            "tarif_name": name,
-            "laufzeit_monate": 24,
-            "abgerufen_am": TAG,
-            "quelle_url": url,
-        }
-
-    s = bd("o2-mobile-s-mit-15-gb-24-mon", "O2 Mobile S mit 15 GB+ (24 Mon.)")
-    m = bd(
-        "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon",
-        "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
-    )
-    karte = [ga.Option("O2 Mobile Unlimited M", "o2-mobile-unlimited-m")]
-    a = _o2_lauf(tmp_path / "a", [s, m], katalog, karte)
-    b = _o2_lauf(tmp_path / "b", [m, s], katalog, karte)
-    felder = ("soll", "erfasst", "nicht_im_soll_zahl", "nicht_verglichen_zahl")
-    assert [a[f] for f in felder] == [b[f] for f in felder] == [1, 1, 0, 1]
-
-
-def test_o2_kaufbarer_tarif_der_uebersicht_wird_nicht_auf_falschen_messnamen_abgebildet(
-    tmp_path, katalog
-):
-    """Tarifübersicht bietet 'O2 Mobile Unlimited M' (Slug o2-mobile-unlimited-m). Die
-    Messung hat beide Tarife (S und Unlimited M) für iPhone 17 256 GB / 24 Mon.
-    erfasst, beide Bündel mit quelle_url ...?tarif=o2-mobile-unlimited-m. Soll = S +
-    Unlimited M, beides erfasst, nichts ohne Angebot."""
-    url = "https://www.o2online.de/e-shop/smartphone/apple-iphone-17?tarif=o2-mobile-unlimited-m"
-    sku = "apple-iphone-17-256gb-schwarz"
-
-    def bd(slug, name):
-        return {
-            "id": f"buendel--x--{sku}--{slug}--24m",
-            "sku_id": sku,
-            "anbieter": "o2",
-            "tarif_id": slug,
-            "tarif_name": name,
-            "laufzeit_monate": 24,
-            "abgerufen_am": TAG,
-            "quelle_url": url,
-        }
-
-    ist = [
-        bd("o2-mobile-s-mit-15-gb-24-mon", "O2 Mobile S mit 15 GB+ (24 Mon.)"),
-        bd(
-            "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon",
-            "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
-        ),
-    ]
-    s = ga.Seite(
-        "https://www.o2online.de/e-shop/smartphone/apple-iphone-17",
-        "Apple iPhone 17",
-        status=ga.GELESEN,
-        speicher=[ga.Option("256 GB", "256 GB")],
-        tarife=[ga.Option("O2 Mobile S mit 15 GB+", "x")],
-        laufzeiten=[ga.Option("24", "24")],
-    )
-    z = ga.Zaehlung("o2", TAG, f"{TAG}T23:10:00+00:00", seiten=[s], genannt=1)
-    z.kacheln = [ga.Kachel(s.url, s.titel)]
-    z.tarifuebersicht = [ga.Option("O2 Mobile Unlimited M", "o2-mobile-unlimited-m")]
-    ga.schreibe(tmp_path, z)
-    sig = Signale()
-    voll = baue(TAG, f"{TAG}T04:00:00+00:00", ist, {}, sig)
-    ein.haenge_ein(voll, tmp_path, TAG, ist, sig, katalog)
-    k = next(x for x in voll["anbieter"] if x["name"] == "o2")["ebenen"][
-        "kombinationen"
-    ]
-    assert [e["grund"] for e in k["nicht_verglichen"]] == [
-        "anderer Kaufweg (Tarifübersicht), nicht gezählt"
-    ]
-    assert (k["soll"], k["erfasst"], k["nicht_im_soll_zahl"]) == (1, 1, 0), (
-        k["soll"],
-        k["erfasst"],
-        k["nicht_im_soll_zahl"],
-        [e["schluessel"] for e in k["nicht_im_soll"]],
-    )
-
-
-def test_o2_tarifuebersicht_ausgefallen_dann_keine_preise_ohne_angebot_behaupten(
-    tmp_path, katalog
-):
-    """Die Tarifübersicht konnte nicht gelesen werden (benannter Ausfall). Die Ist-
-    Bündel des zweiten Kaufwegs (Tarif 'Unlimited M') dürfen dann nicht als 'Preise
-    ohne Angebot auf der Seite' gezählt werden: der Weg wurde nicht gelesen."""
-    sku = "apple-iphone-17-256gb-schwarz"
-
-    def bd(slug, name):
-        return {
-            "id": f"buendel--x--{sku}--{slug}--24m",
-            "sku_id": sku,
-            "anbieter": "o2",
-            "tarif_id": slug,
-            "tarif_name": name,
-            "laufzeit_monate": 24,
-            "abgerufen_am": TAG,
-            "quelle_url": "https://www.o2online.de/e-shop/x?tarif=o2-mobile-unlimited-m",
-        }
-
-    ist = [
-        bd("o2-mobile-s-mit-15-gb-24-mon", "O2 Mobile S mit 15 GB+ (24 Mon.)"),
-        bd(
-            "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon",
-            "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
-        ),
-    ]
-    s = ga.Seite(
-        "https://www.o2online.de/e-shop/smartphone/apple-iphone-17",
-        "Apple iPhone 17",
-        status=ga.GELESEN,
-        speicher=[ga.Option("256 GB", "256 GB")],
-        tarife=[ga.Option("O2 Mobile S mit 15 GB+", "x")],
-        laufzeiten=[ga.Option("24", "24")],
-    )
-    z = ga.Zaehlung("o2", TAG, f"{TAG}T23:10:00+00:00", seiten=[s], genannt=1)
-    z.kacheln = [ga.Kachel(s.url, s.titel)]
-    z.tarifuebersicht = None
-    z.tarifuebersicht_grund = "Tarifübersicht nicht gelesen: Timeout"
-    ga.schreibe(tmp_path, z)
-    sig = Signale()
-    voll = baue(TAG, f"{TAG}T04:00:00+00:00", ist, {}, sig)
-    ein.haenge_ein(voll, tmp_path, TAG, ist, sig, katalog)
-    k = next(x for x in voll["anbieter"] if x["name"] == "o2")["ebenen"][
-        "kombinationen"
-    ]
-    assert k["nicht_im_soll_zahl"] == 0, (
-        k["nicht_im_soll_zahl"],
-        [e["grund"] for e in k["nicht_im_soll"]],
-    )

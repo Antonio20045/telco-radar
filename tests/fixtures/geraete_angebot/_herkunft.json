@@ -302,16 +302,6 @@
    "sha256_roh": "4b51630c5b3aa6f01f25abc7566078efe135a6ce32bf9a7ffdec42aaf62dfa86"
   },
   {
-   "datei": "o2_tarifuebersicht.html.gz",
-   "url": "https://www.o2online.de/tarife/",
-   "abgerufen_am": "2026-11-21",
-   "werkzeug": "Playwright-Chromium, Kennung TelcoRadar/1.0, ein Abruf beim Befund berichte/o2-nicht-plus.md (Seite 2, 15:41:43 CET)",
-   "beleg": "DOM der Tarifübersicht (Reiter Neukunden), nichts angeklickt; Skripte, Stile, Bilder entfernt (BeautifulSoup decompose), sonst unverändert, gzip -9.",
-   "gzip": true,
-   "bytes_roh": 285345,
-   "sha256_roh": "b0504800a4dc4a9463bc5b73af49e555e7b18d2c609b16fc358271fdaa342fc3"
-  },
-  {
    "datei": "o2_iphone18promax_karussell.html.gz",
    "url": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
    "abgerufen_am": "2026-11-21",

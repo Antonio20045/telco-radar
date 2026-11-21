@@ -183,9 +183,7 @@ class Zaehlung:
     """Die Zählung eines Anbieters an einem Messtag (eine Datei). ``genannt`` ist die
     Trefferzahl, die die Übersicht selbst nennt; ``uebersicht_ende`` der Beleg, dass
     sie bis zum Ende gelesen wurde (kein Nachlade-Knopf mehr, Filterzahlen erreicht);
-    ``konkurrenz`` das Ergebnis der Prüfung auf parallele Läufe (``konkurrenz``).
-    ``tarifuebersicht`` (nur o2): Tarife mit „Handy hinzufügen“ der Tarifübersicht, ein
-    zweiter sichtbarer Kaufweg; ``None`` mit ``tarifuebersicht_grund`` bei Ausfall."""
+    ``konkurrenz`` das Ergebnis der Prüfung auf parallele Läufe (``konkurrenz``)."""
 
     schluessel: str
     messtag: str
@@ -200,8 +198,6 @@ class Zaehlung:
     sekunden_uebersicht: float | None = None
     uebersicht_ende: str | None = None
     konkurrenz: str | None = None
-    tarifuebersicht: list[Option] | None = None
-    tarifuebersicht_grund: str | None = None
 
     def als_dict(self) -> dict:
         """Die Datei als Dict (Format ``FORMAT``)."""
@@ -274,8 +270,6 @@ def aus_dict(daten: dict) -> Zaehlung:
     felder = {k: v for k, v in daten.items() if k != "format"}
     felder["kacheln"] = [Kachel(**k) for k in daten.get("kacheln") or ()]
     felder["seiten"] = [_seite(s) for s in daten.get("seiten") or ()]
-    if daten.get("tarifuebersicht") is not None:
-        felder["tarifuebersicht"] = [Option(**o) for o in daten["tarifuebersicht"]]
     try:
         return Zaehlung(**felder)
     except TypeError as fehler:

@@ -1,7 +1,12 @@
 """Reproduktionen des Prüfers zu PR 205, Runde 4 (``/tmp/pruefer/k205c``),
 übernommen; gegen den Stand ``efd265726`` rot. Soll allein aus der Produktseite,
 gescheiterte Klicks und ungelesene Zweitseiten machen die Auswahl „teilweise“,
-nicht verglichene Preise verbieten „vollständig“."""
+nicht verglichene Preise verbieten „vollständig“.
+
+Runde 5: Die Tests mit Kacheln der Tarifübersicht sind entfernt (Kaufweg entfällt);
+„nicht verglichene Preise verbieten vollständig“ prüft jetzt
+``test_geraete_angebot_pruefer205d.py`` mit einer teilweise gelesenen Auswahl.
+"""
 
 from __future__ import annotations
 
@@ -117,26 +122,6 @@ def test_o2_unlimited_m_ohne_plus_ist_nicht_unlimited_m_plus(tmp_path, katalog):
         [ga.Option("O2 Mobile Unlimited M Plus", "o2-mobile-unlimited-m-plus")],
     )
     assert k["nicht_im_soll_zahl"] == 1
-
-
-def test_mehrere_kacheln_passen_ist_nicht_eindeutig(tmp_path, katalog):
-    sku = "apple-iphone-17-256gb-schwarz"
-    ist = [
-        _bd(sku, "o2-mobile-s-mit-15-gb-24-mon", "O2 Mobile S mit 15 GB+ (24 Mon.)"),
-        _bd(
-            sku,
-            "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon",
-            "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
-        ),
-    ]
-    karten = [
-        ga.Option("O2 Mobile Unlimited M", "a"),
-        ga.Option("O2 Mobile Unlimited M mit 100 MBit/s", "b"),
-    ]
-    k, _ = _o2(tmp_path, ist, katalog, karten)
-    assert k["nicht_im_soll_zahl"] == 0
-    assert k["erfasst"] == 1, k["erfasst"]
-    assert k["nicht_verglichen_zahl"] == 1, k.get("nicht_verglichen_zahl")
 
 
 def test_teilweise_gelesene_auswahl_zaehlt_nicht(tmp_path, katalog):
@@ -285,25 +270,3 @@ def test_zweite_seite_desselben_geraets_nicht_gelesen_dann_kein_nicht_angeboten(
         "obwohl die zweite Seite des Geräts nicht gelesen wurde; "
         f"Zeile: {row['satz']} | {row['marke']}"
     )
-
-
-def test_nicht_verglichene_preise_verbieten_vollstaendig(tmp_path, katalog):
-    """Kachel-Zuordnung nicht eindeutig: 1 Preis ist 'nicht verglichen'. Die Zeile darf
-    dann nicht 'vollständig' heißen (alle Geräte gezählt, erfasst = Soll, aber ein
-    Preis ungeprüft)."""
-    sku = "apple-iphone-17-256gb-schwarz"
-    ist = [
-        _bd(sku, "o2-mobile-s-mit-15-gb-24-mon", "O2 Mobile S mit 15 GB+ (24 Mon.)"),
-        _bd(
-            sku,
-            "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon",
-            "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
-        ),
-    ]
-    karten = [
-        ga.Option("O2 Mobile Unlimited M", "a"),
-        ga.Option("O2 Mobile Unlimited M mit 100 MBit/s", "b"),
-    ]
-    k, row = _o2(tmp_path, ist, katalog, karten)
-    assert k["nicht_verglichen_zahl"] == 1
-    assert "vollständig" not in row["marke"], row["marke"]

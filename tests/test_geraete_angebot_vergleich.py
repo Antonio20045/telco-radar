@@ -118,7 +118,7 @@ def test_die_zeile_nennt_angebote_als_wichtigste_zahl():
     assert telekom["satz"] == (
         "Telekom: 4 von 8 Angeboten erfasst (1 von 45 Geräten gezählt)"
     )
-    assert telekom["marke"] == "4 Lücken"
+    assert telekom["marke"] == "Teilzählung · 4 Lücken"
     assert telekom["ebene"] == "angebote"
     assert {lu["grund"] for lu in telekom["luecken"]} == {
         "Bei Telekom nur mit 256 GB gelesen (21.11.2026)"
@@ -133,9 +133,9 @@ def test_angebotszeile_gegenprobe_und_tausendertrenner():
     k.update(soll=1262, erfasst=1240, luecken_zahl=22)
     satz = seite.zeilen(anders, TAG)["zeilen"][0]
     assert satz["zahl"] == "1\u202f240 von 1\u202f262"
-    assert satz["marke"] == "22 Lücken"
+    assert satz["marke"] == "Teilzählung · 22 Lücken"
     k.update(soll=1262, erfasst=1262, luecken_zahl=0)
-    assert seite.zeilen(anders, TAG)["zeilen"][0]["marke"] == ""
+    assert seite.zeilen(anders, TAG)["zeilen"][0]["marke"] == "Teilzählung"
     angebot = anders["vollstaendigkeit"]["anbieter"][0]["angebot"]
     angebot["geraete"] = {"soll": 1045, "gezaehlt": 1045}
     zeile = seite.zeilen(anders, TAG)["zeilen"][0]
@@ -193,6 +193,7 @@ def test_gerenderte_seite_zeigt_die_angebotszeile_aus_der_lauf_datei(tmp_path):
     assert (li["data-soll"], li["data-erfasst"]) == (str(k["soll"]), str(k["erfasst"]))
     assert li.select_one(".gr-vs-zahl").get_text() == "4 von 8"
     assert li.summary.get_text(" ", strip=True) == (
-        "Telekom: 4 von 8 Angeboten erfasst (1 von 45 Geräten gezählt) · 4 Lücken"
+        "Telekom: 4 von 8 Angeboten erfasst (1 von 45 Geräten gezählt)"
+        " · Teilzählung · 4 Lücken"
     )
     assert len(li.select(".gr-vs-luecken li")) == k["luecken_zahl"]

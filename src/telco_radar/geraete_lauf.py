@@ -87,6 +87,7 @@ def vorbehalte(zeile: dict) -> list[str]:
     geraete = angebot.get("geraete") or {}
     pruefungen = (
         ("keine Angebotszählung", k.get("soll") is None),
+        ("kein Angebot gezählt", k.get("soll") == 0),
         ("Ausfall vermerkt", bool(zeile.get("ausfall"))),
         (
             "Übersicht nicht ganz gelesen",
